@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "reference_id": "f0-20260912",
+  "baseline": {
+    "path": "docs/baseline-f0.json",
+    "sha256": "5828ae600458d09219df94d920193b7cd29c32530380284e616aef104755048d"
+  },
+  "runtime": {
+    "image": "ghcr.io/tonyd2wild/vllm-glm53-flash:sm121-v11-dflash2",
+    "image_digest": "ghcr.io/tonyd2wild/vllm-glm53-flash@sha256:4def0ef644cb2e9814136dcffd5e385e21bc594f48f3b292234051904abe85a6",
+    "vllm_commit": "487ecf187d3dfe74d2cf6119a92881dba403c219",
+    "model_runner": "vllm.v1.worker.gpu.model_runner.GPUModelRunner",
+    "model_revision": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "drafter_revision": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "gid_mode": "-1",
+    "launcher_observed_name": "launch-glm53-tp4-f0-20260906.sh",
+    "launcher_restore_name": "launch-glm53-tp4.sh",
+    "launcher_sha256": "4ee95668acba3aa7693c7cf1efa584499fead443cbb9498eeb18f18587d36401"
+  },
+  "nccl": {
+    "version": "v2.30.7-1",
+    "commit": "73cf112295c33aee2b895f329f592f2a9b4b0f97",
+    "path": "$HOME/nccl-patched/libnccl.so.2",
+    "size": 61581280,
+    "sha256": "1ddc3240396a9b3a1e4fa3e54e129d099261106ce3b9263ac3fdc3e070713bd5"
+  },
+  "artifacts": [
+    {
+      "path": "scripts/node/reference/f0-20260912.env",
+      "destination": "$HOME/tp4/scripts/node/reference/f0-20260912.env",
+      "mode": "0644",
+      "sha256": "0837ea1a359509cdc0cb27164265b5bd37ac9d46198d34ad0af7e9503eff59b7"
+    },
+    {
+      "path": "scripts/node/reference/tp4-autostart-f0-20260912.conf.example",
+      "destination": "render <USER>, then /etc/systemd/system/tp4-autostart.service.d/20-f0-reference.conf",
+      "mode": "0644",
+      "sha256": "43a4b828af8efe57dc2c95989d2e571fb454d2eaa4a91883f49374fbd9f6dfd7"
+    },
+    {
+      "path": "scripts/launcher/launch-glm53-tp4.sh",
+      "destination": "$HOME/tp4/launch-glm53-tp4.sh",
+      "mode": "0755",
+      "sha256": "4ee95668acba3aa7693c7cf1efa584499fead443cbb9498eeb18f18587d36401"
+    },
+    {
+      "path": "scripts/tp4ctl",
+      "destination": "$HOME/tp4/tp4ctl-f0-reference",
+      "mode": "0700",
+      "sha256": "6cb6f07cc60a13c86dfed8c01156c13d3f1fb88ca611bd499989841f96688a82"
+    },
+    {
+      "path": "scripts/node/patches/adaptive_k_scheduler.py",
+      "destination": "$HOME/patches/adaptive_k_scheduler.py",
+      "mode": "0644",
+      "sha256": "4cea8f55fa51b0371a52a4dd6eb5511ccb0bccbd81e435e6840f68f4ba641518"
+    },
+    {
+      "path": "scripts/node/moe-configs/E=288,N=512,device_name=NVIDIA_GB10,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "destination": "$HOME/tp4/moe-configs/E=288,N=512,device_name=NVIDIA_GB10,dtype=fp8_w8a8,block_shape=[128,128].json",
+      "mode": "0644",
+      "sha256": "e2d2f68d34ba9d0011c0b2ef48170781b4c7e609885cd4fb16d23221e795968b"
+    },
+    {
+      "path": "scripts/node/sparse_attn_indexer_kpool_sm121.py",
+      "destination": "$HOME/patches/sparse_attn_indexer_kpool.py",
+      "mode": "0644",
+      "sha256": "8a3ecfb0bab2441dd7417ed00a10d142191496149f88e5fe79fcfaea4b160980"
+    },
+    {
+      "path": "scripts/render_chat_template.py",
+      "destination": "$HOME/tp4/scripts/render_chat_template.py",
+      "mode": "0755",
+      "sha256": "2db3481f8c3df20374ae29e793a55846575a9e3828fbda818091d915eeeecaf1"
+    },
+    {
+      "path": "scripts/node/model-manifests/690b705278a3a58e538fcb37c2ca8b5f9511213c.json",
+      "destination": "$HOME/tp4/node/model-manifests/690b705278a3a58e538fcb37c2ca8b5f9511213c.json",
+      "mode": "0644",
+      "sha256": "a54618efecd3d0d9afbfd13e858b4217d2150c05dffa95caf8165e8e8cf5cca0"
+    },
+    {
+      "path": "scripts/node/nccl/nccl-v2.30.7-1-spark-switchless.patch",
+      "destination": "archive-only build input",
+      "mode": "0644",
+      "sha256": "94362fd42a42562931f60e18ca4d5d21ef8f6023a22d21a055fc0f8905e54a91"
+    },
+    {
+      "path": "scripts/node/nccl/SHA256SUMS",
+      "destination": "archive-only NCCL identity input",
+      "mode": "0644",
+      "sha256": "16a18020a9e2967bd3d60bdda9293fa78813e91c3c2f8612e50ac609d77999d5"
+    },
+    {
+      "path": "scripts/node/bootstrap/versions.env",
+      "destination": "archive-only host and image pin input",
+      "mode": "0644",
+      "sha256": "a117aa9a68b28cc0d6b6084a40d1c5c7025c508b7ce60565521c61c312b5d0a6"
+    }
+  ],
+  "known_observed_drift": [
+    "The serving F0 process was launched through the historical launcher filename; its bytes equal the canonical launcher hash above.",
+    "The installed ordinary tp4ctl may differ from the reference controller; coordinated restoration uses a verified regular-file copy.",
+    "The observed autostart unit does not select TP4_ENV. The prepared drop-in selects the frozen reference for a future approved restore.",
+    "Disk and systemd loaded state are recorded separately. Capture does not run daemon-reload or repair differences."
+  ]
+}

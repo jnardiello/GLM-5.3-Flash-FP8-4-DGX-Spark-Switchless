@@ -5,6 +5,12 @@ one-step rollback comments live in [`cluster.env.example`](../cluster.env.exampl
 host/software pins live in `scripts/node/bootstrap/versions.env`, model file manifests
 in `scripts/node/model-manifests/`, and NCCL pins in `scripts/node/nccl/`.
 
+The rollback-stable F0 runtime overlay and its public artifact manifest live in
+`scripts/node/reference/`. They freeze the non-site recipe used by the standing F0
+baseline independently of later `cluster.env` defaults. Resolved node topology and the
+observed host/runtime inventory remain only in a private mode-0600 archive produced by
+`scripts/f0-reference.py`; see [`operations.md`](operations.md#frozen-f0-rollback-reference).
+
 ## Current stack
 
 | Layer | Current component | Purpose and source |
@@ -36,6 +42,8 @@ Before a rank starts, the launcher requires:
 - the target model `config.json`;
 - the DFlash2 `model.safetensors`;
 - the patched `libnccl.so.2`;
+- an active IPv4-mapped RoCEv2 GID on every configured HCA, at the explicit index or
+  selected automatically when `NCCL_IB_GID_INDEX=-1`;
 - the sparse-attention indexer patch;
 - every bind-mount source named by `EXTRA_DOCKER_ENV`;
 - the configured image locally and the rank's management address on its selected
@@ -46,6 +54,12 @@ rank-local hardware overrides. Missing mount sources are fatal because Docker wo
 otherwise create a directory at the source path and start with a broken target.
 `scripts/verify-node.sh`, rather than the launcher, checks the pinned model revision
 marker and file manifest.
+
+The base production template keeps explicit GID index `3`. The frozen serving F0
+reference deliberately overrides it with automatic `-1` selection on all ranks; this
+is part of F0 identity, not a new template default. Automatic selection is otherwise an opt-in
+for hosts whose active HCA ports expose their addressed IPv4 RoCEv2 mappings at
+different indexes; it does not relax the `AF_INET` or RoCEv2 constraints.
 
 Runtime scratch and compile caches live outside the model directory. The page-cache
 flusher runs only while the weights load and is stopped after `/health` reaches 200.
@@ -88,6 +102,12 @@ GLM-5.3-Flash feature. The model's official reasoning controls are
 `reasoning_effort: low`, `high`, and `max`. Keep tests for both the unchanged upstream
 template and the local adapter in `scripts/tests/test-chat-template.py`; never describe
 historical runs as thinking-off unless the generated request and response prove it.
+
+An independent review closed a candidate defect that had been provisionally linked to
+this mechanism: a code-benchmark prose/format failure reproduces at a comparable rate on
+the same pinned model with zero local configuration, tracks how much the model reasons
+before answering rather than which component served it, and is not attributable to this
+adapter. See [`operations.md`](operations.md#e09-reasoning-diagnosis-attribution-closed-on-2026-09-17).
 
 ## Why these customizations remain
 

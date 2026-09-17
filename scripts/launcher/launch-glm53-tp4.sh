@@ -187,15 +187,17 @@ RANK=$((10#$RANK))   # normalize "03" -> 3 and keep the arithmetic below out of 
 [ "$RANK" -lt "$NNODES" ] || usage
 MIP=${_MGMT_IPS[$RANK]}
 MGMT_IF=$(resolve_rank_value "$RANK" MGMT_IF MGMT_IF_BY_RANK enP7s7)
+FABRIC_IFACES=$(resolve_rank_value "$RANK" FABRIC_IFACES FABRIC_IFACES_BY_RANK "enp1s0f0np0 enp1s0f1np1 enP2p1s0f0np0 enP2p1s0f1np1")
 NCCL_IB_HCA=$(resolve_rank_value "$RANK" NCCL_IB_HCA NCCL_IB_HCA_BY_RANK rocep1s0f0,rocep1s0f1)
 NCCL_IB_GID_INDEX=$(resolve_rank_value "$RANK" NCCL_IB_GID_INDEX NCCL_IB_GID_INDEX_BY_RANK 3)
 [[ "$MGMT_IF" =~ ^[A-Za-z0-9_.:-]+$ ]] \
   || { echo "[launch] ERROR: rank $RANK MGMT_IF is not a simple interface name" >&2; exit 1; }
 [[ "$NCCL_IB_HCA" =~ ^[A-Za-z0-9_.:-]+(,[A-Za-z0-9_.:-]+)+$ ]] \
   || { echo "[launch] ERROR: rank $RANK NCCL_IB_HCA must name at least two comma-separated HCAs" >&2; exit 1; }
-case "$NCCL_IB_GID_INDEX" in ''|*[!0-9]*)
-  echo "[launch] ERROR: rank $RANK NCCL_IB_GID_INDEX must be a non-negative integer" >&2; exit 1 ;;
-esac
+if [ "$NCCL_IB_GID_INDEX" != "-1" ] && ! [[ "$NCCL_IB_GID_INDEX" =~ ^[0-9]+$ ]]; then
+  echo "[launch] ERROR: rank $RANK NCCL_IB_GID_INDEX must be -1 or a non-negative integer" >&2
+  exit 1
+fi
 
 # Node-only checks: skipped in dry-run, which is meant to run off the nodes.
 if [ "$DRY_RUN" != "1" ]; then
@@ -206,6 +208,18 @@ if [ "$DRY_RUN" != "1" ]; then
     echo "[launch]        wrong rank for this node, or interface $MGMT_IF is missing." >&2
     exit 1
   fi
+
+  # -1 asks NCCL to select a GID per HCA port. Before Docker starts, require the same
+  # AF_INET/RoCEv2 candidates that the fixed environment below tells NCCL to use.
+  GID_CHECK="$ENV_DIR/scripts/nccl_gid_check.py"
+  [ -r "$GID_CHECK" ] \
+    || { echo "[launch] ERROR: NCCL GID checker missing: $GID_CHECK" >&2; exit 1; }
+  if ! GID_SELECTION=$(python3 "$GID_CHECK" --hcas "$NCCL_IB_HCA" \
+      --gid-index "$NCCL_IB_GID_INDEX" --fabric-ifaces "$FABRIC_IFACES"); then
+    echo "[launch] ERROR: rank $RANK NCCL HCA/GID preflight failed" >&2
+    exit 1
+  fi
+  echo "[launch] NCCL HCA/GID: $GID_SELECTION"
 
   # Preflight
   [ -f "$MODEL_DIR/config.json" ]        || { echo "[launch] ERROR: model missing: $MODEL_DIR/config.json — run scripts/fetch-fp8-weights.sh" >&2; exit 1; }
@@ -259,6 +273,47 @@ if [ -n "${EXTRA_DOCKER_ENV:-}" ]; then
   done
 fi
 
+# These selectors are validated as one coherent HCA/GID decision. Docker's -e/--env forms
+# (including bare host inheritance) must not replace or further filter that decision.
+protected_nccl_selector() {
+  case "$1" in
+    NCCL_IB_HCA|NCCL_IB_GID_INDEX|NCCL_IB_ROCE_VERSION_NUM|NCCL_IB_ADDR_FAMILY|NCCL_IB_ADDR_RANGE)
+      return 0 ;;
+    *) return 1 ;;
+  esac
+}
+reject_protected_env() {
+  local _spec=$1 _source=$2 _key
+  _key=${_spec%%=*}
+  if protected_nccl_selector "$_key"; then
+    echo "[launch] ERROR: EXTRA_DOCKER_ENV $_source must not set $_key; use the rank recipe or TP4_ENV" >&2
+    exit 1
+  fi
+}
+for _i in "${!_XDE[@]}"; do
+  _ENV_SPEC=""; _ENV_FILE=""
+  case "${_XDE[$_i]}" in
+    -e|--env) _ENV_SPEC=${_XDE[$((_i + 1))]:-} ;;
+    -e?*) _ENV_SPEC=${_XDE[$_i]#-e}; _ENV_SPEC=${_ENV_SPEC#=} ;;
+    --env=*) _ENV_SPEC=${_XDE[$_i]#--env=} ;;
+    --env-file) _ENV_FILE=${_XDE[$((_i + 1))]:-} ;;
+    --env-file=*) _ENV_FILE=${_XDE[$_i]#--env-file=} ;;
+  esac
+  [ -z "$_ENV_SPEC" ] || reject_protected_env "$_ENV_SPEC" "entry"
+  if [ -n "$_ENV_FILE" ]; then
+    _ENV_FILE=$(expand_home "$_ENV_FILE")
+    [ -r "$_ENV_FILE" ] \
+      || { echo "[launch] ERROR: cannot validate EXTRA_DOCKER_ENV --env-file: $_ENV_FILE" >&2; exit 1; }
+    while IFS= read -r _ENV_LINE || [ -n "$_ENV_LINE" ]; do
+      _ENV_LINE=${_ENV_LINE#"${_ENV_LINE%%[![:space:]]*}"}
+      case "$_ENV_LINE" in ''|'#'*) continue ;; esac
+      _ENV_KEY=${_ENV_LINE%%=*}
+      _ENV_KEY=${_ENV_KEY%"${_ENV_KEY##*[![:space:]]}"}
+      reject_protected_env "$_ENV_KEY" "--env-file $_ENV_FILE"
+    done <"$_ENV_FILE"
+  fi
+done
+
 if [ "$DRY_RUN" != "1" ]; then
   mkdir -p "$CACHE_DIR"
 
@@ -301,10 +356,6 @@ DOCKER_CMD=(
   -e NCCL_SKIP_TREE_CONNECT=1
   -e NCCL_NET=IB
   -e NCCL_IB_DISABLE=0
-  -e NCCL_IB_HCA="$NCCL_IB_HCA"
-  -e NCCL_IB_GID_INDEX="$NCCL_IB_GID_INDEX"
-  -e NCCL_IB_ROCE_VERSION_NUM=2
-  -e NCCL_IB_ADDR_FAMILY=AF_INET
   -e NCCL_IB_SUBNET_PREFIX_LEN=24
   -e NCCL_IB_SUBNET_AWARE_ROUTING=1
   -e NCCL_ALGO=Ring
@@ -338,11 +389,17 @@ DOCKER_CMD=(
   -e VLLM_CACHE_ROOT=/cache/vllm
 )
 # Word-split on purpose (see cluster.env): both are lists of docker arguments. _XDE is the
-# already-split, $HOME-expanded EXTRA_DOCKER_ENV from the preflight above, and it comes last
-# of the two, so it can override a fixed -e.
+# already-split, $HOME-expanded EXTRA_DOCKER_ENV from the preflight above. The four validated
+# HCA/GID selectors follow it so an extra -e cannot bypass the preflight.
 # shellcheck disable=SC2206
 DOCKER_CMD+=( $LONGLEN_ENV )
 [ "${#_XDE[@]}" -eq 0 ] || DOCKER_CMD+=( "${_XDE[@]}" )
+DOCKER_CMD+=(
+  -e NCCL_IB_HCA="$NCCL_IB_HCA"
+  -e NCCL_IB_GID_INDEX="$NCCL_IB_GID_INDEX"
+  -e NCCL_IB_ROCE_VERSION_NUM=2
+  -e NCCL_IB_ADDR_FAMILY=AF_INET
+)
 DOCKER_CMD+=(
   "$IMAGE" /model
   --served-model-name "$SERVED_NAME"

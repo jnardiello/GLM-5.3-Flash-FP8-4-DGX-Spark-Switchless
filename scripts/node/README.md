@@ -14,6 +14,7 @@ select the files explicitly.
 | `moe-configs/` | GB10 fused-MoE tuning JSON mounted into vLLM |
 | `nccl/` | pinned NCCL build, switchless overlay, shape/checksum record, and atomic installer |
 | `patches/` | container-side Python scheduler patch and CPU-only policy tests |
+| `reference/` | portable F0 runtime overlay, artifact pins and an autostart drop-in template rendered only into a private restore archive |
 | `flusher-unconditional.sh` | temporary page-cache flusher used while model weights load |
 | `sparse_attn_indexer_kpool_sm121.py` | SM121 sparse-attention patch deployed as `sparse_attn_indexer_kpool.py` |
 | `ssh-config.example` | optional workstation SSH alias example |
@@ -23,7 +24,7 @@ select the files explicitly.
 
 | Repository source | Node destination | Owner |
 | --- | --- | --- |
-| launcher, controller, flusher, model helpers | `~/tp4/` and `~/tp4/scripts/` | `scripts/deploy.sh` |
+| launcher, controller, flusher, model and NCCL GID helpers | `~/tp4/` and `~/tp4/scripts/` | `scripts/deploy.sh` |
 | `scripts/node/patches/*.py` except tests | `~/patches/` | `scripts/deploy.sh` |
 | sparse-attention patch | `~/patches/sparse_attn_indexer_kpool.py` | `scripts/deploy.sh` |
 | `scripts/node/moe-configs/*.json` | `~/tp4/moe-configs/` | `scripts/deploy.sh` |
@@ -34,6 +35,8 @@ select the files explicitly.
 | shared `scripts/node/etc/common/` files | `/etc/sysctl.d/`, `/etc/sudoers.d/`, `/usr/local/sbin/`, `/etc/systemd/system/` | bootstrap/deploy-host |
 | GRUB drop-in | `/etc/default/grub.d/zz-tp4-perf.cfg` | bootstrap/deploy-host and `tp4-iommu.sh` |
 | built NCCL library | `$NCCL_DIR/libnccl.so.2` | `scripts/node/nccl/install-nccl.sh` |
+| F0 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/f0-20260912.env` | `scripts/deploy.sh` |
+| F0 reference controller | `~/tp4/tp4ctl-f0-reference` | `scripts/deploy.sh` |
 
 `scripts/deploy.sh` and `scripts/deploy-host.sh` are additive. They copy and verify
 managed content but do not delete stray files or restart containers. The bootstrap
@@ -56,9 +59,9 @@ are also local and ignored; their `.example` files remain public templates.
 ## Runtime requirements
 
 The launcher refuses to start a rank until the model, drafter, patched NCCL library,
-sparse-attention patch, selected image, management address, and every bind-mount source
-exist. This prevents Docker from silently creating a directory where a missing mount
-source should have been a file.
+sparse-attention patch, selected image, management address, usable configured IPv4
+RoCEv2 GIDs, and every bind-mount source exist. This prevents Docker from silently
+creating a directory where a missing mount source should have been a file.
 
 Passwordless sudo is a runtime dependency: the controller and launcher invoke Docker,
 systemd, sysctl, and cache controls through `sudo -n`. The template grants

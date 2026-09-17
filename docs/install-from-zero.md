@@ -246,7 +246,7 @@ Starting and exposing the endpoint needs a separate serving-window approval:
 ```
 
 Expected: static verification passes; fabric-check sees two addressed MTU-9000 ports
-per node and eight successful jumbo pings; `/health` reaches 200; all four runtime
+per node and eight successful jumbo pings; `/health` reaches 200; all five runtime
 signatures in [`operations.md`](operations.md) are present. Run the
 [post-boot functional gates](operations.md#post-boot-functional-gates) within two
 minutes of readiness.

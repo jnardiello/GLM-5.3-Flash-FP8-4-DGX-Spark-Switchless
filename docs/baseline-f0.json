@@ -1,0 +1,225 @@
+{
+  "schema": 1,
+  "baseline_id": "F0",
+  "status": "frozen_historic_baseline",
+  "measured_on": "2026-09-11",
+  "comparison_id": "glm53-nq2-3x-20260911-v1",
+  "reuse_policy": "Use these fixed F0 medians for all future variant comparisons. Rerun or replacement requires an explicit owner request.",
+  "system": {
+    "model": "zai-org/GLM-5.3-Flash",
+    "model_revision": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "quantisation": "FP8 weights and FP8 activations",
+    "serving_engine": "vLLM from the pinned SM121 DFlash2 image",
+    "serving_image": "ghcr.io/tonyd2wild/vllm-glm53-flash@sha256:4def0ef644cb2e9814136dcffd5e385e21bc594f48f3b292234051904abe85a6",
+    "drafter": {
+      "model": "incoai/GLM-5.3-Flash-DFlash2",
+      "revision": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+      "draft_tokens": 5,
+      "adaptive_verification_tokens": [3, 5]
+    },
+    "hardware": "4 x ASUS Ascent GX10, each with one NVIDIA GB10 and 128 GB unified memory",
+    "topology": "TP4 across four nodes on a two-port ConnectX-7 switchless RoCE ring with four direct edges",
+    "context_limit_tokens": 262144,
+    "kv_cache": "fp8_e4m3 with a 17179869184-byte pool per rank",
+    "moe_backend": "Triton FP8 MoE with GB10 tuning table sha256:e2d2f68d34ba9d0011c0b2ef48170781b4c7e609885cd4fb16d23221e795968b",
+    "scheduler": "max sequences 6; max batched tokens 8192; AdaptiveKScheduler per request; async scheduling disabled",
+    "collectives": "NCCL v2.30.7-1 base commit 73cf112295c33aee2b895f329f592f2a9b4b0f97 with switchless-ring patch; NCCL_ALGO=Ring; F0 selects rank-local IPv4 RoCEv2 GIDs automatically with NCCL_IB_GID_INDEX=-1",
+    "nccl_ib_qps_per_connection": null
+  },
+  "rigmark": {
+    "version": "1.1.0",
+    "source": {
+      "revision": "c671b52a97f3cc01919c18d8d1f8e4f01243290c",
+      "repository_dirty": true,
+      "repository_source_sha256": "0f0d206ef0dbd315ad180425c55d719742dedfa9e0c97b6110c5aef9e5b6a183",
+      "repository_worktree_sha256": "2d890062dba7ae6ca09ca6e583d75c109c4b5355468e4990c4af1ed3741a511f"
+    },
+    "prompts": {
+      "version": "1.0.0",
+      "sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb"
+    },
+    "settings": {
+      "seed": 20260905,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "decode_tokens": 8192,
+      "runs": 5,
+      "prefill_depths": [8192, 32768, 65536],
+      "prefill_runs": 3,
+      "concurrency": [1, 2, 4],
+      "concurrency_runs": 3,
+      "concurrency_tokens": 256,
+      "concurrency_workload": "code",
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        },
+        "cache_salts": {
+          "F0-r1": "Ex1CMYpq5KncjVotlMp4qdKl4z7v-ER-",
+          "F0-r2": "LBZi78YJ3GK2_mkrKI1x_00a8s5puVPg",
+          "F0-r3": "Jx55tPimDN5L2DGtzxCK13XCmC3nF7yI"
+        }
+      }
+    }
+  },
+  "receipts": {
+    "F0-r1.json": "1a674199789345bad041606e4b9d72ff4aed2863cd909cf3e616b4b5b0bba2ee",
+    "F0-r2.json": "be15ae95337d288fadbccb1c7250b0dd2d7aaeb068575185eeffcb72be66cfd5",
+    "F0-r3.json": "2cb5f099279d0a09e42566b538f59b99539c97b70bd1de0ed9cd030e5548c323"
+  },
+  "performance": {
+    "aggregation": "median of the three native per-run medians",
+    "run_order": ["F0-r1", "F0-r2", "F0-r3"],
+    "metrics": [
+      {
+        "key": "code_decode_throughput",
+        "source_path": ["decode", "code", "decode_tokens_per_second", "median"],
+        "unit": "tokens_per_second",
+        "per_run": [50.401, 50.332, 50.672],
+        "median": 50.401
+      },
+      {
+        "key": "code_c1_aggregate_end_to_end_throughput",
+        "source_path": ["concurrency", "1", "aggregate_end_to_end_tokens_per_second", "median"],
+        "unit": "tokens_per_second",
+        "per_run": [37.223, 36.655, 38.031],
+        "median": 37.223
+      },
+      {
+        "key": "code_c2_aggregate_end_to_end_throughput",
+        "source_path": ["concurrency", "2", "aggregate_end_to_end_tokens_per_second", "median"],
+        "unit": "tokens_per_second",
+        "per_run": [54.515, 57.009, 57.705],
+        "median": 57.009
+      },
+      {
+        "key": "code_c4_aggregate_end_to_end_throughput",
+        "source_path": ["concurrency", "4", "aggregate_end_to_end_tokens_per_second", "median"],
+        "unit": "tokens_per_second",
+        "per_run": [71.084, 55.757, 75.74],
+        "median": 71.084
+      },
+      {
+        "key": "prose_decode_throughput",
+        "source_path": ["decode", "prose", "decode_tokens_per_second", "median"],
+        "unit": "tokens_per_second",
+        "per_run": [29.343, 29.22, 28.632],
+        "median": 29.22
+      },
+      {
+        "key": "code_ttft",
+        "source_path": ["decode", "code", "ttft_seconds", "median"],
+        "unit": "seconds",
+        "per_run": [0.412, 0.41, 0.41],
+        "median": 0.41
+      },
+      {
+        "key": "prose_ttft",
+        "source_path": ["decode", "prose", "ttft_seconds", "median"],
+        "unit": "seconds",
+        "per_run": [0.399, 0.397, 0.393],
+        "median": 0.397
+      },
+      {
+        "key": "code_c1_per_stream_ttft",
+        "source_path": ["concurrency", "1", "per_stream_ttft_seconds", "median"],
+        "unit": "seconds",
+        "per_run": [0.402, 0.404, 0.408],
+        "median": 0.404
+      },
+      {
+        "key": "code_c2_per_stream_ttft",
+        "source_path": ["concurrency", "2", "per_stream_ttft_seconds", "median"],
+        "unit": "seconds",
+        "per_run": [0.669, 0.576, 0.616],
+        "median": 0.616
+      },
+      {
+        "key": "code_c4_per_stream_ttft",
+        "source_path": ["concurrency", "4", "per_stream_ttft_seconds", "median"],
+        "unit": "seconds",
+        "per_run": [0.935, 5.712, 0.918],
+        "median": 0.935
+      },
+      {
+        "key": "prefill_8k_cold_throughput",
+        "source_path": ["prefill", "8192", "cold", "effective_prefill_tokens_per_second", "median"],
+        "unit": "tokens_per_second",
+        "per_run": [2117.775, 2110.641, 2112.218],
+        "median": 2112.218
+      },
+      {
+        "key": "prefill_8k_replay_throughput",
+        "source_path": ["prefill", "8192", "warm_replay", "effective_prefill_tokens_per_second", "median"],
+        "unit": "tokens_per_second",
+        "per_run": [4624.719, 4649.988, 4675.81],
+        "median": 4649.988
+      },
+      {
+        "key": "prefill_32k_cold_throughput",
+        "source_path": ["prefill", "32768", "cold", "effective_prefill_tokens_per_second", "median"],
+        "unit": "tokens_per_second",
+        "per_run": [2202.698, 2200.929, 2201.97],
+        "median": 2201.97
+      },
+      {
+        "key": "prefill_32k_replay_throughput",
+        "source_path": ["prefill", "32768", "warm_replay", "effective_prefill_tokens_per_second", "median"],
+        "unit": "tokens_per_second",
+        "per_run": [19597.266, 21604.301, 21524.192],
+        "median": 21524.192
+      },
+      {
+        "key": "prefill_64k_cold_throughput",
+        "source_path": ["prefill", "65536", "cold", "effective_prefill_tokens_per_second", "median"],
+        "unit": "tokens_per_second",
+        "per_run": [2201.282, 2193.392, 2208.969],
+        "median": 2201.282
+      },
+      {
+        "key": "prefill_64k_replay_throughput",
+        "source_path": ["prefill", "65536", "warm_replay", "effective_prefill_tokens_per_second", "median"],
+        "unit": "tokens_per_second",
+        "per_run": [36080.894, 35971.377, 35660.203],
+        "median": 35971.377
+      }
+    ]
+  },
+  "functional": {
+    "completed_runs": {
+      "count": 3,
+      "expected": 3
+    },
+    "measured_requests": {
+      "count": 162,
+      "per_run": [54, 54, 54]
+    },
+    "native_validation_errors": {
+      "count": 0,
+      "denominator": 162,
+      "per_run": [
+        {"count": 0, "denominator": 54},
+        {"count": 0, "denominator": 54},
+        {"count": 0, "denominator": 54}
+      ]
+    },
+    "code_length_caps": {
+      "count": 0,
+      "denominator": 15,
+      "per_run": [
+        {"count": 0, "denominator": 5},
+        {"count": 0, "denominator": 5},
+        {"count": 0, "denominator": 5}
+      ]
+    },
+    "code_completion_gate": {
+      "passed": 15,
+      "total": 15,
+      "per_run": [
+        {"passed": 5, "total": 5},
+        {"passed": 5, "total": 5},
+        {"passed": 5, "total": 5}
+      ]
+    }
+  }
+}

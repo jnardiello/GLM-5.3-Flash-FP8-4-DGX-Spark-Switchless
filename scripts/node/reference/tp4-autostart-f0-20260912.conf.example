@@ -1,0 +1,9 @@
+# Render <USER> into the private archive before installation. Install only in an
+# approved coordinated F0 restore after verifying both controller and overlay hashes.
+[Service]
+Environment=TP4_ENV=scripts/node/reference/f0-20260912.env
+Environment="TP4_HOSTS=<TP4_HOSTS>"
+ExecStart=
+ExecStart=/home/<USER>/tp4/tp4ctl-f0-reference up
+ExecStop=
+ExecStop=/home/<USER>/tp4/tp4ctl-f0-reference down

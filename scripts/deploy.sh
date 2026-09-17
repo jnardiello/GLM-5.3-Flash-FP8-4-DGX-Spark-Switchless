@@ -26,8 +26,9 @@ $USAGE
                    exec bit of every managed file ("STATE  <node>  <path>"). No scp, no chmod.
   --host <alias>   push to (or check) one node of NODES/TP4_HOSTS only
 
-Managed files: cluster.env, scripts/launcher/launch-glm53-tp4.sh, scripts/tp4ctl, the flusher,
-model fetch/helper/manifests, the indexer patch, scripts/node/patches/*.py (minus tests),
+Managed files: cluster.env, scripts/launcher/launch-glm53-tp4.sh, scripts/tp4ctl, the
+regular-file F0 reference controller, the flusher,
+model and NCCL GID helpers/manifests, the indexer patch, scripts/node/patches/*.py (minus tests),
 scripts/node/moe-configs/*.json, and the TP4_ENV overlay when set. Host assets:
 scripts/deploy-host.sh.
 EOF
@@ -79,15 +80,18 @@ FILES=(
   "cluster.env:tp4/cluster.env"
   "scripts/launcher/launch-glm53-tp4.sh:tp4/launch-glm53-tp4.sh"
   "scripts/tp4ctl:tp4/tp4ctl"
+  "scripts/tp4ctl:tp4/tp4ctl-f0-reference"
   "scripts/node/flusher-unconditional.sh:tp4/flusher-unconditional.sh"
   "scripts/node/sparse_attn_indexer_kpool_sm121.py:patches/sparse_attn_indexer_kpool.py"
   "scripts/fetch-fp8-weights.sh:tp4/scripts/fetch-fp8-weights.sh"
   "scripts/model_manifest.py:tp4/scripts/model_manifest.py"
+  "scripts/nccl_gid_check.py:tp4/scripts/nccl_gid_check.py"
   "scripts/render_chat_template.py:tp4/scripts/render_chat_template.py"
   "scripts/lib/common.sh:tp4/scripts/lib/common.sh"
 )
-EXECUTABLES="tp4/launch-glm53-tp4.sh tp4/tp4ctl tp4/flusher-unconditional.sh tp4/scripts/fetch-fp8-weights.sh tp4/scripts/model_manifest.py"
-SHELL_SCRIPTS="tp4/launch-glm53-tp4.sh tp4/tp4ctl tp4/flusher-unconditional.sh tp4/scripts/fetch-fp8-weights.sh tp4/scripts/lib/common.sh"
+EXECUTABLES="tp4/launch-glm53-tp4.sh tp4/tp4ctl tp4/tp4ctl-f0-reference tp4/flusher-unconditional.sh tp4/scripts/fetch-fp8-weights.sh tp4/scripts/model_manifest.py"
+REFERENCE_EXECUTABLES="tp4/tp4ctl-f0-reference"
+SHELL_SCRIPTS="tp4/launch-glm53-tp4.sh tp4/tp4ctl tp4/tp4ctl-f0-reference tp4/flusher-unconditional.sh tp4/scripts/fetch-fp8-weights.sh tp4/scripts/lib/common.sh"
 
 # Extra remote directories to create before scp (relative to $HOME).
 REMOTE_DIRS=(tp4 patches tp4/scripts tp4/scripts/lib tp4/node/model-manifests)
@@ -190,6 +194,8 @@ if [ "$CHECK" = 1 ]; then
       case "$pst" in
         PRESENT)
           if [ "$want" != "$got" ]; then st=DRIFT; rc=1
+          elif [[ " $REFERENCE_EXECUTABLES " == *" $dst "* ]] && [ "${pmode:-}" != 700 ]; then
+            st=MODE-DRIFT; rc=1
           elif [[ " $EXECUTABLES " == *" $dst "* ]] && [ $(( 8#${pmode:-0} & 0100 )) -eq 0 ]; then
             st=MODE-DRIFT; rc=1
           else st=OK
@@ -229,6 +235,8 @@ for host in "${HOSTS[@]}"; do
 
   ssh -n "${SSH_OPTS[@]}" "$host" "cd \"\$HOME\" && chmod +x $EXECUTABLES" \
     || { warn "$host: chmod +x failed"; rc=1; }
+  ssh -n "${SSH_OPTS[@]}" "$host" "cd \"\$HOME\" && chmod 0700 $REFERENCE_EXECUTABLES" \
+    || { warn "$host: reference controller mode failed"; rc=1; }
 
   log "sha256 verification"
   for entry in "${FILES[@]}"; do

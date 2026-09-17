@@ -62,8 +62,9 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# Verification needs site values, while --help must remain usable from a fresh checkout.
-tp4_load_env "$REPO" --require
+# Verification needs the same effective recipe as the launcher, while --help must remain
+# usable from a fresh checkout. TP4_ENV stays opt-in and is sourced after the base recipe.
+tp4_load_env "$REPO" --require --overlay
 
 read -r -a HOSTS <<<"${TP4_HOSTS:-$NODES}"
 read -r -a NODE_ALIASES <<<"$NODES"
@@ -126,6 +127,9 @@ NCCL_SHA_SRC="scripts/node/nccl/SHA256SUMS"
 [ -f "$REPO/scripts/node/nccl/SHA256SUMS" ] || die "scripts/node/nccl/SHA256SUMS missing: it is the only source for the patched NCCL sha"
 NCCL_SHA=$(awk '/libnccl\.so\.2/{print $1; exit}' "$REPO/scripts/node/nccl/SHA256SUMS")
 [ -n "$NCCL_SHA" ] || die "no libnccl.so.2 line in scripts/node/nccl/SHA256SUMS"
+GID_CHECK="$REPO/scripts/nccl_gid_check.py"
+[ -r "$GID_CHECK" ] || die "scripts/nccl_gid_check.py missing"
+GID_CHECK_SHA=$(shasum -a 256 "$GID_CHECK" | awk '{print $1}')
 
 # sysctl expectations: every `key=value` line of the two drop-ins.
 SYSCTL_EXPECT=$(cat "$REPO"/scripts/node/etc/common/98-tp4-fabric.conf "$REPO"/scripts/node/etc/common/99-tp4-vm.conf 2>/dev/null \
@@ -221,19 +225,18 @@ fi
 say rdma "$(dpkg-query -W -f='${Version}' rdma-core 2>/dev/null)"
 say holds "$(apt-mark showhold 2>/dev/null | tr '\n' ' ')"
 say mgmt "$(ip -4 -o addr show dev "$P_MGMT_IF" 2>/dev/null | awk '{print $4}' | tr '\n' ' ')"
-bad_rdma=""
-oldifs=$IFS; IFS=,; set -- $P_HCAS; IFS=$oldifs
-for h in "$@"; do
-  [ -d "/sys/class/infiniband/$h" ] || { bad_rdma="$bad_rdma $h(absent)"; continue; }
-  gid_ok=0
-  for port in /sys/class/infiniband/"$h"/ports/*; do
-    [ -d "$port" ] || continue
-    type=$(cat "$port/gid_attrs/types/$P_GID" 2>/dev/null || true)
-    [ "$type" = "RoCE v2" ] && gid_ok=1
-  done
-  [ "$gid_ok" = 1 ] || bad_rdma="$bad_rdma $h(gid-$P_GID-not-RoCE-v2)"
-done
-say rdma_selection "${bad_rdma:-ok}"
+gid_checker="$HOME/tp4/scripts/nccl_gid_check.py"
+gid_checker_sha=$(sha256sum "$gid_checker" 2>/dev/null | awk '{print $1}')
+if [ "$gid_checker_sha" != "$P_GID_CHECK_SHA" ]; then
+  say rdma_selection "GID checker missing or drifted"
+  say rdma_selection_detail "expected deployed scripts/nccl_gid_check.py"
+else
+  gid_detail=$(python3 "$gid_checker" --hcas "$P_HCAS" --gid-index "$P_GID" \
+    --fabric-ifaces "$P_IFACES" 2>&1)
+  gid_rc=$?
+  if [ "$gid_rc" = 0 ]; then say rdma_selection ok; else say rdma_selection "$gid_detail"; fi
+  say rdma_selection_detail "$gid_detail"
+fi
 for kv in $P_SYSCTL; do say "sysctl:${kv%%=*}" "$(sysctl -n "${kv%%=*}" 2>/dev/null)"; done
 say unit "$(systemctl is-enabled tp4-fabric-iptables 2>&1 | tail -1)/$(systemctl is-active tp4-fabric-iptables 2>&1 | tail -1)"
 fabric_reload=$(systemctl show tp4-fabric-iptables -p NeedDaemonReload --value 2>/dev/null || echo unknown)
@@ -297,6 +300,7 @@ probe_host() {
   PROBE=$(bounded "$PROBE_TIMEOUT" ssh "${SSH_OPTS[@]}" "$host" "env \
       P_SYSCTL='$SYSCTL_EXPECT' P_IFACES='$FAB_IFACES' P_MODEL='$MODEL_DIR' P_DRAFT='$DRAFT_DIR' \
       P_MGMT_IF='$RESOLVED_MGMT_IF' P_HCAS='$RESOLVED_HCAS' P_GID='$RESOLVED_GID' \
+      P_GID_CHECK_SHA='$GID_CHECK_SHA' \
       P_RANK='$RESOLVED_RANK' \
       P_NCCL='$NCCL_DIR' P_IMAGE='$IMAGE' P_CONTAINER='$CONTAINER' P_MOUNTS='$MOUNT_SRCS' bash -s" \
       <"$PROBE_SCRIPT") || return 1
@@ -369,7 +373,7 @@ check_node() {   # check_node <host> <rank>
 
   v=$(pv rdma_selection); rc=1; [ "$v" = ok ] && rc=0
   verdict "$host" "NCCL HCA/GID" $rc \
-    "$([ "$rc" = 0 ] && echo "$RESOLVED_HCAS at RoCEv2 GID index $RESOLVED_GID" || echo "$v")"
+    "$([ "$rc" = 0 ] && pv rdma_selection_detail || echo "$v")"
 
   # rdma-core: the major version is what versions.env pins (RDMA_CORE_MIN).
   v=$(pv rdma); w=${v%%[!0-9]*}; rc=1

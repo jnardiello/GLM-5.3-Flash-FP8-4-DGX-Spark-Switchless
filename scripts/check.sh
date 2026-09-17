@@ -16,8 +16,11 @@ public_path() {
 
 required=(
   scripts/tp4ctl
+  scripts/check-f0.py
+  scripts/f0-reference.py
   scripts/launcher/launch-glm53-tp4.sh
   scripts/agent-preflight.sh
+  scripts/nccl_gid_check.py
   scripts/bootstrap-node.sh
   scripts/deploy.sh
   scripts/deploy-host.sh
@@ -57,6 +60,8 @@ echo "python-ast: PASS ($python_count files)"
 python3 scripts/check_markdown_links.py
 
 ./scripts/tp4ctl --help >/dev/null
+python3 scripts/check-f0.py --help >/dev/null
+python3 scripts/f0-reference.py --help >/dev/null
 ./scripts/deploy.sh --help >/dev/null
 ./scripts/deploy-host.sh --help >/dev/null
 ./scripts/bootstrap-node.sh --help >/dev/null
@@ -72,6 +77,10 @@ doc_count=$(find docs -type f -name '*.md' | wc -l | tr -d ' ')
 [ "$doc_count" = 4 ] || { echo "check: docs/ must contain exactly 4 Markdown files (got $doc_count)" >&2; exit 1; }
 
 ./scripts/tests/test-agent-preflight.sh
+python3 scripts/tests/test-nccl-gid-selection.py
+python3 scripts/tests/test-sircl-gid-selection.py
+python3 scripts/tests/test-check-f0.py
+python3 scripts/tests/test-f0-reference.py
 ./scripts/tests/test-host-lifecycle.sh
 bash ./scripts/tests/test-controller-lifecycle.sh
 python3 scripts/tests/test-model-snapshot.py

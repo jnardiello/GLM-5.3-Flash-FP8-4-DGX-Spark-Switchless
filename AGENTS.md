@@ -24,6 +24,65 @@ document for the requested task before substantive work:
 - A `TP4_ENV` file is a delta sourced after `cluster.env`; use the same value for
   every command in its window, including `down`. Never override `CONTAINER`.
 
+## Optimization workflow
+
+Use the independent Rigmark suite at `~/workspace/jacopo/rigmark` directly as the
+benchmark interface. Do not recreate it with private wrapper scripts, blanket campaign
+qualification prerequisites, or a parallel benchmark/admission framework; necessary
+measurement fixes belong in Rigmark.
+
+Run one experiment at a time. Use the frozen historic F0 baseline recorded in
+[`docs/baseline-f0.json`](docs/baseline-f0.json) for every future comparison; its three
+native Rigmark runs and fixed medians are the standing reference. Do not rerun or replace
+that baseline without an explicit owner request. Use `scripts/check-f0.py` for a fast,
+read-only operational F0 check; it does not rerun Rigmark or send inference requests.
+Agree the variant repetition count with
+the owner only when explicit later direction changes the standing protocol. By default,
+run every variant three consecutive times. Manually apply it to all four Beast nodes in
+one coordinated transition, load its weights once, and preserve that process across all
+three runs. Use the same Rigmark version, suites, prompts, and parameters under comparable
+idle, warmup, and cache conditions.
+
+For every performance metric, compare the fixed F0 median with the median of the three
+native per-run variant values. Label the actual variant run and request counts. Keep
+correctness and error results as explicit counts or totals with denominators rather than
+medians. The results report requires fixed-baseline and variant-median columns; delta
+columns and a separate statistical framework are not required. Judge prefill and
+generation throughput, TTFT, concurrency, and functional results beyond measured noise,
+with no fixed percentage floor. Record commands, configuration, results, and failures,
+then classify the outcome as promote, discard, or unresolved. Restore the reference when
+discarded or unresolved unless the next candidate is already prepared and authorized.
+An owner stop may end the three-run series early; report the actual run and request counts
+and do not claim a three-run median. A direct transition to the next candidate needs no
+intermediate F0 reload: derive its complete recipe from F0, remove the previous delta, and
+use the usual coordinated four-rank transition and functional gates. Continue to compare
+against the fixed F0 medians. Restore F0 whenever work stops without a prepared next
+candidate.
+
+A promote decision requires encoding the tested change in existing repository IaC;
+update the relevant documentation, rollback guidance, and changelog; reapply it through
+IaC from the reference; and verify actual configuration, cluster gates, and Rigmark
+reproduce the manual result before committing within the session's explicit
+authorization. Finish the experiment, then agree the next one with the owner.
+
+Rank success by these criteria:
+
+1. Agentic code generation C1 and parallel work with two to four agents are primary.
+   Repeatable gains beyond measured noise in code or concurrency may justify unchanged
+   or slightly slower prose. Do not silently trade a measured regression in one primary
+   code or concurrency metric for another; record conflicting primary outcomes as
+   `decision_required` unless existing owner direction resolves them.
+2. Prose gains qualify only when code and parallel performance remain unchanged within
+   measurement uncertainty.
+3. Structured-generation speed is diagnostic and never qualifies a variant by itself.
+4. Prefill gains are welcome only without regressions beyond noise in higher-priority
+   code, concurrency, or prose metrics, subject to the explicit code-led prose exception
+   above.
+
+Correctness, transport and error integrity, and healthy four-rank operation are required
+gates and cannot be traded for speed. Record every tradeoff explicitly; marginal or
+inconclusive results remain unresolved.
+
 ## Work rules
 
 Inspect before editing and preserve unrelated work. Local code and documentation
