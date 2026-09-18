@@ -1,7 +1,8 @@
 # Agent entry point
 
-This repository controls a four-node TP4 GLM-5.3-Flash cluster. Read the one
-document for the requested task before substantive work:
+This public repository distributes a general purpose installer for GLM-5.3-Flash
+on four DGX Spark nodes using TP4. Read the one document for the requested task
+before substantive work:
 
 | Task | Required document |
 | --- | --- |
@@ -10,6 +11,20 @@ document for the requested task before substantive work:
 | Cabling, addressing, MTU, RoCE, HCA/GID or NCCL failure | [`docs/fabric.md`](docs/fabric.md) |
 | Current model, image, scheduler, patches or host recipe | [`docs/production-recipe.md`](docs/production-recipe.md) |
 | Local code or documentation only | relevant row above, then `CHANGELOG.md` and `./scripts/check.sh`; do not probe the cluster automatically |
+
+## Public purpose and documentation
+
+Write repository documentation for external users installing and operating their own
+cluster. Public guides must stand on their own, with reusable instructions, explicit
+prerequisites and configurable examples that do not depend on the maintainer's site
+or knowledge of previous agent sessions.
+
+Before saving documentation, distinguish reusable product guidance from local working
+notes. Keep site addresses, host aliases, private paths, session chronology, incident
+receipts and experiment diaries in ignored local files or private archives outside the
+checkout. Bring generally applicable lessons into the public guides as concise operating
+instructions; keep the detailed local history in those private records. Apply this
+principle to new documentation and updates to existing files, including the changelog.
 
 ## Sources of truth
 

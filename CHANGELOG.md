@@ -30,6 +30,8 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- Clarified the repository's public installer purpose and documentation rules: write
+  reusable guides for external DGX Spark TP4 users and keep local operational history private.
 - Made Current the base IaC configuration, with no experiment overlay required:
   SparkCache enabled, automatic NCCL GID selection, explicit B12X attention and Triton
   compute backends, a separate FP8 drafter cache type, and documented Previous rollback.
