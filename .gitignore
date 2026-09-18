@@ -5,6 +5,13 @@ __pycache__/
 .ruff_cache/
 .claude/settings.local.json
 
+# Internal working documents; retained locally, excluded from public documentation.
+/HANDOVER.md
+/OPTIMIZATION-PLAN.md
+/E09-ROOT-CAUSE-ANALYSIS-2026-09-17.md
+/E09-QUALIFICATION-2026-09-17.md
+/OPERATIONS-HISTORY.md
+
 # --- Site configuration: created by the user from public templates, never committed.
 /cluster.env
 # Per-node netplan directories (one per alias). The template and the shared/common

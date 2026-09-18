@@ -139,7 +139,7 @@ library exists and the candidate fails, leave the cluster down.
 
 ## 5. Pull the container image
 
-The exact image is owned by `IMAGE` in `cluster.env`. The F1 lane pins it by registry
+The exact image is owned by `IMAGE` in `cluster.env`. The Current configuration pins it by registry
 digest, and `IMAGE_ID` pins the content ID the launcher must find locally:
 
 ```sh
@@ -218,7 +218,7 @@ approved use, the revision differs, or any node is incomplete.
 
 ## 8. Place the SparkCache and SIRCL payload
 
-The F1 lane (`SPARKCACHE_MODE=on`) needs two operator-provided sets of files that carry
+The Current configuration (`SPARKCACHE_MODE=on`) needs two operator-provided sets of files that carry
 no license and are therefore neither tracked nor fetched by this repository: the
 SparkCache connector module, and the SIRCL bundle and runtime. Obtain them from the
 owner's private archive and place them on every rank with the deployment account:

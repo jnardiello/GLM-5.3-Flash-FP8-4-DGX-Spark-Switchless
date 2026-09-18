@@ -84,7 +84,7 @@ RoCEv2 GID present on each rank. Stop and report if the addressed port set is wr
 any port is MTU 1500, speed or RDMA/HCA/GID state differs, a jumbo ping fails, or a
 rank is unreachable. Do not start TP4 and do not repair one serving rank in isolation.
 
-`NCCL_IB_GID_INDEX` accepts a non-negative explicit index or the opt-in sentinel `-1`.
+`NCCL_IB_GID_INDEX` accepts a non-negative explicit index or the automatic-selection sentinel `-1`.
 With `-1`, pinned NCCL selects per HCA port while the launcher continues to constrain
 selection to `NCCL_IB_ADDR_FAMILY=AF_INET` and `NCCL_IB_ROCE_VERSION_NUM=2`. Before a
 rank starts, and during static verification, every configured HCA must have an active
@@ -92,25 +92,30 @@ port with a RoCEv2 GID that is IPv4-mapped, names a configured fabric netdev, an
 exactly matches an IPv4 address on that netdev. A link-local RoCEv2 entry alone does
 not pass. This follows NVIDIA's [automatic GID selection guidance](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/troubleshooting/networking_troubleshooting.html).
 
-The default remains explicit index `3`. Use `-1` only as a deliberate recipe or
-`TP4_ENV` override when valid indexes differ between selected ports. Roll back by
-restoring the previously verified non-negative scalar or four per-rank entries, using
-the same overlay for `down` before returning to the base recipe.
+Current selects `-1` by default; the Previous base configuration used explicit index
+`3`. Verify the actual addressed ports and their GIDs before selecting an explicit
+index. For rollback, use the values documented in `cluster.env.example`, keeping the
+same `TP4_ENV` for `down` when leaving an overlay.
 
 Keep `NCCL_RELAY_ENABLE` unset with automatic GID selection. The optional compiled
 relay discovery still probes explicit index `3`; it is inert in this production recipe.
 
+### Verify SIRCL GID selections
+
 SIRCL selects its own explicit `SPARK_TP4_DEVICE0/1` and `SPARK_TP4_GID0/1` from
 the mounted serving runtime; NCCL automatic selection does not update them. For
-the experimental single-rail profile, source that runtime and run
+the Current single-rail profile, source that runtime and run
 `python3 -S scripts/sircl_gid_check.py --fabric-ifaces <edge0-netdev> <edge1-netdev>`
 before loading weights. The checker requires active Ethernet port 1, IPv4 RoCEv2,
 the expected netdev and its primary IPv4, and a distinct peer in that edge's subnet.
 It uses read-only Linux interface ioctls, so the serving image needs no `ip` utility.
 It rejects stale selections without replacing them. Hash the complete SIRCL bundle
 and runtime, then check the native capability records from all four ranks in the
-actual image without mounting model weights. See the
-[September 17 recovery](operations.md#e09-sircl-gid-recovery-on-2026-09-17).
+actual image without mounting model weights when qualifying a changed payload.
+A successful jumbo ping does not prove that SIRCL selected a valid GID. Keep the
+runtime selections and their site-specific hashes consistent; never change a manifest
+merely to accept an unexpected file. See the
+[payload installation procedure](install-from-zero.md#8-place-the-sparkcache-and-sircl-payload).
 
 ## Why patched NCCL is required
 
@@ -141,5 +146,5 @@ preserved in [`CREDITS.md`](../CREDITS.md).
 | Wrong-but-present NCCL library | Compare every node to `scripts/node/nccl/SHA256SUMS` | Re-run the atomic installer, then perform an approved full restart and gates |
 
 After any repair, require the static verifier, fabric-check, a full-cluster boot, the
-[post-boot functional gates](operations.md#post-boot-functional-gates), and all five
+[post-boot functional gates](operations.md#post-boot-functional-gates), and all six
 runtime signatures before declaring recovery.

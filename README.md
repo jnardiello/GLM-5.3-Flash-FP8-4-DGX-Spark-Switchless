@@ -2,48 +2,69 @@
 
 [![Follow me on X](https://img.shields.io/badge/Follow%20me%20on%20X-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/jnardiello)
 
-This repository installs and operates one vLLM tensor-parallel cluster serving
-GLM-5.3-Flash FP8 across four NVIDIA GB10 systems. Four verified ASUS Ascent GX10
-nodes connect directly through a switchless ConnectX-7 RoCE fabric with no dedicated
-network switch. Management and API access use a separate Ethernet or trusted VPN
-path. Other GB10 systems may need different interface, HCA, GID, renderer, or package
-settings.
+Run GLM-5.3-Flash FP8 with vLLM across four NVIDIA GB10 systems, connected directly
+through a switchless ConnectX-7 RoCE ring. This repository provides the configuration,
+installation scripts, runtime patches, and operating procedures for the cluster.
 
-**Configured context window: 256K (262,144 tokens).** See `MAX_MODEL_LEN` in
-[`cluster.env.example`](cluster.env.example).
+GLM-5.3-Flash is my daily driver for heavy coding workloads and parallel agent use.
+The deployment is tuned for code generation and concurrent requests, with a
+**256K context window (262,144 tokens)**. The verified hardware is four ASUS Ascent
+GX10 nodes; other GB10 systems may need different hardware and host settings.
 
-## Current recipe: F1
+## Current configuration
 
-The production recipe is **F1** (promoted 2026-09-18): the SparkRing/SparkCache vLLM
-image pinned by registry digest, a persistent SparkCache prefix cache over the SIRCL
-single-rail prefill transport, and DFlash2 speculative decoding with batch-uniform
-adaptive verification length. Medians of three native
-[Rigmark](https://github.com/alexellis/rigmark) runs, frozen in
-[`docs/baseline-f1.json`](docs/baseline-f1.json), against the previous F0 recipe:
+- **Model:** GLM-5.3-Flash FP8, tensor-parallel across four GPUs.
+- **Engine:** SparkRing/SparkCache vLLM image pinned by registry digest.
+- **Prefix reuse:** persistent SparkCache storage for long shared contexts.
+- **Speculative decoding:** DFlash2 with an adaptive verification length shared by
+  every request in a batch (`batch-uniform`).
+- **Communication:** SIRCL single-rail prefill transport and patched NCCL for the
+  switchless ring.
+
+The current configuration is the default in
+[`cluster.env.example`](cluster.env.example). The
+[production recipe](docs/production-recipe.md) explains its components and rollback.
+
+The SparkCache connector and SIRCL bundle/runtime are operator-supplied files, pinned
+by SHA-256 but not redistributed here. Read the
+[payload installation step](docs/install-from-zero.md#8-place-the-sparkcache-and-sircl-payload)
+and [third-party terms](CREDITS.md) before setting up this configuration. The DFlash2
+checkpoint used by this recipe carries non-commercial terms.
+
+## Measured performance
+
+**Current** is the configuration qualified on September 18, 2026. **Previous** is the
+configuration measured on September 11, before SparkCache and batch-uniform adaptive
+verification became the defaults. Each column reports medians across three native
+[Rigmark](https://github.com/alexellis/rigmark) runs from the same workstation.
 
 <div align="center">
 
-| Workload | F0 | F1 |
+| Workload | Previous | Current |
 | --- | ---: | ---: |
-| Code decode, one agent | 50.4 tok/s | 51.8 tok/s |
-| Code, four parallel agents (aggregate) | 71.1 tok/s | 84.1 tok/s |
-| Code, four agents, per-stream TTFT | 0.94 s | 0.60 s |
+| Code decode, one request | 50.4 tok/s | 51.8 tok/s |
+| Code, one request (end-to-end) | 37.2 tok/s | 38.4 tok/s |
+| Code, two concurrent requests (aggregate, end-to-end) | 57.0 tok/s | 57.4 tok/s |
+| Code, four concurrent requests (aggregate, end-to-end) | 71.1 tok/s | 84.1 tok/s |
+| Code, four concurrent requests, per-stream TTFT | 0.94 s | 0.60 s |
 | Prose decode | 29.2 tok/s | 30.3 tok/s |
 | Prefill 8K / 32K, cached prefix replay | 4.6k / 21.5k tok/s | 9.7k / 32.0k tok/s |
 | Prefill 64K, cold | 2.2k tok/s | 2.3k tok/s |
 
 </div>
 
-The SparkCache connector and the SIRCL bundle/runtime are third-party files without a
-license: this repository pins them by SHA-256 but does not ship them. Place them on the
-nodes as described in
-[`docs/install-from-zero.md`](docs/install-from-zero.md#8-place-the-sparkcache-and-sircl-payload),
-or roll back to the F0 lane with the values named in `cluster.env.example`.
+Decode throughput measures generation after the first token; end-to-end throughput
+includes the initial wait. TTFT is time to first token. Concurrent-request tests use
+up to 256 output tokens per request, while the long decode tests allow up to 8192.
+These are inference benchmarks; they do not measure complete agent tasks. Cold prefill
+processes a new prefix, while replay reuses a cached prefix; each run uses a fresh
+`cache_salt`.
 
-## Assumptions
-
-GLM-5.3-Flash is my daily driver for heavy coding workloads and extensive parallel
-subagent use. This repository configures the deployment for those workloads.
+The [current baseline](docs/baseline-f1.json) and
+[previous baseline](docs/baseline-f0.json) contain all metrics, per-run values, settings,
+and evidence hashes. Current qualification completed 162/162 requests with zero errors.
+The [qualification summary](docs/production-recipe.md#qualification-and-reproduction)
+also records reproduction through the repository's deployment scripts.
 
 ## Hardware
 
@@ -59,57 +80,32 @@ subagent use. This repository configures the deployment for those workloads.
 
 </div>
 
-All site addresses and hardware selections belong in the gitignored `cluster.env`.
-[`cluster.env.example`](cluster.env.example) is the annotated source for every
-public recipe value and its rollback.
+Site addresses and hardware selections belong in the gitignored `cluster.env`, created
+from the public template. The API and fabric require a trusted private network. The
+API has no authentication, TLS, rate limit, or caller isolation; use a trusted VPN or
+an authenticating reverse proxy for access beyond that network.
 
 ## Start here
 
-An agent must read [`AGENTS.md`](AGENTS.md) first. For a new installation, follow
-[`docs/install-from-zero.md`](docs/install-from-zero.md) in order. For an existing
-cluster, begin with the read-only status procedure in
-[`docs/operations.md`](docs/operations.md).
+For installation, begin with four hosts running Ubuntu, NVIDIA drivers, Docker with
+GPU support, and `rdma-core`, then follow the installation guide in order. It covers
+preflight, site configuration, bootstrap, images, weights, payload, deployment, and
+post-boot verification. For an existing cluster, begin with the operations guide.
+Agents working in this repository must read [AGENTS.md](AGENTS.md) first.
 
-The public API is OpenAI compatible and is exposed by rank 0. It has no API key,
-TLS, rate limit, or caller isolation. Keep the management network and all four
-fabric links private; expose the endpoint only through a trusted VPN or an
-authenticating reverse proxy. The deployment account receives passwordless sudo
-because Docker, systemd, network setup, and cache management require it.
-
-The shortest safe sequence for a new checkout is:
-
-```sh
-TP4_HOSTS='user@node0 user@node1 user@node2 user@node3' \
-  ./scripts/agent-preflight.sh --report /tmp/tp4-preflight.json
-
-cp cluster.env.example cluster.env
-$EDITOR cluster.env
-./scripts/render-netplan.sh --write
-```
-
-The public checkout intentionally has no `cluster.env`. The user creates this required,
-gitignored site file from the template after the targeted read-only preflight, which
-uses explicit `TP4_HOSTS`. Run documented shell blocks with Bash because several
-procedures use Bash arrays and loops.
-
-Review the proposed rank and cable map before changing any node. With an approved
-installation window, complete the bootstrap, NCCL, image, weight, and payload steps in
-the installation guide. With a separately approved serving window:
-
-```sh
-./scripts/verify-node.sh
-./scripts/tp4ctl fabric-check
-./scripts/tp4ctl up
-./scripts/tp4ctl health
-```
-
-`/health` returning 200 is the readiness signal. `/v1/models` may answer while the
-engine is still loading. A cold start takes roughly 16 minutes on the verified
-hardware; do not issue a second `up` while it is loading.
+| Goal | Guide |
+| --- | --- |
+| Install on prepared hosts | [Install from zero](docs/install-from-zero.md) |
+| Inspect, deploy, start, stop, recover, or roll back | [Operations](docs/operations.md) |
+| Cable, configure, or diagnose the RoCE ring | [Fabric](docs/fabric.md) |
+| Understand the current components and customizations | [Production recipe](docs/production-recipe.md) |
+| Understand files installed on the nodes | [Node assets](scripts/node/README.md) |
+| Build and install patched NCCL | [NCCL guide](scripts/node/nccl/README.md) |
 
 ## Use the endpoint
 
-From a client that is already inside the trusted network:
+Once the cluster has passed readiness and its post-boot gates, the OpenAI-compatible
+API is available on rank 0. From a client inside the trusted network:
 
 ```sh
 curl http://<MGMT_IP_RANK0>:8000/v1/chat/completions \
@@ -123,32 +119,9 @@ curl http://<MGMT_IP_RANK0>:8000/v1/chat/completions \
   }'
 ```
 
-The current local chat-template adapter closes an empty `<think></think>` block
-when `enable_thinking=false`. This is a local compatibility behavior, not a native
-GLM-5.3-Flash reasoning mode. The official request values remain `low`, `high`, and
-`max`; see [`docs/production-recipe.md`](docs/production-recipe.md).
-
-## Documentation
-
-<div align="center">
-
-| Need | Read |
-| --- | --- |
-| Install from OS + driver + Docker, including image and weights | [`docs/install-from-zero.md`](docs/install-from-zero.md) |
-| Inspect, deploy, start, stop, recover, roll back, run functional gates, or promote | [`docs/operations.md`](docs/operations.md) |
-| Cable, address, verify, or diagnose the RoCE ring and patched NCCL | [`docs/fabric.md`](docs/fabric.md) |
-| Understand the current runtime recipe and its customizations | [`docs/production-recipe.md`](docs/production-recipe.md) |
-| Compare an optimization against the standing reference | [`docs/baseline-f1.json`](docs/baseline-f1.json) |
-| Resume optimization work (agent handover, next experiments) | [`HANDOVER.md`](HANDOVER.md) |
-| Understand files copied to the nodes | [`scripts/node/README.md`](scripts/node/README.md) |
-| Rebuild and install the patched NCCL library | [`scripts/node/nccl/README.md`](scripts/node/nccl/README.md) |
-
-</div>
-
-Changes are recorded incrementally in [`CHANGELOG.md`](CHANGELOG.md). Attribution
-and third-party terms are in [`CREDITS.md`](CREDITS.md); original project material
-is under [`LICENSE`](LICENSE), while derived files and fetched artifacts retain
-their own terms.
+`enable_thinking=false` selects the local chat-template adapter. Its behavior and the
+model's reasoning controls are explained in
+[Thinking-off compatibility](docs/production-recipe.md#thinking-off-compatibility).
 
 ## Development checks
 
@@ -159,7 +132,13 @@ python3 -m pip install 'Jinja2==3.1.6'
 ./scripts/check.sh
 ```
 
-The check uses no GPU, Docker daemon, SSH connection, private site configuration,
-or model weights. It validates shell and Python syntax, local Markdown links,
-command help, manifests, chat-template rendering, host lifecycle fixtures, agent
-preflight fixtures, and the adaptive-k policy.
+The check requires no GPU, Docker daemon, SSH connection, site configuration, or model
+weights. It validates syntax, public documentation links, command help, manifests,
+chat-template rendering, host and controller lifecycle fixtures, preflight, and the
+adaptive-k policy.
+
+## Changes and credits
+
+[CHANGELOG.md](CHANGELOG.md) records changes to the deployment and tooling.
+[CREDITS.md](CREDITS.md) lists sources and third-party terms. Original project material
+is under [LICENSE](LICENSE); derived files and fetched artifacts retain their own terms.

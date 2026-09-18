@@ -13,13 +13,13 @@ select the files explicitly.
 | `model-manifests/` | immutable filename, size, and SHA-256 manifests for supported model snapshots |
 | `moe-configs/` | GB10 fused-MoE tuning JSON mounted into vLLM |
 | `nccl/` | pinned NCCL build, switchless overlay, shape/checksum record, and atomic installer |
-| `overrides/` | F1 vLLM override modules (Apache-2.0 derived) bind-mounted over the R10 image |
+| `overrides/` | Current vLLM override modules (Apache-2.0 derived) bind-mounted over the R10 image |
 | `patches/` | container-side Python scheduler patch and CPU-only policy tests |
-| `reference/` | portable F0 runtime overlay, the frozen F0 launcher bytes, artifact pins and an autostart drop-in template rendered only into a private restore archive |
+| `reference/` | portable Previous runtime overlay, the frozen Previous launcher bytes, artifact pins and an autostart drop-in template rendered only into a private restore archive |
 | `sparkcache/` | tracked `kv-transfer-config.json` and the SHA-256 manifest of the untracked connector payload |
 | `sircl/` | SHA-256 manifest of the untracked SIRCL bundle/runtime payload |
 | `flusher-unconditional.sh` | temporary page-cache flusher used while model weights load |
-| `sparse_attn_indexer_kpool_sm121.py` | SM121 sparse-attention patch deployed as `sparse_attn_indexer_kpool.py`; mounted only in the F0 lane (`SPARKCACHE_MODE=off`) |
+| `sparse_attn_indexer_kpool_sm121.py` | SM121 sparse-attention patch deployed as `sparse_attn_indexer_kpool.py`; mounted only in the Previous configuration (`SPARKCACHE_MODE=off`) |
 | `ssh-config.example` | optional workstation SSH alias example |
 | `tp4-autostart.service.example` | rank-0 unit template that starts all four ranks |
 
@@ -38,8 +38,8 @@ select the files explicitly.
 | shared `scripts/node/etc/common/` files | `/etc/sysctl.d/`, `/etc/sudoers.d/`, `/usr/local/sbin/`, `/etc/systemd/system/` | bootstrap/deploy-host |
 | GRUB drop-in | `/etc/default/grub.d/zz-tp4-perf.cfg` | bootstrap/deploy-host and `tp4-iommu.sh` |
 | built NCCL library | `$NCCL_DIR/libnccl.so.2` | `scripts/node/nccl/install-nccl.sh` |
-| F0 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/f0-20260912.env` | `scripts/deploy.sh` |
-| F0 reference controller | `~/tp4/tp4ctl-f0-reference` | `scripts/deploy.sh` |
+| Previous reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/f0-20260912.env` | `scripts/deploy.sh` |
+| Previous reference controller | `~/tp4/tp4ctl-f0-reference` | `scripts/deploy.sh` |
 | `scripts/node/overrides/**/*.py` | `~/tp4/overrides/…` (same relative layout) | `scripts/deploy.sh` |
 | `scripts/node/sparkcache/kv-transfer-config.json` and `SHA256SUMS` | `~/tp4/sparkcache/` | `scripts/deploy.sh` |
 | `scripts/node/sircl/SHA256SUMS` and the gitignored per-site `SHA256SUMS.site` | `~/tp4/sircl/` | `scripts/deploy.sh` |
@@ -66,7 +66,7 @@ are also local and ignored; their `.example` files remain public templates.
 ## Runtime requirements
 
 The launcher refuses to start a rank until the model, drafter, patched NCCL library,
-sparse-attention patch (F0 lane), selected image, management address, usable configured
+sparse-attention patch (Previous configuration), selected image, management address, usable configured
 IPv4 RoCEv2 GIDs, and every bind-mount source exist. With `SPARKCACHE_MODE=on` it also
 requires the image content ID named by `IMAGE_ID`, the SparkCache config and connector
 at their pinned SHA-256, and a verified SIRCL manifest. This prevents Docker from

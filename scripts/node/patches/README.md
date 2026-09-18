@@ -6,7 +6,7 @@ deployed to `~/patches/`; a patch becomes active only when the launcher or
 
 | File | Role | Activation |
 | --- | --- | --- |
-| `../sparse_attn_indexer_kpool_sm121.py` | Apache-2.0-derived SM121 sparse-attention K-pool fix | deployed as `~/patches/sparse_attn_indexer_kpool.py` and always mounted by the launcher |
+| `../sparse_attn_indexer_kpool_sm121.py` | Apache-2.0-derived SM121 sparse-attention K-pool fix | deployed as `~/patches/sparse_attn_indexer_kpool.py` and mounted by the launcher only for the Previous configuration (`SPARKCACHE_MODE=off`) |
 | `adaptive_k_scheduler.py` | Apache-2.0-derived adaptive speculative verification scheduler | mounted at `/opt/tp4/adaptive_k_scheduler.py`, added to `PYTHONPATH`, and selected by `--scheduler-cls` in `cluster.env` |
 | `test_adaptive_k_policy.py` | CPU-only policy and observation-gate tests | workstation only; `scripts/deploy.sh` skips `test_*.py` |
 

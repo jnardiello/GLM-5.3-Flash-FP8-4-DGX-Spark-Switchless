@@ -14,6 +14,14 @@ SKIP_DIRS = {
     ".git",
     ".claude",
 }
+# Exact root-relative paths, matching the internal-document entries in .gitignore.
+INTERNAL_DOCUMENTS = {
+    "HANDOVER.md",
+    "OPTIMIZATION-PLAN.md",
+    "E09-ROOT-CAUSE-ANALYSIS-2026-09-17.md",
+    "E09-QUALIFICATION-2026-09-17.md",
+    "OPERATIONS-HISTORY.md",
+}
 LINK_RE = re.compile(r"!?\[[^\]]*\]\((<[^>]+>|[^\s)]+)(?:\s+[^)]*)?\)")
 HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$")
 FENCE_RE = re.compile(r"^\s*(```|~~~)")
@@ -22,6 +30,8 @@ HTML_TAG_RE = re.compile(r"<[^>]+>")
 
 def is_public(path: Path) -> bool:
     rel = path.relative_to(ROOT)
+    if rel.as_posix() in INTERNAL_DOCUMENTS:
+        return False
     if any(part in SKIP_DIRS for part in rel.parts):
         return False
     return True
@@ -85,6 +95,9 @@ def check_file(source: Path) -> list[str]:
                 target.relative_to(ROOT)
             except ValueError:
                 errors.append(f"{source.relative_to(ROOT)}:{lineno}: link escapes repository: {raw}")
+                continue
+            if not is_public(target):
+                errors.append(f"{source.relative_to(ROOT)}:{lineno}: link targets internal documentation: {raw}")
                 continue
             if not target.exists():
                 errors.append(f"{source.relative_to(ROOT)}:{lineno}: missing target: {raw}")
