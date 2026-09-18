@@ -24,6 +24,38 @@ document for the requested task before substantive work:
 - A `TP4_ENV` file is a delta sourced after `cluster.env`; use the same value for
   every command in its window, including `down`. Never override `CONTAINER`.
 
+## Mandatory debugging discipline
+
+**Start with the simplest plausible explanation and the cheapest test that can
+distinguish it. Escalate incrementally to more complex hypotheses only when the
+evidence requires it. This is a mandatory working rule, not an optional preference.**
+
+1. State the observed symptom separately from the suspected cause. Before each test,
+   identify the hypothesis, the result that would support or reject it, and the next
+   action. Prefer a small reproduction over a broad diagnostic campaign.
+2. For unexpected model output, first suggest a matched request to the official cloud
+   model or another reference deployment, before investigating cluster internals.
+   Match prompt, model, sampling, reasoning settings and token budget where possible;
+   record differences. Reuse existing reference evidence. Run external requests only
+   within the authorized scope; lack of a reference does not establish a local defect.
+3. If the same failure occurs on the reference, investigate the shared model, prompt,
+   request parameters or benchmark assumptions first. Do not keep treating that symptom
+   as evidence against this cluster without a new observation that distinguishes it.
+4. Change one factor at a time and inspect the result before the next experiment.
+   Prefer request/configuration checks and existing logs before instrumentation, kernel
+   changes, model reloads or engine variants. Every escalation needs evidence explaining
+   why the simpler explanations are insufficient; complexity is not evidence of rigor.
+5. Preserve the user's objective. Do not turn performance measurement into an answer-
+   quality project, add unrelated acceptance gates, or let an optional diagnostic block
+   the requested work. Stop a diagnostic branch when its hypothesis loses support and
+   return to the original task.
+
+The E09 cloud control is the concrete lesson: model-generated code/format failures
+also observed on the reference do not justify an FP8/KDA/connector investigation or
+blocking the performance benchmark on Go compilation, model tests or a custom oracle.
+Earlier E09 quality-based stop decisions are historical records, not prerequisites
+for resuming performance measurements.
+
 ## Optimization workflow
 
 Use the independent Rigmark suite at `~/workspace/jacopo/rigmark` directly as the
@@ -45,8 +77,8 @@ idle, warmup, and cache conditions.
 
 For every performance metric, compare the fixed F0 median with the median of the three
 native per-run variant values. Label the actual variant run and request counts. Keep
-correctness and error results as explicit counts or totals with denominators rather than
-medians. The results report requires fixed-baseline and variant-median columns; delta
+measurement-integrity and error results as explicit counts or totals with denominators
+rather than medians. The results report requires fixed-baseline and variant-median columns; delta
 columns and a separate statistical framework are not required. Judge prefill and
 generation throughput, TTFT, concurrency, and functional results beyond measured noise,
 with no fixed percentage floor. Record commands, configuration, results, and failures,
@@ -79,9 +111,19 @@ Rank success by these criteria:
    code, concurrency, or prose metrics, subject to the explicit code-led prose exception
    above.
 
-Correctness, transport and error integrity, and healthy four-rank operation are required
-gates and cannot be traded for speed. Record every tradeoff explicitly; marginal or
-inconclusive results remain unresolved.
+Measurement integrity, transport/error accounting and healthy four-rank operation are
+required and cannot be traded for speed. Rigmark's role here is performance measurement:
+generation throughput, time to first token/first visible response, prefill and concurrency.
+Generated-answer quality, Markdown format, Go compilation, model-written tests and
+independent or race-detector audits are not performance acceptance gates. Do not run
+those audits as part of the benchmark workflow unless the owner separately requests them.
+A normal token-budget stop is a measured output limit, not by itself a cluster failure.
+Record native output gates and finish reasons honestly without rewriting receipts or
+turning FAIL into PASS; assess which timing/throughput metrics are supported separately.
+If no visible response exists, report its latency as unavailable rather than zero or a
+successful delivery. Do not discard otherwise valid speed measurements solely because
+the generated answer fails a quality check. Record performance tradeoffs explicitly;
+insufficient or conflicting performance evidence remains unresolved or decision_required.
 
 ## Work rules
 

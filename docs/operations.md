@@ -1026,6 +1026,97 @@ qualification remains **unresolved** on its own merits (see above); this
 entry only closes the attribution of the reasoning/format defect, it does not
 qualify or promote any candidate.
 
+### E09 same-client performance series and batch-uniform qualification on 2026-09-18
+
+The owner authorized re-measuring the E09 SparkCache candidate from the workstation
+that measured F0 (`mini`), removing the Beast0-loopback client caveat recorded above.
+Rigmark was first reset to its upstream (`github.com/alexellis/rigmark`, `master`
+`c5a0db0`, 57/57 tests); the prior local audit-oracle patch is archived, not applied.
+The reset dropped the local `cache_salt` passthrough for `/v1/completions` prefill
+probes, and the first repeated run reproduced its absence: with the same
+`comparison_id` the "cold" prefill probes hit the previous run's persisted prefixes
+(64K cold 38,872 tok/s, faster than replay). That receipt (`mini-e09-sparkcache-r2`)
+is retained as invalid evidence and excluded. The passthrough was reapplied as a
+12-line measurement fix in `bench.py` (`prefill_once`/`run_prefill` forward
+`extra_body["cache_salt"]`), uncommitted in the local Rigmark checkout; every later run
+uses a fresh salt.
+
+Candidate `e09-r10-on-pending-publication-gid-recovery.env` (SparkCache ON, DFlash2,
+adaptive-k `per-request`), owner-stopped after two valid runs (`r1`, `r2b`; 54/54
+streams each, gates 30/30, same process, no reload). Two-run medians versus frozen F0:
+code decode +4.4%, prose +4.9%, C1 +1.8%, **C2 −7.9%**, **C4 −5.6%**, all TTFTs lower,
+prefill cold +7.5–14.2%, replay +3.7–113.5%. Two primary concurrency regressions with
+the same client as F0 made the candidate `decision_required`.
+
+Attribution used one factor at a time. Per-stream data from the two receipts showed the
+loss inside active generation from the first stream of every C2/C4 round (aggregate ÷
+per-stream×N stayed 92–95% at C1/C2/C4), not in admission. The connector source
+extracted read-only from the running container (`spark_context_cache_connector.py`,
+SHA-256 `a0bedc1c…`) shows `get_finished_count()` returning the physical rank count, but
+`request_finished()` only delays block release when the streaming runtime has pending
+store work, absent for the 130–136-token concurrency prompts; the quorum path is not
+engaged. A single-variable control on the already-prepared target-only overlay
+(SparkCache ON, no DFlash2, `--skip-prefill`, one run) scaled C2/C1 1.68 and C4/C1 2.75
+against F0 1.53/1.91 and the candidate 1.38/1.77: the connector does not hurt batching;
+DFlash2's gain collapses under concurrency with it (+55% at C1, +27% at C2, +3% at C4).
+`adaptive_k_scheduler.py` (byte-identical code on 4/4 ranks, comment-only drift from the
+repository copy) supplies the candidate mechanism: in `per-request` mode a step mixing
+k=3 and k=5 requests runs the PIECEWISE decode graph; measured code acceptance sits at
+the 0.58 up-threshold, so mixed steps appear only at concurrency ≥ 2. The uniform-step
+counters below prove that k was uniform, not which graph executed; the graph
+contribution is plausible and supported, not isolated, and is not a promotion
+prerequisite.
+
+`scripts/node/etc/local/e09-r10-on-batch-uniform-20260918.env` (SHA-256 `facde599…`,
+gitignored like every window overlay, copied to 4/4 nodes without `deploy.sh` because
+`--check` reports launcher, controller and scheduler drift between this checkout and the
+nodes) sources the candidate overlay and substitutes only
+`-e VLLM_ADAPTIVE_K_MODE=batch-uniform`. One coordinated transition, weight load, health
+200, both gates PASS at +1 s and +3 s; the boot line reports `mode=batch-uniform
+engine_k=5 async=True`. Pilot (`--skip-prefill`): C1 39.0, C2 59.5, C4 86.4.
+
+Qualification: **3/3 full native runs, 162/162 requests complete, 0 errors, 0 length
+caps (all 45 decode samples end with `stop`), basic gates 45/45**, same process (loaded
+3.5 h earlier and served the pilot and two gates; idle 0/0 before each run; no warmup
+run), fresh salts, receipts `fbfc7cd4…`/`e5f657fc…`/`140ce756…`:
+
+| Metric | F0 median (range) | batch-uniform median (q1/q2/q3) |
+| --- | ---: | ---: |
+| Code decode tok/s | 50.401 (50.33–50.67) | 51.777 (52.98/51.50/51.78) |
+| C1 tok/s | 37.223 (36.66–38.03) | 38.431 (38.65/38.43/36.55) |
+| C2 tok/s | 57.009 (54.52–57.70) | 57.389 (58.14/55.10/57.39) |
+| C4 tok/s | 71.084 (55.76–75.74) | 84.051 (84.05/89.36/83.52) |
+| Prose decode tok/s | 29.220 (28.63–29.34) | 30.270 (30.62/30.14/30.27) |
+| C2 / C4 per-stream TTFT s | 0.616 / 0.935 | 0.447 / 0.597 |
+| Prefill 8K cold / replay | 2112 / 4650 | 2393 / 9720 |
+| Prefill 32K cold / replay | 2202 / 21524 | 2502 / 31977 |
+| Prefill 64K cold / replay | 2201 (2193–2209) / 35971 (35660–36081) | 2254 (2391/2086/2254) / 35378 (35378/35427/35299) |
+
+Spec-decode counters over each concurrency phase: 1,803–1,860 drafts, 6,420–6,546 draft
+tokens, 53.5–54.9% accepted, ~1.9 accepted per draft; the scheduler log ends at 24,352
+uniform steps (13,668 k=3, 10,684 k=5, 897 switches), zero mixed steps. Reading: code,
+C1, C4, prose and 8K/32K prefill gain beyond F0's own spread; C2 is unchanged within
+noise (q2 55.10 sits inside F0's range) and remains the most variable metric; 64K cold is
+within noise; 64K replay is **−1.6%** (all three runs below F0's minimum) and is recorded
+as an observed median regression of unverified repeatability, in the lowest-ranked tier;
+F0's three-run range is not a confidence interval. No primary regression remains, so
+the candidate is promote-eligible under the ranked criteria, with C4 as the decisive
+gain; the C1, code and prose gains are small. The target-only and pilot receipts and
+the four spec-decode snapshots are diagnostic, kept apart from the qualification
+medians.
+
+Promotion has not started. It requires the whole R10 recipe in IaC, not one variable:
+the offline-imported image (local ID `5e32aaa1bbe3`, no registry digest; the digest is
+pinned only in the private `RECIPE-CONTRACT.json`), the E09 launcher (81 lines apart
+from `scripts/launcher/launch-glm53-tp4.sh`), the SIRCL bundle/runtime, four vLLM
+override sets, the connector and `kv-transfer-config.json` (45 private files, ~2.1 MB),
+plus rollback comments, boot signatures and the Rigmark `cache_salt` fix committed in
+Rigmark. The batch-uniform candidate stays loaded on 4/4 ranks; the Docker healthcheck
+marker `/tmp/sparkring-engine-ready` is absent on every E09 recipe, so `docker ps`
+reports `unhealthy` while `/health` is 200 — `/health` remains the readiness definition.
+Receipts, spec-decode snapshots, rank-0 logs and the extracted sources are in the
+owner's private `e09-investigation-2026-09-17` archive.
+
 ## Recovery and rollback
 
 Begin with read-only status and choose the narrowest matching rollback. Every restart

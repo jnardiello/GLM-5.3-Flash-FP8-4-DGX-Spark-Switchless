@@ -8,6 +8,31 @@ release.
 
 ### Added
 
+- Qualified an E09 fix for the concurrency regression with a same-client series,
+  recorded in
+  [`operations.md`](docs/operations.md#e09-same-client-performance-series-and-batch-uniform-qualification-on-2026-09-18).
+  Re-measured from the F0 workstation, the SparkCache candidate showed C2 −7.9% and
+  C4 −5.6% against frozen F0 (2 runs, owner stop). One-factor controls attributed the
+  loss to mixed k=3/k=5 verify steps under concurrency (PIECEWISE decode graphs), not to
+  the connector: SparkCache without DFlash2 scaled C2/C1 1.68 and C4/C1 2.75. With the
+  documented `VLLM_ADAPTIVE_K_MODE=batch-uniform` as the only change, 3/3 full native
+  runs (162/162 requests complete, 0 errors, 0 length caps, gates 45/45) give C1 +3.2%,
+  C2 +0.7% (within noise), C4 +18.2% (the decisive gain),
+  code +2.7%, prose +3.6%, prefill 8K/32K replay +109%/+49%, and a single −1.6% on 64K
+  replay; spec-decode acceptance 53.5–54.9% with zero mixed steps. The candidate is
+  promote-eligible; promotion is not started and needs the full R10 recipe in IaC.
+  Rigmark was reset to upstream `c5a0db0`; its dropped `cache_salt` prefill passthrough
+  invalidated one receipt (kept, excluded) and was reapplied as an uncommitted 12-line
+  measurement fix. Window overlays stay gitignored; no `deploy.sh` ran because `--check`
+  reports node drift on launcher, controller and scheduler.
+- Made incremental debugging mandatory in `AGENTS.md`: start with the simplest
+  plausible explanation and a small distinguishing test, propose a matched cloud or
+  reference-model control before cluster-internal diagnosis, and require evidence
+  before escalating complexity. Clarified that Rigmark qualifies performance and
+  measurement integrity; generated-code quality, formatting and optional Go audits
+  must not block the benchmark. Preserve native receipts and disclose output limits
+  and unavailable visible-response latency without relabeling their gates. This
+  supersedes the earlier use of E09 quality failures as a performance stop condition.
 - Closed the attribution of the E09 code-workload reasoning/format defect with an
   independent, owner-authorized review, documented in
   [`operations.md`](docs/operations.md#e09-reasoning-diagnosis-attribution-closed-on-2026-09-17)

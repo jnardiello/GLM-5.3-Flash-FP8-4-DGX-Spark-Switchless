@@ -79,6 +79,14 @@ not add the optional `--async-scheduling` CLI flag in the current recipe. In the
 vLLM/DFlash path, the custom class still derives from `AsyncScheduler`; it disables its
 policy if the engine reports that required path unavailable.
 
+`per-request` is the production mode. A step that mixes k=3 and k=5 requests runs the
+PIECEWISE decode graph; with code acceptance measured at the 0.58 up-threshold, mixed
+steps appear as soon as two requests are batched. `batch-uniform` (one k per step)
+removed a C2/C4 regression on the E09 SparkCache candidate in a qualified three-run
+series (see
+[`operations.md`](operations.md#e09-same-client-performance-series-and-batch-uniform-qualification-on-2026-09-18));
+it is not promoted and has not been measured on the F0 recipe alone.
+
 The policy is CPU-testable without vLLM:
 
 ```sh
