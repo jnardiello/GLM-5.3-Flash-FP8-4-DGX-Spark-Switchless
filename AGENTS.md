@@ -63,11 +63,16 @@ benchmark interface. Do not recreate it with private wrapper scripts, blanket ca
 qualification prerequisites, or a parallel benchmark/admission framework; necessary
 measurement fixes belong in Rigmark.
 
-Run one experiment at a time. Use the frozen historic F0 baseline recorded in
-[`docs/baseline-f0.json`](docs/baseline-f0.json) for every future comparison; its three
-native Rigmark runs and fixed medians are the standing reference. Do not rerun or replace
-that baseline without an explicit owner request. Use `scripts/check-f0.py` for a fast,
-read-only operational F0 check; it does not rerun Rigmark or send inference requests.
+Run one experiment at a time. Use the frozen baseline **F1** recorded in
+[`docs/baseline-f1.json`](docs/baseline-f1.json) for every future comparison; its three
+native Rigmark runs and fixed medians, measured from the same workstation with a fresh
+`cache_salt` per run, are the standing reference. Do not rerun or replace that baseline
+without an explicit owner request. [`docs/baseline-f0.json`](docs/baseline-f0.json) is
+the historic F0 record and, until the F1 recipe is encoded in IaC with a registry image
+digest, the only IaC-backed operational reference: use `scripts/check-f0.py` for a fast,
+read-only operational F0 identity check (it does not rerun Rigmark or send inference
+requests), and restore F1 by the coordinated up of its window overlay, not by a
+reference `deploy.sh`.
 Agree the variant repetition count with
 the owner only when explicit later direction changes the standing protocol. By default,
 run every variant three consecutive times. Manually apply it to all four Beast nodes in
@@ -75,7 +80,7 @@ one coordinated transition, load its weights once, and preserve that process acr
 three runs. Use the same Rigmark version, suites, prompts, and parameters under comparable
 idle, warmup, and cache conditions.
 
-For every performance metric, compare the fixed F0 median with the median of the three
+For every performance metric, compare the fixed F1 median with the median of the three
 native per-run variant values. Label the actual variant run and request counts. Keep
 measurement-integrity and error results as explicit counts or totals with denominators
 rather than medians. The results report requires fixed-baseline and variant-median columns; delta
@@ -86,10 +91,10 @@ then classify the outcome as promote, discard, or unresolved. Restore the refere
 discarded or unresolved unless the next candidate is already prepared and authorized.
 An owner stop may end the three-run series early; report the actual run and request counts
 and do not claim a three-run median. A direct transition to the next candidate needs no
-intermediate F0 reload: derive its complete recipe from F0, remove the previous delta, and
-use the usual coordinated four-rank transition and functional gates. Continue to compare
-against the fixed F0 medians. Restore F0 whenever work stops without a prepared next
-candidate.
+intermediate reference reload: derive its complete recipe from F1, remove the previous
+delta, and use the usual coordinated four-rank transition and functional gates. Continue
+to compare against the fixed F1 medians. Restore the F1 state whenever work stops without
+a prepared next candidate.
 
 A promote decision requires encoding the tested change in existing repository IaC;
 update the relevant documentation, rollback guidance, and changelog; reapply it through

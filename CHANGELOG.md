@@ -8,6 +8,16 @@ release.
 
 ### Added
 
+- Froze the qualified E09 batch-uniform state as measurement baseline **F1** in
+  [`docs/baseline-f1.json`](docs/baseline-f1.json) by explicit owner request: the three
+  receipts' hashes, per-run values and medians for all sixteen F0 metrics, the true
+  recipe identity (offline-imported image ID without registry digest, overlay, launcher,
+  connector, adaptive-k `batch-uniform` parameters, SIRCL transport), functional counts
+  (162/162 requests, 0 errors, 0 caps, gates 45/45, post-boot gates 2/2) and the
+  spec-decode counters as diagnostics. `AGENTS.md` now compares future variants with the
+  fixed F1 medians from the same workstation; F0 remains the historic record and the
+  only IaC-backed operational reference (`scripts/check-f0.py` and the archive restore
+  still target F0) until the F1 recipe is promoted into IaC.
 - Qualified an E09 fix for the concurrency regression with a same-client series,
   recorded in
   [`operations.md`](docs/operations.md#e09-same-client-performance-series-and-batch-uniform-qualification-on-2026-09-18).

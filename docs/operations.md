@@ -1117,6 +1117,17 @@ reports `unhealthy` while `/health` is 200 — `/health` remains the readiness d
 Receipts, spec-decode snapshots, rank-0 logs and the extracted sources are in the
 owner's private `e09-investigation-2026-09-17` archive.
 
+By explicit owner request this qualified state is the new frozen measurement baseline
+**F1**, recorded in [`baseline-f1.json`](baseline-f1.json) from the three receipts with
+the true recipe identity (the receipts' embedded appliance block still describes F0 and
+`per-request`; the JSON is authoritative). Future variants compare against the fixed F1
+medians from the same workstation with a fresh `cache_salt` per run. F0 stays the
+historic record and, until the F1 recipe is encoded in IaC with a registry image digest,
+the only IaC-backed operational reference: `scripts/check-f0.py` and the
+[frozen F0 archive restore](#restore-from-the-frozen-f0-archive) still target F0, and an
+F1 restore means the coordinated up of the batch-uniform overlay with the pinned E09
+controller, not a `deploy.sh` reference restore.
+
 ## Recovery and rollback
 
 Begin with read-only status and choose the narrowest matching rollback. Every restart

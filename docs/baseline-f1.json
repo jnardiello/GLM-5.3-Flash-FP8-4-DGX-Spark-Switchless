@@ -1,0 +1,530 @@
+{
+  "schema": 1,
+  "baseline_id": "F1",
+  "status": "frozen_baseline",
+  "measured_on": "2026-09-18",
+  "supersedes": "F0 (docs/baseline-f0.json, kept as the historic reference)",
+  "comparison_id": "glm53-nq2-3x-20260911-v1",
+  "reuse_policy": "Use these fixed F1 medians for all future variant comparisons, measured from the same workstation (mini) with a fresh cache_salt per run. Rerun or replacement requires an explicit owner request. Operational identity checks (scripts/check-f0.py) still target F0 until the F1 recipe is encoded in IaC with a registry image digest.",
+  "system": {
+    "model": "zai-org/GLM-5.3-Flash",
+    "model_revision": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "quantisation": "FP8 weights and FP8 activations",
+    "serving_engine": "vLLM from the E09 R10 SparkRing/SparkCache image",
+    "serving_image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache (offline OCI import, local image ID 5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075, no registry digest recorded; registry digest pinned only in the private RECIPE-CONTRACT.json)",
+    "recipe_overlay": {
+      "file": "scripts/node/etc/local/e09-r10-on-batch-uniform-20260918.env",
+      "sha256": "facde59991ac82c54f85f846b56b762daeee014433ed76f7bd42d75add5a3311",
+      "sources": "scripts/node/etc/local/e09-r10-on-pending-publication-gid-recovery.env (sha256 e4ac8df05391afcdd8541d0ac4d2287358432cb63cf9213ce702fdf676932e8e)",
+      "launcher": "launch-glm53-tp4-e09-r10-pending-publication.sh"
+    },
+    "drafter": {
+      "model": "incoai/GLM-5.3-Flash-DFlash2",
+      "revision": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+      "draft_tokens": 5,
+      "adaptive_verification_tokens": [
+        3,
+        5
+      ],
+      "draft_kv_cache_dtype": "fp8_e4m3"
+    },
+    "adaptive_k": {
+      "mode": "batch-uniform",
+      "k_lo": 3,
+      "k_hi": 5,
+      "up": 0.58,
+      "down": 0.42,
+      "alpha": 0.15,
+      "seed": 1.0,
+      "signal": "pos",
+      "scheduler_sha256": "b7590778dc2213149c8ea84522e13448c0a056ee7cf63ade2b2d413ac6173621",
+      "boot_line": "adaptive-k: AdaptiveKScheduler active (... mode=batch-uniform ...) engine_k=5 async=True"
+    },
+    "sparkcache": {
+      "connector": "spark_context_cache_connector.py",
+      "connector_sha256": "a0bedc1c33a316d3c56ae857652c4a17acac9a82b053a4a71689684f33b75745",
+      "kv_transfer_config_sha256": "a38abd2e03f2f19857af7105179ea2bf155fb55474504023734a777faf012142"
+    },
+    "hardware": "4 x ASUS Ascent GX10, each with one NVIDIA GB10 and 128 GB unified memory",
+    "topology": "TP4 across four nodes on a two-port ConnectX-7 switchless RoCE ring with four direct edges",
+    "context_limit_tokens": 262144,
+    "kv_cache": "fp8_e4m3 with a 17179869184-byte pool per rank; target/KDA shared pool with dense DFlash draft allocation (E09 override)",
+    "moe_backend": "Triton FP8 MoE with GB10 tuning table sha256:e2d2f68d34ba9d0011c0b2ef48170781b4c7e609885cd4fb16d23221e795968b",
+    "scheduler": "max sequences 6; max batched tokens 8192; AdaptiveKScheduler batch-uniform; async scheduling effective",
+    "collectives": "NCCL v2.30.7-1 with switchless-ring patch plus SIRCL single-rail sync-prefill transport (E07a); NCCL_IB_GID_INDEX=-1 with SIRCL GID preflight",
+    "measurement_client": "mini (macOS workstation over the management LAN), the same client location as F0",
+    "receipt_appliance_note": "The appliance block embedded in the three receipts came from an unrevised metadata.beast.json and still describes the F0 image and per-request mode; this file is the authoritative identity."
+  },
+  "rigmark": {
+    "version": "1.1.0",
+    "source": {
+      "revision": "c5a0db01b0542ac291883ab049b6141efae0c7d3",
+      "repository_dirty": true,
+      "repository_source_sha256": "e0e92cff99f74ffa43d0a82541cf9db6010dd0a4ef3e8e7b84c5e1abd13a867f",
+      "repository_worktree_sha256": "ba9d6d3fa6f6366bb2a54d730dc85e506120aa373ef8ce13f54219edfe2ccad4",
+      "note": "upstream master plus the uncommitted cache_salt prefill passthrough, committed afterwards as ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087 with identical bench.py content"
+    },
+    "prompts": {
+      "version": "1.0.0",
+      "sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb"
+    },
+    "settings": {
+      "seed": 20260905,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "decode_tokens": 8192,
+      "runs": 5,
+      "prefill_depths": [
+        8192,
+        32768,
+        65536
+      ],
+      "prefill_runs": 3,
+      "concurrency": [
+        1,
+        2,
+        4
+      ],
+      "concurrency_runs": 3,
+      "concurrency_tokens": 256,
+      "concurrency_workload": "code",
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        },
+        "cache_salts": {
+          "F1-r1": "666fb3930cd176f4d3fb5c3a41e8600b",
+          "F1-r2": "0858142ca6fa7c3945c0b3aaeffbd348",
+          "F1-r3": "a80c98f415ad09c4a041ed3bfe86c603"
+        }
+      }
+    },
+    "labels": [
+      "mini-e09-batchuniform-q1",
+      "mini-e09-batchuniform-q2",
+      "mini-e09-batchuniform-q3"
+    ],
+    "started_at": [
+      "2026-09-18T03:24:06.671228+00:00",
+      "2026-09-18T03:34:48.479359+00:00",
+      "2026-09-18T03:45:39.965274+00:00"
+    ],
+    "finished_at": [
+      "2026-09-18T03:34:29.841194+00:00",
+      "2026-09-18T03:45:25.393846+00:00",
+      "2026-09-18T03:56:24.059777+00:00"
+    ]
+  },
+  "receipts": {
+    "F1-r1.json": "fbfc7cd4b7bac0b07b221d3ec287a79baa6b335a935bf6978d15f74c1412fbd5",
+    "F1-r2.json": "e5f657fc1b611d42474619a825a9d4affc758533ac0bd9e71dad1054ec4b54d2",
+    "F1-r3.json": "140ce756689c1441e8a7a13164cea707d2c30549871d23f5850f91d1a38335d6"
+  },
+  "receipt_files": {
+    "F1-r1.json": "mini-e09-batchuniform-q1.json",
+    "F1-r2.json": "mini-e09-batchuniform-q2.json",
+    "F1-r3.json": "mini-e09-batchuniform-q3.json"
+  },
+  "performance": {
+    "aggregation": "median of the three native per-run medians",
+    "run_order": [
+      "F1-r1",
+      "F1-r2",
+      "F1-r3"
+    ],
+    "metrics": [
+      {
+        "key": "code_decode_throughput",
+        "source_path": [
+          "decode",
+          "code",
+          "decode_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          52.984,
+          51.499,
+          51.777
+        ],
+        "median": 51.777
+      },
+      {
+        "key": "code_c1_aggregate_end_to_end_throughput",
+        "source_path": [
+          "concurrency",
+          "1",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          38.651,
+          38.431,
+          36.554
+        ],
+        "median": 38.431
+      },
+      {
+        "key": "code_c2_aggregate_end_to_end_throughput",
+        "source_path": [
+          "concurrency",
+          "2",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          58.138,
+          55.097,
+          57.389
+        ],
+        "median": 57.389
+      },
+      {
+        "key": "code_c4_aggregate_end_to_end_throughput",
+        "source_path": [
+          "concurrency",
+          "4",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          84.051,
+          89.361,
+          83.523
+        ],
+        "median": 84.051
+      },
+      {
+        "key": "prose_decode_throughput",
+        "source_path": [
+          "decode",
+          "prose",
+          "decode_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          30.62,
+          30.136,
+          30.27
+        ],
+        "median": 30.27
+      },
+      {
+        "key": "code_ttft",
+        "source_path": [
+          "decode",
+          "code",
+          "ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "per_run": [
+          0.405,
+          0.398,
+          0.391
+        ],
+        "median": 0.398
+      },
+      {
+        "key": "prose_ttft",
+        "source_path": [
+          "decode",
+          "prose",
+          "ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "per_run": [
+          0.379,
+          0.38,
+          0.378
+        ],
+        "median": 0.379
+      },
+      {
+        "key": "code_c1_per_stream_ttft",
+        "source_path": [
+          "concurrency",
+          "1",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "per_run": [
+          0.395,
+          0.395,
+          0.392
+        ],
+        "median": 0.395
+      },
+      {
+        "key": "code_c2_per_stream_ttft",
+        "source_path": [
+          "concurrency",
+          "2",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "per_run": [
+          0.445,
+          0.447,
+          0.457
+        ],
+        "median": 0.447
+      },
+      {
+        "key": "code_c4_per_stream_ttft",
+        "source_path": [
+          "concurrency",
+          "4",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "per_run": [
+          0.584,
+          0.597,
+          0.681
+        ],
+        "median": 0.597
+      },
+      {
+        "key": "prefill_8k_cold_throughput",
+        "source_path": [
+          "prefill",
+          "8192",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          2396.194,
+          2345.121,
+          2393.385
+        ],
+        "median": 2393.385
+      },
+      {
+        "key": "prefill_8k_replay_throughput",
+        "source_path": [
+          "prefill",
+          "8192",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          9719.716,
+          8318.238,
+          9840.536
+        ],
+        "median": 9719.716
+      },
+      {
+        "key": "prefill_32k_cold_throughput",
+        "source_path": [
+          "prefill",
+          "32768",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          2547.291,
+          2502.08,
+          2352.822
+        ],
+        "median": 2502.08
+      },
+      {
+        "key": "prefill_32k_replay_throughput",
+        "source_path": [
+          "prefill",
+          "32768",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          27775.706,
+          31976.985,
+          32333.758
+        ],
+        "median": 31976.985
+      },
+      {
+        "key": "prefill_64k_cold_throughput",
+        "source_path": [
+          "prefill",
+          "65536",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          2391.153,
+          2086.332,
+          2253.989
+        ],
+        "median": 2253.989
+      },
+      {
+        "key": "prefill_64k_replay_throughput",
+        "source_path": [
+          "prefill",
+          "65536",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          35378.185,
+          35427.163,
+          35298.838
+        ],
+        "median": 35378.185
+      }
+    ]
+  },
+  "functional": {
+    "completed_runs": {
+      "count": 3,
+      "expected": 3
+    },
+    "measured_requests": {
+      "count": 162,
+      "per_run": [
+        54,
+        54,
+        54
+      ]
+    },
+    "native_validation_errors": {
+      "count": 0,
+      "denominator": 162,
+      "per_run": [
+        {
+          "count": 0,
+          "denominator": 54
+        },
+        {
+          "count": 0,
+          "denominator": 54
+        },
+        {
+          "count": 0,
+          "denominator": 54
+        }
+      ]
+    },
+    "code_length_caps": {
+      "count": 0,
+      "denominator": 15,
+      "per_run": [
+        {
+          "count": 0,
+          "denominator": 5
+        },
+        {
+          "count": 0,
+          "denominator": 5
+        },
+        {
+          "count": 0,
+          "denominator": 5
+        }
+      ]
+    },
+    "code_completion_gate": {
+      "passed": 15,
+      "total": 15,
+      "per_run": [
+        {
+          "passed": 5,
+          "total": 5
+        },
+        {
+          "passed": 5,
+          "total": 5
+        },
+        {
+          "passed": 5,
+          "total": 5
+        }
+      ]
+    },
+    "prose_completion_gate": {
+      "passed": 15,
+      "total": 15,
+      "per_run": [
+        {
+          "passed": 5,
+          "total": 5
+        },
+        {
+          "passed": 5,
+          "total": 5
+        },
+        {
+          "passed": 5,
+          "total": 5
+        }
+      ]
+    },
+    "structured_completion_gate": {
+      "passed": 15,
+      "total": 15,
+      "per_run": [
+        {
+          "passed": 5,
+          "total": 5
+        },
+        {
+          "passed": 5,
+          "total": 5
+        },
+        {
+          "passed": 5,
+          "total": 5
+        }
+      ]
+    },
+    "post_boot_gates": {
+      "coherent_response": "PASS at +1 s",
+      "tool_call": "PASS at +3 s",
+      "health_200_at": "2026-09-17T23:39:31Z"
+    },
+    "process_continuity": "one weight load on 2026-09-17T23:2xZ; pilot run and two gates before the series; idle 0/0 before each run; no reload or restart",
+    "spec_decode_concurrency_phase": {
+      "per_run": [
+        {
+          "drafts": 1860,
+          "draft_tokens": 6546,
+          "accepted_tokens": 3505
+        },
+        {
+          "drafts": 1814,
+          "draft_tokens": 6420,
+          "accepted_tokens": 3520
+        },
+        {
+          "drafts": 1829,
+          "draft_tokens": 6493,
+          "accepted_tokens": 3544
+        }
+      ],
+      "note": "diagnostic counters from /metrics deltas over each concurrency phase; not qualification evidence"
+    }
+  }
+}
