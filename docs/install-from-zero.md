@@ -139,18 +139,20 @@ library exists and the candidate fails, leave the cluster down.
 
 ## 5. Pull the container image
 
-The exact image is owned by `IMAGE` in `cluster.env`:
+The exact image is owned by `IMAGE` in `cluster.env`. The F1 lane pins it by registry
+digest, and `IMAGE_ID` pins the content ID the launcher must find locally:
 
 ```sh
 . ./cluster.env
 for n in $NODES; do
-  ssh "$n" "sudo -n docker pull '$IMAGE'"
+  ssh "$n" "sudo -n docker pull '$IMAGE' && sudo -n docker image inspect --format '{{.Id}}' '$IMAGE'"
 done
 ```
 
-Expected: `docker image inspect "$IMAGE"` succeeds on all four nodes. Stop on an
-unexpected registry challenge, digest mismatch reported by the verifier, or
-insufficient disk. Do not add registry credentials to this repository.
+Expected: the pull succeeds anonymously and every node prints exactly `IMAGE_ID`. Stop
+on an unexpected registry challenge, a different content ID, a digest mismatch reported
+by the verifier, or insufficient disk. Do not add registry credentials to this
+repository.
 
 ## 6. Install the FP8 weights
 
@@ -214,7 +216,44 @@ Expected: `config.json` and `model.safetensors` exist on every node and the repo
 base model is `zai-org/GLM-5.3-Flash`. Stop if upstream terms differ from the owner's
 approved use, the revision differs, or any node is incomplete.
 
-## 8. Deploy runtime and host files
+## 8. Place the SparkCache and SIRCL payload
+
+The F1 lane (`SPARKCACHE_MODE=on`) needs two operator-provided sets of files that carry
+no license and are therefore neither tracked nor fetched by this repository: the
+SparkCache connector module, and the SIRCL bundle and runtime. Obtain them from the
+owner's private archive and place them on every rank with the deployment account:
+
+| Payload | Node path (`cluster.env` key) | Manifest |
+| --- | --- | --- |
+| connector | `~/tp4/sparkcache/spark_context_cache_connector.py` (`SPARKCACHE_CONNECTOR`) | `scripts/node/sparkcache/SHA256SUMS` |
+| SIRCL bundle | `~/tp4/sircl/bundle/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS` |
+| SIRCL runtime and entrypoint | `~/tp4/sircl/runtime/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS` |
+| SIRCL per-rank peer/GID files, their runtime manifest and gate attestation | `~/tp4/sircl/runtime/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS.site` (gitignored) |
+
+Copy node to node over the management LAN and keep the files readable by the
+deployment account only. The tracked manifests cover the portable files. The per-rank
+`rank<N>.env` files carry this site's fabric peers and GIDs, so their hashes stay out of
+the public repository: after checking those files against
+[`fabric.md`](fabric.md) and the SIRCL GID check, record them once in the ignored
+checkout file (run on one rank, copy the output into `scripts/node/sircl/SHA256SUMS.site`
+in the operator checkout):
+
+```sh
+cd ~/tp4/sircl && sha256sum runtime/gate-attestation.json runtime/rank?.env runtime/SHA256SUMS
+```
+
+After the deploy in the next step has placed the manifests, verify every rank:
+
+```sh
+./scripts/verify-node.sh
+```
+
+Expected: the `sparkcache payload` and `sircl payload` rows are PASS on all four ranks.
+The launcher refuses to start a rank whose connector, config or SIRCL files do not
+match the manifests; never edit a manifest to match a file. Do not commit, mirror or
+publish the payload.
+
+## 9. Deploy runtime and host files
 
 ```sh
 ./scripts/deploy.sh
@@ -231,7 +270,7 @@ Expected: deploy summaries are green and
 the installed drop-in, and synchronized GRUB on all nodes after reboot. Stop on mixed
 state or exit code 4.
 
-## 9. Verify and start
+## 10. Verify and start
 
 Starting and exposing the endpoint needs a separate serving-window approval:
 
@@ -246,7 +285,7 @@ Starting and exposing the endpoint needs a separate serving-window approval:
 ```
 
 Expected: static verification passes; fabric-check sees two addressed MTU-9000 ports
-per node and eight successful jumbo pings; `/health` reaches 200; all five runtime
+per node and eight successful jumbo pings; `/health` reaches 200; all six runtime
 signatures in [`operations.md`](operations.md) are present. Run the
 [post-boot functional gates](operations.md#post-boot-functional-gates) within two
 minutes of readiness.

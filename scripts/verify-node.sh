@@ -289,10 +289,26 @@ say draft_commit "$(head -1 "$DRAFT/.cache/huggingface/download/config.json.meta
 say nccl "$(sha256sum "$NCCL/libnccl.so.2" 2>/dev/null | awk '{print $1}')"
 say patches "$(ls "$HOME"/patches/*.py 2>/dev/null | wc -l | tr -d ' ')"
 mmiss=""
-for m in $P_MOUNTS; do [ -e "$m" ] || mmiss="$mmiss ${m##*/}"; done
+# Sources may be written as $HOME/... or ~/... (single-quoted in cluster.env); expand them
+# here exactly as the launcher does before Docker sees them.
+for m in $P_MOUNTS; do
+  case "$m" in '$HOME/'*) m="$HOME/${m#\$HOME/}" ;; '~/'*) m="$HOME/${m#\~/}" ;; esac
+  [ -e "$m" ] || mmiss="$mmiss ${m##*/}"
+done
 say mounts "${mmiss:-ok}"
 say freegib "$(df -BG --output=avail "$HOME" 2>/dev/null | tail -1 | tr -dc '0-9')"
 say psline "$(sudo -n docker ps --filter "name=$P_CONTAINER" --format '{{.Names}} {{.Status}}' 2>/dev/null | head -1)"
+# F1 SparkCache lane payloads: the deployed SHA256SUMS must be satisfied by operator-placed
+# files (the connector and the SIRCL bundle/runtime are not redistributed by the repository).
+# SHA256SUMS pins portable files; an optional SHA256SUMS.site pins site-generated files
+# (SIRCL per-rank peer/GID env) and is required for sircl.
+for d in sparkcache sircl; do
+  mf="SHA256SUMS"; [ -f "$HOME/tp4/$d/SHA256SUMS.site" ] && mf="SHA256SUMS SHA256SUMS.site"
+  if [ ! -f "$HOME/tp4/$d/SHA256SUMS" ]; then say "payload_$d" no-manifest
+  elif [ "$d" = sircl ] && [ ! -f "$HOME/tp4/$d/SHA256SUMS.site" ]; then say "payload_$d" no-site-manifest
+  elif (cd "$HOME/tp4/$d" && cat $mf | sha256sum --check --strict --quiet - >/dev/null 2>&1); then say "payload_$d" ok
+  else say "payload_$d" "mismatch:$(cd "$HOME/tp4/$d" && cat $mf | sha256sum --check --strict - 2>/dev/null | grep -vc ': OK$')"; fi
+done
 REMOTE
 
 probe_host() {
@@ -548,6 +564,20 @@ check_node() {   # check_node <host> <rank>
       "sha256 ${v:-absent} (expected $MODEL_TEMPLATE_SHA from ${MODEL_MANIFEST#$REPO/})"
   fi
 
+  for d in sparkcache sircl; do
+    v=$(pv "payload_$d")
+    if [ "${SPARKCACHE_MODE:-off}" != "on" ]; then
+      row "$host" "$d payload" SKIP "SPARKCACHE_MODE is not on (${v:-no-manifest})"
+    else
+      case "$v" in
+        ok) row "$host" "$d payload" PASS "every file in ~/tp4/$d manifests present and unchanged" ;;
+        no-manifest) row "$host" "$d payload" FAIL "~/tp4/$d/SHA256SUMS missing (run scripts/deploy.sh)" ;;
+        no-site-manifest) row "$host" "$d payload" FAIL "~/tp4/$d/SHA256SUMS.site missing (create it in the checkout, then scripts/deploy.sh)" ;;
+        *) row "$host" "$d payload" FAIL "${v:-probe failed}: place the operator payload under ~/tp4/$d (docs/install-from-zero.md)" ;;
+      esac
+    fi
+  done
+
   if [ "$FULL_MODEL" = 1 ]; then
     if [ -z "$MODEL_MANIFEST" ]; then
       row "$host" "model manifest" SKIP "MODEL_REV is not pinned"
@@ -577,8 +607,11 @@ check_node() {   # check_node <host> <rank>
   v=$(pv image); rc=1; [ -n "$v" ] && [ "$v" != absent ] && rc=0
   verdict "$host" "docker image" $rc "$([ "$rc" = 0 ] && echo "$((v / 1024 / 1024 / 1024)) GiB local" || echo "$IMAGE not pulled")"
 
-  # The tag in IMAGE is mutable; the digest is what actually pins the serving stack.
+  # The tag in IMAGE is mutable; the digest is what actually pins the serving stack. An IMAGE
+  # already written as name@sha256:... (the F1 lane) is its own pin; a tagged IMAGE (the F0
+  # rollback lane) is checked against IMAGE_DIGEST from versions.env.
   v=$(pv image_digest)
+  case "$IMAGE" in *@sha256:*) IMAGE_DIGEST=$IMAGE; VERSIONS_SRC="IMAGE in cluster.env" ;; esac
   if [ -z "${IMAGE_DIGEST:-}" ]; then
     row "$host" "docker image digest" WARN "IMAGE_DIGEST not pinned in $VERSIONS_SRC; this node serves ${v:-unknown}"
   elif [ -z "$v" ] || [ "$v" = absent ]; then

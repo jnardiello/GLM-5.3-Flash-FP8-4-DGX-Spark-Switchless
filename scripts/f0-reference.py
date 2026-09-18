@@ -708,7 +708,8 @@ def capture(args: argparse.Namespace, collector: Callable = collect_rank) -> int
                               "started_at": utcnow(), "status": "INCOMPLETE", "problems": []}
     try:
         problems = public_reference_problems(); recipe = load_recipe(args.timeout)
-        problems.extend(CHECK_F0.recipe_problems(recipe, CHECK_F0.expected_f0()))
+        # This tool captures the historic F0 reference, never the standing F1 default.
+        problems.extend(CHECK_F0.recipe_problems(recipe, CHECK_F0.expected_f0(REPO / "docs/baseline-f0.json")))
         site_bytes = safe_config(REPO / "cluster.env")
         resolved_bytes = resolved_site_env(recipe)
         write_private(archive / "private/site/cluster.env", site_bytes)

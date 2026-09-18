@@ -141,8 +141,28 @@ NETPLAN_RENDERER_BY_RANK=()
 ENV
 TP4_DRY_RUN=1 bash "$TMPD/launcher/launch-glm53-tp4.sh" 0 >"$TMPD/launch-asus.txt"
 grep -q 'NCCL_IB_HCA=rocep1s0f0,rocep1s0f1' "$TMPD/launch-asus.txt"
-grep -q 'NCCL_IB_GID_INDEX=3' "$TMPD/launch-asus.txt"
+grep -q 'NCCL_IB_GID_INDEX=-1' "$TMPD/launch-asus.txt"
 grep -q 'NCCL_SOCKET_IFNAME=enP7s7' "$TMPD/launch-asus.txt"
+# F1 template: SparkCache lane on, image healthcheck off, no F0 indexer mount.
+grep -q -- '--kv-transfer-config' "$TMPD/launch-asus.txt"
+grep -q -- '--no-healthcheck' "$TMPD/launch-asus.txt"
+grep -q -- '--entrypoint /opt/sircl-serving/entrypoint.sh' "$TMPD/launch-asus.txt"
+absent() { if grep -q -- "$1" "$2"; then echo "unexpected '$1' in ${2##*/}" >&2; exit 1; fi; }
+absent 'sparse_attn_indexer_kpool.py:ro' "$TMPD/launch-asus.txt"
+# A connector reference in EXTRA_VLLM_ARGS is refused on the ON lane.
+cp "$TMPD/launcher/cluster.env" "$TMPD/launcher/cluster.env.f1"
+printf '%s\n' 'EXTRA_VLLM_ARGS="$EXTRA_VLLM_ARGS --kv-transfer-config {}"' >>"$TMPD/launcher/cluster.env"
+if TP4_DRY_RUN=1 bash "$TMPD/launcher/launch-glm53-tp4.sh" 0 >"$TMPD/launch-dup.txt" 2>&1; then
+  echo "duplicate --kv-transfer-config was accepted" >&2; exit 1
+fi
+cp "$TMPD/launcher/cluster.env.f1" "$TMPD/launcher/cluster.env"
+# F0 rollback lane: SPARKCACHE_MODE=off restores the indexer mount and drops the connector.
+printf '%s\n' 'SPARKCACHE_MODE=off' "EXTRA_DOCKER_ENV='-e PYTHONPATH=/opt/tp4'" >>"$TMPD/launcher/cluster.env"
+TP4_DRY_RUN=1 bash "$TMPD/launcher/launch-glm53-tp4.sh" 0 >"$TMPD/launch-f0.txt"
+grep -q 'sparse_attn_indexer_kpool.py:ro' "$TMPD/launch-f0.txt"
+absent '--kv-transfer-config' "$TMPD/launch-f0.txt"
+absent '--no-healthcheck' "$TMPD/launch-f0.txt"
+cp "$TMPD/launcher/cluster.env.f1" "$TMPD/launcher/cluster.env"
 
 # The repository layout uses cluster.env two levels above scripts/launcher; the deployed
 # layout above keeps the launcher and config adjacent. Both must resolve the same recipe.

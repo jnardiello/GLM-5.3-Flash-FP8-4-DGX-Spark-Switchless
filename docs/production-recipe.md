@@ -5,8 +5,15 @@ one-step rollback comments live in [`cluster.env.example`](../cluster.env.exampl
 host/software pins live in `scripts/node/bootstrap/versions.env`, model file manifests
 in `scripts/node/model-manifests/`, and NCCL pins in `scripts/node/nccl/`.
 
+The production lane is **F1** (promoted on 2026-09-18, frozen in
+[`baseline-f1.json`](baseline-f1.json)): the SparkRing/SparkCache R10 image pinned by
+registry digest, the SparkCache persistent prefix cache over the SIRCL single-rail
+transport, and adaptive-k `batch-uniform`. It is encoded directly in
+`cluster.env.example`, one rollback comment per block, so no window overlay is needed
+to serve it.
+
 The rollback-stable F0 runtime overlay and its public artifact manifest live in
-`scripts/node/reference/`. They freeze the non-site recipe used by the standing F0
+`scripts/node/reference/`. They freeze the non-site recipe used by the historic F0
 baseline independently of later `cluster.env` defaults. Resolved node topology and the
 observed host/runtime inventory remain only in a private mode-0600 archive produced by
 `scripts/f0-reference.py`; see [`operations.md`](operations.md#frozen-f0-rollback-reference).
@@ -17,12 +24,15 @@ observed host/runtime inventory remain only in a private mode-0600 archive produ
 | --- | --- | --- |
 | Hardware | four NVIDIA GB10 nodes, verified on ASUS Ascent GX10 | one GPU per TP rank; platform overrides belong in `cluster.env` |
 | Network | two-port ConnectX-7 switchless RoCE ring | four direct edges, MTU 9000; see [`fabric.md`](fabric.md) |
-| Serving engine | pinned SM121 vLLM container referenced by `IMAGE` | rank 0 exposes the OpenAI-compatible API; ranks 1–3 are headless |
+| Serving engine | SparkRing/SparkCache R10 SM121 vLLM container pinned by registry digest (`IMAGE`) and content ID (`IMAGE_ID`) | rank 0 exposes the OpenAI-compatible API; ranks 1–3 are headless; the F0 rollback names the previous tagged image |
+| Prefix cache | SparkCache connector selected by `scripts/node/sparkcache/kv-transfer-config.json` (`SPARKCACHE_MODE=on`) | persistent context cache under the runtime cache volume; the connector module is operator payload pinned by SHA-256, not tracked |
+| Transport | SIRCL single-rail sync-prefill bundle and runtime under `SIRCL_DIR`, started through its entrypoint | operator payload pinned by `scripts/node/sircl/SHA256SUMS`; the container runs with `--no-healthcheck` because that entrypoint never writes the image's readiness marker |
+| Engine overrides | six vLLM modules under `scripts/node/overrides/` bind-mounted over the image | KV-cache interface and utilities, worker utilities, and the GLM-5.3 pooled indexer/kpool ops the R10 image needs with SparkCache |
 | Target model | pinned `zai-org/GLM-5.3-Flash` FP8 snapshot | immutable file list and hashes under `scripts/node/model-manifests/` |
 | Drafter | pinned `incoai/GLM-5.3-Flash-DFlash2` | fused speculative draft; non-commercial upstream terms apply |
 | Expert kernels | vLLM Triton FP8 MoE with the GB10-specific JSON in `scripts/node/moe-configs/` | loads the selected platform configuration for the Triton backend |
-| Speculation policy | `scripts/node/patches/adaptive_k_scheduler.py` | adjusts verification length per request from its own acceptance history |
-| Sparse attention | `scripts/node/sparse_attn_indexer_kpool_sm121.py` | SM121 K-pool compatibility patch bind-mounted over the image module |
+| Speculation policy | `scripts/node/patches/adaptive_k_scheduler.py` in `batch-uniform` mode | one verification length per step, chosen from the batched requests' acceptance history |
+| Sparse attention | `scripts/node/sparse_attn_indexer_kpool_sm121.py` (F0 lane only) | SM121 K-pool compatibility patch bind-mounted over the image module when `SPARKCACHE_MODE=off`; the R10 image ships its own |
 | Host tier | pinned kernel/packages and `iommu.passthrough=1` | verified host baseline; owned by `scripts/node/bootstrap/` and `scripts/node/host/` |
 | Collectives | host-preloaded patched NCCL | prevents uncabled tree connections and uses the physical ring |
 
@@ -44,7 +54,11 @@ Before a rank starts, the launcher requires:
 - the patched `libnccl.so.2`;
 - an active IPv4-mapped RoCEv2 GID on every configured HCA, at the explicit index or
   selected automatically when `NCCL_IB_GID_INDEX=-1`;
-- the sparse-attention indexer patch;
+- the sparse-attention indexer patch (F0 lane, `SPARKCACHE_MODE=off`);
+- with `SPARKCACHE_MODE=on`: the local image content ID equal to `IMAGE_ID`, the
+  SparkCache config and connector matching their pinned SHA-256, the SIRCL manifest
+  verified inside `SIRCL_DIR`, no `--kv-transfer-config` or connector reference in
+  `EXTRA_VLLM_ARGS`, and the connector mounted exactly once by `EXTRA_DOCKER_ENV`;
 - every bind-mount source named by `EXTRA_DOCKER_ENV`;
 - the configured image locally and the rank's management address on its selected
   management interface.
@@ -55,11 +69,11 @@ otherwise create a directory at the source path and start with a broken target.
 `scripts/verify-node.sh`, rather than the launcher, checks the pinned model revision
 marker and file manifest.
 
-The base production template keeps explicit GID index `3`. The frozen serving F0
-reference deliberately overrides it with automatic `-1` selection on all ranks; this
-is part of F0 identity, not a new template default. Automatic selection is otherwise an opt-in
-for hosts whose active HCA ports expose their addressed IPv4 RoCEv2 mappings at
-different indexes; it does not relax the `AF_INET` or RoCEv2 constraints.
+The F1 template selects the GID automatically (`NCCL_IB_GID_INDEX=-1`) on all ranks,
+as the frozen F0 reference overlay did; explicit index `3` is the F0 base rollback named
+beside the value. Automatic selection serves hosts whose active HCA ports expose their
+addressed IPv4 RoCEv2 mappings at different indexes; it does not relax the `AF_INET` or
+RoCEv2 constraints.
 
 Runtime scratch and compile caches live outside the model directory. The page-cache
 flusher runs only while the weights load and is stopped after `/health` reaches 200.
@@ -79,13 +93,15 @@ not add the optional `--async-scheduling` CLI flag in the current recipe. In the
 vLLM/DFlash path, the custom class still derives from `AsyncScheduler`; it disables its
 policy if the engine reports that required path unavailable.
 
-`per-request` is the production mode. A step that mixes k=3 and k=5 requests runs the
-PIECEWISE decode graph; with code acceptance measured at the 0.58 up-threshold, mixed
-steps appear as soon as two requests are batched. `batch-uniform` (one k per step)
-removed a C2/C4 regression on the E09 SparkCache candidate in a qualified three-run
-series (see
-[`operations.md`](operations.md#e09-same-client-performance-series-and-batch-uniform-qualification-on-2026-09-18));
-it is not promoted and has not been measured on the F0 recipe alone.
+`batch-uniform` is the production mode since F1: the scheduler chooses one k per step,
+so every decode step replays a full CUDA graph. In `per-request` mode (F0) a step that
+mixes k=3 and k=5 requests runs the PIECEWISE decode graph; with code acceptance
+measured at the 0.58 up-threshold, mixed steps appear as soon as two requests are
+batched, which cost C2/C4 on the SparkCache candidate. The qualified three-run series
+(see
+[`operations.md`](operations.md#e09-same-client-performance-series-and-batch-uniform-qualification-on-2026-09-18))
+measured C4 +18.2% with C2 within noise; `per-request` remains the rollback named beside
+`VLLM_ADAPTIVE_K_MODE` and has not been re-measured on the F0 recipe alone.
 
 The policy is CPU-testable without vLLM:
 
@@ -96,6 +112,30 @@ python3 scripts/node/patches/test_adaptive_k_policy.py
 The implementation is derived from vLLM's Apache-2.0 scheduler interfaces and retains
 its SPDX/provenance header. Exceptions in the optimization path log once and fall back
 to base scheduling rather than taking down the endpoint.
+
+## SparkCache prefix cache and SIRCL transport
+
+`SPARKCACHE_MODE=on` selects the F1 lane. The launcher builds `--kv-transfer-config`
+from the tracked `scripts/node/sparkcache/kv-transfer-config.json` (deployed to
+`~/tp4/sparkcache/`), which names the `SparkContextCacheConnector`, the target and
+drafter checkpoint hashes it accepts, a 4,096–262,144-token span, store and restore
+enabled with `recompute` on a failed load, and the cache root under the runtime cache
+volume. The connector module and the SIRCL bundle and runtime carry no license and are
+not tracked: they are operator payload placed at `SPARKCACHE_CONNECTOR` and `SIRCL_DIR`
+(see [`install-from-zero.md`](install-from-zero.md#8-place-the-sparkcache-and-sircl-payload))
+and verified against `scripts/node/sparkcache/SHA256SUMS` and
+`scripts/node/sircl/SHA256SUMS` by the launcher and by `scripts/verify-node.sh`; the
+SIRCL per-rank peer/GID files are site data, pinned by the gitignored
+`scripts/node/sircl/SHA256SUMS.site` in the operator checkout. The
+lane disables the PCIe and FlashInfer all-reduce paths and vLLM plugins in the container
+environment, starts through the SIRCL entrypoint, and turns the image healthcheck off;
+`/health` 200 stays the only readiness definition.
+
+Rollback to the F0 lane is the set of values named in the rollback comments of
+`cluster.env.example` (image tag and empty `IMAGE_ID`, `SPARKCACHE_MODE=off`, explicit
+GID index, `SPEC_EXTRA_JSON`, `EXTRA_DOCKER_ENV`, `EXTRA_VLLM_ARGS`), then a deploy and a
+full restart; see the
+[recovery table](operations.md#recovery-and-rollback).
 
 ## Thinking-off compatibility
 
@@ -123,7 +163,13 @@ adapter. See [`operations.md`](operations.md#e09-reasoning-diagnosis-attribution
   four-node target.
 - DFlash2 drafts a block in one pass, avoiding sequential MTP draft steps on this engine.
 - Triton FP8 MoE uses the versioned GB10 configuration without changing model weights.
-- Adaptive verification selects the low or high length from each request's own history.
+- Adaptive verification selects the low or high length per step from the batched
+  requests' history; one length per step keeps decode on full CUDA graphs under
+  concurrency.
+- SparkCache restores long shared prefixes from a persistent cache instead of
+  recomputing them: replay prefill at 8K/32K roughly doubled against F0.
+- SIRCL supplies the single-rail synchronous prefill transport that the R10 image and
+  the connector expect on this ring.
 - IOMMU passthrough is pinned and checked as part of the host baseline.
 - Patched NCCL is structural: the uncabled diagonals make the stock tree connection
   plan unsuitable for this topology.
@@ -139,6 +185,8 @@ mesh to all ranks including itself. Compromise of those accounts is compromise o
 cluster. No credentials belong in the repository; site values belong only in ignored
 local files.
 
-Model, drafter, container, derived vLLM files, NCCL, and the switchless overlay keep
-their upstream terms. [`CREDITS.md`](../CREDITS.md) records attribution and the known
-license uncertainty around the overlay.
+Model, drafter, container, derived vLLM files, NCCL, the switchless overlay, the
+SparkCache connector and the SIRCL payload keep their upstream terms.
+[`CREDITS.md`](../CREDITS.md) records attribution, the known license uncertainty around
+the overlay, and why the connector and SIRCL files are pinned by hash rather than
+redistributed.

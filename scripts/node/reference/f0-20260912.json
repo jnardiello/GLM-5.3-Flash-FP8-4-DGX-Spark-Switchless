@@ -38,7 +38,7 @@
       "sha256": "43a4b828af8efe57dc2c95989d2e571fb454d2eaa4a91883f49374fbd9f6dfd7"
     },
     {
-      "path": "scripts/launcher/launch-glm53-tp4.sh",
+      "path": "scripts/node/reference/launch-glm53-tp4-f0-20260912.sh",
       "destination": "$HOME/tp4/launch-glm53-tp4.sh",
       "mode": "0755",
       "sha256": "4ee95668acba3aa7693c7cf1efa584499fead443cbb9498eeb18f18587d36401"

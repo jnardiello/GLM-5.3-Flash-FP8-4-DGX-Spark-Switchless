@@ -18,6 +18,15 @@ scripts/node/ssh-config
 scripts/mirror-private-terms.txt
 .claude/
 
+# F1 SparkCache/SIRCL operator payload: unlicensed third-party files stay on the nodes.
+# Only the portable SHA-256 manifests and the repository's own kv-transfer-config.json are
+# tracked; sircl/SHA256SUMS.site pins this site's per-rank peer/GID files and stays local.
+/scripts/node/sparkcache/*
+!/scripts/node/sparkcache/kv-transfer-config.json
+!/scripts/node/sparkcache/SHA256SUMS
+/scripts/node/sircl/*
+!/scripts/node/sircl/SHA256SUMS
+
 # Local mirror tooling stays outside the public repository.
 /scripts/mirror-snapshot.sh
 /scripts/mirror-allow.txt

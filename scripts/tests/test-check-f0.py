@@ -88,7 +88,26 @@ def recipe() -> dict[str, str]:
 def expected() -> dict:
     value = check.expected_f0()
     value["image_digest"] = "example/f0@sha256:abc"
+    # The fixtures describe the per-request policy regardless of which frozen baseline the
+    # checkout carries; the baseline-driven expectation is covered separately below.
+    value["adaptive_env"] = dict(check.ADAPTIVE_DEFAULTS)
     return value
+
+
+def test_baseline_adaptive_policy_is_read_from_the_baseline() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        data = json.loads(check.BASELINE.read_text(encoding="utf-8"))
+        data["system"]["adaptive_k"] = {"mode": "batch-uniform", "k_lo": 3, "k_hi": 5}
+        data["system"]["serving_image_digest"] = "example/f1@sha256:def"
+        path = Path(tmp) / "baseline.json"
+        path.write_text(json.dumps(data), encoding="utf-8")
+        value = check.expected_f0(path)
+    assert value["adaptive_env"]["VLLM_ADAPTIVE_K_MODE"] == "batch-uniform"
+    assert value["adaptive_env"]["VLLM_ADAPTIVE_K_LO"] == "3"
+    assert value["image_digest"] == "example/f1@sha256:def"
+
+
+test_baseline_adaptive_policy_is_read_from_the_baseline()
 
 
 def probe(rank: int) -> dict:

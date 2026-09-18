@@ -6,7 +6,59 @@ release.
 
 ## Unreleased
 
+### Changed
+
+- Promoted **F1** into IaC by owner decision, without an attribution control: the
+  SparkCache R10 recipe is now the base recipe in `cluster.env.example`, served without a
+  window overlay. The image is pulled by registry digest
+  (`ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3…`) and its content ID
+  is pinned by the new `IMAGE_ID`. `scripts/launcher/launch-glm53-tp4.sh` gains a
+  `SPARKCACHE_MODE=on` lane (image-ID gate, SHA-256 checks of the kv-transfer config,
+  connector and SIRCL payload, duplicate-connector refusal, `--kv-transfer-config`,
+  `--no-healthcheck`, PCIe/FlashInfer all-reduce and vLLM plugins off); the
+  sparse-attention `PATCH_FILE` mount is now F0-lane only. Adaptive-k runs in
+  `batch-uniform` mode, with automatic GID selection, the drafter KV dtype pinned in
+  `SPEC_EXTRA_JSON` and the R10 `EXTRA_VLLM_ARGS`; every block names its one-step F0
+  rollback. `scripts/check-f0.py` validates the F1 identity by default (`--baseline`
+  selects F0); its test covers the baseline-driven adaptive policy. Both
+  `scripts/check-f0.py` and `scripts/verify-node.sh` treat a digest-pinned `IMAGE` as its
+  own pin (the `versions.env` digest still pins the tagged F0 image), and
+  `verify-node.sh` expands `$HOME/`/`~/` mount sources on the node as the launcher does,
+  instead of reporting single-quoted F1 mounts as missing. The frozen F0
+  reference keeps its exact launcher bytes as
+  `scripts/node/reference/launch-glm53-tp4-f0-20260912.sh` (unchanged SHA-256), and
+  `scripts/f0-reference.py capture` validates against `docs/baseline-f0.json` explicitly.
+  `scripts/tests/test-agent-preflight.sh` now asserts the F1 template lane
+  (`--kv-transfer-config`, `--no-healthcheck`, SIRCL entrypoint, no indexer mount), the
+  refusal of a duplicate connector config, and the `SPARKCACHE_MODE=off` rollback lane.
+- Reapplied F1 through IaC on the cluster (owner-authorized window, 2026-09-18): payload
+  placed at the stable paths, `deploy.sh` (drift cleared), image pulled by digest on 4/4,
+  coordinated `down` and `up` without `TP4_ENV`, `/health` 200 after 713 s, both gates
+  PASS, identity confirmed on four ranks. One native Rigmark run (owner direction)
+  reproduces F1: 54/54 requests, 0 errors, all primary code/concurrency metrics inside the
+  F1 per-run range (C4 86.39 tok/s). Recorded in `docs/operations.md`.
+- Documentation follows the promotion: stack table, SparkCache/SIRCL section and
+  `batch-uniform` as production mode in `production-recipe.md`; six boot signatures,
+  deploy notes, an F1→F0 rollback row and the promotion record in `operations.md`;
+  pull-by-digest and a new payload-placement step in `install-from-zero.md` (later steps
+  renumbered); node asset map; `AGENTS.md` restores F1 through plain IaC.
+
 ### Added
+
+- Added [`HANDOVER.md`](HANDOVER.md), addressed to the Astra agent that resumes the
+  optimization work: current F1 state and medians, the promotion as last change, known
+  pitfalls (untracked payload, incompatible old overlays, persistent cache and
+  `cache_salt`, pre-existing host drift) and the ordered plan for the next prefill/decode
+  experiments, including the SIRCL 8192-row admission limit that constrains E06. The
+  README gains a current-recipe section with F0/F1 medians and links to the baseline
+  and the handover.
+- Tracked the F1 engine assets: six Apache-2.0-derived vLLM override modules under
+  `scripts/node/overrides/`, the repository's `kv-transfer-config.json`, and SHA-256
+  manifests for the untracked SparkCache connector and SIRCL bundle/runtime.
+  `scripts/deploy.sh` ships them and `scripts/verify-node.sh` reports `sparkcache payload`
+  and `sircl payload` rows. The connector and SIRCL files carry no license and stay
+  operator payload (gitignored, see `CREDITS.md`); the SIRCL per-rank peer/GID files are
+  site data, pinned only by the gitignored `scripts/node/sircl/SHA256SUMS.site`.
 
 - Froze the qualified E09 batch-uniform state as measurement baseline **F1** in
   [`docs/baseline-f1.json`](docs/baseline-f1.json) by explicit owner request: the three

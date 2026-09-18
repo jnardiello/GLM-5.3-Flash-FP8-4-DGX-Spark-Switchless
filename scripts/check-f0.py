@@ -23,7 +23,9 @@ from typing import Any, Callable
 
 
 REPO = Path(__file__).resolve().parents[1]
-BASELINE = REPO / "docs/baseline-f0.json"
+# The standing frozen baseline: F1 when present (docs/baseline-f1.json), else the historic F0.
+BASELINE = next((p for p in (REPO / "docs/baseline-f1.json", REPO / "docs/baseline-f0.json")
+                 if p.exists()), REPO / "docs/baseline-f0.json")
 ADAPTIVE_DEFAULTS = {
     "VLLM_ADAPTIVE_K_ENABLE": "1", "VLLM_ADAPTIVE_K_LO": "3",
     "VLLM_ADAPTIVE_K_HI": "5", "VLLM_ADAPTIVE_K_MODE": "per-request",
@@ -59,6 +61,8 @@ readonly base_api_port base_fabric_prefix_re base_container base_model_dir base_
 readonly base_served_name base_extra_docker_env base_extra_vllm_args
 tp4_load_env "$repo" --require --overlay
 . "$repo/scripts/node/bootstrap/versions.env"
+# A digest-pinned IMAGE (F1 lane) is its own pin; versions.env pins the tagged F0 image.
+case "$IMAGE" in *@sha256:*) IMAGE_DIGEST=$IMAGE ;; esac
 emit() { printf '%s\0%s\0' "$1" "$2"; }
 emit base_nodes "$base_nodes"; emit base_tp4_hosts "$base_tp4_hosts"; emit base_mgmt_ips "$base_mgmt_ips"
 emit base_hosts "$base_hosts"; emit base_master_ip "$base_master_ip"; emit base_master_port "$base_master_port"
@@ -278,18 +282,28 @@ def load_recipe(timeout: float) -> tuple[dict[str, str], dict[str, Any]]:
             diagnostic)
 
 
-def expected_f0() -> dict[str, Any]:
-    system = json.loads(BASELINE.read_text(encoding="utf-8"))["system"]
+def expected_f0(baseline: Path | None = None) -> dict[str, Any]:
+    system = json.loads((baseline or BASELINE).read_text(encoding="utf-8"))["system"]
     seqs = re.search(r"max sequences (\d+)", system["scheduler"])
     batched = re.search(r"max batched tokens (\d+)", system["scheduler"])
-    if not seqs or not batched: raise CheckFailure("frozen F0 scheduler identity is not parseable")
+    if not seqs or not batched: raise CheckFailure("frozen baseline scheduler identity is not parseable")
+    # F1 records the pullable digest reference separately from the descriptive image field.
+    image_digest = system.get("serving_image_digest") or system["serving_image"]
+    adaptive = dict(ADAPTIVE_DEFAULTS)
+    policy = system.get("adaptive_k") or {}
+    for key, name in (("VLLM_ADAPTIVE_K_MODE", "mode"), ("VLLM_ADAPTIVE_K_LO", "k_lo"),
+                      ("VLLM_ADAPTIVE_K_HI", "k_hi"), ("VLLM_ADAPTIVE_K_UP", "up"),
+                      ("VLLM_ADAPTIVE_K_DOWN", "down"), ("VLLM_ADAPTIVE_K_ALPHA", "alpha"),
+                      ("VLLM_ADAPTIVE_K_SEED", "seed"), ("VLLM_ADAPTIVE_K_SIGNAL", "signal")):
+        if name in policy: adaptive[key] = str(policy[name])
     return {
         "model_repo": system["model"], "model_rev": system["model_revision"],
-        "draft_rev": system["drafter"]["revision"], "image_digest": system["serving_image"],
+        "draft_rev": system["drafter"]["revision"], "image_digest": image_digest,
         "max_model_len": str(system["context_limit_tokens"]), "max_num_seqs": seqs.group(1),
         "batched_tokens": batched.group(1), "kv_cache_dtype": system["kv_cache"].split()[0],
         "spec_tokens": str(system["drafter"]["draft_tokens"]),
         "adaptive_tokens": system["drafter"]["adaptive_verification_tokens"],
+        "adaptive_env": adaptive,
     }
 
 
@@ -344,7 +358,7 @@ def recipe_problems(recipe: dict[str, str], expected: dict[str, Any]) -> list[st
         if recipe.get(key) != str(expected[key]): problems.append(f"effective recipe mismatch: {key}")
     base_env = adaptive_env(recipe.get("base_extra_docker_env", ""))
     env = adaptive_env(recipe.get("extra_docker_env", ""))
-    for key, value in ADAPTIVE_DEFAULTS.items():
+    for key, value in expected.get("adaptive_env", ADAPTIVE_DEFAULTS).items():
         if base_env[key] != value: problems.append("base F0 adaptive policy: " + key)
         if env[key] != value: problems.append("effective F0 adaptive policy: " + key)
     raw_env = docker_env(recipe.get("extra_docker_env", ""))
@@ -490,7 +504,7 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
             problems.append(f"rank {rank}: adaptive graph table")
         if container.get("async_flag_count") != 0: problems.append(f"rank {rank}: optional async CLI flag")
         env = container.get("environment") or {}
-        for key, value in ADAPTIVE_DEFAULTS.items():
+        for key, value in expected.get("adaptive_env", ADAPTIVE_DEFAULTS).items():
             if env.get(key, value) != value: problems.append(f"rank {rank}: adaptive policy {key}")
         if "NCCL_IB_QPS_PER_CONNECTION" in env: problems.append(f"rank {rank}: NQ2 QPS delta")
         selectors = {"NCCL_ALGO": "Ring", "NCCL_IB_HCA": recipe.get(f"hca_{rank}"),
@@ -578,6 +592,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", help="endpoint base URL, including a localhost SSH tunnel")
     parser.add_argument("--timeout", type=positive, default=90.0)
+    parser.add_argument("--baseline", type=Path, default=BASELINE,
+                        help="frozen baseline JSON to check against (default: %(default)s)")
     parser.add_argument("--report-root", type=Path, help=argparse.SUPPRESS)
     return parser.parse_args(argv)
 

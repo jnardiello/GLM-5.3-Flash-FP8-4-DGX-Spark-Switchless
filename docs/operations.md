@@ -74,15 +74,16 @@ LAN, run the health probe from rank 0 because the local `MASTER_IP` may be unrea
 ssh <ALIAS_RANK0> 'curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8000/health'
 ```
 
-Then verify five signatures that `docker ps` does not prove:
+Then verify six signatures that `docker ps` does not prove:
 
 | Signature | Read-only check | Expected result |
 | --- | --- | --- |
-| Four-rank identity | `./scripts/tp4ctl status` | the configured `CONTAINER` is `Up` once on every rank |
+| Four-rank identity | `./scripts/tp4ctl status`, `docker inspect` | the configured `CONTAINER` is `Up` once on every rank; its `RepoDigests` entry equals `IMAGE` and `.Image` equals `IMAGE_ID` |
 | Triton MoE configuration | `./scripts/tp4ctl logs` on rank 0 | `Using TRITON Fp8 MoE backend` and `Using configuration from …NVIDIA_GB10…json` |
 | Host IOMMU tier | `deploy-host.sh ... tp4-iommu.sh --status` | passthrough on all four ranks, drop-in installed, GRUB synchronized |
 | NCCL HCA/GID selection | `./scripts/verify-node.sh` | every configured HCA has an active IPv4-mapped RoCEv2 GID on its addressed fabric netdev; explicit index or automatic `-1` mode is identified |
-| Adaptive scheduler | rank-0 log | `AdaptiveKScheduler active (enabled=1 …)` and a `num_speculative_tokens_per_batch_size` table in engine initialization |
+| Adaptive scheduler | rank-0 log | `AdaptiveKScheduler active (enabled=1 … mode=batch-uniform engine_k=5 async=True)` and a `num_speculative_tokens_per_batch_size` table in engine initialization |
+| SparkCache lane | `docker inspect`, `./scripts/verify-node.sh` | `--kv-transfer-config` naming `SparkContextCacheConnector` in the command, entrypoint `/opt/sircl-serving/entrypoint.sh`, the connector, override and SIRCL mounts present, `sparkcache payload` and `sircl payload` rows PASS; `docker ps` shows no health state because the lane runs with `--no-healthcheck` |
 
 For a boot caused by rank-0 autostart, inspect the units too:
 
@@ -96,22 +97,26 @@ unreachable rank, or health mismatch. `/v1/models` is never a readiness check.
 `tp4ctl status` exits nonzero unless it can verify the configured container running on
 all four ranks and receive `/health` 200.
 
-### Fast F0 operational check
+### Fast baseline operational check
 
-Run the reusable read-only check when a single concise F0 identity and idle verdict is
-needed:
+Run the reusable read-only check when a single concise baseline identity and idle
+verdict is needed:
 
 ```sh
 ./scripts/check-f0.py
 ./scripts/check-f0.py --base-url http://127.0.0.1:8000
+./scripts/check-f0.py --baseline docs/baseline-f0.json
 ```
 
 The second form uses an already-established localhost SSH tunnel when the management LAN
 is not directly reachable. The checker reads the local `cluster.env` and honors `TP4_ENV`
-as the effective delta. An F0-changing delta fails the check.
+as the effective delta. By default it validates the frozen **F1** identity from
+[`baseline-f1.json`](baseline-f1.json) (registry image digest, adaptive-k
+`batch-uniform` parameters); the third form validates the F0 lane instead. A
+baseline-changing delta fails the check.
 
 The checker runs bounded SSH probes for all four ranks in parallel with strict host-key checking.
-It verifies the effective recipe against the frozen F0 pins, the configured running
+It verifies the effective recipe against the selected baseline's pins, the configured running
 container and key command/environment identity, image digest and model marker, unfiltered
 GPU containers and processes, inactive flusher, addressed MTU-9000 interfaces, all eight
 jumbo directions, `/health` 200, and zero running/waiting requests. Stdout is exactly one
@@ -180,6 +185,15 @@ the archived IaC, atomically installs the archived NCCL bytes, and prepares auto
 The reference overlay is deployed at the same relative path by setting
 `TP4_ENV=scripts/node/reference/f0-20260912.env` on `scripts/deploy.sh`.
 
+Since the F1 promotion the live launcher has an F1 lane, so the manifest pins the exact
+F0 launcher bytes as the frozen copy `scripts/node/reference/launch-glm53-tp4-f0-20260912.sh`
+(same SHA-256 as before). The F0 overlay is valid only together with the archived F0 IaC
+that `plan-restore` deploys; on top of the F1 base `cluster.env` it inherits
+`SPARKCACHE_MODE=on` and `IMAGE_ID`, and the launcher refuses the F0 image (fail-closed).
+For a lighter F0 return use the rollback comments in `cluster.env.example` (see the
+[recovery table](#recovery-and-rollback)). `f0-reference.py capture` always validates
+against `docs/baseline-f0.json`.
+
 ## Post-boot functional gates
 
 Run both gates within two minutes of `/health` reaching 200 after any changed boot.
@@ -241,13 +255,21 @@ content or touching a running container. It does replace `~/tp4/cluster.env`, wh
 what rank-0 autostart uses next. `restart` is disruptive and always cycles all ranks.
 
 `EXTRA_DOCKER_ENV` is one word-split string carrying the tuned MoE JSON, the adaptive
-scheduler mount, `PYTHONPATH`, and policy variables. An overlay replaces the complete
-value. Preserve every unrelated entry, avoid spaces/globs in values, and never clear
-the string while `--scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler` remains in
-`EXTRA_VLLM_ARGS`.
+scheduler mount, `PYTHONPATH`, policy variables, the six vLLM override mounts, the
+SIRCL bundle/runtime mounts with their entrypoint, and the connector mount. An overlay
+replaces the complete value. Preserve every unrelated entry, avoid spaces/globs in
+values, and never clear the string while `--scheduler-cls
+adaptive_k_scheduler.AdaptiveKScheduler` remains in `EXTRA_VLLM_ARGS`.
+
+The F1 lane adds `scripts/node/overrides/`, `scripts/node/sparkcache/kv-transfer-config.json`
+and the two `SHA256SUMS` manifests to the deploy set. The SparkCache connector and the
+SIRCL bundle/runtime are not deployed by `deploy.sh`: place them once per rank at
+`SPARKCACHE_CONNECTOR` and `SIRCL_DIR` (see
+[`install-from-zero.md`](install-from-zero.md#8-place-the-sparkcache-and-sircl-payload))
+and let `./scripts/verify-node.sh` confirm both payload rows before `restart`.
 
 Expected: every copied file matches its source, all ranks launch in order 3→2→1→0,
-`/health` reaches 200, and the five signatures return. Run the
+`/health` reaches 200, and the six signatures return. Run the
 [post-boot functional gates](#post-boot-functional-gates) within two minutes, followed
 by any task-specific verification. Stop the stack immediately if a gate fails.
 
@@ -1105,28 +1127,98 @@ gain; the C1, code and prose gains are small. The target-only and pilot receipts
 the four spec-decode snapshots are diagnostic, kept apart from the qualification
 medians.
 
-Promotion has not started. It requires the whole R10 recipe in IaC, not one variable:
-the offline-imported image (local ID `5e32aaa1bbe3`, no registry digest; the digest is
-pinned only in the private `RECIPE-CONTRACT.json`), the E09 launcher (81 lines apart
-from `scripts/launcher/launch-glm53-tp4.sh`), the SIRCL bundle/runtime, four vLLM
-override sets, the connector and `kv-transfer-config.json` (45 private files, ~2.1 MB),
-plus rollback comments, boot signatures and the Rigmark `cache_salt` fix committed in
-Rigmark. The batch-uniform candidate stays loaded on 4/4 ranks; the Docker healthcheck
-marker `/tmp/sparkring-engine-ready` is absent on every E09 recipe, so `docker ps`
-reports `unhealthy` while `/health` is 200 — `/health` remains the readiness definition.
+At qualification time the R10 recipe lived outside IaC: an offline-imported image
+(local ID `5e32aaa1bbe3`, no registry digest), an 81-line private launcher delta, the
+SIRCL bundle/runtime, four vLLM override sets, the connector and
+`kv-transfer-config.json` (45 private files, ~2.1 MB). The Docker healthcheck marker
+`/tmp/sparkring-engine-ready` is absent on every E09 recipe, so `docker ps` reported
+`unhealthy` while `/health` was 200 — `/health` remains the readiness definition.
 Receipts, spec-decode snapshots, rank-0 logs and the extracted sources are in the
 owner's private `e09-investigation-2026-09-17` archive.
 
-By explicit owner request this qualified state is the new frozen measurement baseline
+By explicit owner request this qualified state is the frozen measurement baseline
 **F1**, recorded in [`baseline-f1.json`](baseline-f1.json) from the three receipts with
 the true recipe identity (the receipts' embedded appliance block still describes F0 and
 `per-request`; the JSON is authoritative). Future variants compare against the fixed F1
-medians from the same workstation with a fresh `cache_salt` per run. F0 stays the
-historic record and, until the F1 recipe is encoded in IaC with a registry image digest,
-the only IaC-backed operational reference: `scripts/check-f0.py` and the
-[frozen F0 archive restore](#restore-from-the-frozen-f0-archive) still target F0, and an
-F1 restore means the coordinated up of the batch-uniform overlay with the pinned E09
-controller, not a `deploy.sh` reference restore.
+medians from the same workstation with a fresh `cache_salt` per run. The owner then
+decided to promote the whole state without an attribution control (whether the
+prefill gains survive without the connector); the promotion is recorded next.
+
+### F1 promotion into IaC on 2026-09-18
+
+The private R10 recipe was encoded as the base recipe of this repository:
+
+- the image is pulled by registry digest and pinned twice
+  (`IMAGE=ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3…`,
+  `IMAGE_ID=sha256:5e32aaa1…`, verified equal by the launcher); the digest's config blob
+  is byte-identical to the offline-imported image that served every F1 run;
+- `scripts/launcher/launch-glm53-tp4.sh` carries the E09 launcher logic as one
+  `SPARKCACHE_MODE=on` lane: image-ID gate, SHA-256 verification of
+  `SPARKCACHE_CONFIG`/`SPARKCACHE_CONNECTOR`, SIRCL manifest check, refusal of duplicate
+  `--kv-transfer-config`/connector entries, exactly-once connector mount, canonical
+  `--kv-transfer-config` JSON, `--no-healthcheck`, PCIe/FlashInfer all-reduce and vLLM
+  plugins disabled; the `PATCH_FILE` mount belongs to the `off` lane only;
+- the six vLLM override modules (Apache-2.0 derived, SPDX headers) live under
+  `scripts/node/overrides/`; the connector and the SIRCL bundle/runtime are unlicensed
+  operator payload, ignored by git and pinned by `scripts/node/sparkcache/SHA256SUMS`
+  and `scripts/node/sircl/SHA256SUMS`; the SIRCL per-rank files carry the site's fabric
+  peers and GIDs, so their hashes live only in the gitignored
+  `scripts/node/sircl/SHA256SUMS.site`; `scripts/verify-node.sh` gains the two payload
+  rows and `scripts/deploy.sh` ships overrides, config and manifests;
+- `cluster.env.example` holds the F1 values (`SPARKCACHE_*`, `SIRCL_DIR`,
+  `NCCL_IB_GID_INDEX=-1`, `SPEC_EXTRA_JSON` with `kv_cache_dtype`, the batch-uniform
+  `EXTRA_DOCKER_ENV` and the R10 `EXTRA_VLLM_ARGS`) with a one-step F0 rollback comment per
+  block; `scripts/check-f0.py` validates the F1 identity by default.
+
+No site address, credential or payload file entered the repository; the review covered
+the full diff and every new file. The SIRCL bundle's IPv4 literals are the public example
+addresses already present in the NCCL patch; only the per-rank peer/GID files are site
+data and stay out of git.
+
+**Window, 2026-09-18 (UTC).** The payload was copied node-locally from the E09 window
+directories to the stable paths on all four ranks and matched both manifests.
+`deploy.sh --check` first showed the expected drift (F0-era launcher, controller, helpers,
+recipe, comment-only scheduler, missing F1 assets); after `deploy.sh` every managed file
+matched on every rank. `docker pull` by digest completed on 4/4 without re-downloading
+layers: `RepoDigests` equals the pin and the content ID equals `IMAGE_ID`. The E09 window
+overlay now refuses to load on top of the F1 base (its guard sees SIRCL already present),
+so the old stack was stopped with a plain coordinated `down` at 07:17 (overlays cannot
+change `CONTAINER`). `tp4ctl up` without `TP4_ENV` passed the SIRCL GID preflight and
+reached `/health` 200 after 713 s; both gates passed at +1.2 s and +3.4 s. On 4/4 ranks
+the container runs the pinned content ID with the SIRCL entrypoint,
+`SparkContextCacheConnector`, B12X, the adaptive scheduler and
+`VLLM_ADAPTIVE_K_MODE=batch-uniform`; rank 0 logs `mode=batch-uniform … engine_k=5
+async=True`. `scripts/check-f0.py` reports only one pre-existing host item (below).
+
+**Reproduction.** By owner direction one native Rigmark run (not three) checked that
+IaC reproduces F1: `mini-f1-iac-r1`, same client and protocol, fresh `cache_salt`, first
+run after boot with no pilot. 54/54 requests complete, 0 errors, 0 length caps, gates
+15/15, spec-decode acceptance 59.2%.
+
+| Metric | F1 median (range) | IaC run |
+| --- | --- | --- |
+| Code decode tok/s | 51.78 (51.50–52.98) | 52.25 |
+| Code C1 / C2 / C4 aggregate tok/s | 38.43 / 57.39 / 84.05 | 37.74 / 56.53 / 86.39 (all in range) |
+| Prose decode tok/s | 30.27 (30.14–30.62) | 29.91 |
+| Code / prose TTFT s | 0.398 / 0.379 | 0.408 / 0.382 |
+| C1 / C2 / C4 per-stream TTFT s | 0.395 / 0.447 / 0.597 | 0.394 / 0.571 / 0.567 |
+| Prefill 8K cold / replay tok/s | 2,393 / 9,720 | 2,390 / 8,101 |
+| Prefill 32K cold / replay tok/s | 2,502 / 31,977 | 2,526 / 35,510 |
+| Prefill 64K cold / replay tok/s | 2,254 / 35,378 | 2,492 / 35,808 |
+
+Verdict: **reproduced**. All four primary code/concurrency metrics fall inside the F1
+per-run range, C4 above its median. The C2 per-stream TTFT median over six streams is
+raised by the first batch-of-two round after boot (0.693 s on both streams, where the F1
+runs followed a pilot) and one scheduling collision (1.183 s); typical rounds are
+0.45 s, and the F1 receipts contain the same kind of outlier (0.748 s, 0.756 s). The
+8K replay spread matches the F1 receipts (7,341–9,910 tok/s per sample); prose −1.2% and
+code TTFT +10 ms are at single-run noise scale. The receipt stays in Rigmark's results
+and the private `f1-iac-reproduction-2026-09-18` archive with spec-decode snapshots.
+
+Open host items, pre-existing and outside this promotion: one rank reports
+`NeedDaemonReload` for the fabric iptables unit (this is the only `check-f0.py` problem),
+and `scripts/deploy-host.sh --check` reports host-script and sudoers drift on all ranks.
+Both need their own authorized host window.
 
 ## Recovery and rollback
 
@@ -1136,7 +1228,8 @@ below is full-cluster and must fall within an authorized service window.
 | Condition | Recovery | Verification |
 | --- | --- | --- |
 | Overlay result is bad | `./scripts/tp4ctl restart` with no `TP4_ENV` | base `cluster.env` signatures and gates return |
-| Production engine knob is bad | restore the rollback documented beside the value in `cluster.env.example`, update local `cluster.env`, deploy, restart | five signatures plus task gate |
+| Production engine knob is bad | restore the rollback documented beside the value in `cluster.env.example`, update local `cluster.env`, deploy, restart | six signatures plus task gate |
+| F1 lane must be rolled back to F0 | apply every F0 value named in the rollback comments of `cluster.env.example` (tagged image and empty `IMAGE_ID`, `SPARKCACHE_MODE=off`, `NCCL_IB_GID_INDEX=3`, `SPEC_EXTRA_JSON`, `EXTRA_DOCKER_ENV`, `EXTRA_VLLM_ARGS`) in `cluster.env`, deploy, restart; the deeper alternative is the [frozen F0 archive restore](#restore-from-the-frozen-f0-archive) | `PATCH_FILE` mount present, no `--kv-transfer-config`, `mode=per-request`, `./scripts/check-f0.py --baseline docs/baseline-f0.json` PASS, both gates |
 | Model revision is bad | restore the previous pinned revision and manifest named beside `MODEL_REV`, deploy fetch tooling, rerun the manifest fetch and `verify-node.sh --full-model`, then restart | identical revision markers and complete hashes on all ranks |
 | Adaptive scheduler must be removed | apply the coupled rollback beside its settings: scheduler flag, mount, policy env, speculative length/table; preserve the MoE mount | no adaptive line, intended fixed-k init, MoE config still loaded |
 | Tuned MoE config must be removed | remove only its mount; preserve scheduler entries | expected default-MoE line, Triton backend and adaptive scheduler remain |

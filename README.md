@@ -12,6 +12,34 @@ settings.
 **Configured context window: 256K (262,144 tokens).** See `MAX_MODEL_LEN` in
 [`cluster.env.example`](cluster.env.example).
 
+## Current recipe: F1
+
+The production recipe is **F1** (promoted 2026-09-18): the SparkRing/SparkCache vLLM
+image pinned by registry digest, a persistent SparkCache prefix cache over the SIRCL
+single-rail prefill transport, and DFlash2 speculative decoding with batch-uniform
+adaptive verification length. Medians of three native
+[Rigmark](https://github.com/alexellis/rigmark) runs, frozen in
+[`docs/baseline-f1.json`](docs/baseline-f1.json), against the previous F0 recipe:
+
+<div align="center">
+
+| Workload | F0 | F1 |
+| --- | ---: | ---: |
+| Code decode, one agent | 50.4 tok/s | 51.8 tok/s |
+| Code, four parallel agents (aggregate) | 71.1 tok/s | 84.1 tok/s |
+| Code, four agents, per-stream TTFT | 0.94 s | 0.60 s |
+| Prose decode | 29.2 tok/s | 30.3 tok/s |
+| Prefill 8K / 32K, cached prefix replay | 4.6k / 21.5k tok/s | 9.7k / 32.0k tok/s |
+| Prefill 64K, cold | 2.2k tok/s | 2.3k tok/s |
+
+</div>
+
+The SparkCache connector and the SIRCL bundle/runtime are third-party files without a
+license: this repository pins them by SHA-256 but does not ship them. Place them on the
+nodes as described in
+[`docs/install-from-zero.md`](docs/install-from-zero.md#8-place-the-sparkcache-and-sircl-payload),
+or roll back to the F0 lane with the values named in `cluster.env.example`.
+
 ## Assumptions
 
 GLM-5.3-Flash is my daily driver for heavy coding workloads and extensive parallel
@@ -65,8 +93,8 @@ uses explicit `TP4_HOSTS`. Run documented shell blocks with Bash because several
 procedures use Bash arrays and loops.
 
 Review the proposed rank and cable map before changing any node. With an approved
-installation window, complete the bootstrap, NCCL, image, and weight steps in the
-installation guide. With a separately approved serving window:
+installation window, complete the bootstrap, NCCL, image, weight, and payload steps in
+the installation guide. With a separately approved serving window:
 
 ```sh
 ./scripts/verify-node.sh
@@ -110,6 +138,8 @@ GLM-5.3-Flash reasoning mode. The official request values remain `low`, `high`, 
 | Inspect, deploy, start, stop, recover, roll back, run functional gates, or promote | [`docs/operations.md`](docs/operations.md) |
 | Cable, address, verify, or diagnose the RoCE ring and patched NCCL | [`docs/fabric.md`](docs/fabric.md) |
 | Understand the current runtime recipe and its customizations | [`docs/production-recipe.md`](docs/production-recipe.md) |
+| Compare an optimization against the standing reference | [`docs/baseline-f1.json`](docs/baseline-f1.json) |
+| Resume optimization work (agent handover, next experiments) | [`HANDOVER.md`](HANDOVER.md) |
 | Understand files copied to the nodes | [`scripts/node/README.md`](scripts/node/README.md) |
 | Rebuild and install the patched NCCL library | [`scripts/node/nccl/README.md`](scripts/node/nccl/README.md) |
 

@@ -116,6 +116,27 @@ for f in "$REPO"/scripts/node/patches/*.py; do
   patch_count=$((patch_count + 1))
 done
 
+# F1 SparkCache lane. The vLLM override files (Apache-2.0 derived, scripts/node/overrides/)
+# and the kv-transfer config are managed here; the connector and the SIRCL payload are not
+# redistributed (CREDITS.md), so only their SHA256SUMS travel and the launcher verifies the
+# operator-placed files against them before Docker starts.
+override_count=0
+if [ -d "$REPO/scripts/node/overrides" ]; then
+  while IFS= read -r f; do
+    FILES+=("$f:tp4/overrides/${f#scripts/node/overrides/}")
+    override_count=$((override_count + 1))
+  done < <(cd "$REPO" && find scripts/node/overrides -type f -name '*.py' | sort)
+fi
+if [ "$override_count" -gt 0 ]; then
+  REMOTE_DIRS+=(tp4/overrides/vllm/v1/core tp4/overrides/vllm/v1/worker tp4/overrides/vllm/models/glm5next/nvidia/ops)
+fi
+# SHA256SUMS.site is the gitignored per-site manifest (SIRCL per-rank peer/GID files).
+for f in scripts/node/sparkcache/kv-transfer-config.json scripts/node/sparkcache/SHA256SUMS scripts/node/sircl/SHA256SUMS scripts/node/sircl/SHA256SUMS.site; do
+  [ -f "$REPO/$f" ] || continue
+  FILES+=("$f:tp4/${f#scripts/node/}")
+done
+REMOTE_DIRS+=(tp4/sparkcache tp4/sircl)
+
 # The configuration overlay travels next to cluster.env, at the same relative path.
 if [ -n "${TP4_ENV:-}" ]; then
   FILES+=("$TP4_ENV:tp4/$TP4_ENV")

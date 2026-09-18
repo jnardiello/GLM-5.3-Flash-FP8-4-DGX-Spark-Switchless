@@ -11,7 +11,7 @@
     "model_revision": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
     "quantisation": "FP8 weights and FP8 activations",
     "serving_engine": "vLLM from the E09 R10 SparkRing/SparkCache image",
-    "serving_image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache (offline OCI import, local image ID 5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075, no registry digest recorded; registry digest pinned only in the private RECIPE-CONTRACT.json)",
+    "serving_image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f (content ID sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075; measured from an offline OCI import of the same digest, RepoDigests empty at measurement time)",
     "recipe_overlay": {
       "file": "scripts/node/etc/local/e09-r10-on-batch-uniform-20260918.env",
       "sha256": "facde59991ac82c54f85f846b56b762daeee014433ed76f7bd42d75add5a3311",
@@ -53,7 +53,9 @@
     "scheduler": "max sequences 6; max batched tokens 8192; AdaptiveKScheduler batch-uniform; async scheduling effective",
     "collectives": "NCCL v2.30.7-1 with switchless-ring patch plus SIRCL single-rail sync-prefill transport (E07a); NCCL_IB_GID_INDEX=-1 with SIRCL GID preflight",
     "measurement_client": "mini (macOS workstation over the management LAN), the same client location as F0",
-    "receipt_appliance_note": "The appliance block embedded in the three receipts came from an unrevised metadata.beast.json and still describes the F0 image and per-request mode; this file is the authoritative identity."
+    "receipt_appliance_note": "The appliance block embedded in the three receipts came from an unrevised metadata.beast.json and still describes the F0 image and per-request mode; this file is the authoritative identity.",
+    "serving_image_digest": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "serving_image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
   },
   "rigmark": {
     "version": "1.1.0",

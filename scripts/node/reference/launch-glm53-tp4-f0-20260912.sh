@@ -1,15 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Single recipe of this repo: GLM-5.3-Flash FP8 weights + DFlash2 drafter. The F1 lane
-# (SPARKCACHE_MODE=on, cluster.env.example) serves the R10 SparkRing/SparkCache image
-# pinned by digest: the image content ID is checked, the kv-transfer config and the optional
-# connector override are verified by SHA-256 before Docker starts, --kv-transfer-config is
-# owned by this launcher, the image's built-in indexer patch replaces the PATCH_FILE mount,
-# the SIRCL payload directory is verified against its deployed SHA256SUMS, and the image
-# healthcheck is disabled because the SIRCL entrypoint never writes its marker (/health is
-# the readiness definition). SPARKCACHE_MODE=off is the F0 lane (v11-dflash2 image).
-# Documented fallbacks for the F0 lane:
+# Single recipe of this repo: GLM-5.3-Flash FP8 weights + DFlash2 drafter, image
+# v11-dflash2. Documented fallbacks:
 #
 #  a) the boot dies with "persistent_topk ... >=128KB smem": swap the single indexer
 #     patch mount below for the two v8-tuned indexer patch mounts, i.e. replace the
@@ -176,18 +169,6 @@ NCCL_DIR=$(expand_home "$NCCL_DIR")
 PATCH_FILE=$(expand_home "$PATCH_FILE")
 CACHE_DIR=$(expand_home "$CACHE_DIR")
 
-# SparkCache lane switch and its pinned inputs (see the header). Paths carry $HOME like the
-# other node paths; the SHA-256 pins are public recipe values from cluster.env.
-SPARKCACHE_MODE=${SPARKCACHE_MODE:-off}
-case "$SPARKCACHE_MODE" in
-  on|off) ;;
-  *) echo "[launch] ERROR: SPARKCACHE_MODE must be on or off (cluster.env, current: $SPARKCACHE_MODE)" >&2; exit 1 ;;
-esac
-SPARKCACHE_CONFIG=$(expand_home "${SPARKCACHE_CONFIG:-}")
-SPARKCACHE_CONNECTOR=$(expand_home "${SPARKCACHE_CONNECTOR:-}")
-SPARKCACHE_CONNECTOR_PATH=/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_connector.py
-SIRCL_DIR=$(expand_home "${SIRCL_DIR:-}")
-
 # The rank space is the length of MGMT_IPS, not a hard-coded 0-3.
 read -r -a _MGMT_IPS <<<"$MGMT_IPS"
 NNODES=${#_MGMT_IPS[@]}
@@ -244,30 +225,11 @@ if [ "$DRY_RUN" != "1" ]; then
   [ -f "$MODEL_DIR/config.json" ]        || { echo "[launch] ERROR: model missing: $MODEL_DIR/config.json — run scripts/fetch-fp8-weights.sh" >&2; exit 1; }
   [ -f "$NCCL_DIR/libnccl.so.2" ]        || { echo "[launch] ERROR: patched NCCL missing: $NCCL_DIR/libnccl.so.2" >&2; exit 1; }
   [ -f "$DRAFT_DIR/model.safetensors" ]  || { echo "[launch] ERROR: draft model missing: $DRAFT_DIR/model.safetensors" >&2; exit 1; }
-  if [ "$SPARKCACHE_MODE" != "on" ]; then
-    [ -f "$PATCH_FILE" ]                 || { echo "[launch] ERROR: indexer patch missing: $PATCH_FILE" >&2; exit 1; }
-  fi
+  [ -f "$PATCH_FILE" ]                   || { echo "[launch] ERROR: indexer patch missing: $PATCH_FILE" >&2; exit 1; }
   # Keep upstream model files immutable; generate a runtime compatibility template.
   python3 "$ENV_DIR/scripts/render_chat_template.py" "$MODEL_DIR/chat_template.jinja" "$CACHE_DIR/tp4-chat-template.jinja"
-  IMAGE_ID_ACTUAL=$(sudo docker image inspect --format '{{.Id}}' "$IMAGE" 2>/dev/null) \
+  sudo docker image inspect "$IMAGE" >/dev/null 2>&1 \
     || { echo "[launch] ERROR: image not present locally: $IMAGE (docker pull it)" >&2; exit 1; }
-  # IMAGE_ID (optional) pins the image content ID independently of how the reference was
-  # resolved (registry digest or offline import).
-  if [ -n "${IMAGE_ID:-}" ] && [ "$IMAGE_ID_ACTUAL" != "$IMAGE_ID" ]; then
-    echo "[launch] ERROR: image content ID mismatch: $IMAGE_ID_ACTUAL (expected $IMAGE_ID)" >&2; exit 1
-  fi
-  # The SIRCL payload is not part of this repository (CREDITS.md): only its manifests are
-  # deployed, and every listed file must be present and unchanged on the node. SHA256SUMS
-  # (tracked) pins the portable bundle and runtime; SHA256SUMS.site (gitignored, deployed
-  # from the operator checkout) pins the per-rank peer/GID files generated for this site.
-  if [ -n "$SIRCL_DIR" ]; then
-    for _m in SHA256SUMS SHA256SUMS.site; do
-      [ -f "$SIRCL_DIR/$_m" ] \
-        || { echo "[launch] ERROR: SIRCL manifest missing: $SIRCL_DIR/$_m (run scripts/deploy.sh)" >&2; exit 1; }
-      (cd "$SIRCL_DIR" && sha256sum --check --strict --quiet "$_m") \
-        || { echo "[launch] ERROR: SIRCL payload under $SIRCL_DIR does not match $_m" >&2; exit 1; }
-    done
-  fi
 fi
 
 # SPEC_EXTRA_JSON (optional, default empty): extra key/value pairs appended verbatim inside the
@@ -287,40 +249,6 @@ case "$ASYNC_SCHEDULING" in
   0|1) ;;
   *) echo "[launch] ERROR: ASYNC_SCHEDULING must be 0 or 1 (cluster.env, current: $ASYNC_SCHEDULING)" >&2; exit 1 ;;
 esac
-
-# SparkCache lane: the connector arguments are owned here, the kv-transfer config (and the
-# connector override, when a file is named) must match their SHA-256 pins, and the config
-# is passed to vLLM as canonical JSON. The connector file is optional: when empty, the
-# image's own connector at SPARKCACHE_CONNECTOR_PATH is used unmodified.
-KV_TRANSFER_JSON=""
-verify_pinned_file() {
-  local _path=$1 _expected=$2 _label=$3 _actual
-  [ -n "$_expected" ] \
-    || { echo "[launch] ERROR: $_label has no SHA-256 pin in cluster.env" >&2; exit 1; }
-  [ -f "$_path" ] && [ ! -L "$_path" ] \
-    || { echo "[launch] ERROR: $_label must be a regular non-symlink file: $_path" >&2; exit 1; }
-  _actual=$(python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' "$_path")
-  [ "$_actual" = "$_expected" ] \
-    || { echo "[launch] ERROR: $_label SHA-256 mismatch: $_path" >&2; exit 1; }
-}
-if [ "$SPARKCACHE_MODE" = "on" ]; then
-  case " ${EXTRA_VLLM_ARGS:-} " in
-    *'--kv-transfer-config'*|*'sparkcache'*|*'SparkCache'*)
-      echo "[launch] ERROR: SparkCache connector arguments are owned by the launcher; remove them from EXTRA_VLLM_ARGS" >&2
-      exit 1 ;;
-  esac
-  [ -n "$SPARKCACHE_CONFIG" ] \
-    || { echo "[launch] ERROR: SPARKCACHE_MODE=on requires SPARKCACHE_CONFIG (cluster.env)" >&2; exit 1; }
-  if [ "$DRY_RUN" = "1" ]; then
-    echo "[dry-run] would verify SparkCache config $SPARKCACHE_CONFIG${SPARKCACHE_CONNECTOR:+ and connector $SPARKCACHE_CONNECTOR}"
-    KV_TRANSFER_JSON="<canonical JSON of $SPARKCACHE_CONFIG>"
-  else
-    verify_pinned_file "$SPARKCACHE_CONFIG" "${SPARKCACHE_CONFIG_SHA256:-}" "SparkCache config"
-    [ -z "$SPARKCACHE_CONNECTOR" ] \
-      || verify_pinned_file "$SPARKCACHE_CONNECTOR" "${SPARKCACHE_CONNECTOR_SHA256:-}" "SparkCache connector"
-    KV_TRANSFER_JSON=$(python3 -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1], encoding="utf-8")), separators=(",", ":"), sort_keys=True))' "$SPARKCACHE_CONFIG")
-  fi
-fi
 
 # EXTRA_DOCKER_ENV is word-split ONCE here, into _XDE, and that array is what the docker
 # argv below gets. Two things happen on the way:
@@ -343,19 +271,6 @@ if [ -n "${EXTRA_DOCKER_ENV:-}" ]; then
       exit 1
     fi
   done
-fi
-
-# A named connector override must be mounted exactly once, at the image path, through
-# EXTRA_DOCKER_ENV: never twice, never elsewhere.
-if [ "$SPARKCACHE_MODE" = "on" ] && [ -n "$SPARKCACHE_CONNECTOR" ]; then
-  _SPARKCACHE_MOUNT="$SPARKCACHE_CONNECTOR:$SPARKCACHE_CONNECTOR_PATH:ro"
-  _SPARKCACHE_MOUNT_COUNT=0
-  for _ARG in "${_XDE[@]}"; do
-    [ "$_ARG" = "$_SPARKCACHE_MOUNT" ] || continue
-    _SPARKCACHE_MOUNT_COUNT=$((_SPARKCACHE_MOUNT_COUNT + 1))
-  done
-  [ "$_SPARKCACHE_MOUNT_COUNT" -eq 1 ] \
-    || { echo "[launch] ERROR: SparkCache connector must be mounted exactly once in EXTRA_DOCKER_ENV as $_SPARKCACHE_MOUNT" >&2; exit 1; }
 fi
 
 # These selectors are validated as one coherent HCA/GID decision. Docker's -e/--env forms
@@ -434,6 +349,7 @@ fi
 DOCKER_CMD=(
   sudo docker run -d --name "$CONTAINER" --restart no --network host --ipc host --shm-size 32g --gpus all --device /dev/infiniband --cap-add IPC_LOCK --ulimit memlock=-1:-1
   -v "$MODEL_DIR":/model:ro -v "$DRAFT_DIR":/draft:ro -v "$NCCL_DIR":/opt/patched-nccl:ro
+  -v "$PATCH_FILE":/usr/local/lib/python3.12/dist-packages/vllm/model_executor/layers/sparse_attn_indexer_kpool.py:ro
   -v "$CACHE_DIR":/cache
   -e LD_PRELOAD=/opt/patched-nccl/libnccl.so.2
   -e VLLM_NCCL_SO_PATH=/opt/patched-nccl/libnccl.so.2
@@ -472,21 +388,6 @@ DOCKER_CMD=(
   -e XDG_CACHE_HOME=/cache
   -e VLLM_CACHE_ROOT=/cache/vllm
 )
-if [ "$SPARKCACHE_MODE" = "on" ]; then
-  # R10 lane: the indexer patch is built into the image; the SIRCL transport owns the
-  # all-reduce path (no PCIe/FlashInfer all-reduce, no plugin autoload); the image
-  # HEALTHCHECK marker is never written by the SIRCL entrypoint.
-  DOCKER_CMD+=(
-    --no-healthcheck
-    -e VLLM_ENABLE_PCIE_ALLREDUCE=0
-    -e VLLM_ALLREDUCE_USE_FLASHINFER=0
-    -e VLLM_PLUGINS=
-  )
-else
-  DOCKER_CMD+=(
-    -v "$PATCH_FILE":/usr/local/lib/python3.12/dist-packages/vllm/model_executor/layers/sparse_attn_indexer_kpool.py:ro
-  )
-fi
 # Word-split on purpose (see cluster.env): both are lists of docker arguments. _XDE is the
 # already-split, $HOME-expanded EXTRA_DOCKER_ENV from the preflight above. The four validated
 # HCA/GID selectors follow it so an extra -e cannot bypass the preflight.
@@ -525,7 +426,6 @@ DOCKER_CMD+=(
   --reasoning-parser glm45
   --distributed-executor-backend mp
 )
-[ -z "$KV_TRANSFER_JSON" ] || DOCKER_CMD+=( --kv-transfer-config "$KV_TRANSFER_JSON" )
 # shellcheck disable=SC2206
 DOCKER_CMD+=( $HEADFLAGS $EXTRA_VLLM_ARGS )
 

@@ -67,12 +67,13 @@ Run one experiment at a time. Use the frozen baseline **F1** recorded in
 [`docs/baseline-f1.json`](docs/baseline-f1.json) for every future comparison; its three
 native Rigmark runs and fixed medians, measured from the same workstation with a fresh
 `cache_salt` per run, are the standing reference. Do not rerun or replace that baseline
-without an explicit owner request. [`docs/baseline-f0.json`](docs/baseline-f0.json) is
-the historic F0 record and, until the F1 recipe is encoded in IaC with a registry image
-digest, the only IaC-backed operational reference: use `scripts/check-f0.py` for a fast,
-read-only operational F0 identity check (it does not rerun Rigmark or send inference
-requests), and restore F1 by the coordinated up of its window overlay, not by a
-reference `deploy.sh`.
+without an explicit owner request. F1 is the IaC base recipe in `cluster.env.example`
+(image pinned by registry digest, `SPARKCACHE_MODE=on`): restore it with a plain
+`scripts/deploy.sh` and a coordinated restart without `TP4_ENV`. Use
+`scripts/check-f0.py` for a fast, read-only operational identity check against F1 (it
+does not rerun Rigmark or send inference requests). [`docs/baseline-f0.json`](docs/baseline-f0.json)
+is the historic F0 record; its lane stays reachable through the rollback comments in
+`cluster.env.example` and `scripts/check-f0.py --baseline docs/baseline-f0.json`.
 Agree the variant repetition count with
 the owner only when explicit later direction changes the standing protocol. By default,
 run every variant three consecutive times. Manually apply it to all four Beast nodes in
