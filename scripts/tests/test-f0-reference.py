@@ -21,6 +21,10 @@ SPEC.loader.exec_module(tool)
 
 compile(tool.REMOTE_COLLECTOR, "REMOTE_COLLECTOR", "exec")
 assert tool.public_reference_problems() == []
+frozen_controller = REPO / "scripts/node/reference/tp4ctl-f0-20260912.sh"
+assert tool.sha256_file(frozen_controller) == "6cb6f07cc60a13c86dfed8c01156c13d3f1fb88ca611bd499989841f96688a82"
+assert (REPO / "scripts/tp4ctl").read_bytes() != frozen_controller.read_bytes()
+assert '"scripts/node/reference/tp4ctl-f0-20260912.sh:tp4/tp4ctl-f0-reference"' in (REPO / "scripts/deploy.sh").read_text()
 assert 'elif rc in accepted: status="ok"' in tool.REMOTE_COLLECTOR
 assert 'unsupported=bool(re.search(br"(?i)(operation not supported|not supported|unknown option|unknown command)",err))' in tool.REMOTE_COLLECTOR
 assert '["sudo","-n","devlink","dev","eswitch","show",dev]' in tool.REMOTE_COLLECTOR
@@ -63,6 +67,32 @@ with tempfile.TemporaryDirectory(prefix="f0-reference-test-") as temp:
                                 capture_output=True, text=True, check=False)
     assert sealed_cli.returncode == 0, sealed_cli.stderr
     assert not (isolated_scripts / "__pycache__").exists()
+
+    controller_archive = root / "controller-archive"
+    legacy = controller_archive / "source/completed-iac/scripts/tp4ctl"
+    legacy.parent.mkdir(parents=True)
+    legacy.write_bytes(frozen_controller.read_bytes())
+    expected_controller_sha = tool.sha256_file(frozen_controller)
+    assert tool.archived_controller_source(controller_archive, expected_controller_sha) == legacy
+    frozen = legacy.parent / "node/reference/tp4ctl-f0-20260912.sh"
+    frozen.parent.mkdir(parents=True)
+    frozen.write_bytes(frozen_controller.read_bytes())
+    legacy.write_text("changed operational controller\n")
+    assert tool.archived_controller_source(controller_archive, expected_controller_sha) == frozen
+    frozen.write_text("changed frozen controller\n")
+    try:
+        tool.archived_controller_source(controller_archive, expected_controller_sha)
+    except tool.ReferenceError as exc:
+        assert "hash mismatch" in str(exc)
+    else:
+        raise AssertionError("changed frozen controller was accepted")
+    frozen.unlink(); legacy.unlink()
+    try:
+        tool.archived_controller_source(controller_archive, expected_controller_sha)
+    except tool.ReferenceError as exc:
+        assert "missing" in str(exc)
+    else:
+        raise AssertionError("missing archived controller was accepted")
 
     ordinary = root / "ordinary.env"
     ordinary.write_text("SPEC_TOKENS=5\nBATCHED_TOKENS=8192\n")

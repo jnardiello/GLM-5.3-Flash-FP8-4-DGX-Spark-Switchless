@@ -44,7 +44,7 @@
       "sha256": "4ee95668acba3aa7693c7cf1efa584499fead443cbb9498eeb18f18587d36401"
     },
     {
-      "path": "scripts/tp4ctl",
+      "path": "scripts/node/reference/tp4ctl-f0-20260912.sh",
       "destination": "$HOME/tp4/tp4ctl-f0-reference",
       "mode": "0700",
       "sha256": "6cb6f07cc60a13c86dfed8c01156c13d3f1fb88ca611bd499989841f96688a82"

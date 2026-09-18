@@ -1030,6 +1030,18 @@ def stage_source(args: argparse.Namespace) -> int:
     return 0
 
 
+def archived_controller_source(archive: Path, expected_sha: str) -> Path:
+    # Support sealed archives created before the reference controller was split out.
+    # A present but changed frozen copy must not silently fall back to another file.
+    for relative in ("scripts/node/reference/tp4ctl-f0-20260912.sh", "scripts/tp4ctl"):
+        source = archive / "source/completed-iac" / relative
+        if source.is_file():
+            if sha256_file(source) != expected_sha:
+                raise ReferenceError("archived Previous controller hash mismatch")
+            return source
+    raise ReferenceError("archived Previous controller missing")
+
+
 def plan_restore(args: argparse.Namespace, collector: Callable = collect_rank) -> int:
     archive = outside_repo(args.archive)
     offline = validate_archive(archive)
@@ -1063,7 +1075,15 @@ def plan_restore(args: argparse.Namespace, collector: Callable = collect_rank) -
     stage_controller = rank0_home + "/tp4/.tp4ctl-f0-reference.stage"
     controller = rank0_home + "/tp4/tp4ctl-f0-reference"
     controller_sha = next(item["sha256"] for item in json.loads(REFERENCE_MANIFEST.read_text())["artifacts"]
-                          if item["path"] == "scripts/tp4ctl")
+                          if item["path"] == "scripts/node/reference/tp4ctl-f0-20260912.sh")
+    controller_source = archive / "source/completed-iac/scripts/node/reference/tp4ctl-f0-20260912.sh"
+    controller_problem = ""
+    if not offline:
+        try:
+            controller_source = archived_controller_source(archive, controller_sha)
+        except ReferenceError as exc:
+            controller_problem = str(exc)
+            comparison.append(controller_problem)
     stage_nccl = rank1_home + "/tp4/f0-reference/libnccl.so.2"
     stage_dropin = rank0_home + "/tp4/.20-f0-reference.conf.stage"
     remote_install_controller = shlex.join([
@@ -1082,7 +1102,7 @@ def plan_restore(args: argparse.Namespace, collector: Callable = collect_rank) -
         (f"python3 {shlex.quote(str(archive / 'source/completed-iac/scripts/f0-reference.py'))} "
          f"stage-source --archive {shlex.quote(str(archive))} --destination {shlex.quote(work)}"),
         f"python3 {shlex.quote(work + '/scripts/f0-reference.py')} verify --offline --archive {shlex.quote(str(archive))}",
-        shlex.join(["scp", "-p", work + "/scripts/tp4ctl", f"{rank0}:{stage_controller}"]),
+        shlex.join(["scp", "-p", str(controller_source), f"{rank0}:{stage_controller}"]),
         shlex.join(["ssh", rank0, remote_install_controller]) + f"  # expect {controller_sha}",
         shlex.join(["ssh", rank0, remote_down]),
         f"cd {shlex.quote(work)} && TP4_ENV=scripts/node/reference/f0-20260912.env bash scripts/deploy.sh --check",
@@ -1098,6 +1118,8 @@ def plan_restore(args: argparse.Namespace, collector: Callable = collect_rank) -
         shlex.join(["ssh", rank0, f"curl -fsS http://localhost:{recipe.get('api_port','8000')}/health"]),
         f"cd {shlex.quote(work)} && TP4_ENV=scripts/node/reference/f0-20260912.env python3 scripts/check-f0.py",
     ]
+    if controller_problem:
+        commands[2] = "BLOCKED: " + controller_problem
     if live and args.current_overlay is None:
         commands[4] = "BLOCKED: live identity differs; supply --current-overlay for the currently running recipe before generating a down command"
     document = f"""# F0 restore review plan
@@ -1144,6 +1166,7 @@ per-rank receipts for exact paths, modes, ownership, symlinks and loaded-vs-disk
     write_private(directory / "restore-plan.md", document.encode())
     write_json(directory / "comparison.json", {"schema": 1, "created_at": utcnow(),
                "offline_problems": offline, "live_differences": live,
+               "controller_problem": controller_problem,
                "rank_status": [{"rank": i, "capture_status": item.get("capture_status"),
                                  "comparison": item.get("comparison")}
                                for i, item in enumerate(current)],

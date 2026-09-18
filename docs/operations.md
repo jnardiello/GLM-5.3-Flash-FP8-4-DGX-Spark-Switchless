@@ -189,8 +189,14 @@ The reference overlay is deployed at the same relative path by setting
 
 The live launcher supports the Current configuration, so the manifest pins the exact
 Previous launcher bytes as the frozen copy `scripts/node/reference/launch-glm53-tp4-f0-20260912.sh`
-(same SHA-256 as before). The Previous overlay is valid only together with the archived Previous IaC
-that `plan-restore` deploys; on top of the Current base `cluster.env` it inherits
+(same SHA-256 as before). Its controller is independently frozen at
+`scripts/node/reference/tp4ctl-f0-20260912.sh`, also with its original SHA-256.
+Deployment installs that copy as `tp4ctl-f0-reference`; fixes to the operational
+`scripts/tp4ctl` do not change Previous. Restore plans use the controller inside the
+verified archive, including the original `scripts/tp4ctl` path in older sealed archives.
+Existing archive files and manifests stay unchanged. The Previous overlay is valid
+only together with the archived Previous IaC that `plan-restore` deploys; on top of
+the Current base `cluster.env` it inherits
 `SPARKCACHE_MODE=on` and `IMAGE_ID`, and the launcher refuses the Previous image (fail-closed).
 For a lighter Previous return use the rollback comments in `cluster.env.example` (see the
 [recovery table](#recovery-and-rollback)). `f0-reference.py capture` always validates
@@ -291,8 +297,21 @@ the page-cache flusher active on all ranks, verifies stale containers absent, la
 workers before rank 0, waits for `/health`, and verifies the flusher stopped. A failed
 prerequisite or partial flusher start occurs before teardown and leaves an existing
 serving stack alone. Once prelaunch teardown begins, a teardown or launch error,
-readiness timeout, interruption, or failed final flusher stop triggers a best-effort
+readiness timeout, interruption, or a persistent final flusher failure triggers a best-effort
 full four-rank container teardown and flusher shutdown, then returns failure.
+
+After readiness, a failed flusher stop/verification logs the host, last attempted phase
+and exit status. The controller waits one second and repeats the complete stop and
+absence verification on **all four ranks once**. A second failure triggers the full
+cleanup above. Missing collected transient units are accepted only after process absence
+is verified; SSH, sudo and probe errors remain failures.
+
+The readiness timeout is **35 minutes**, with `/health` polled every 30 seconds.
+Keep full timestamped logs from all ranks during distributed initialization and weight
+loading. A pause in log output alone does not justify interrupting startup. Inspect
+worker stacks with available diagnostic tools if progress pauses, and allow the
+readiness timeout to elapse unless a worker terminates, memory is exhausted, a fatal
+error occurs or a rank is lost.
 
 `down` attempts both stop operations on every rank and succeeds only after it verifies
 the configured container and flusher absent everywhere; an already absent container or

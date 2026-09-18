@@ -59,6 +59,13 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Fixed
 
+- Added phase and exit status diagnostics for flusher shutdown failures; after readiness,
+  retry the complete four-rank stop and verification once after one second before
+  tearing down the serving stack on persistent failure.
+- Froze the original Previous controller separately from the operational controller,
+  using it for deployment and rollback plans while preserving older sealed archives.
+- Clarified the 35-minute startup timeout and evidence required before interrupting a
+  distributed initialization pause.
 - Hardened the SparkCache launcher with image-ID and payload-hash verification,
   duplicate connector rejection, and exactly-once connector mounting. Disabled competing
   all-reduce paths and plugin autoload; `/health` is the readiness signal when the

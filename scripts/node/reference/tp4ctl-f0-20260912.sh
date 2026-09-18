@@ -283,77 +283,16 @@ flusher_on() {
 }
 
 flusher_off() {
-  local i host rc=0 remote_rc output stop_script
-  # Keep the last attempted phase and the original command status visible, including
-  # when SSH or the timeout guard interrupts the remote shell. Do not conflate sudo
-  # denial with pgrep's normal exit 1 (no matching process).
-  stop_script=$(cat <<'REMOTE'
-# tp4-flusher-off
-phase=start
-step() { phase=$1; printf '[tp4ctl] flusher phase=%s\n' "$phase" >&2; }
-fail() { printf '[tp4ctl] flusher failed phase=%s rc=%s\n' "$phase" "$1" >&2; exit "$1"; }
-load_unit() {
-  step "$1"
-  load=$(systemctl show -p LoadState --value tp4-flusher) || fail "$?"
-  [ -n "$load" ] || fail 1
-}
-probe_flusher() {
-  sudo -n sh -c 'pgrep -f "[f]lusher-unconditional" >/dev/null; probe_rc=$?; case "$probe_rc" in 0) printf present ;; 1) printf absent ;; *) exit "$probe_rc" ;; esac'
-}
-probe_process() {
-  step "$1"
-  proc_state=$(probe_flusher) || fail "$?"
-}
-load_unit load-before-stop
-if [ "$load" != not-found ]; then
-  step stop-unit
-  sudo -n systemctl stop tp4-flusher || fail "$?"
-  load_unit load-after-stop
-  if [ "$load" != not-found ]; then
-    step reset-failed
-    sudo -n systemctl reset-failed tp4-flusher
-    reset_rc=$?
-    if [ "$reset_rc" -ne 0 ]; then
-      load_unit load-after-reset-failure
-      # --collect may remove the unit between show and reset-failed.
-      if [ "$load" != not-found ]; then
-        step reset-failed
-        fail "$reset_rc"
-      fi
-    fi
-  fi
-fi
-probe_process process-before-kill
-if [ "$proc_state" = present ]; then
-  step kill-process
-  sudo -n pkill -f '[f]lusher-unconditional'
-  kill_rc=$?
-  if [ "$kill_rc" -ne 0 ]; then
-    probe_process process-after-kill-failure
-    if [ "$proc_state" != absent ]; then
-      step kill-process
-      fail "$kill_rc"
-    fi
-  fi
-fi
-load_unit load-final
-if [ "$load" != not-found ]; then
-  step active-final
-  state=$(systemctl show -p ActiveState --value tp4-flusher) || fail "$?"
-  [ "$state" = inactive ] || fail 1
-fi
-probe_process process-final
-[ "$proc_state" = absent ] || fail 1
-REMOTE
-)
+  local i host rc=0
   for i in $(seq 0 $((NNODES - 1))); do
     host=${HOSTS[$i]}
-    if output=$(rsht 20 "$host" "$stop_script" 2>&1); then
+    # A collected transient unit is legitimately not-found. The legacy pgrep/pkill path
+    # remains for flushers started before the unit existed, and is verified explicitly.
+    # The [f] character class keeps the matcher from selecting the shell carrying it.
+    if rsht 20 "$host" "probe_flusher() { sudo sh -c 'pgrep -f \"[f]lusher-unconditional\" >/dev/null 2>&1; probe_rc=\$?; case \"\$probe_rc\" in 0) printf present ;; 1) printf absent ;; *) exit \"\$probe_rc\" ;; esac'; }; load=\$(systemctl show -p LoadState --value tp4-flusher 2>/dev/null) || exit 1; if [ \"\$load\" != not-found ]; then sudo systemctl stop tp4-flusher || exit 1; load=\$(systemctl show -p LoadState --value tp4-flusher 2>/dev/null) || exit 1; if [ \"\$load\" != not-found ]; then sudo systemctl reset-failed tp4-flusher; reset_rc=\$?; if [ \"\$reset_rc\" -ne 0 ]; then load=\$(systemctl show -p LoadState --value tp4-flusher 2>/dev/null) || exit 1; [ \"\$load\" = not-found ] || exit \"\$reset_rc\"; fi; fi; fi; proc_state=\$(probe_flusher) || exit 1; if [ \"\$proc_state\" = present ]; then sudo pkill -f '[f]lusher-unconditional' >/dev/null 2>&1; kill_rc=\$?; if [ \"\$kill_rc\" -ne 0 ]; then proc_state=\$(probe_flusher) || exit 1; [ \"\$proc_state\" = absent ] || exit \"\$kill_rc\"; fi; fi; load=\$(systemctl show -p LoadState --value tp4-flusher 2>/dev/null) || exit 1; [ \"\$load\" = not-found ] || { state=\$(systemctl show -p ActiveState --value tp4-flusher 2>/dev/null) || exit 1; [ \"\$state\" = inactive ]; } || exit 1; [ \"\$(probe_flusher)\" = absent ]" >/dev/null 2>&1; then
       log "flusher OFF on $host"
     else
-      remote_rc=$?
-      printf '%s\n' "$output" >&2
-      warn "flusher OFF on $host: stop or absence verification failed (phase=remote rc=$remote_rc; last remote phase above)"
+      warn "flusher OFF on $host: stop or absence verification failed"
       rc=1
     fi
   done
@@ -462,11 +401,7 @@ cmd_up() {
   done
 
   log "turning the flusher off everywhere"
-  if ! flusher_off; then
-    warn "post-readiness flusher verification failed; retrying stop and verification on all ranks once after 1s"
-    sleep 1
-    flusher_off || die "endpoint reached readiness but the flusher could not be stopped everywhere after one retry"
-  fi
+  flusher_off || die "endpoint reached readiness but the flusher could not be stopped everywhere"
   trap - EXIT INT TERM HUP
 
   log "endpoint ready: http://$MASTER_IP:$API_PORT/v1  (model id: $SERVED_NAME)"

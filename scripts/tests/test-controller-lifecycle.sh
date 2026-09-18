@@ -32,6 +32,7 @@ export TP4_TEST_SSH_LOG="$SSH_LOG" TP4_TEST_REMOTE_BIN="$REMOTE_BIN" TP4_TEST_ST
 
 cat >"$TMPD/bash-env" <<'ENV'
 sleep() {
+  printf "%s\n" "$*" >>"$TP4_TEST_STATE/sleeps"
   if [ "${TP4_TEST_INTERRUPT:-0}" = 1 ]; then
     TP4_TEST_INTERRUPT=0
     kill -TERM "$$"
@@ -64,6 +65,10 @@ for arg in "$@"; do case "$arg" in h[0-3]) host=$arg ;; esac; done
 cmd=${!#}
 printf '%s|%s\n' "$host" "$cmd" >>"$TP4_TEST_SSH_LOG"
 [ "${TP4_TEST_SSH_FAIL_HOST:-}" != "$host" ] || exit 255
+if [[ "$cmd" == '# tp4-flusher-off'* ]]; then
+  [ "${TP4_TEST_POST_READY_SSH_FAIL_HOST:-}" != "$host" ] || exit 255
+  export TP4_TEST_REMOTE_OFF=1
+fi
 case "$cmd" in
   true) exit 0 ;;
   'test -f '*) exit 0 ;;
@@ -91,9 +96,13 @@ MOCK
 cat >"$REMOTE_BIN/sudo" <<'MOCK'
 #!/usr/bin/env bash
 [ "${TP4_TEST_SUDO_FAIL_HOST:-}" != "$TP4_REMOTE_HOST" ] || exit 1
+if [ "${TP4_TEST_REMOTE_OFF:-0}" = 1 ]; then
+  [ "${TP4_TEST_POST_READY_SUDO_FAIL_HOST:-}" != "$TP4_REMOTE_HOST" ] || exit 1
+fi
 if [ "${TP4_TEST_SUDO_PGREP_FAIL_HOST:-}" = "$TP4_REMOTE_HOST" ]; then
   case " $* " in *' pgrep -f '*) exit 1 ;; esac
 fi
+if [ "${1:-}" = -n ]; then shift; fi
 exec "$@"
 MOCK
 
@@ -176,6 +185,13 @@ MOCK
 
 cat >"$REMOTE_BIN/pgrep" <<'MOCK'
 #!/usr/bin/env bash
+if [ "${TP4_TEST_TRANSIENT_PROBE_HOST:-}" = "$TP4_REMOTE_HOST" ]; then
+  counter="$TP4_TEST_STATE/probes.$TP4_REMOTE_HOST"
+  count=0; [ ! -f "$counter" ] || read -r count <"$counter"
+  count=$((count + 1)); printf '%s\n' "$count" >"$counter"
+  # Fail the final process check on the first post-readiness stop pass only.
+  [ "$count" != 2 ] || exit 2
+fi
 [ "${TP4_TEST_PGREP_FAIL_HOST:-}" != "$TP4_REMOTE_HOST" ] || exit 2
 [ "${TP4_TEST_LEGACY_RACE_HOST:-}" != "$TP4_REMOTE_HOST" ] || {
   if [ -e "$TP4_TEST_STATE/legacy.$TP4_REMOTE_HOST" ]; then
@@ -190,7 +206,7 @@ cat >"$REMOTE_BIN/pkill" <<'MOCK'
 #!/usr/bin/env bash
 [ "${TP4_TEST_PKILL_FAIL_HOST:-}" != "$TP4_REMOTE_HOST" ] || exit 76
 [ -e "$TP4_TEST_STATE/legacy.$TP4_REMOTE_HOST" ] || exit 1
-rm -f "$TP4_TEST_STATE/legacy.$TP4_REMOTE_HOST"
+[ "${TP4_TEST_RESIDUAL_HOST:-}" = "$TP4_REMOTE_HOST" ] || rm -f "$TP4_TEST_STATE/legacy.$TP4_REMOTE_HOST"
 MOCK
 
 chmod +x "$BIN/curl" "$BIN/ssh" "$REMOTE_BIN/sudo" "$REMOTE_BIN/docker" \
@@ -205,6 +221,8 @@ reset_case() {
   : >"$SSH_LOG"
   unset TP4_TEST_SSH_FAIL_HOST TP4_TEST_FABRIC_FAIL_HOST TP4_TEST_DOCKER_FAIL_HOST
   unset TP4_TEST_SYSTEMD_FAIL_HOST TP4_TEST_STOP_FAIL_HOST TP4_TEST_SUDO_FAIL_HOST
+  unset TP4_TEST_POST_READY_SSH_FAIL_HOST TP4_TEST_POST_READY_SUDO_FAIL_HOST
+  unset TP4_TEST_TRANSIENT_PROBE_HOST TP4_TEST_RESIDUAL_HOST
   unset TP4_TEST_SUDO_PGREP_FAIL_HOST
   unset TP4_TEST_PGREP_FAIL_HOST TP4_TEST_PKILL_FAIL_HOST TP4_TEST_FLUSHER_RUN_FAIL_HOST
   unset TP4_TEST_LEGACY_RACE_HOST
@@ -239,7 +257,7 @@ reset_case
 run_ctl down >"$TMPD/down-idempotent.out"
 [ ! -e "$STATE/legacy.h0" ]
 [ "$(grep -c 'docker ps -a' "$SSH_LOG")" = 4 ]
-[ "$(grep -c 'pgrep' "$SSH_LOG")" = 4 ]
+[ "$(grep -c '^h[0-3]|# tp4-flusher-off' "$SSH_LOG")" = 4 ]
 
 # A --collect unit may disappear immediately after stop, and a legacy process may exit
 # between pgrep and pkill. A final absence check keeps both races idempotent.
@@ -273,6 +291,13 @@ for failure in docker ssh systemd sudo pgrep pkill; do
   code=0
   run_ctl down >"$TMPD/down-$failure.out" 2>&1 || code=$?
   [ "$code" -ne 0 ]
+  case "$failure" in
+    ssh) grep -q 'phase=remote rc=255' "$TMPD/down-$failure.out" ;;
+    systemd) grep -q 'phase=stop-unit rc=74' "$TMPD/down-$failure.out" ;;
+    sudo) grep -q 'phase=process-before-kill rc=1' "$TMPD/down-$failure.out" ;;
+    pgrep) grep -q 'phase=process-before-kill rc=2' "$TMPD/down-$failure.out" ;;
+    pkill) grep -q 'phase=kill-process rc=76' "$TMPD/down-$failure.out" ;;
+  esac
   grep -q '^h3|.*docker ps -a' "$SSH_LOG"
 done
 
@@ -382,6 +407,56 @@ export TP4_TEST_STOP_FAIL_HOST=h1
 code=0; run_ctl up >"$TMPD/up-flusher-off.out" 2>&1 || code=$?; [ "$code" -ne 0 ]
 grep -q 'endpoint reached readiness but the flusher could not be stopped' "$TMPD/up-flusher-off.out"
 assert_no_state container
+
+# Exactly one complete retry is allowed after readiness, then persistent errors clean
+# up every rank. A transient failure on the final probe preserves all containers.
+[ "$(grep -c '^h[0-3]|# tp4-flusher-off' "$SSH_LOG")" = 12 ]
+[ "$(grep -c '^1$' "$STATE/sleeps")" = 1 ]
+grep -q 'phase=stop-unit rc=74' "$TMPD/up-flusher-off.out"
+
+reset_case
+export TP4_TEST_TRANSIENT_PROBE_HOST=h2
+run_ctl up >"$TMPD/up-transient.out" 2>&1
+for host in h0 h1 h2 h3; do [ -e "$STATE/container.$host" ]; done
+assert_no_state flusher
+[ "$(grep -c '^h[0-3]|# tp4-flusher-off' "$SSH_LOG")" = 8 ]
+[ "$(grep -c '^1$' "$STATE/sleeps")" = 1 ]
+grep -q 'phase=process-final rc=2' "$TMPD/up-transient.out"
+[ "$(grep -c 'docker ps -a' "$SSH_LOG")" = 4 ]
+
+reset_case
+: >"$STATE/legacy.h1"
+export TP4_TEST_RESIDUAL_HOST=h1
+code=0; run_ctl up >"$TMPD/up-residual.out" 2>&1 || code=$?; [ "$code" -ne 0 ]
+assert_no_state container
+assert_no_state flusher
+[ -e "$STATE/legacy.h1" ]
+grep -q 'phase=process-final rc=1' "$TMPD/up-residual.out"
+[ "$(grep -c '^h[0-3]|# tp4-flusher-off' "$SSH_LOG")" = 12 ]
+grep -q 'automatic cleanup was incomplete' "$TMPD/up-residual.out"
+
+# SSH and sudo errors in the post-readiness pass also receive exactly one retry;
+# full container cleanup continues and the unverified flusher is reported, not hidden.
+for failure in ssh sudo; do
+  reset_case
+  if [ "$failure" = ssh ]; then
+    export TP4_TEST_POST_READY_SSH_FAIL_HOST=h2
+  else
+    export TP4_TEST_POST_READY_SUDO_FAIL_HOST=h2
+  fi
+  code=0; run_ctl up >"$TMPD/up-post-$failure.out" 2>&1 || code=$?; [ "$code" -ne 0 ]
+  assert_no_state container
+  [ -e "$STATE/flusher.h2" ]
+  for host in h0 h1 h3; do [ ! -e "$STATE/flusher.$host" ]; done
+  [ "$(grep -c '^h[0-3]|# tp4-flusher-off' "$SSH_LOG")" = 12 ]
+  [ "$(grep -c '^1$' "$STATE/sleeps")" = 1 ]
+  grep -q 'automatic cleanup was incomplete' "$TMPD/up-post-$failure.out"
+  if [ "$failure" = ssh ]; then
+    grep -q 'phase=remote rc=255' "$TMPD/up-post-$failure.out"
+  else
+    grep -q 'phase=stop-unit rc=1' "$TMPD/up-post-$failure.out"
+  fi
+done
 
 # Valid boot preserves worker-first order and leaves four running containers, no flushers.
 reset_case

@@ -15,7 +15,7 @@ select the files explicitly.
 | `nccl/` | pinned NCCL build, switchless overlay, shape/checksum record, and atomic installer |
 | `overrides/` | Current vLLM override modules (Apache-2.0 derived) bind-mounted over the R10 image |
 | `patches/` | container-side Python scheduler patch and CPU-only policy tests |
-| `reference/` | portable Previous runtime overlay, the frozen Previous launcher bytes, artifact pins and an autostart drop-in template rendered only into a private restore archive |
+| `reference/` | portable Previous runtime overlay, the frozen Previous launcher and controller bytes, artifact pins and an autostart drop-in template rendered only into a private restore archive |
 | `sparkcache/` | tracked `kv-transfer-config.json` and the SHA-256 manifest of the untracked connector payload |
 | `sircl/` | SHA-256 manifest of the untracked SIRCL bundle/runtime payload |
 | `flusher-unconditional.sh` | temporary page-cache flusher used while model weights load |
@@ -39,7 +39,7 @@ select the files explicitly.
 | GRUB drop-in | `/etc/default/grub.d/zz-tp4-perf.cfg` | bootstrap/deploy-host and `tp4-iommu.sh` |
 | built NCCL library | `$NCCL_DIR/libnccl.so.2` | `scripts/node/nccl/install-nccl.sh` |
 | Previous reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/f0-20260912.env` | `scripts/deploy.sh` |
-| Previous reference controller | `~/tp4/tp4ctl-f0-reference` | `scripts/deploy.sh` |
+| Frozen `reference/tp4ctl-f0-20260912.sh` controller | `~/tp4/tp4ctl-f0-reference` | `scripts/deploy.sh` |
 | `scripts/node/overrides/**/*.py` | `~/tp4/overrides/…` (same relative layout) | `scripts/deploy.sh` |
 | `scripts/node/sparkcache/kv-transfer-config.json` and `SHA256SUMS` | `~/tp4/sparkcache/` | `scripts/deploy.sh` |
 | `scripts/node/sircl/SHA256SUMS` and the gitignored per-site `SHA256SUMS.site` | `~/tp4/sircl/` | `scripts/deploy.sh` |

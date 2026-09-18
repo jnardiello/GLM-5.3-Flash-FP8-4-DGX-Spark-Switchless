@@ -80,7 +80,7 @@ FILES=(
   "cluster.env:tp4/cluster.env"
   "scripts/launcher/launch-glm53-tp4.sh:tp4/launch-glm53-tp4.sh"
   "scripts/tp4ctl:tp4/tp4ctl"
-  "scripts/tp4ctl:tp4/tp4ctl-f0-reference"
+  "scripts/node/reference/tp4ctl-f0-20260912.sh:tp4/tp4ctl-f0-reference"
   "scripts/node/flusher-unconditional.sh:tp4/flusher-unconditional.sh"
   "scripts/node/sparse_attn_indexer_kpool_sm121.py:patches/sparse_attn_indexer_kpool.py"
   "scripts/fetch-fp8-weights.sh:tp4/scripts/fetch-fp8-weights.sh"
