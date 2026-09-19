@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Plot the public Rigmark records; requires matplotlib==3.11.2.
 
-Reads frozen JSON records only. The September 19 chart series contains its two
+Reads public JSON records only. The September 19 chart series contains its two
 accepted runs plus the separate IaC reproduction; it does not replace a baseline.
 """
 
@@ -37,6 +37,7 @@ LATENCY = [
 ]
 COLD = [(f"prefill_{depth}k_cold_throughput", f"{depth}K tokens") for depth in (8, 32, 64)]
 REPLAY = [(f"prefill_{depth}k_replay_throughput", f"{depth}K tokens") for depth in (8, 32, 64)]
+CONTEXT_SOURCE = "docs/context-decode-probes.json"
 
 
 def read_series():
@@ -125,11 +126,91 @@ def figure(output_dir, name, title, panels, series):
              fontsize=10.5, color=MUTED)
     fig.text(0.035, 0.07, "19 Sep combines two accepted runs and one separate deployment reproduction. The frozen two-run baseline is unchanged.",
              fontsize=10.5, color=MUTED)
+    save_figure(fig, output_dir, name)
+
+
+def save_figure(fig, output_dir, name):
+    import matplotlib.pyplot as plt
+
     fig.savefig(output_dir / f"{name}.png", dpi=160, facecolor="white", metadata={"Software": "Matplotlib"})
     svg = output_dir / f"{name}.svg"
     fig.savefig(svg, facecolor="white", metadata={"Date": None, "Creator": "Matplotlib"})
     svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
     plt.close(fig)
+
+
+def context_figure(output_dir, series):
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+    from matplotlib.ticker import FuncFormatter, MaxNLocator
+
+    probes = json.loads((ROOT / CONTEXT_SOURCE).read_text())
+    contexts = probes["context_tokens"]
+    if contexts != [8192, 32768, 65536] or probes["completion_tokens_per_request"] != 8:
+        raise ValueError("Expected 8-token decode probes at 8K, 32K and 64K")
+    runs = probes["runs"]
+    if [run["kind"] for run in runs] != ["accepted", "accepted", "iac_reproduction"]:
+        raise ValueError("Expected two accepted decode-probe runs followed by the IaC reproduction")
+    if any(run["date"] != "2026-09-19" for run in runs):
+        raise ValueError("Expected September 19 decode probes")
+    if any(len(run["decode_tokens_per_second"][str(context)]) != 3 for run in runs for context in contexts):
+        raise ValueError("Expected three cold requests per context per run")
+    decode = [None, [
+        [median(run["decode_tokens_per_second"][str(context)]) for run in runs]
+        for context in contexts
+    ]]
+    prefill = [[series[key][group] for key, _ in COLD] for group in range(2)]
+
+    fig, axes = plt.subplots(1, 2, figsize=(14.5, 8), facecolor="white")
+    fig.subplots_adjust(left=0.085, right=0.965, bottom=0.28, top=0.70, wspace=0.25)
+    fig.text(0.035, 0.94, "Throughput versus context length", fontsize=23, fontweight="bold", color=INK)
+    fig.text(0.035, 0.89, "GLM-5.3-Flash · TP4 / four GB10 nodes · Cold prefill requests from native Rigmark runs",
+             fontsize=12, color=MUTED)
+    handles = [
+        Line2D([], [], color=BLUE, linewidth=2.4, label="11 Sep 2026 · median of three runs"),
+        Line2D([], [], color=TEAL, linewidth=2.4, label="19 Sep 2026 · median of three available runs"),
+        Line2D([], [], color=GOLD, marker="D", linestyle="none", label="Separate IaC reproduction"),
+    ]
+    fig.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.028, 0.85),
+               ncols=3, frameon=False, fontsize=10.5, columnspacing=1.6, labelcolor=INK)
+    for ax, groups, title in zip(axes, (prefill, decode),
+                                 ("Prefill · effective input tok/s", "Decode · 19 Sep, 8-token probe")):
+        for group, (values, color) in enumerate(zip(groups, (BLUE, TEAL))):
+            if values is None:
+                continue
+            medians = [median(runs) for runs in values]
+            ax.fill_between(contexts, [min(runs) for runs in values], [max(runs) for runs in values],
+                            color=color, alpha=0.12, linewidth=0)
+            ax.plot(contexts, medians, color=color, linewidth=2.4, zorder=3)
+            for context, runs, center in zip(contexts, values, medians):
+                for run_index, value in enumerate(runs):
+                    iac = group == 1 and run_index == 2
+                    ax.scatter(context, value, s=48, marker="D" if iac else "o",
+                               color=GOLD if iac else color, edgecolors="white", linewidths=0.8, zorder=4)
+                label = f"{center:,.0f}" if ax is axes[0] else f"{center:.1f}"
+                label_y = max(runs) if group == 1 else min(runs)
+                ax.annotate(label, (context, label_y), xytext=(0, 12 if group == 1 else -21),
+                            textcoords="offset points", ha="center", fontsize=10.5, color=color)
+        ax.set_title(title, loc="left", fontsize=15, fontweight="bold", color=INK, pad=22)
+        ax.set_xticks(contexts, ["8K", "32K", "64K"])
+        ax.set_xlim(0, 73728)
+        ax.set_xlabel("Input context length (tokens; K = 1,024)", fontsize=11, color=MUTED, labelpad=12)
+        ax.set_ylabel("Tokens per second", fontsize=11, color=MUTED, labelpad=10)
+        ax.set_ylim(0, max(value for values in groups if values is not None for runs in values for value in runs) * 1.22)
+        ax.yaxis.set_major_locator(MaxNLocator(nbins=6))
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:,.0f}"))
+        ax.tick_params(axis="both", length=0, labelcolor=MUTED, pad=9)
+        ax.grid(color="#dfe5ed", linewidth=0.8, zorder=0)
+        ax.set_axisbelow(True)
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+    fig.text(0.035, 0.17, "Points = per-run medians of 3 requests · Lines = medians of 3 runs · Shading = observed run range",
+             fontsize=10.5, color=MUTED)
+    fig.text(0.035, 0.12, "Decode: 8 output tokens, 7 / first-to-last output time. Diagnostic only; no sustained decode or initial-baseline curve available.",
+             fontsize=10.5, color=INK)
+    fig.text(0.035, 0.075, "19 Sep combines two accepted runs and one separate IaC reproduction. Frozen baseline records remain unchanged.",
+             fontsize=10.5, color=MUTED)
+    save_figure(fig, output_dir, "context-throughput")
 
 
 def main():
@@ -151,7 +232,8 @@ def main():
         (COLD, "Cold prefill · higher is better", "Effective prefill tokens per second", False),
         (REPLAY, "Immediate replay · higher is better", "Effective prefill tokens per second", False),
     ], series)
-    print(f"Rendered 16 metrics, six run values each, to {args.output_dir}")
+    context_figure(args.output_dir, series)
+    print(f"Rendered three figures from 16 summary metrics and 27 short decode probes to {args.output_dir}")
 
 
 if __name__ == "__main__":

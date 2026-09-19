@@ -55,18 +55,30 @@ records live deployment checks and 54 requests; the frozen medians above remain 
 
 The charts show all three September 11 runs and three available September 19 runs:
 the two accepted runs plus the separate IaC reproduction, marked with a gold diamond.
-Each point is one native per-run metric; lines show the observed range. Median ticks
-and labels summarize the three plotted values per configuration. This descriptive
-view combines two separate September 19 boots; the table above keeps the frozen
+In the first two images, each point is one native per-run metric; lines show the
+observed range. Median ticks and labels summarize the three plotted values per
+configuration. This descriptive view combines two separate September 19 boots; the table above keeps the frozen
 two-run baseline. The run excluded for competing traffic is not included.
 
 [![Generation throughput and TTFT for three runs of each configuration; the IaC run is marked separately.](docs/plots/generation-comparison.png)](docs/plots/generation-comparison.svg)
 
 [![Cold prefill and immediate cache replay at 8K, 32K and 64K, showing all individual runs and their medians.](docs/plots/prefill-comparison.png)](docs/plots/prefill-comparison.svg)
 
-Click either image for the SVG version. The TTFT axis is logarithmic so every
+[![Throughput versus input context length at 8K, 32K and 64K: cold prefill compares September 11 and 19; diagnostic eight-token decode tails show September 19 only.](docs/plots/context-throughput.png)](docs/plots/context-throughput.svg)
+
+The third image plots context length on X and tok/s on Y. Lines connect medians of
+the three per-run values; shading spans their observed range. The prefill panel uses
+the same cold-request metrics as above. The decode panel uses the **8-token output
+tails of those prefill requests**, with each run represented by its median of three
+requests. These short probes are sensitive to streaming bursts and do not measure
+sustained decode. Only September 19 is shown for decode: the initial public record
+does not contain these rates, and its raw receipts were unavailable for extraction.
+The [27 extracted measurements and source hashes](docs/context-decode-probes.json)
+make the additional panel reproducible.
+
+Click any image for the SVG version. The TTFT axis is logarithmic so every
 observation, including the initial 5.712-second result, remains visible.
-Regenerate both figures from the public JSON records with
+Regenerate all three figures from the public JSON records with
 `python3 scripts/plot-baseline-comparison.py` in an environment containing
 `matplotlib==3.11.2`. The script also writes PNG copies for the README.
 

@@ -7,6 +7,9 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Added a two-panel context-length chart for cold prefill and the available
+  eight-token decode probes, with reproducible extracted measurements and explicit
+  limits on sustained decode and initial-baseline comparison.
 - Added reproducible comparison charts showing all 16 metrics and individual runs
   from September 11 versus the two accepted September 19 runs plus its separate IaC
   reproduction, with that run identified and the frozen baseline unchanged.

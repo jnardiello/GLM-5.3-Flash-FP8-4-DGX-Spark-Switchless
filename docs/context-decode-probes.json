@@ -1,0 +1,149 @@
+{
+  "description": "Diagnostic decode tails from the same cold prefill requests used in the September 19 comparison. This is a supplementary extract, not a replacement performance baseline.",
+  "context_tokens": [
+    8192,
+    32768,
+    65536
+  ],
+  "completion_tokens_per_request": 8,
+  "requests_per_context_per_run": 3,
+  "total_requests": 27,
+  "source_path": [
+    "prefill",
+    "<context_tokens>",
+    "cold",
+    "runs"
+  ],
+  "metric": "decode_tokens_per_second",
+  "unit": "tokens_per_second",
+  "native_formula": "(completion_tokens - 1) / (last_output_time - first_output_time)",
+  "aggregation": "Median of three native request values within each run; the chart line is the median of the three per-run medians. The third run is a separate IaC reproduction.",
+  "limits": [
+    "Eight output tokens and only three measured SSE events per request provide a short, burst-sensitive diagnostic, not sustained decode throughput.",
+    "The initial September 11 public record does not include decode rates for these context lengths; its native receipts were unavailable for extraction. No initial decode curve is inferred.",
+    "All 27 requests reported the exact requested prompt length, eight output tokens, three measured SSE events, finish_reason=length and the stream DONE marker.",
+    "Only portable numeric fields and receipt hashes are included; native raw receipts remain private."
+  ],
+  "runs": [
+    {
+      "date": "2026-09-19",
+      "kind": "accepted",
+      "receipt_sha256": "17f1a9c35ca2a83724239464934117bc53d5aa131ea9048f1d2b130bea72679d",
+      "reference_record": "baseline-2026-09-19.json",
+      "decode_tokens_per_second": {
+        "8192": [
+          38.599,
+          47.458,
+          38.78
+        ],
+        "32768": [
+          36.952,
+          31.088,
+          26.156
+        ],
+        "65536": [
+          56.311,
+          45.956,
+          57.515
+        ]
+      },
+      "decode_seconds": {
+        "8192": [
+          0.181354,
+          0.1475,
+          0.180506
+        ],
+        "32768": [
+          0.189435,
+          0.225171,
+          0.267626
+        ],
+        "65536": [
+          0.124309,
+          0.152318,
+          0.121708
+        ]
+      }
+    },
+    {
+      "date": "2026-09-19",
+      "kind": "accepted",
+      "receipt_sha256": "a7591e5cbc10c23eb4d6f6060d9adbb106433f7f869763191511a589b19080fe",
+      "reference_record": "baseline-2026-09-19.json",
+      "decode_tokens_per_second": {
+        "8192": [
+          46.03,
+          37.927,
+          39.209
+        ],
+        "32768": [
+          30.122,
+          37.809,
+          34.539
+        ],
+        "65536": [
+          75.32,
+          57.903,
+          47.841
+        ]
+      },
+      "decode_seconds": {
+        "8192": [
+          0.152076,
+          0.184564,
+          0.178529
+        ],
+        "32768": [
+          0.23239,
+          0.18514,
+          0.202671
+        ],
+        "65536": [
+          0.092937,
+          0.120891,
+          0.146317
+        ]
+      }
+    },
+    {
+      "date": "2026-09-19",
+      "kind": "iac_reproduction",
+      "receipt_sha256": "b7fb9d6ea7b1017e74a7cf20b45d92d6a52cb6fa2c407a61358cb61f111180a6",
+      "reference_record": "reproduction-2026-09-19.json",
+      "decode_tokens_per_second": {
+        "8192": [
+          46.625,
+          42.41,
+          40.377
+        ],
+        "32768": [
+          26.327,
+          36.911,
+          33.431
+        ],
+        "65536": [
+          67.513,
+          42.276,
+          53.354
+        ]
+      },
+      "decode_seconds": {
+        "8192": [
+          0.150134,
+          0.165056,
+          0.173366
+        ],
+        "32768": [
+          0.265882,
+          0.189648,
+          0.209386
+        ],
+        "65536": [
+          0.103684,
+          0.165579,
+          0.131198
+        ]
+      }
+    }
+  ]
+}
