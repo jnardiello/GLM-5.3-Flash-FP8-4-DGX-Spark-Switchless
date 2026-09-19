@@ -7,6 +7,9 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Added reproducible comparison charts showing all 16 metrics and individual runs
+  from September 11 versus the two accepted September 19 runs plus its separate IaC
+  reproduction, with that run identified and the frozen baseline unchanged.
 - Added the September 19 performance reference and a dated README comparison with
   September 11 and September 18. The new reference reports two valid native Rigmark
   runs (108 requests), performance tradeoffs and reduced KV capacity; historical records

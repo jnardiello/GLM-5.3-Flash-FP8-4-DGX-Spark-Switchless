@@ -50,6 +50,28 @@ were active; their overhead was not isolated. Two runs give less repeatability e
 than three. A separate [one-run IaC reproduction](docs/reproduction-2026-09-19.json)
 records live deployment checks and 54 requests; the frozen medians above remain unchanged.
 
+<details>
+<summary>Run-by-run comparison charts: initial versus current configuration</summary>
+
+The charts show all three September 11 runs and three available September 19 runs:
+the two accepted runs plus the separate IaC reproduction, marked with a gold diamond.
+Each point is one native per-run metric; lines show the observed range. Median ticks
+and labels summarize the three plotted values per configuration. This descriptive
+view combines two separate September 19 boots; the table above keeps the frozen
+two-run baseline. The run excluded for competing traffic is not included.
+
+[![Generation throughput and TTFT for three runs of each configuration; the IaC run is marked separately.](docs/plots/generation-comparison.png)](docs/plots/generation-comparison.svg)
+
+[![Cold prefill and immediate cache replay at 8K, 32K and 64K, showing all individual runs and their medians.](docs/plots/prefill-comparison.png)](docs/plots/prefill-comparison.svg)
+
+Click either image for the SVG version. The TTFT axis is logarithmic so every
+observation, including the initial 5.712-second result, remains visible.
+Regenerate both figures from the public JSON records with
+`python3 scripts/plot-baseline-comparison.py` in an environment containing
+`matplotlib==3.11.2`. The script also writes PNG copies for the README.
+
+</details>
+
 The [current recipe](docs/production-recipe.md), encoded in
 [`cluster.env.example`](cluster.env.example), combines the digest-pinned SparkRing
 image, DFlash2 with adaptive verification, hybrid INT8/BF16 KDA projections,
