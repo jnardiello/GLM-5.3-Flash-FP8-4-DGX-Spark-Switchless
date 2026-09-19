@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Plot the public Rigmark records; requires matplotlib==3.11.2.
 
-Reads public JSON records only. The September 19 chart series contains its two
-accepted runs plus the separate IaC reproduction; it does not replace a baseline.
+Reads saved public JSON records only. Medians use the frozen baseline
+runs, matching the README table. The separate IaC reproduction is a point only.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+from decimal import Decimal
 from pathlib import Path
 from statistics import median
 
@@ -56,46 +57,37 @@ def read_series():
         for field in ("unit", "source_path"):
             if not old[field] == new[field] == replay[field]:
                 raise ValueError(f"Metric definition differs: {key}, {field}")
-        series[key] = (old["per_run"], new["per_run"] + [replay["reproduction_single_run_value"]])
+        for record in (old, new):
+            if abs(median(record["per_run"]) - record["median"]) > 1e-9:
+                raise ValueError(f"Frozen median differs from its run values: {key}")
+        series[key] = (old["median"], new["median"], replay["reproduction_single_run_value"])
     return series
 
 
-def panel(ax, rows, series, title, xlabel, *, logarithmic=False):
-    from matplotlib.ticker import FuncFormatter, MaxNLocator, NullLocator
+def panel(ax, rows, series, title, xlabel, *, seconds=False):
+    from matplotlib.ticker import FuncFormatter, MaxNLocator
 
     values = []
     for row_index, (key, _) in enumerate(rows):
-        if row_index % 2 == 0:
-            ax.axhspan(row_index - 0.47, row_index + 0.47, color="#f2f5f9", zorder=0)
-        for group, (runs, color) in enumerate(zip(series[key], (BLUE, TEAL))):
+        for group, (center, color) in enumerate(zip(series[key][:2], (BLUE, TEAL))):
             y = row_index + (-0.18 if group == 0 else 0.18)
-            values.extend(runs)
-            ax.hlines(y, min(runs), max(runs), color=color, linewidth=2, alpha=0.7, zorder=2)
-            ax.vlines(median(runs), y - 0.12, y + 0.12, color=color, linewidth=2.6, zorder=3)
-            for run_index, (value, offset) in enumerate(zip(runs, (-0.07, 0, 0.07))):
-                iac = group == 1 and run_index == 2
-                ax.scatter(value, y + offset, s=46, marker="D" if iac else "o",
-                           color=GOLD if iac else color, edgecolors="white", linewidths=0.8, zorder=4)
-                if logarithmic and value > 2:
-                    ax.annotate(f"{value:.3f} s", (value, y + offset), xytext=(-5, 9),
-                                textcoords="offset points", ha="right", color=color, fontsize=10)
-            label = f"{median(runs):.3f}" if logarithmic else f"{median(runs):,.2f}"
+            values.append(center)
+            ax.barh(y, center, height=0.27, color=color, zorder=2)
+            if group == 1:
+                values.append(series[key][2])
+                ax.scatter(series[key][2], y, s=52, marker="D", color=GOLD,
+                           edgecolors="white", linewidths=0.9, zorder=3)
+            precision = 3 if seconds else 1 if key.startswith("prefill_") else 2
+            label = f"{Decimal(str(center)):,.{precision}f}"
             ax.text(1.025, y, label, transform=ax.get_yaxis_transform(), va="center",
                     color=color, fontsize=10.5)
     ax.set_title(title, loc="left", fontsize=15, color=INK, fontweight="bold", pad=20)
     ax.text(1.025, 1.04, "Median", transform=ax.transAxes, color=MUTED, fontsize=10)
     ax.set_yticks(range(len(rows)), [label for _, label in rows], fontsize=11, color=INK)
     ax.set_ylim(len(rows) - 0.5, -0.5)
-    ax.set_xlim(min(values) * 0.88, max(values) * 1.15)
-    if logarithmic:
-        ax.set_xscale("log", base=2)
-        ax.set_xlim(0.25, 8)
-        ax.set_xticks([0.25, 0.5, 1, 2, 4, 8])
-        ax.xaxis.set_minor_locator(NullLocator())
-        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{x:g}"))
-    else:
-        ax.xaxis.set_major_locator(MaxNLocator(nbins=5))
-        ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{x:,.0f}"))
+    ax.set_xlim(0, max(values) * 1.08)
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=5))
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{x:g}" if seconds else f"{x:,.0f}"))
     ax.set_xlabel(xlabel, fontsize=11, color=MUTED, labelpad=12)
     ax.tick_params(axis="both", length=0, labelcolor=MUTED, pad=9)
     ax.grid(axis="x", color="#dfe5ed", linewidth=0.8, zorder=1)
@@ -107,6 +99,7 @@ def panel(ax, rows, series, title, xlabel, *, logarithmic=False):
 def figure(output_dir, name, title, panels, series):
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
 
     fig = plt.figure(figsize=(14.5, 7.4), facecolor="white")
     axes = [fig.add_axes([0.15, 0.22, 0.29, 0.48]), fig.add_axes([0.64, 0.22, 0.27, 0.48])]
@@ -114,17 +107,17 @@ def figure(output_dir, name, title, panels, series):
     fig.text(0.035, 0.885, "GLM-5.3-Flash · TP4 / four GB10 nodes · Native Rigmark run summaries",
              fontsize=12, color=MUTED)
     handles = [
-        Line2D([], [], color=BLUE, marker="o", linewidth=2, label="11 Sep 2026 · three runs"),
-        Line2D([], [], color=TEAL, marker="o", linewidth=2, label="19 Sep 2026 · two accepted runs"),
+        Patch(color=BLUE, label="11 Sep 2026 · baseline"),
+        Patch(color=TEAL, label="19 Sep 2026 · baseline"),
         Line2D([], [], color=GOLD, marker="D", linestyle="none", label="19 Sep 2026 · IaC reproduction"),
     ]
     fig.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.028, 0.847),
                ncols=3, frameon=False, fontsize=11, columnspacing=2.3, labelcolor=INK)
-    for ax, (rows, heading, xlabel, logarithmic) in zip(axes, panels):
-        panel(ax, rows, series, heading, xlabel, logarithmic=logarithmic)
-    fig.text(0.035, 0.115, "Points = individual runs · Lines = observed min–max · Vertical ticks = median of the three plotted values",
+    for ax, (rows, heading, xlabel, seconds) in zip(axes, panels):
+        panel(ax, rows, series, heading, xlabel, seconds=seconds)
+    fig.text(0.035, 0.115, "Bars and labels = baseline medians, matching the README table · 11 Sep: 3 runs · 19 Sep: 2 accepted runs",
              fontsize=10.5, color=MUTED)
-    fig.text(0.035, 0.07, "19 Sep combines two accepted runs and one separate deployment reproduction. The frozen two-run baseline is unchanged.",
+    fig.text(0.035, 0.07, "Gold diamonds = the separate IaC reproduction, excluded from baseline medians.",
              fontsize=10.5, color=MUTED)
     save_figure(fig, output_dir, name)
 
@@ -155,11 +148,11 @@ def context_figure(output_dir, series):
         raise ValueError("Expected September 19 decode probes")
     if any(len(run["decode_tokens_per_second"][str(context)]) != 3 for run in runs for context in contexts):
         raise ValueError("Expected three cold requests per context per run")
-    decode = [None, [
-        [median(run["decode_tokens_per_second"][str(context)]) for run in runs]
-        for context in contexts
-    ]]
-    prefill = [[series[key][group] for key, _ in COLD] for group in range(2)]
+    decode = []
+    for context in contexts:
+        per_run = [median(run["decode_tokens_per_second"][str(context)]) for run in runs]
+        decode.append((None, median(per_run[:2]), per_run[2]))
+    prefill = [series[key] for key, _ in COLD]
 
     fig, axes = plt.subplots(1, 2, figsize=(14.5, 8), facecolor="white")
     fig.subplots_adjust(left=0.085, right=0.965, bottom=0.28, top=0.70, wspace=0.25)
@@ -168,27 +161,24 @@ def context_figure(output_dir, series):
              fontsize=12, color=MUTED)
     handles = [
         Line2D([], [], color=BLUE, linewidth=2.4, label="11 Sep 2026 · median of three runs"),
-        Line2D([], [], color=TEAL, linewidth=2.4, label="19 Sep 2026 · median of three available runs"),
+        Line2D([], [], color=TEAL, linewidth=2.4, label="19 Sep 2026 · median of two accepted runs"),
         Line2D([], [], color=GOLD, marker="D", linestyle="none", label="Separate IaC reproduction"),
     ]
     fig.legend(handles=handles, loc="upper left", bbox_to_anchor=(0.028, 0.85),
                ncols=3, frameon=False, fontsize=10.5, columnspacing=1.6, labelcolor=INK)
-    for ax, groups, title in zip(axes, (prefill, decode),
+    for ax, measurements, title in zip(axes, (prefill, decode),
                                  ("Prefill · effective input tok/s", "Decode · 19 Sep, 8-token probe")):
-        for group, (values, color) in enumerate(zip(groups, (BLUE, TEAL))):
-            if values is None:
+        for group, color in enumerate((BLUE, TEAL)):
+            medians = [row[group] for row in measurements]
+            if medians[0] is None:
                 continue
-            medians = [median(runs) for runs in values]
-            ax.fill_between(contexts, [min(runs) for runs in values], [max(runs) for runs in values],
-                            color=color, alpha=0.12, linewidth=0)
-            ax.plot(contexts, medians, color=color, linewidth=2.4, zorder=3)
-            for context, runs, center in zip(contexts, values, medians):
-                for run_index, value in enumerate(runs):
-                    iac = group == 1 and run_index == 2
-                    ax.scatter(context, value, s=48, marker="D" if iac else "o",
-                               color=GOLD if iac else color, edgecolors="white", linewidths=0.8, zorder=4)
-                label = f"{center:,.0f}" if ax is axes[0] else f"{center:.1f}"
-                label_y = max(runs) if group == 1 else min(runs)
+            ax.plot(contexts, medians, color=color, linewidth=2.4, marker="o", markersize=6, zorder=3)
+            for context, row, center in zip(contexts, measurements, medians):
+                if group == 1:
+                    ax.scatter(context, row[2], s=52, marker="D", color=GOLD,
+                               edgecolors="white", linewidths=0.9, zorder=4)
+                label = f"{Decimal(str(center)):,.1f}"
+                label_y = max(center, row[2]) if group == 1 else center
                 ax.annotate(label, (context, label_y), xytext=(0, 12 if group == 1 else -21),
                             textcoords="offset points", ha="center", fontsize=10.5, color=color)
         ax.set_title(title, loc="left", fontsize=15, fontweight="bold", color=INK, pad=22)
@@ -196,7 +186,7 @@ def context_figure(output_dir, series):
         ax.set_xlim(0, 73728)
         ax.set_xlabel("Input context length (tokens; K = 1,024)", fontsize=11, color=MUTED, labelpad=12)
         ax.set_ylabel("Tokens per second", fontsize=11, color=MUTED, labelpad=10)
-        ax.set_ylim(0, max(value for values in groups if values is not None for runs in values for value in runs) * 1.22)
+        ax.set_ylim(0, max(value for row in measurements for value in row if value is not None) * 1.22)
         ax.yaxis.set_major_locator(MaxNLocator(nbins=6))
         ax.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:,.0f}"))
         ax.tick_params(axis="both", length=0, labelcolor=MUTED, pad=9)
@@ -204,11 +194,11 @@ def context_figure(output_dir, series):
         ax.set_axisbelow(True)
         for spine in ax.spines.values():
             spine.set_visible(False)
-    fig.text(0.035, 0.17, "Points = per-run medians of 3 requests · Lines = medians of 3 runs · Shading = observed run range",
+    fig.text(0.035, 0.17, "Lines and labels = baseline medians · 11 Sep: 3 runs · 19 Sep: 2 accepted runs",
              fontsize=10.5, color=MUTED)
     fig.text(0.035, 0.12, "Decode: 8 output tokens, 7 / first-to-last output time. Diagnostic only; no sustained decode or initial-baseline curve available.",
              fontsize=10.5, color=INK)
-    fig.text(0.035, 0.075, "19 Sep combines two accepted runs and one separate IaC reproduction. Frozen baseline records remain unchanged.",
+    fig.text(0.035, 0.075, "Prefill medians match the README table. Gold diamonds show the separate IaC run, excluded from baseline medians.",
              fontsize=10.5, color=MUTED)
     save_figure(fig, output_dir, "context-throughput")
 
@@ -226,7 +216,7 @@ def main():
     args.output_dir.mkdir(parents=True, exist_ok=True)
     figure(args.output_dir, "generation-comparison", "Generation throughput and first-token latency", [
         (GENERATION, "Throughput · higher is better", "Tokens per second", False),
-        (LATENCY, "Time to first token · lower is better", "Seconds · logarithmic scale", True),
+        (LATENCY, "Time to first token · lower is better", "Seconds", True),
     ], series)
     figure(args.output_dir, "prefill-comparison", "Long-context prefill and prefix-cache reuse", [
         (COLD, "Cold prefill · higher is better", "Effective prefill tokens per second", False),

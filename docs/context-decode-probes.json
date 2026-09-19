@@ -17,7 +17,7 @@
   "metric": "decode_tokens_per_second",
   "unit": "tokens_per_second",
   "native_formula": "(completion_tokens - 1) / (last_output_time - first_output_time)",
-  "aggregation": "Median of three native request values within each run; the chart line is the median of the three per-run medians. The third run is a separate IaC reproduction.",
+  "aggregation": "Median of three native request values within each run; chart lines use only the two accepted per-run medians, consistent with the September 19 baseline. The third run is a separate IaC reproduction shown as a point only.",
   "limits": [
     "Eight output tokens and only three measured SSE events per request provide a short, burst-sensitive diagnostic, not sustained decode throughput.",
     "The initial September 11 public record does not include decode rates for these context lengths; its native receipts were unavailable for extraction. No initial decode curve is inferred.",

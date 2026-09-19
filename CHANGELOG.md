@@ -10,7 +10,7 @@ Versions and releases are created only at the owner's explicit request.
 - Added a two-panel context-length chart for cold prefill and the available
   eight-token decode probes, with reproducible extracted measurements and explicit
   limits on sustained decode and initial-baseline comparison.
-- Added reproducible comparison charts showing all 16 metrics and individual runs
+- Added reproducible comparison charts showing all 16 metrics
   from September 11 versus the two accepted September 19 runs plus its separate IaC
   reproduction, with that run identified and the frozen baseline unchanged.
 - Added the September 19 performance reference and a dated README comparison with
@@ -63,6 +63,9 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Fixed
 
+- Aligned chart medians and numeric labels with the frozen README baseline values,
+  keeping the separate IaC run visible but outside those summaries. Charts now
+  appear directly in the README, with simple bars, lines and linear axes.
 - Counted deployment drift from file-status rows, excluding diagnostic summaries that
   previously inflated the reported number of mismatched files.
 - Released completed SparkCache saver payload references before the next queue wait and
