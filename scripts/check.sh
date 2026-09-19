@@ -7,7 +7,7 @@ export PYTHONDONTWRITEBYTECODE=1
 
 public_path() {
   case "$1" in
-    ./.git/*|./.claude/*|./scripts/mirror-snapshot.sh|\
+    ./.git/*|./.claude/*|./docs/rigmark_reports/*|./scripts/mirror-snapshot.sh|\
     ./scripts/mirror-allow.txt|./scripts/mirror-private-terms.example)
       return 1 ;;
     *) return 0 ;;
@@ -15,6 +15,12 @@ public_path() {
 }
 
 required=(
+  docs/install-from-zero.md
+  docs/operations.md
+  docs/fabric.md
+  docs/production-recipe.md
+  docs/benchmarks/README.md
+  docs/rigmark_reports/README.md
   scripts/tp4ctl
   scripts/check-f0.py
   scripts/prepare-sparkcache.py
@@ -73,9 +79,6 @@ python3 scripts/f0-reference.py --help >/dev/null
 scripts/node/nccl/build.sh --help >/dev/null
 scripts/node/nccl/install-nccl.sh --help >/dev/null
 echo "command-help: PASS"
-
-doc_count=$(find docs -path docs/internal -prune -o -type f -name '*.md' -print | wc -l | tr -d ' ')
-[ "$doc_count" = 4 ] || { echo "check: docs/ must contain exactly 4 public Markdown files (got $doc_count)" >&2; exit 1; }
 
 ./scripts/tests/test-agent-preflight.sh
 python3 scripts/tests/test-nccl-gid-selection.py

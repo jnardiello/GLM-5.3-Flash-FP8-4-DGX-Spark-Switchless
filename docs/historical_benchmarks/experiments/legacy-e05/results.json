@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "experiment_id": "legacy-e05",
+  "record_type": "portable_measurement_extract",
+  "title": "E05: native MTP, depth 3",
+  "outcome": "discard by owner decision on 2026-09-12",
+  "coverage": "Summary-only historical evidence; original native receipts unavailable in this import.",
+  "privacy": "Numeric fields, safe protocol/settings fields and receipt digests only. Raw prompts, responses, cache salts, endpoints, host identities and private paths are omitted.",
+  "evidence_coverage": "summary_only",
+  "counts": {
+    "completed_runs": 3,
+    "completed_requests": 162,
+    "native_validation_findings": 0,
+    "code_output_gates_passed": 15,
+    "code_output_gates_total": 15
+  },
+  "metrics": [
+    {
+      "key": "code_decode_throughput",
+      "unit": "tokens_per_second",
+      "value": 46.135
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "value": 38.943
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "value": 55.71
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "value": 82.378
+    },
+    {
+      "key": "prose_decode_throughput",
+      "unit": "tokens_per_second",
+      "value": 29.398
+    }
+  ],
+  "summary_source": {
+    "description": "Recorded local optimization outcome, E05",
+    "sha256": "ae14bbdc066a31879f3ce988fb41012642af66843f76578db2673c28a666474c"
+  },
+  "per_run_values_available": false
+}

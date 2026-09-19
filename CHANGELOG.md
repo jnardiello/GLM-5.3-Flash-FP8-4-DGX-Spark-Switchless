@@ -7,13 +7,17 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Added dated benchmark reports and result archives for baselines, reproductions and
+  experiments, preserving incomplete and excluded evidence with explicit outcomes.
+- Added a local native-report directory and a mandatory absolute `--output` convention
+  for every Rigmark run, with consolidated agent instructions for execution and archiving.
 - Added a two-panel context-length chart for cold prefill and the available
   eight-token decode probes, with reproducible extracted measurements and explicit
   limits on sustained decode and initial-baseline comparison.
 - Added reproducible comparison charts showing all 16 metrics
   from September 11 versus the two accepted September 19 runs plus its separate IaC
   reproduction, with that run identified and the frozen baseline unchanged.
-- Added the September 19 performance reference and a dated README comparison with
+- Added the September 19 performance reference and a dated historical comparison with
   September 11 and September 18. The new reference reports two valid native Rigmark
   runs (108 requests), performance tradeoffs and reduced KV capacity; historical records
   remain unchanged.
@@ -36,6 +40,12 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- Moved frozen benchmark JSON and historical PNG/SVG figures into dated archives,
+  preserving their bytes and hashes and updating operational references.
+- Simplified the README to current-baseline values and figures, retaining percentage
+  changes against the linked September 11 reference and preserving history in reports.
+- Allowed benchmark Markdown reports alongside the four required operating guides;
+  native local receipts remain outside public documentation checks and Git tracking.
 - Added percentage changes from the initial to the latest baseline in the README
   performance table, calculated from unrounded medians with TTFT direction clarified.
 - Made the September 19 configuration the base IaC recipe: hybrid KDA execution,
@@ -63,9 +73,11 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Fixed
 
-- Aligned chart medians and numeric labels with the frozen README baseline values,
-  keeping the separate IaC run visible but outside those summaries. Charts now
-  appear directly in the README, with simple bars, lines and linear axes.
+- Resolve the baseline path for rollback from the sealed archive's own manifest,
+  supporting both historical and reorganized source layouts without rewriting archives.
+- Aligned chart medians and numeric labels with the frozen README baseline values.
+  The README uses simple current-baseline charts; archived comparisons retain the
+  separate IaC run outside the frozen summaries.
 - Counted deployment drift from file-status rows, excluding diagnostic summaries that
   previously inflated the reported number of mismatched files.
 - Released completed SparkCache saver payload references before the next queue wait and

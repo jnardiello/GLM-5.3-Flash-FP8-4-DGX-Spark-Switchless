@@ -5,16 +5,16 @@ one-step rollback comments live in [`cluster.env.example`](../cluster.env.exampl
 host/software pins live in `scripts/node/bootstrap/versions.env`, model file manifests
 in `scripts/node/model-manifests/`, and NCCL pins in `scripts/node/nccl/`.
 
-The **Current** configuration is the [September 19, 2026 baseline](baseline-2026-09-19.json).
+The **Current** configuration is the [September 19, 2026 baseline](historical_benchmarks/baselines/2026-09-19/baseline.json).
 It combines the digest-pinned SparkRing/SparkCache R10 image, SIRCL single-rail
 transport, adaptive-k `batch-uniform`, hybrid KDA projections, cache-memory
 corrections, and a 15 GiB KV pool per rank. The base recipe is encoded directly in
 `cluster.env.example`, without an experiment overlay. The accepted performance
 record contains two native Rigmark runs. A separate
-[one-run IaC reproduction](reproduction-2026-09-19.json) records deployment verification
+[one-run IaC reproduction](historical_benchmarks/baselines/2026-09-19/reproduction.json) records deployment verification
 and performance after redeploying the published defaults.
 
-The [September 18](baseline-f1.json) and [September 11](baseline-f0.json) measurements
+The [September 18](historical_benchmarks/baselines/2026-09-18/baseline.json) and [September 11](historical_benchmarks/baselines/2026-09-11/baseline.json) measurements
 remain unchanged historical references. The complete September 18 rollback is
 [`scripts/node/reference/baseline-20260918.env`](../scripts/node/reference/baseline-20260918.env).
 The older September 11 recipe retains its own frozen launcher, controller, and
@@ -139,7 +139,7 @@ policy if the engine reports that required path unavailable.
 so every decode step replays a full CUDA graph. In `per-request` mode (September 11) a step that
 mixes k=3 and k=5 requests runs the PIECEWISE decode graph; with code acceptance
 measured at the 0.58 up-threshold, mixed steps appear as soon as two requests are
-batched. The historical [September 18 three-run series](baseline-f1.json) measured
+batched. The historical [September 18 three-run series](historical_benchmarks/baselines/2026-09-18/baseline.json) measured
 C4 +18.2% against September 11 with C2 within noise. That result belongs to the
 complete September 18 recipe; it does not isolate the scheduler's contribution.
 The September 18 rollback retains `batch-uniform`.
@@ -256,7 +256,7 @@ Generated-code quality audits remain separate from performance acceptance.
 
 ## Qualification and reproduction
 
-The [September 19 baseline](baseline-2026-09-19.json) contains **two complete native
+The [September 19 baseline](historical_benchmarks/baselines/2026-09-19/baseline.json) contains **two complete native
 Rigmark runs and 108 requests**, with the same loaded processes retained on all four
 ranks and a fresh `cache_salt` per run. The operator accepted that two-run series;
 a third run was excluded in full because competing traffic was reported. It is
@@ -273,8 +273,8 @@ requests matched their requested token counts. Both operational post-boot gates
 passed within two minutes of `/health` 200.
 
 Code decode was 53.8905 tok/s; aggregate end-to-end code throughput at concurrency
-1/2/4 was 40.300/57.252/87.527 tok/s. Full prefill, TTFT, prose, and historical
-comparisons are in the frozen records and the project README. Concurrency requests
+1/2/4 was 40.300/57.252/87.527 tok/s. Full prefill, TTFT, prose and historical comparisons are in the
+[benchmark reports](benchmarks/README.md); the project README shows only the current baseline. Concurrency requests
 use a 256-token output cap, so these measurements do not establish performance for
 long parallel generations or complete agent tasks. The full instrumented recipe
 was accepted together; individual kernel, cache-fix, and memory-budget contributions
@@ -283,7 +283,7 @@ three-run references, and the KV pool is smaller.
 
 The published defaults were subsequently deployed through repository IaC, with
 `TP4_ENV` unset and a coordinated four-rank restart. The separate
-[reproduction record](reproduction-2026-09-19.json) reports **one native Rigmark run
+[reproduction record](historical_benchmarks/baselines/2026-09-19/reproduction.json) reports **one native Rigmark run
 and 54 requests**, compared with the unchanged two-run baseline medians. Node checks
 recorded 166 PASS, 0 FAIL, 2 WARN and 7 SKIP. Operational identity passed before and
 after the benchmark; all four containers remained running without restarts. Both

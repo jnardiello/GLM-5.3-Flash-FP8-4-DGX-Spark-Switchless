@@ -19,7 +19,7 @@ for each part of the requested task before substantive work:
 For installation, read both [`docs/install-from-zero.md`](docs/install-from-zero.md)
 and [`docs/operations.md`](docs/operations.md). The default recipe is
 [`cluster.env.example`](cluster.env.example); its measured identity and performance
-record is [`docs/baseline-2026-09-19.json`](docs/baseline-2026-09-19.json). Preserve its
+record is [`docs/historical_benchmarks/baselines/2026-09-19/baseline.json`](docs/historical_benchmarks/baselines/2026-09-19/baseline.json). Preserve its
 non-site settings unless the owner requests a variant. Use this checklist to navigate
 the existing procedures:
 
@@ -145,46 +145,108 @@ qualification prerequisites, or a parallel benchmark/admission framework; necess
 measurement fixes belong in Rigmark.
 
 Run one experiment at a time. Use the frozen **September 19, 2026** baseline in
-[`docs/baseline-2026-09-19.json`](docs/baseline-2026-09-19.json) for future comparisons.
+[`docs/historical_benchmarks/baselines/2026-09-19/baseline.json`](docs/historical_benchmarks/baselines/2026-09-19/baseline.json) for future comparisons.
 Its fixed medians use exactly two valid native Rigmark runs (108 requests), accepted by
 the owner after a third run was excluded for competing traffic. Do not call this a
 three-run median or rerun/replace the reference without an explicit owner request.
 The current IaC base is `cluster.env.example`: hybrid KDA input projections, corrected
 SparkCache allocations and 15 GiB KV per rank. `scripts/check-f0.py` checks this identity
-by default without inference requests. The [September 18 record](docs/baseline-f1.json)
-and [September 11 record](docs/baseline-f0.json) remain immutable historical references;
+by default without inference requests. The [September 18 record](docs/historical_benchmarks/baselines/2026-09-18/baseline.json)
+and [September 11 record](docs/historical_benchmarks/baselines/2026-09-11/baseline.json) remain immutable historical references;
 select them explicitly with `--baseline`. The immediate rollback uses
 `scripts/node/reference/baseline-20260918.env`; the older archive workflow remains in
 `docs/operations.md`. Source parity of the new defaults does not by itself establish
 live IaC reproduction: record any later deploy and benchmark separately.
-Agree the variant repetition count with
-the owner only when explicit later direction changes the standing protocol. By default,
-run every variant three consecutive times. Manually apply it to all four nodes in
-one coordinated transition, load its weights once, and preserve that process across all
-three runs. Use the same Rigmark version, suites, prompts, and parameters under comparable
-idle, warmup, and cache conditions.
+### Run the benchmark
 
-For every performance metric, compare the fixed current-baseline median with the median of the three
-native per-run variant values. Label the actual variant run and request counts. Keep
-measurement-integrity and error results as explicit counts or totals with denominators
-rather than medians. The results report requires fixed-baseline and variant-median columns; delta
-columns and a separate statistical framework are not required. Judge prefill and
-generation throughput, TTFT, concurrency, and functional results beyond measured noise,
-with no fixed percentage floor. Record commands, configuration, results, and failures,
-then classify the outcome as promote, discard, or unresolved. Restore the reference when
-discarded or unresolved unless the next candidate is already prepared and authorized.
-An owner stop may end the three-run series early; report the actual run and request counts
-and do not claim a three-run median. A direct transition to the next candidate needs no
-intermediate reference reload: derive its complete recipe from the current baseline, remove the previous
-delta, and use the usual coordinated four-rank transition and functional gates. Continue
-to compare against the fixed current-baseline medians. Restore the current baseline state whenever work stops without
-a prepared next candidate.
+Use the selected frozen record's `rigmark.source`, prompts and settings as the
+execution specification. Keep version/source hash, comparison ID, model, seed,
+request body, reasoning controls, token limits, prefill depths and concurrency
+settings matched. Do not substitute Rigmark's defaults for explicit recorded values.
+For the current reference, the complete suite has 54 requests: five requests for each
+of three decode workloads, three cold/replay pairs at each of three prefill depths,
+and three rounds at concurrency 1/2/4. `--runs 5` is an internal suite setting;
+**three variant runs means three complete suite executions**, normally 162 requests.
 
-A promote decision requires encoding the tested change in existing repository IaC;
-update the relevant documentation, rollback guidance, and changelog; reapply it through
-IaC from the reference; and verify actual configuration, cluster gates, and Rigmark
-reproduce the manual result before committing within the session's explicit
-authorization. Finish the experiment, then agree the next one with the owner.
+Run one experiment at a time. By default run each variant three consecutive times,
+with one authorized coordinated four-rank transition and one weight load retained
+across the series. Use comparable idle, warmup and cache conditions. Generate a fresh
+`cache_salt` for every complete execution, forwarded to both chat and prefill requests;
+preserve it within that run's cold/replay pairs. Keep the comparison ID matched to
+the reference so the benchmark prompt construction remains comparable.
+
+**Every native `./rigmark run` command must specify `--output`:**
+
+```sh
+--output "$TP4_REPO_ROOT/docs/rigmark_reports/<date-experiment>/run-<n>.json"
+```
+
+Set `TP4_REPO_ROOT` to the absolute path of this repository before changing into the
+independent Rigmark checkout. Use a unique dated experiment directory and a new run
+filename; never overwrite receipts. Use `umask 077` for local originals. Native cards
+are saved beside the JSON when the run completes. See
+[report storage and viewing](docs/rigmark_reports/README.md) for the full convention
+and the native `report`/`compare` commands. Do not create a benchmark wrapper.
+
+### Evaluate and preserve results
+
+After each execution inspect the saved result and errors before starting the next.
+On failure, preserve partial receipts/logs, diagnose from the available evidence,
+report the cause or remaining uncertainty, and stop the series. Do not automatically
+restart, unload the model or restore a baseline outside the owner's explicit lifecycle
+authorization. Do not turn a normal output-budget stop or an answer-quality issue into
+an infrastructure failure. The functional and measurement rules below still apply.
+
+For every performance metric compare the fixed **current operational baseline**
+median with the median of the variant's native per-run values. Record actual run and
+request counts. Integrity and error results use explicit totals and denominators,
+not medians. Judge code, concurrency, prose, prefill and latency beyond measured noise,
+with no fixed percentage floor. Keep reproduction runs separate from frozen baselines.
+An owner stop or excluded run can shorten a series; report its actual size and never
+claim a three-run median without three accepted runs. Preserve excluded measurements
+with their reason, but keep them out of accepted aggregates.
+
+Record the outcome as promote, discard, unresolved or decision_required, supported
+by the evidence and owner decision. Retain incomplete, owner-stopped and diagnostic
+results with their actual status. A superseded experiment is not automatically a
+discarded experiment. Before an authorized next candidate, derive its complete recipe
+from the current baseline and remove the previous delta; no intermediate baseline
+reload is required. If work stops, report the loaded state and coordinate any required
+restoration with the owner rather than unloading automatically.
+
+A promotion requires encoding the tested change in existing IaC, updating recipe and
+rollback documentation, reapplying the recipe in an authorized window, and verifying
+actual configuration, functional gates and native Rigmark reproduction. Record that
+reproduction separately. Commit and push only within the owner's authorization.
+
+### Archive and publish
+
+Use these locations for every experiment, including discarded or incomplete ones:
+
+| Location | Contents |
+| --- | --- |
+| `docs/rigmark_reports/<date-experiment>/` | Ignored native JSON, cards and logs, unchanged and privately retained |
+| `docs/historical_benchmarks/baselines/<date>/` | Frozen public baseline records and separate reproduction evidence |
+| `docs/historical_benchmarks/experiments/<date-experiment>/` | Portable result extracts, counts, protocol/configuration identity and source hashes |
+| `docs/benchmarks/` | Index and Markdown reports for baselines, experiments and comparisons |
+| `docs/plots/` | PNG/SVG figures under dated baseline, experiment or comparison directories |
+
+Archive the available evidence at the end of every run, including partial results;
+update the experiment report and index when its status changes. Public reports must
+include the comparison reference, settings, actual counts, exclusions, metric
+aggregation, limitations and documented outcome. Publish numeric extracts with native
+receipt hashes, omitting site values, private paths, raw salts and generated payloads.
+If only a historic summary survives, label it as summary-only; do not invent receipts.
+Keep frozen JSON bytes and hashes unchanged when relocating records. Their original
+embedded path strings are provenance; use the index for current paths.
+
+The README shows **only the current baseline**, with simple current-only figures.
+Its percentage column remains relative to the **initial September 11 baseline**, linked
+through the dated Markdown report. This historical presentation reference does not
+replace the current operational baseline used to assess new experiments. Calculate
+percentages from unrounded frozen medians and format decimal labels consistently.
+Keep prior comparison tables, images and diagnostic probes in the archive, not in the
+README. Read [the benchmark index](docs/benchmarks/README.md) before publishing results.
 
 Rank success by these criteria:
 

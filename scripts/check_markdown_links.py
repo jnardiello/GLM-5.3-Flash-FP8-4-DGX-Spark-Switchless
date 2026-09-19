@@ -32,6 +32,8 @@ def is_public(path: Path) -> bool:
     rel = path.relative_to(ROOT)
     if rel.parts[:2] == ("docs", "internal"):
         return False
+    if rel.parts[:2] == ("docs", "rigmark_reports") and rel.as_posix() != "docs/rigmark_reports/README.md":
+        return False
     if rel.as_posix() in INTERNAL_DOCUMENTS:
         return False
     if any(part in SKIP_DIRS for part in rel.parts):

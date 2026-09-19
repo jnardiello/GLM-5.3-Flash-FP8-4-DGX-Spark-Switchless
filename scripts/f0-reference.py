@@ -34,6 +34,7 @@ sys.dont_write_bytecode = True
 REPO = Path(__file__).resolve().parents[1]
 REFERENCE_ENV = REPO / "scripts/node/reference/f0-20260912.env"
 REFERENCE_MANIFEST = REPO / "scripts/node/reference/f0-20260912.json"
+EXPECTED_F0_BASELINE_SHA = "5828ae600458d09219df94d920193b7cd29c32530380284e616aef104755048d"
 EXPECTED_NCCL_SHA = "1ddc3240396a9b3a1e4fa3e54e129d099261106ce3b9263ac3fdc3e070713bd5"
 EXPECTED_NCCL_SIZE = 61_581_280
 ARCHIVE_MANIFEST = "SHA256SUMS.json"
@@ -685,6 +686,43 @@ def archive_hashes(root: Path) -> list[dict[str, Any]]:
     return records
 
 
+def confined_regular_file(root: Path, relative: Path, label: str) -> Path:
+    if not relative.parts or relative.is_absolute() or ".." in relative.parts:
+        raise ReferenceError(f"{label}: unsafe relative path")
+    path = root
+    try:
+        for part in relative.parts:
+            path /= part
+            if path.is_symlink():
+                raise ReferenceError(f"{label}: symlink is not allowed")
+        if not stat.S_ISREG(path.lstat().st_mode):
+            raise ReferenceError(f"{label}: regular file is unavailable")
+    except (OSError, ValueError) as exc:
+        raise ReferenceError(f"{label}: regular file is unavailable") from exc
+    return path
+
+
+def reference_baseline_source(root: Path, source_prefix: Path = Path()) -> Path:
+    # Resolve the baseline through the manifest in this source tree. Sealed older
+    # archives retain their original paths; no current-layout fallback is valid.
+    manifest_path = confined_regular_file(
+        root, source_prefix / "scripts/node/reference/f0-20260912.json", "F0 reference manifest")
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        baseline = manifest["baseline"]
+        relative, expected_sha = baseline["path"], baseline["sha256"]
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        raise ReferenceError("F0 reference manifest: invalid baseline entry") from exc
+    if not isinstance(relative, str) or not relative or Path(relative).is_absolute() or ".." in Path(relative).parts:
+        raise ReferenceError("F0 baseline: unsafe relative path")
+    if expected_sha != EXPECTED_F0_BASELINE_SHA:
+        raise ReferenceError("F0 baseline: manifest hash does not match the frozen F0 identity")
+    source = confined_regular_file(root, source_prefix / relative, "F0 baseline")
+    if sha256_file(source) != expected_sha:
+        raise ReferenceError("F0 baseline: archived file hash mismatch")
+    return source
+
+
 def public_reference_problems() -> list[str]:
     problems = []
     manifest = json.loads(REFERENCE_MANIFEST.read_text())
@@ -692,9 +730,10 @@ def public_reference_problems() -> list[str]:
         path = REPO / item["path"]
         if not path.is_file(): problems.append("missing public artifact: " + item["path"])
         elif sha256_file(path) != item["sha256"]: problems.append("public artifact hash: " + item["path"])
-    baseline = REPO / manifest["baseline"]["path"]
-    if not baseline.is_file() or sha256_file(baseline) != manifest["baseline"]["sha256"]:
-        problems.append("frozen baseline hash")
+    try:
+        reference_baseline_source(REPO)
+    except ReferenceError as exc:
+        problems.append(str(exc))
     return problems
 
 
@@ -709,7 +748,7 @@ def capture(args: argparse.Namespace, collector: Callable = collect_rank) -> int
     try:
         problems = public_reference_problems(); recipe = load_recipe(args.timeout)
         # This tool captures the historic F0 reference, never the current default.
-        problems.extend(CHECK_F0.recipe_problems(recipe, CHECK_F0.expected_f0(REPO / "docs/baseline-f0.json")))
+        problems.extend(CHECK_F0.recipe_problems(recipe, CHECK_F0.expected_f0(reference_baseline_source(REPO))))
         site_bytes = safe_config(REPO / "cluster.env")
         resolved_bytes = resolved_site_env(recipe)
         write_private(archive / "private/site/cluster.env", site_bytes)
@@ -1052,6 +1091,18 @@ def plan_restore(args: argparse.Namespace, collector: Callable = collect_rank) -
     recipe = json.loads((archive / "private/site/effective-recipe.json").read_text()) if not offline else {}
     state = json.loads((archive / "archive.json").read_text()) if not offline else {}
     comparison = offline + live
+    baseline_relative = None
+    baseline_problem = "archived F0 baseline unavailable: archive integrity check failed" if offline else ""
+    if not offline:
+        try:
+            source_prefix = Path("source/completed-iac")
+            baseline_source = reference_baseline_source(archive, source_prefix)
+            baseline_relative = str(baseline_source.relative_to(archive / source_prefix))
+        except ReferenceError as exc:
+            baseline_problem = str(exc)
+            comparison.append(baseline_problem)
+    baseline_check = (shlex.join(["scripts/check-f0.py", "--baseline", baseline_relative])
+                      if baseline_relative else "UNAVAILABLE: " + baseline_problem)
     rank_homes = []
     if not offline:
         for rank in range(4):
@@ -1116,7 +1167,8 @@ def plan_restore(args: argparse.Namespace, collector: Callable = collect_rank) -
         shlex.join(["ssh", rank0, remote_dropin]),
         shlex.join(["ssh", rank0, remote_up]),
         shlex.join(["ssh", rank0, f"curl -fsS http://localhost:{recipe.get('api_port','8000')}/health"]),
-        f"cd {shlex.quote(work)} && TP4_ENV=scripts/node/reference/f0-20260912.env python3 scripts/check-f0.py --baseline docs/baseline-f0.json",
+        (f"cd {shlex.quote(work)} && TP4_ENV=scripts/node/reference/f0-20260912.env python3 {baseline_check}"
+         if baseline_relative else baseline_check),
     ]
     if controller_problem:
         commands[2] = "BLOCKED: " + controller_problem
@@ -1138,7 +1190,7 @@ Captured operational readiness: {(state.get('operational_readiness') or {}).get(
 3. Use the currently running overlay for one coordinated four-rank `down`; reference F0 is selected only after the old process is stopped.
 4. Deploy the completed archived IaC and exact archived NCCL bytes through the repository's additive deploy/install procedures; verify every destination hash.
 5. Install the prepared autostart drop-in only after review, then daemon-reload. This selects the frozen overlay for the next boot.
-6. Run fabric prerequisites, one coordinated four-rank `up`, wait for `/health` 200, run both functional gates within 120 seconds, then `scripts/check-f0.py --baseline docs/baseline-f0.json`.
+6. Run fabric prerequisites, one coordinated four-rank `up`, wait for `/health` 200, run both functional gates within 120 seconds, then `{baseline_check}`.
 
 ## Host and fabric state (deferred review, never automatic)
 
@@ -1167,6 +1219,7 @@ per-rank receipts for exact paths, modes, ownership, symlinks and loaded-vs-disk
     write_json(directory / "comparison.json", {"schema": 1, "created_at": utcnow(),
                "offline_problems": offline, "live_differences": live,
                "controller_problem": controller_problem,
+               "baseline_path": baseline_relative, "baseline_problem": baseline_problem,
                "rank_status": [{"rank": i, "capture_status": item.get("capture_status"),
                                  "comparison": item.get("comparison")}
                                for i, item in enumerate(current)],

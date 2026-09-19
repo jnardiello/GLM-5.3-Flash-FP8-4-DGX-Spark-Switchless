@@ -10,72 +10,45 @@ contains the infrastructure as code, runtime patches, and guides to
 
 ## Measured performance
 
-Native [Rigmark](https://github.com/alexellis/rigmark) measurements from the same
-workstation, shown as medians of per-run values. Dates use day/month/year.
+Current baseline: **19/09/2026**, measured with native
+[Rigmark](https://github.com/alexellis/rigmark). Values are frozen medians of
+**two accepted runs: 108/108 requests**, zero measurement/runtime errors and
+30/30 native output gates passing.
 
-<div align="center">
+| Workload | Current · 19/09/2026 | Change vs [📊 11/09/2026](docs/benchmarks/baselines/2026-09-11.md) |
+| --- | ---: | ---: |
+| Code decode, one request | 53.89 tok/s | +6.9% |
+| Prose decode | 31.88 tok/s | +9.1% |
+| Code, one request (end-to-end) | 40.30 tok/s | +8.3% |
+| Code, two concurrent requests (aggregate, end-to-end) | 57.25 tok/s | +0.4% |
+| Code, four concurrent requests (aggregate, end-to-end) | 87.53 tok/s | +23.1% |
+| Prefill 8K, cold | 2,354.7 tok/s | +11.5% |
+| Prefill 32K, cold | 2,534.1 tok/s | +15.1% |
+| Prefill 64K, cold | 2,421.7 tok/s | +10.0% |
+| Code, two concurrent requests, per-stream TTFT | 0.495 s | -19.6% |
+| Code, four concurrent requests, per-stream TTFT | 0.680 s | -27.3% |
 
-| Workload | 11/09/2026 | 18/09/2026 | 19/09/2026 | Change, 19/09 vs 11/09 |
-| --- | ---: | ---: | ---: | ---: |
-| Code decode, one request | 50.40 tok/s | 51.78 tok/s | 53.89 tok/s | +6.9% |
-| Prose decode | 29.22 tok/s | 30.27 tok/s | 31.88 tok/s | +9.1% |
-| Code, one request (end-to-end) | 37.22 tok/s | 38.43 tok/s | 40.30 tok/s | +8.3% |
-| Code, two concurrent requests (aggregate, end-to-end) | 57.01 tok/s | 57.39 tok/s | 57.25 tok/s | +0.4% |
-| Code, four concurrent requests (aggregate, end-to-end) | 71.08 tok/s | 84.05 tok/s | 87.53 tok/s | +23.1% |
-| Prefill 8K, cold | 2,112.2 tok/s | 2,393.4 tok/s | 2,354.7 tok/s | +11.5% |
-| Prefill 32K, cold | 2,202.0 tok/s | 2,502.1 tok/s | 2,534.1 tok/s | +15.1% |
-| Prefill 64K, cold | 2,201.3 tok/s | 2,254.0 tok/s | 2,421.7 tok/s | +10.0% |
-| Code, two concurrent requests, per-stream TTFT | 0.616 s | 0.447 s | 0.495 s | -19.6% |
-| Code, four concurrent requests, per-stream TTFT | 0.935 s | 0.597 s | 0.680 s | -27.3% |
+Percentages use unrounded medians relative to the initial September 11 baseline.
+Higher throughput and lower TTFT are better. The separate IaC reproduction and the
+run excluded for competing traffic are outside these medians.
 
-</div>
+Decode speed excludes the initial wait; end-to-end speed includes it. TTFT is time
+to first token. Concurrent requests cap output at 256 tokens; long decode tests
+allow 8192. Cold prefill uses a new prefix and a fresh cache salt per run.
+These measurements describe inference rather than complete agent tasks.
 
-Percentage changes use the unrounded medians and are relative to September 11.
-Higher throughput and lower TTFT are better.
+The graphs show only the current baseline, using the same frozen values as the table.
+Click an image for its SVG version.
 
-September 11 and 18 each use **three runs**. September 19 uses **exactly two completed
-runs: 108/108 requests**, zero measurement/runtime errors, and 30/30 native output
-gates passing. Its third run was excluded entirely because of competing traffic.
-The records for [September 11](docs/baseline-f0.json), [September 18](docs/baseline-f1.json),
-and [September 19](docs/baseline-2026-09-19.json) include all 16 metrics and evidence hashes.
+[![Current baseline generation throughput and time to first token.](docs/plots/baselines/2026-09-19/generation.png)](docs/plots/baselines/2026-09-19/generation.svg)
 
-Decode speed excludes the initial wait; end-to-end speed includes it. TTFT is time to
-first token. Concurrency tests cap output at 256 tokens per request; long decode tests
-allow 8192. These measure inference, not complete agent tasks. Cold prefill processes
-a new prefix, using a fresh `cache_salt` per run.
+[![Current baseline cold prefill and immediate cache replay at 8K, 32K and 64K.](docs/plots/baselines/2026-09-19/prefill.png)](docs/plots/baselines/2026-09-19/prefill.svg)
 
-Compared with September 18, September 19 has higher code/prose throughput and longer
-concurrent-request TTFT, with **15 GiB KV per rank versus 16 GiB** previously. Allocator and host memory probes
-were active; their overhead was not isolated. Two runs give less repeatability evidence
-than three. A separate [one-run IaC reproduction](docs/reproduction-2026-09-19.json)
-records live deployment checks and 54 requests; the frozen medians above remain unchanged.
-
-The charts below compare September 11 with September 19 using the **same baseline
-medians as the table**: three initial runs and two accepted current runs. Blue is the
-initial baseline; green is the current baseline. Gold diamonds show the separate
-IaC reproduction, excluded from the medians. All figures use saved Rigmark results;
-the run excluded for competing traffic is not included.
-
-[![Generation throughput and TTFT using the README table medians: three September 11 runs and two accepted September 19 runs, with IaC shown separately.](docs/plots/generation-comparison.png)](docs/plots/generation-comparison.svg)
-
-[![Cold prefill and immediate cache replay at 8K, 32K and 64K, comparing baseline medians with IaC shown separately.](docs/plots/prefill-comparison.png)](docs/plots/prefill-comparison.svg)
-
-[![Throughput versus input context length at 8K, 32K and 64K: cold prefill compares September 11 and 19; diagnostic eight-token decode tails show September 19 only.](docs/plots/context-throughput.png)](docs/plots/context-throughput.svg)
-
-The first two images use bars for baseline medians. The third plots context length
-on X and tok/s on Y, with lines connecting those medians. Its prefill panel uses the
-same cold-request metrics as the table. Its decode panel uses the **8-token output
-tails of those prefill requests**, with each run represented by its median of three
-requests. These short probes are sensitive to streaming bursts and do not measure
-sustained decode. Only September 19 is shown for decode: the initial public record
-does not contain these rates, and its raw receipts were unavailable for extraction.
-The [27 extracted measurements and source hashes](docs/context-decode-probes.json)
-make the additional panel reproducible.
-
-Click any image for the SVG version. All axes are linear and start at zero.
-Regenerate the figures from the public JSON records with
-`python3 scripts/plot-baseline-comparison.py` in an environment containing
-`matplotlib==3.11.2`. The script also writes PNG copies for the README.
+The [current benchmark report](docs/benchmarks/baselines/2026-09-19.md) records all
+16 metrics, settings and limits, including the **15 GiB KV pool per rank**.
+The [benchmark archive](docs/benchmarks/README.md) retains previous baselines,
+comparisons, experiments and separate reproduction results. See
+[local Rigmark reports](docs/rigmark_reports/README.md) for saving and viewing native receipts.
 
 The [current recipe](docs/production-recipe.md), encoded in
 [`cluster.env.example`](cluster.env.example), combines the digest-pinned SparkRing
@@ -107,7 +80,7 @@ Replace the placeholders below, then give this prompt to the agent in the checko
 ```text
 Install this repository's September 19, 2026 recipe on my four nodes.
 Read AGENTS.md, docs/install-from-zero.md, and docs/operations.md first.
-Use docs/baseline-2026-09-19.json and cluster.env.example as the reference.
+Use docs/historical_benchmarks/baselines/2026-09-19/baseline.json and cluster.env.example as the reference.
 
 SSH targets in rank order:
 0: <user@rank0-host>
@@ -145,6 +118,7 @@ short execution checklist. The guides below own the complete procedures.
 | Generate site network files | [Netplan renderer](scripts/render-netplan.md) |
 | Build and install patched NCCL | [NCCL guide](scripts/node/nccl/README.md) |
 | Maintain workstation scripts | [Shared shell helpers](scripts/lib/README.md) |
+| Review benchmark results and history | [Benchmark reports](docs/benchmarks/README.md), [native report storage](docs/rigmark_reports/README.md) |
 | Review changes and third-party terms | [Changelog](CHANGELOG.md), [credits](CREDITS.md), [license](LICENSE) |
 
 ## Use the endpoint

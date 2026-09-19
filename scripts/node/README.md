@@ -5,7 +5,7 @@ artifacts for the four cluster hosts. Nothing in this directory runs merely beca
 it exists in the repository; deploy, bootstrap, launcher, and configuration choices
 select the files explicitly.
 
-The base configuration is the [September 19, 2026 recipe](../../docs/baseline-2026-09-19.json).
+The base configuration is the [September 19, 2026 recipe](../../docs/historical_benchmarks/baselines/2026-09-19/baseline.json).
 September 18 and September 11 remain separate historical references with their own
 rollback assets; the September 12 filenames below belong to the September 11
 reference's later capture.

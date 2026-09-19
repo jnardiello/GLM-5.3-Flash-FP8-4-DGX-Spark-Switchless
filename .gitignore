@@ -14,6 +14,10 @@ __pycache__/
 /E09-QUALIFICATION-2026-09-17.md
 /OPERATIONS-HISTORY.md
 
+# Native Rigmark receipts remain local; portable extracts are published separately.
+/docs/rigmark_reports/*
+!/docs/rigmark_reports/README.md
+
 # --- Site configuration: created by the user from public templates, never committed.
 /cluster.env
 # Per-node netplan directories (one per alias). The template and the shared/common

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "experiment_id": "legacy-e01",
+  "record_type": "portable_measurement_extract",
+  "title": "E01: batch-uniform scheduler",
+  "outcome": "discard by owner decision on 2026-09-12",
+  "coverage": "Summary-only historical evidence; original native receipts unavailable in this import.",
+  "privacy": "Numeric fields, safe protocol/settings fields and receipt digests only. Raw prompts, responses, cache salts, endpoints, host identities and private paths are omitted.",
+  "evidence_coverage": "summary_only",
+  "counts": {
+    "completed_runs": 1,
+    "completed_requests": 54,
+    "planned_runs": 3,
+    "second_run_owner_stopped": true,
+    "third_run_executed": false
+  },
+  "metrics": [],
+  "summary_source": {
+    "description": "Recorded local optimization outcome, E01",
+    "sha256": "ae14bbdc066a31879f3ce988fb41012642af66843f76578db2673c28a666474c"
+  },
+  "per_run_values_available": false
+}

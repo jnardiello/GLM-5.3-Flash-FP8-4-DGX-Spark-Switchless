@@ -2,7 +2,7 @@
   "schema": 1,
   "reference_id": "f0-20260912",
   "baseline": {
-    "path": "docs/baseline-f0.json",
+    "path": "docs/historical_benchmarks/baselines/2026-09-11/baseline.json",
     "sha256": "5828ae600458d09219df94d920193b7cd29c32530380284e616aef104755048d"
   },
   "runtime": {

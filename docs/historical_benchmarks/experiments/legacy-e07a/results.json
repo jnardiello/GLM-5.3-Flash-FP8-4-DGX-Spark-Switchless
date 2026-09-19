@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "experiment_id": "legacy-e07a",
+  "record_type": "portable_measurement_extract",
+  "title": "E07a: SIRCL/RoCE transport",
+  "outcome": "unresolved; not promoted in the recorded series",
+  "coverage": "Summary-only historical evidence; original native receipts unavailable in this import.",
+  "privacy": "Numeric fields, safe protocol/settings fields and receipt digests only. Raw prompts, responses, cache salts, endpoints, host identities and private paths are omitted.",
+  "evidence_coverage": "summary_only",
+  "counts": {
+    "completed_runs": 3,
+    "completed_requests": 162,
+    "native_validation_findings": 0,
+    "code_output_gates_passed": 14,
+    "code_output_gates_total": 15,
+    "code_length_caps": 1
+  },
+  "metrics": [
+    {
+      "key": "code_decode_throughput",
+      "unit": "tokens_per_second",
+      "value": 50.513
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "value": 38.911
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "value": 53.891
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "value": 73.481
+    },
+    {
+      "key": "prose_decode_throughput",
+      "unit": "tokens_per_second",
+      "value": 28.769
+    },
+    {
+      "key": "code_ttft",
+      "unit": "seconds",
+      "value": 0.412
+    },
+    {
+      "key": "prose_ttft",
+      "unit": "seconds",
+      "value": 0.393
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "unit": "seconds",
+      "value": 0.41
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "unit": "seconds",
+      "value": 0.646
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "unit": "seconds",
+      "value": 0.92
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "unit": "tokens_per_second",
+      "value": 2128.427
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "unit": "tokens_per_second",
+      "value": 4709.914
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "unit": "tokens_per_second",
+      "value": 2205.697
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "unit": "tokens_per_second",
+      "value": 20007.803
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "unit": "tokens_per_second",
+      "value": 2212.39
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "unit": "tokens_per_second",
+      "value": 35866.017
+    }
+  ],
+  "summary_source": {
+    "description": "Recorded local optimization outcome, E07A",
+    "sha256": "ae14bbdc066a31879f3ce988fb41012642af66843f76578db2673c28a666474c"
+  },
+  "per_run_values_available": false
+}

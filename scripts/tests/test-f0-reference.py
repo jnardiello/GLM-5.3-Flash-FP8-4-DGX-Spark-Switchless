@@ -6,6 +6,7 @@ import importlib.util
 import io
 import json
 import os
+import shutil
 import stat
 import subprocess
 import tempfile
@@ -21,6 +22,10 @@ SPEC.loader.exec_module(tool)
 
 compile(tool.REMOTE_COLLECTOR, "REMOTE_COLLECTOR", "exec")
 assert tool.public_reference_problems() == []
+baseline_relative = "docs/historical_benchmarks/baselines/2026-09-11/baseline.json"
+baseline_bytes = (REPO / baseline_relative).read_bytes()
+assert tool.reference_baseline_source(REPO) == REPO / baseline_relative
+assert tool.sha256_file(REPO / baseline_relative) == tool.EXPECTED_F0_BASELINE_SHA
 frozen_controller = REPO / "scripts/node/reference/tp4ctl-f0-20260912.sh"
 assert tool.sha256_file(frozen_controller) == "6cb6f07cc60a13c86dfed8c01156c13d3f1fb88ca611bd499989841f96688a82"
 assert (REPO / "scripts/tp4ctl").read_bytes() != frozen_controller.read_bytes()
@@ -93,6 +98,36 @@ with tempfile.TemporaryDirectory(prefix="f0-reference-test-") as temp:
         assert "missing" in str(exc)
     else:
         raise AssertionError("missing archived controller was accepted")
+
+    # Capture selects F0 through this checkout's manifest, even if its path is
+    # different from the standard current layout. Abort before any node work.
+    capture_source = root / "capture-source"
+    capture_manifest = capture_source / "scripts/node/reference/f0-20260912.json"
+    capture_manifest.parent.mkdir(parents=True)
+    capture_baseline = capture_source / "docs/custom-f0.json"
+    capture_baseline.parent.mkdir(parents=True)
+    capture_baseline.write_bytes(baseline_bytes)
+    capture_manifest.write_text(json.dumps({"artifacts": [], "baseline": {
+        "path": "docs/custom-f0.json", "sha256": tool.EXPECTED_F0_BASELINE_SHA}}))
+    old_repo, old_manifest = tool.REPO, tool.REFERENCE_MANIFEST
+    old_load, old_expected = tool.load_recipe, tool.CHECK_F0.expected_f0
+    selected_paths = []
+    def stop_after_baseline(path):
+        selected_paths.append(path)
+        raise tool.ReferenceError("fixture stops before configuration capture or node calls")
+    try:
+        tool.REPO, tool.REFERENCE_MANIFEST = capture_source, capture_manifest
+        tool.load_recipe = lambda timeout: {}
+        tool.CHECK_F0.expected_f0 = stop_after_baseline
+        capture_args = tool.parse_args(["capture", "--archive", str(root / "capture-result"),
+                                       "--prechange-source", str(root / "unused-source"),
+                                       "--evidence-dir", str(root / "unused-evidence")])
+        with contextlib.redirect_stdout(io.StringIO()):
+            assert tool.capture(capture_args) == 1
+        assert selected_paths == [capture_baseline]
+    finally:
+        tool.REPO, tool.REFERENCE_MANIFEST = old_repo, old_manifest
+        tool.load_recipe, tool.CHECK_F0.expected_f0 = old_load, old_expected
 
     ordinary = root / "ordinary.env"
     ordinary.write_text("SPEC_TOKENS=5\nBATCHED_TOKENS=8192\n")
@@ -183,6 +218,104 @@ with tempfile.TemporaryDirectory(prefix="f0-reference-test-") as temp:
     put(tool.ARCHIVE_MANIFEST, {"schema": 1, "entries": entries})
     archive_problems = tool.validate_archive(archive, rerender=False)
     assert archive_problems == [], archive_problems
+
+    def seal_layout(layout):
+        source_root = layout / "source/completed-iac"
+        records = [{"path": str(path.relative_to(source_root)), "type": "file", "mode": 0o644,
+                    "uid": os.getuid(), "gid": os.getgid(), "size": path.stat().st_size,
+                    "sha256": tool.sha256_file(path)}
+                   for path in sorted(source_root.rglob("*")) if path.is_file()]
+        (layout / "source/completed-iac-manifest.json").write_text(json.dumps(records))
+        tool.secure_tree(layout)
+        (layout / tool.ARCHIVE_MANIFEST).write_text(json.dumps({
+            "schema": 1, "entries": tool.archive_hashes(layout)}))
+
+    def unchanged(rank, _host, _recipe, _timeout, _command_limit, _total_limit):
+        return {"rank": rank, "capture_status": "complete", "runtime_signature": "same", "problems": []}
+
+    def restore_plan(layout, label, expected_status):
+        report_root = root / ("layout-reports-" + label)
+        args = tool.parse_args(["plan-restore", "--archive", str(layout), "--report-root", str(report_root)])
+        with contextlib.redirect_stdout(io.StringIO()):
+            assert tool.plan_restore(args, unchanged) == expected_status
+        reports = list(report_root.glob("f0-reference-report-*"))
+        assert len(reports) == 1
+        return ((reports[0] / "restore-plan.md").read_text(),
+                json.loads((reports[0] / "comparison.json").read_text()))
+
+    # The fixtures have no netplan implementation. All archive integrity checks
+    # remain real; only their already-tested renderer and live node reads are stubbed.
+    old_render, old_manifest = tool.render_private, tool.REFERENCE_MANIFEST
+    different_current_manifest = root / "different-current-reference.json"
+    current_manifest = json.loads(old_manifest.read_text())
+    current_manifest["baseline"]["path"] = "docs/not-in-any-archive.json"
+    different_current_manifest.write_text(json.dumps(current_manifest))
+    try:
+        tool.render_private = lambda *args: {"status": "PASS", "generated": []}
+        tool.REFERENCE_MANIFEST = different_current_manifest
+        for label, relative in (("old", "docs/baseline-f0.json"), ("new", baseline_relative)):
+            layout = root / ("layout-" + label)
+            shutil.copytree(archive, layout)
+            source_root = layout / "source/completed-iac"
+            baseline = source_root / relative
+            baseline.parent.mkdir(parents=True, exist_ok=True)
+            baseline.write_bytes(baseline_bytes)
+            manifest_path = source_root / "scripts/node/reference/f0-20260912.json"
+            manifest_path.parent.mkdir(parents=True, exist_ok=True)
+            archived_manifest = json.loads((REPO / "scripts/node/reference/f0-20260912.json").read_text())
+            archived_manifest["baseline"]["path"] = relative
+            manifest_path.write_text(json.dumps(archived_manifest))
+            (manifest_path.parent / frozen_controller.name).write_bytes(frozen_controller.read_bytes())
+            seal_layout(layout)
+            before = tool.archive_hashes(layout), (layout / tool.ARCHIVE_MANIFEST).read_bytes()
+            plan, comparison = restore_plan(layout, label, 0)
+            assert plan.count("scripts/check-f0.py --baseline " + relative) == 2
+            assert comparison["baseline_path"] == relative and comparison["baseline_problem"] == ""
+            assert before == (tool.archive_hashes(layout), (layout / tool.ARCHIVE_MANIFEST).read_bytes())
+
+            for defect in ("missing", "corrupt", "changed-pin", "escaping", "absolute", "missing-manifest"):
+                broken = root / ("layout-" + label + "-" + defect)
+                shutil.copytree(layout, broken)
+                broken_source = broken / "source/completed-iac"
+                broken_baseline = broken_source / relative
+                broken_manifest = broken_source / "scripts/node/reference/f0-20260912.json"
+                record = json.loads(broken_manifest.read_text())
+                if defect == "missing": broken_baseline.unlink()
+                elif defect in ("corrupt", "changed-pin"):
+                    broken_baseline.write_text("changed baseline\n")
+                    if defect == "changed-pin": record["baseline"]["sha256"] = tool.sha256_file(broken_baseline)
+                elif defect == "escaping": record["baseline"]["path"] = "../outside-baseline.json"
+                elif defect == "absolute": record["baseline"]["path"] = str(baseline)
+                if defect == "missing-manifest": broken_manifest.unlink()
+                else: broken_manifest.write_text(json.dumps(record))
+                # Reseal the fixture consistently: the baseline's independent
+                # frozen identity and confinement must still reject this archive.
+                seal_layout(broken)
+                assert tool.validate_archive(broken, rerender=False) == []
+                plan, comparison = restore_plan(broken, label + "-" + defect, 1)
+                assert "scripts/check-f0.py --baseline" not in plan
+                assert "UNAVAILABLE:" in plan and comparison["baseline_path"] is None
+                assert comparison["baseline_problem"]
+
+            baseline.unlink()
+            baseline.symlink_to(REPO / baseline_relative)
+            try:
+                tool.reference_baseline_source(layout, Path("source/completed-iac"))
+            except tool.ReferenceError as exc:
+                assert "symlink" in str(exc)
+            else:
+                raise AssertionError("symlink baseline was accepted")
+            baseline.unlink()
+            baseline.parent.rmdir()
+            baseline.parent.symlink_to((REPO / baseline_relative).parent, target_is_directory=True)
+            try:
+                tool.reference_baseline_source(layout, Path("source/completed-iac"))
+            except tool.ReferenceError as exc:
+                assert "symlink" in str(exc)
+            else:
+                raise AssertionError("symlink baseline directory was accepted")
+    finally:
+        tool.render_private, tool.REFERENCE_MANIFEST = old_render, old_manifest
     (archive / "archive.json").write_text(json.dumps({**state, "changed": True}))
     assert "archive hash: archive.json" in tool.validate_archive(archive, rerender=False)
     put(tool.ARCHIVE_MANIFEST, {"schema": 1, "entries": [{**entries[0], "path": "../escape"}, *entries[1:]]})
@@ -218,7 +351,9 @@ with tempfile.TemporaryDirectory(prefix="f0-reference-test-") as temp:
     assert json.loads(reports[0].read_text())["restore_commands_executed"] is False
     assert stat.S_IMODE(reports[0].stat().st_mode) == 0o600
     restore_plan = (reports[0].parent / "restore-plan.md").read_text()
-    assert restore_plan.count("scripts/check-f0.py --baseline docs/baseline-f0.json") == 2
+    assert "scripts/check-f0.py --baseline" not in restore_plan
+    assert "UNAVAILABLE: archived F0 baseline unavailable" in restore_plan
+    assert json.loads(reports[0].read_text())["baseline_path"] is None
 
     stage_cli = subprocess.run([
         "python3", str(REPO / "scripts/f0-reference.py"), "stage-source",

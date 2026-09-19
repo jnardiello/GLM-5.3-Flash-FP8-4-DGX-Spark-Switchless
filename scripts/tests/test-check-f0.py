@@ -15,6 +15,7 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[2]
+BASELINES = REPO / "docs/historical_benchmarks/baselines"
 SPEC = importlib.util.spec_from_file_location("check_f0", REPO / "scripts/check-f0.py")
 assert SPEC and SPEC.loader
 check = importlib.util.module_from_spec(SPEC)
@@ -91,7 +92,7 @@ def recipe() -> dict[str, str]:
 
 
 def expected() -> dict:
-    value = check.expected_f0(REPO / "docs/baseline-f0.json")
+    value = check.expected_f0(BASELINES / "2026-09-11/baseline.json")
     value["image_digest"] = "example/f0@sha256:abc"
     # The fixtures describe the per-request policy regardless of which frozen baseline the
     # checkout carries; the baseline-driven expectation is covered separately below.
@@ -101,7 +102,7 @@ def expected() -> dict:
 
 def test_baseline_adaptive_policy_is_read_from_the_baseline() -> None:
     with tempfile.TemporaryDirectory() as tmp:
-        data = json.loads((REPO / "docs/baseline-f0.json").read_text(encoding="utf-8"))
+        data = json.loads((BASELINES / "2026-09-11/baseline.json").read_text(encoding="utf-8"))
         data["system"]["adaptive_k"] = {"mode": "batch-uniform", "k_lo": 3, "k_hi": 5}
         data["system"]["serving_image_digest"] = "example/f1@sha256:def"
         path = Path(tmp) / "baseline.json"
@@ -402,9 +403,9 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
     return rec, exp, ranks
 
 
-assert check.BASELINE == REPO / "docs/baseline-2026-09-19.json"
-for name in ("baseline-f0.json", "baseline-f1.json", "baseline-2026-09-19.json"):
-    baseline_path = REPO / "docs" / name
+assert check.BASELINE == BASELINES / "2026-09-19/baseline.json"
+for name in ("2026-09-11", "2026-09-18", "2026-09-19"):
+    baseline_path = BASELINES / name / "baseline.json"
     baseline_recipe, baseline_expected, baseline_ranks = baseline_fixture(baseline_path)
     assert check.evaluate(baseline_recipe, baseline_expected, baseline_ranks, endpoint()) == [], name
 
@@ -463,8 +464,8 @@ assert "rank 0: running image content ID" in check.evaluate(
 original_load = check.load_recipe
 try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-selection.") as temp:
-        for name in ("baseline-f0.json", "baseline-f1.json", "baseline-2026-09-19.json"):
-            path = REPO / "docs" / name
+        for name in ("2026-09-11", "2026-09-18", "2026-09-19"):
+            path = BASELINES / name / "baseline.json"
             rec, exp, ranks = baseline_fixture(path)
             check.load_recipe = lambda timeout: (deepcopy(rec), {"returncode": 0})
             output = io.StringIO()
@@ -500,20 +501,20 @@ RELAY_DEST=operator@192.0.2.23
 '''
         check.REPO = isolated
         for overlay, baseline in (
-            (None, "baseline-2026-09-19.json"),
-            ("scripts/node/reference/baseline-20260918.env", "baseline-f1.json"),
-            ("scripts/node/reference/f0-20260912.env", "baseline-f0.json"),
+            (None, "2026-09-19"),
+            ("scripts/node/reference/baseline-20260918.env", "2026-09-18"),
+            ("scripts/node/reference/f0-20260912.env", "2026-09-11"),
         ):
             # The frozen F0 overlay predates SparkCache. An archived F0 source
             # restores an OFF base; it is not a complete lane switch over ON.
-            base = config + ('\nSPARKCACHE_MODE=off\n' if baseline == "baseline-f0.json" else "")
+            base = config + ('\nSPARKCACHE_MODE=off\n' if baseline == "2026-09-11" else "")
             (isolated / "cluster.env").write_text(base, encoding="utf-8")
             if overlay:
                 os.environ["TP4_ENV"] = overlay
             else:
                 os.environ.pop("TP4_ENV", None)
             effective, diagnostic = check.load_recipe(10)
-            selected = check.expected_f0(REPO / "docs" / baseline)
+            selected = check.expected_f0(BASELINES / baseline / "baseline.json")
             assert diagnostic["returncode"] == 0
             problems = check.recipe_problems(effective, selected)
             assert problems == [], (baseline, problems)

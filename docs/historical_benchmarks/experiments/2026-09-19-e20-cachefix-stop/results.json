@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-19-e20-cachefix-stop",
+  "record_type": "portable_measurement_extract",
+  "title": "E20: cache-memory corrections, owner stop",
+  "outcome": "owner-requested stop; not an engine failure",
+  "coverage": "Three code calls attempted: two completed, the third interrupted. No completed benchmark run.",
+  "privacy": "Numeric fields, safe protocol/settings fields and receipt digests only. Raw prompts, responses, cache salts, endpoints, host identities and private paths are omitted.",
+  "completed_runs": 0,
+  "planned_requests": 54,
+  "attempted_requests": 3,
+  "completed_requests": 2,
+  "interrupted_requests": 1,
+  "unattempted_requests": 51,
+  "native_receipt_available": false,
+  "rounded_stdout_summaries": [
+    {
+      "sample": 1,
+      "completion_tokens": 2044,
+      "decode_tokens_per_second": 55.0,
+      "ttft_seconds": 0.366
+    },
+    {
+      "sample": 2,
+      "completion_tokens": 1932,
+      "decode_tokens_per_second": 54.6,
+      "ttft_seconds": 0.382
+    }
+  ],
+  "accounting_note_sha256": "bb1fa243cea4e9804f03fa7fc74415e4b7fe25a0b5dfa89b7f907ea6162b0797",
+  "owner_stop_receipt_sha256": "59e7c5e8fb8bba73b66bb912e4c0aa231274511456e18976b2fe137fa41b0cb7"
+}

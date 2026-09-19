@@ -106,14 +106,14 @@ verdict is needed:
 ```sh
 ./scripts/check-f0.py
 ./scripts/check-f0.py --base-url http://127.0.0.1:8000
-./scripts/check-f0.py --baseline docs/baseline-f1.json
-./scripts/check-f0.py --baseline docs/baseline-f0.json
+./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-18/baseline.json
+./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-11/baseline.json
 ```
 
 The second form uses an already-established localhost SSH tunnel when the management LAN
 is not directly reachable. The checker reads the local `cluster.env` and honors `TP4_ENV`
 as the effective delta. By default it validates the **September 19** identity from
-[the current baseline](baseline-2026-09-19.json), including the hybrid sources, cache
+[the current baseline](historical_benchmarks/baselines/2026-09-19/baseline.json), including the hybrid sources, cache
 fixes, KV byte budget, image content ID and adaptive-k parameters. The last two forms
 select September 18 and September 11 explicitly; select the matching runtime recipe
 as well. A baseline-changing delta fails the check.
@@ -205,8 +205,9 @@ the Current base `cluster.env` it inherits
 `SPARKCACHE_MODE=on` and `IMAGE_ID`, and the launcher refuses the September 11 image (fail-closed).
 Use that verified archive workflow for a September 11 return; do not reconstruct
 its recipe by mixing individual historical values with the current base.
-`f0-reference.py capture` and the generated restore checks explicitly select
-`docs/baseline-f0.json`.
+`f0-reference.py capture` selects the September 11 baseline named in the current
+reference manifest. Generated restore checks use the path recorded in the sealed
+archive's own manifest, so older archives retain their original source layout.
 
 ## Post-boot functional gates
 
@@ -373,8 +374,8 @@ below is full-cluster and must fall within an authorized service window.
 | --- | --- | --- |
 | Overlay result is bad | `./scripts/tp4ctl restart` with no `TP4_ENV` | base `cluster.env` signatures and gates return |
 | Production engine knob is bad | restore the rollback documented beside the value in `cluster.env.example`, update local `cluster.env`, deploy, restart | all runtime signatures plus task gate |
-| Restore the September 18 baseline | use the complete [September 18 overlay](#restore-the-september-18-baseline) for deploy and the coordinated transition | 16 GiB KV, original KDA model and connector, original cache namespace, no hybrid helper/encoder/probe mounts; `./scripts/check-f0.py --baseline docs/baseline-f1.json` with the same overlay, both gates |
-| Restore the September 11 baseline | use the [frozen archive restore](#restore-from-the-frozen-previous-archive): verify the archive and run its prepared restore plan, including the original base and overlay | `PATCH_FILE` mount present, no `--kv-transfer-config`, `mode=per-request`, automatic GID selection, `./scripts/check-f0.py --baseline docs/baseline-f0.json` PASS, both gates |
+| Restore the September 18 baseline | use the complete [September 18 overlay](#restore-the-september-18-baseline) for deploy and the coordinated transition | 16 GiB KV, original KDA model and connector, original cache namespace, no hybrid helper/encoder/probe mounts; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-18/baseline.json` with the same overlay, both gates |
+| Restore the September 11 baseline | use the [frozen archive restore](#restore-from-the-frozen-previous-archive): verify the archive and run its prepared restore plan, including the original base and overlay | `PATCH_FILE` mount present, no `--kv-transfer-config`, `mode=per-request`, automatic GID selection, generated identity-check command using the archived baseline path PASS, both gates |
 | Model revision is bad | restore the previous pinned revision and manifest named beside `MODEL_REV`, deploy fetch tooling, rerun the manifest fetch and `verify-node.sh --full-model`, then restart | identical revision markers and complete hashes on all ranks |
 | Adaptive scheduler must be removed | apply the coupled rollback beside its settings: scheduler flag, mount, policy env, speculative length/table; preserve the MoE mount | no adaptive line, intended fixed-k init, MoE config still loaded |
 | Tuned MoE config must be removed | remove only its mount; preserve scheduler entries | expected default-MoE line, Triton backend and adaptive scheduler remain |
@@ -408,7 +409,7 @@ export TP4_ENV=scripts/node/reference/baseline-20260918.env
 ./scripts/deploy.sh
 ./scripts/tp4ctl up
 # Complete both post-boot functional gates within two minutes of /health 200.
-./scripts/check-f0.py --baseline docs/baseline-f1.json
+./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-18/baseline.json
 ```
 
 Keep this overlay for later lifecycle commands. For unattended autostart, install a
