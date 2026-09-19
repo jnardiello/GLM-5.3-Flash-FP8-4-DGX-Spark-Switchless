@@ -1,0 +1,744 @@
+{
+  "schema": 1,
+  "baseline_id": "2026-09-19",
+  "status": "frozen_baseline",
+  "measured_on": "2026-09-19",
+  "supersedes": "2026-09-18 performance reference; docs/baseline-f1.json and docs/baseline-f0.json remain unchanged historical records",
+  "comparison_id": "glm53-nq2-3x-20260911-v1",
+  "reuse_policy": "Use these fixed medians for future comparisons. This baseline contains exactly two complete native Rigmark runs, accepted as the final series after a third run was excluded for competing traffic. Repeating or replacing the reference requires explicit operator authorization.",
+  "system": {
+    "model": "zai-org/GLM-5.3-Flash",
+    "model_revision": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "quantisation": "FP8 target model with group-128 INT8 storage and BF16 activations for 34 fused KDA input projections; remaining modules retain their preceding precision.",
+    "serving_engine": "SparkRing/SparkCache R10 SM121 vLLM with hybrid KDA input projections and the pinned cache-memory corrections",
+    "serving_image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "serving_image_digest": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "serving_image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "drafter": {
+      "model": "incoai/GLM-5.3-Flash-DFlash2",
+      "revision": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+      "draft_tokens": 5,
+      "adaptive_verification_tokens": [
+        3,
+        5
+      ],
+      "draft_kv_cache_dtype": "fp8_e4m3"
+    },
+    "adaptive_k": {
+      "mode": "batch-uniform",
+      "k_lo": 3,
+      "k_hi": 5,
+      "up": 0.58,
+      "down": 0.42,
+      "alpha": 0.15,
+      "seed": 1,
+      "signal": "pos",
+      "scheduler_sha256": "4cea8f55fa51b0371a52a4dd6eb5511ccb0bccbd81e435e6840f68f4ba641518",
+      "boot_line": "adaptive-k: AdaptiveKScheduler active (... mode=batch-uniform ...) engine_k=5 async=True"
+    },
+    "hardware": "4 x ASUS Ascent GX10, each with one NVIDIA GB10 and 128 GB unified memory",
+    "topology": "TP4 over a two-port ConnectX-7 switchless RoCE ring; four direct edges at 200 Gb/s with MTU 9000",
+    "context_limit_tokens": 262144,
+    "kv_cache_dtype": "fp8_e4m3",
+    "kv_cache_memory_bytes_per_rank": 16106127360,
+    "kv_cache": "fp8_e4m3 with a 16106127360-byte pool per rank; shared target/KDA pool and dense FP8 DFlash draft allocation",
+    "observed_kv_capacity": {
+      "tokens": 1344328,
+      "maximum_concurrency_at_262144_tokens": 5.13,
+      "interpretation": "Engine-reported aggregate capacity, not a guarantee of that many simultaneous full-context requests"
+    },
+    "active_kda_quantization": {
+      "module": "KDA in_proj_qkvgfab",
+      "module_count": 34,
+      "converted_components": [
+        "Q",
+        "K",
+        "V",
+        "beta",
+        "f_a"
+      ],
+      "weight_bits": 8,
+      "quantization_group_size": 128,
+      "activation_dtype": "bfloat16",
+      "weight_shape_per_rank": [
+        6288,
+        4096
+      ],
+      "marlin_padded_shape_per_rank": [
+        6400,
+        4096
+      ],
+      "prefill_bf16_min_tokens": 2048,
+      "shared_scratch_bytes_per_rank": 51515392,
+      "packed_bytes_per_rank": 905222528,
+      "original_weights_bytes_per_rank": 1751384064,
+      "saved_bytes_vs_f1_per_rank": 794646144,
+      "small_m_path": "native Marlin W8A16 with padding to N=6400",
+      "large_m_path": "dequantization of the same INT8 weights into shared BF16 scratch plus native torch.nn.functional.linear",
+      "scratch_module": "e20_hybrid_scratch.MarlinBF16Scratch",
+      "checkpoint_on_disk": "unchanged; conversion is applied after loading",
+      "variant": "pad6400-bf16-scratch"
+    },
+    "sparkcache": {
+      "mode": "on",
+      "connector": "spark_context_cache_connector.py",
+      "connector_module_path": "sparkcache.spark_context_cache_connector",
+      "connector_sha256": "23c1e05cc3bbabecd6b377b493bddfdd3125341d4a6cf63534d07419fdd73b9c",
+      "hybrid_encoder": "spark_context_cache_hybrid.py",
+      "hybrid_encoder_sha256": "11a2db855306b816a4f3d377d04207cc2d62112a381bcc54162099248bbf75f6",
+      "kv_transfer_config_sha256": "0bfbb068c0cd36d6ce3740743ef285b8a294703fac01b402a5c65c2c7b78fec6",
+      "kv_role": "kv_both",
+      "kv_load_failure_policy": "recompute",
+      "extra_config": {
+        "spark_cache_cuda_restore": false,
+        "spark_cache_draft_checkpoint_sha256": "5d3e05d24de860b98fa172f480a859d808e3022731d0fda1e1a83ad8d776e1ff",
+        "spark_cache_draft_policy": "separate",
+        "spark_cache_max_span_tokens": 262144,
+        "spark_cache_min_span_tokens": 4096,
+        "spark_cache_model_profile": "glm53-flash-hybrid",
+        "spark_cache_restore": true,
+        "spark_cache_scheduler_probe": "none",
+        "spark_cache_store": true,
+        "spark_cache_streaming_snapshots": false,
+        "spark_cache_target_checkpoint_sha256": "c652a5964160ed137dce29253f7d8a6a1477f17c68a82042b65d94b1f97683f4",
+        "spark_cache_pending_wait_ms": 2000
+      },
+      "cache_namespace_policy": "Dedicated namespace under the runtime cache volume for this quantized-weight recipe; do not reuse a namespace from unconverted weights. The recorded config digest includes the measured namespace.",
+      "memory_corrections": [
+        "Release completed saver snapshot and encoded-page references before blocking for the next item",
+        "Encode the page header and payload parts with one join to avoid an extra full-size copy"
+      ],
+      "distribution": "Connector and encoder are operator-supplied pinned payloads; hashes do not grant redistribution rights."
+    },
+    "scheduler": "max sequences 6; max batched tokens 8192; AdaptiveKScheduler batch-uniform; async scheduler effective without the --async-scheduling CLI flag",
+    "engine_arguments": {
+      "tensor_parallel_size": 4,
+      "max_model_len": 262144,
+      "max_num_seqs": 6,
+      "max_num_batched_tokens": 8192,
+      "kv_cache_memory_bytes": 16106127360,
+      "kv_cache_dtype": "fp8_e4m3",
+      "attention_backend": "B12X",
+      "moe_backend": "triton",
+      "linear_backend": "triton",
+      "scheduler_cls": "adaptive_k_scheduler.AdaptiveKScheduler",
+      "async_scheduling_cli_flag": false,
+      "speculative_method": "dflash",
+      "num_speculative_tokens": 5,
+      "num_speculative_tokens_per_batch_size": [
+        [
+          1,
+          1,
+          5
+        ],
+        [
+          2,
+          6,
+          3
+        ]
+      ],
+      "draft_kv_cache_dtype": "fp8_e4m3"
+    },
+    "moe_backend": "Triton FP8 MoE with GB10 tuning table sha256:e2d2f68d34ba9d0011c0b2ef48170781b4c7e609885cd4fb16d23221e795968b",
+    "collectives": "Patched NCCL v2.30.7-1 with switchless-ring topology and SIRCL single-rail sync-prefill transport; automatic rank-local IPv4 RoCEv2 GID selection",
+    "transport": {
+      "entrypoint": "/opt/sircl-serving/entrypoint.sh",
+      "image_healthcheck_disabled": true,
+      "readiness_endpoint": "/health",
+      "bundle_manifest": "scripts/node/sircl/SHA256SUMS",
+      "bundle_manifest_sha256": "2e08f770730b543495bc2f49149ca7e6ee892ba0336d3f2d2887d974407f0d56",
+      "site_peer_and_gid_files": "Operator configuration; excluded from this portable record"
+    },
+    "host_recipe": {
+      "versions_file": "scripts/node/bootstrap/versions.env",
+      "iommu_passthrough": true
+    },
+    "measurement_client": "The same external macOS workstation over the management LAN as the historical references",
+    "source_files_sha256": {
+      "scripts/node/overrides/vllm/models/glm5next/nvidia/e20_hybrid_scratch.py": "f4368638f1286d67f529f6b6e89cb066e375ac365deb4c8698f07e39e876ab7d",
+      "scripts/node/overrides/vllm/models/glm5next/nvidia/e20_kda_w8a16.py": "3c7f1650c1f8d3c0525323a8875ea4f1190a7ccca4232d9b6701525aece22572",
+      "scripts/node/overrides/vllm/models/glm5next/nvidia/model.py": "6f4d22ca391ae948e8057d4ec9639281371a658fcd9a40684564732f6409ad87",
+      "scripts/node/overrides/vllm/v1/worker/gpu_worker.py": "46aa3a7ea68948cc16c78ebeb3b8aff0de6d9583657d75711e8231ed4209ed9d",
+      "scripts/node/sparkcache/kv-transfer-config.json": "0bfbb068c0cd36d6ce3740743ef285b8a294703fac01b402a5c65c2c7b78fec6",
+      "scripts/node/overrides/vllm/v1/kv_cache_interface.py": "d4a5ed8b784d13be2be2ba176b602656ba03a3ddd97a8507c0b491cb3c231c2b",
+      "scripts/node/overrides/vllm/v1/core/kv_cache_utils.py": "d5a9093b5d05d03f9fe70e5fcbf45a5d9f5a0863845c987c4bd5c3f6886ee57b",
+      "scripts/node/overrides/vllm/v1/worker/utils.py": "e407bdef5f77557cde85d591ec8108835e6fabbae314e7e72d3e1d0aa92f601c",
+      "scripts/node/overrides/vllm/models/glm5next/nvidia/ops/glm_kpool.py": "960515841061a6d89868f06876b3014f8b1247f9edf22c726b61819c7e4e5479",
+      "scripts/node/overrides/vllm/models/glm5next/nvidia/pooled_indexer.py": "a8b55ac2a80b94b263160a5a17bd88fbf0663cdc536a3a0c4447b390ee28dfe9",
+      "scripts/node/patches/adaptive_k_scheduler.py": "4cea8f55fa51b0371a52a4dd6eb5511ccb0bccbd81e435e6840f68f4ba641518",
+      "scripts/node/sircl/SHA256SUMS": "2e08f770730b543495bc2f49149ca7e6ee892ba0336d3f2d2887d974407f0d56"
+    },
+    "payload_packaging": {
+      "schema_version": 1,
+      "source_files_scope": "Hashes of the measured runtime sources and configuration that are distributed in this repository. Operator-supplied SparkCache source files are listed separately below; their canonical paths are relative to the deployed tp4 directory.",
+      "operator_payloads": {
+        "sparkcache/spark_context_cache_connector.py": {
+          "sha256": "23c1e05cc3bbabecd6b377b493bddfdd3125341d4a6cf63534d07419fdd73b9c",
+          "configuration_variable": "SPARKCACHE_CONNECTOR",
+          "container_path": "/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_connector.py"
+        },
+        "sparkcache/spark_context_cache_hybrid.py": {
+          "sha256": "11a2db855306b816a4f3d377d04207cc2d62112a381bcc54162099248bbf75f6",
+          "configuration_variable": "SPARKCACHE_ENCODER",
+          "container_path": "/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_hybrid.py"
+        }
+      },
+      "measured_sparkcache_manifest_sha256": "3a2b18832fc409ae9e40d4b515881481d6040daf58d19061ad7588a54a8e51c2",
+      "distributed_sparkcache_manifest": {
+        "path": "scripts/node/sparkcache/SHA256SUMS",
+        "sha256": "9599f39b0c5c8ae6d91e131634a92f7f42d10cf18e34b2f68cb39cd6771d1558"
+      },
+      "manifest_difference": "The distributed manifest adds the encoder's measured hash to the configuration and connector entries. This packaging change preserves all three measured payload hashes; it is not a new performance measurement."
+    },
+    "operational_identity": {
+      "container_file_sha256": {
+        "/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_hybrid.py": "11a2db855306b816a4f3d377d04207cc2d62112a381bcc54162099248bbf75f6",
+        "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e20_kda_w8a16.py": "3c7f1650c1f8d3c0525323a8875ea4f1190a7ccca4232d9b6701525aece22572",
+        "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py": "46aa3a7ea68948cc16c78ebeb3b8aff0de6d9583657d75711e8231ed4209ed9d",
+        "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e20_hybrid_scratch.py": "f4368638f1286d67f529f6b6e89cb066e375ac365deb4c8698f07e39e876ab7d",
+        "/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_connector.py": "23c1e05cc3bbabecd6b377b493bddfdd3125341d4a6cf63534d07419fdd73b9c",
+        "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/model.py": "6f4d22ca391ae948e8057d4ec9639281371a658fcd9a40684564732f6409ad87"
+      },
+      "environment": {
+        "VLLM_ADAPTIVE_K_MODE": "batch-uniform",
+        "NCCL_IB_GID_INDEX": "-1",
+        "VLLM_NCCL_SO_PATH": "/opt/patched-nccl/libnccl.so.2",
+        "LD_PRELOAD": "/opt/patched-nccl/libnccl.so.2"
+      },
+      "kda_boot_receipt": {
+        "group_size": 128,
+        "modules": 34,
+        "original_bytes": 1751384064,
+        "packed_bytes": 905222528,
+        "prefill_bf16_min_tokens": 2048,
+        "shape_nk": [
+          6288,
+          4096
+        ],
+        "shared_scratch_bytes": 51515392,
+        "variant": "pad6400-bf16-scratch",
+        "padded_n": 6400
+      },
+      "memory_probe": {
+        "schema": "e20-memory-probe-v1",
+        "phase": "post_warmup_periodic"
+      }
+    },
+    "instrumentation": {
+      "nsight_enabled": false,
+      "gpu_worker_probe": {
+        "enabled": true,
+        "module": "vllm.v1.worker.gpu_worker",
+        "function": "_start_e20_memory_probe",
+        "interval_seconds": 1,
+        "sampling": "CUDA and pinned-host allocator counters from a background thread; no CUDA synchronization; process-lifetime peaks are not reset"
+      },
+      "external_host_observer": {
+        "enabled_during_measurement": true,
+        "meminfo_hz": 5,
+        "process_pss_period_seconds": 5
+      },
+      "overhead": "Not measured separately; reported performance includes these observers."
+    }
+  },
+  "rigmark": {
+    "version": "1.1.0",
+    "source": {
+      "revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+      "repository_dirty": false,
+      "repository_source": "git-worktree",
+      "repository_source_sha256": "e0e92cff99f74ffa43d0a82541cf9db6010dd0a4ef3e8e7b84c5e1abd13a867f",
+      "comparison_note": "Source and prompt content match the 2026-09-18 reference. The 2026-09-11 record uses an earlier source hash and remains a historical comparison."
+    },
+    "prompts": {
+      "version": "1.0.0",
+      "sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb"
+    },
+    "cache_salt_policy": "Fresh per run; shared by its cold/replay pairs and forwarded to both chat and prefill requests. Raw salts are omitted; hashes identify the measured values.",
+    "cache_salt_sha256": {
+      "run-1": "f33d824f807dcf87d91d4e437e791d9789727cc40a85a5ff6c91f4f8e3cf215b",
+      "run-2": "d6925c66b4bf3a2376f39f739ead4aa40e4058611727d7fff8a708f6541b14dd"
+    },
+    "settings": {
+      "concurrency": [
+        1,
+        2,
+        4
+      ],
+      "concurrency_runs": 3,
+      "concurrency_tokens": 256,
+      "concurrency_workload": "code",
+      "decode_tokens": 8192,
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      },
+      "prefill_depths": [
+        8192,
+        32768,
+        65536
+      ],
+      "prefill_runs": 3,
+      "runs": 5,
+      "seed": 20260905,
+      "temperature": 0,
+      "top_p": 1
+    }
+  },
+  "receipts": {
+    "run-1": "17f1a9c35ca2a83724239464934117bc53d5aa131ea9048f1d2b130bea72679d",
+    "run-2": "a7591e5cbc10c23eb4d6f6060d9adbb106433f7f869763191511a589b19080fe"
+  },
+  "validation_receipts": {
+    "run-1": "fa3ee69fdf1deec97049689cab3f2dc72495305fdc004abfa7ac7cb5fb242934",
+    "run-2": "381611117692bde70445f7eb1c25635d9a3dd68d1066ea5421061fa25d06a4db"
+  },
+  "performance": {
+    "aggregation": "Median of exactly two native per-run values; for two values this is their arithmetic midpoint. No request pooling and no three-run median.",
+    "run_order": [
+      "run-1",
+      "run-2"
+    ],
+    "included_run_count": 2,
+    "metrics": [
+      {
+        "key": "code_decode_throughput",
+        "source_path": [
+          "decode",
+          "code",
+          "decode_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          54.015,
+          53.766
+        ],
+        "median": 53.8905
+      },
+      {
+        "key": "code_c1_aggregate_end_to_end_throughput",
+        "source_path": [
+          "concurrency",
+          "1",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          40.05,
+          40.55
+        ],
+        "median": 40.3
+      },
+      {
+        "key": "code_c2_aggregate_end_to_end_throughput",
+        "source_path": [
+          "concurrency",
+          "2",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          57.729,
+          56.775
+        ],
+        "median": 57.252
+      },
+      {
+        "key": "code_c4_aggregate_end_to_end_throughput",
+        "source_path": [
+          "concurrency",
+          "4",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          87.031,
+          88.023
+        ],
+        "median": 87.527
+      },
+      {
+        "key": "prose_decode_throughput",
+        "source_path": [
+          "decode",
+          "prose",
+          "decode_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          32.25,
+          31.506
+        ],
+        "median": 31.878
+      },
+      {
+        "key": "code_ttft",
+        "source_path": [
+          "decode",
+          "code",
+          "ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "per_run": [
+          0.393,
+          0.41
+        ],
+        "median": 0.4015
+      },
+      {
+        "key": "prose_ttft",
+        "source_path": [
+          "decode",
+          "prose",
+          "ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "per_run": [
+          0.381,
+          0.379
+        ],
+        "median": 0.38
+      },
+      {
+        "key": "code_c1_per_stream_ttft",
+        "source_path": [
+          "concurrency",
+          "1",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "per_run": [
+          0.39,
+          0.409
+        ],
+        "median": 0.3995
+      },
+      {
+        "key": "code_c2_per_stream_ttft",
+        "source_path": [
+          "concurrency",
+          "2",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "per_run": [
+          0.547,
+          0.443
+        ],
+        "median": 0.495
+      },
+      {
+        "key": "code_c4_per_stream_ttft",
+        "source_path": [
+          "concurrency",
+          "4",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "per_run": [
+          0.681,
+          0.678
+        ],
+        "median": 0.6795
+      },
+      {
+        "key": "prefill_8k_cold_throughput",
+        "source_path": [
+          "prefill",
+          "8192",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          2363.42,
+          2345.911
+        ],
+        "median": 2354.6655
+      },
+      {
+        "key": "prefill_8k_replay_throughput",
+        "source_path": [
+          "prefill",
+          "8192",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          9535.205,
+          9580.592
+        ],
+        "median": 9557.8985
+      },
+      {
+        "key": "prefill_32k_cold_throughput",
+        "source_path": [
+          "prefill",
+          "32768",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          2549.911,
+          2518.25
+        ],
+        "median": 2534.0805
+      },
+      {
+        "key": "prefill_32k_replay_throughput",
+        "source_path": [
+          "prefill",
+          "32768",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          35621.263,
+          34869.071
+        ],
+        "median": 35245.167
+      },
+      {
+        "key": "prefill_64k_cold_throughput",
+        "source_path": [
+          "prefill",
+          "65536",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          2453.238,
+          2390.227
+        ],
+        "median": 2421.7325
+      },
+      {
+        "key": "prefill_64k_replay_throughput",
+        "source_path": [
+          "prefill",
+          "65536",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "per_run": [
+          35474.107,
+          35407.276
+        ],
+        "median": 35440.6915
+      }
+    ]
+  },
+  "functional": {
+    "completed_runs": {
+      "count": 2,
+      "expected_in_accepted_series": 2,
+      "initially_planned": 3
+    },
+    "excluded_runs": {
+      "count": 1,
+      "reason": "Competing traffic reported during the third run; the entire run was excluded. The included series ends at two runs; no replacement run is part of this record.",
+      "used_in_metrics": false,
+      "engine_failure": false
+    },
+    "measured_requests": {
+      "count": 108,
+      "per_run": [
+        54,
+        54
+      ]
+    },
+    "request_breakdown": {
+      "decode": {
+        "count": 30,
+        "per_run": [
+          15,
+          15
+        ]
+      },
+      "prefill": {
+        "count": 36,
+        "per_run": [
+          18,
+          18
+        ]
+      },
+      "concurrency_streams": {
+        "count": 42,
+        "per_run": [
+          21,
+          21
+        ]
+      },
+      "note": "Tokenization calls, operational gates and excluded-run requests are outside these counts."
+    },
+    "native_validation_errors": {
+      "count": 0,
+      "denominator": 108,
+      "per_run": [
+        {
+          "count": 0,
+          "denominator": 54
+        },
+        {
+          "count": 0,
+          "denominator": 54
+        }
+      ]
+    },
+    "runtime_errors": {
+      "count": 0,
+      "run_denominator": 2
+    },
+    "stream_done_markers": {
+      "passed": 108,
+      "total": 108,
+      "per_run": [
+        54,
+        54
+      ]
+    },
+    "visible_responses": {
+      "passed": 108,
+      "total": 108,
+      "per_run": [
+        54,
+        54
+      ]
+    },
+    "finish_reasons": {
+      "stop": 30,
+      "length": 78,
+      "denominator": 108,
+      "per_run": [
+        {
+          "stop": 15,
+          "length": 39
+        },
+        {
+          "stop": 15,
+          "length": 39
+        }
+      ],
+      "length_note": "Normal caps in prefill and short concurrency requests; not transport failures."
+    },
+    "code_length_caps": {
+      "count": 0,
+      "denominator": 10,
+      "per_run": [
+        {
+          "count": 0,
+          "denominator": 5
+        },
+        {
+          "count": 0,
+          "denominator": 5
+        }
+      ]
+    },
+    "code_completion_gate": {
+      "passed": 10,
+      "total": 10,
+      "per_run": [
+        {
+          "passed": 5,
+          "total": 5
+        },
+        {
+          "passed": 5,
+          "total": 5
+        }
+      ]
+    },
+    "prose_completion_gate": {
+      "passed": 10,
+      "total": 10,
+      "per_run": [
+        {
+          "passed": 5,
+          "total": 5
+        },
+        {
+          "passed": 5,
+          "total": 5
+        }
+      ]
+    },
+    "structured_completion_gate": {
+      "passed": 10,
+      "total": 10,
+      "per_run": [
+        {
+          "passed": 5,
+          "total": 5
+        },
+        {
+          "passed": 5,
+          "total": 5
+        }
+      ]
+    },
+    "prefill_exact_token_counts": {
+      "passed": 36,
+      "total": 36,
+      "per_run": [
+        18,
+        18
+      ]
+    },
+    "token_usage": {
+      "prompt_tokens": 1287242,
+      "prompt_tokens_per_run": [
+        643621,
+        643621
+      ],
+      "completion_tokens": 48312,
+      "completion_tokens_per_run": [
+        23718,
+        24594
+      ]
+    },
+    "post_boot_gates": {
+      "coherent_response": "PASS",
+      "tool_call": "PASS",
+      "completed_within_120_seconds_of_health": true
+    },
+    "process_continuity": "The same loaded containers and GPU workers were retained on all four ranks across the two included runs."
+  },
+  "evidence": {
+    "boot_identity_sha256": "986460aeeb3d2b0bddba063d17f26a89f5fc9a4db8ab3d34859ce12394d6fd67",
+    "boot_gates_sha256": "6514794ef3bfefa8e0a1145112f030d02b65a8f68234dbe8d6cfdc8f6f3260a3",
+    "measured_memory_comparison_sha256": "5ad64d2e24506e175aeaab9b3e9342e5e103b29b4de7b0a75b095acd8df421e4",
+    "storage": "Raw receipts and operator logs are retained privately; this record contains portable settings, metrics, counts and hashes only."
+  },
+  "limits": [
+    "Two included runs provide less repeatability evidence than the three-run historical references.",
+    "Concurrent code requests use a 256-token cap; these measurements do not cover complete agent tasks or long parallel generations.",
+    "KV pool capacity is 15 GiB per rank versus 16 GiB in both earlier references; model context limit remains 262144.",
+    "Allocator and external host memory probes were active; their overhead is not isolated.",
+    "The full recipe changed together; these measurements do not isolate each kernel, cache correction or memory-budget change.",
+    "The September 19 recipe has two native runs on its measured boot. No additional benchmark of a later clean deployment of the published IaC is included.",
+    "Native output gates are recorded; generated-code audits and general answer-quality guarantees are outside this performance record."
+  ]
+}

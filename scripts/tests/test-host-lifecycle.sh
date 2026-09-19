@@ -20,7 +20,6 @@ cp "$REPO/scripts/node/etc/common/99-tp4-vm.conf" "$FIXTURE/scripts/node/etc/com
 cp "$REPO/scripts/node/etc/common/tp4-fabric-iptables.sh" "$FIXTURE/scripts/node/etc/common/tp4-fabric-iptables.sh"
 cp "$REPO/scripts/node/etc/common/tp4-fabric-iptables.service" "$FIXTURE/scripts/node/etc/common/tp4-fabric-iptables.service"
 cp "$REPO/scripts/node/host/tp4-iommu.sh" "$FIXTURE/scripts/node/host/tp4-iommu.sh"
-cp "$REPO/scripts/node/host/tp4-gpu-clocks.sh" "$FIXTURE/scripts/node/host/tp4-gpu-clocks.sh"
 
 cat >>"$FIXTURE/cluster.env" <<'ENV'
 NODES="n0 n1 n2 n3"
@@ -145,13 +144,17 @@ grep -q 'tp4-iommu.sh --status summary' "$TMPD/status.out"
 grep -q 'status-ok' "$TMPD/status.out"
 
 # Other status implementations are rejected because they are not guaranteed read-only.
+cat >"$FIXTURE/scripts/node/host/dummy-host.sh" <<'HOST_SCRIPT'
+#!/usr/bin/env bash
+exit 99
+HOST_SCRIPT
 : >"$SSH_LOG"
 code=0
 TP4_TEST_REPO="$FIXTURE" TP4_TEST_SSH_LOG="$SSH_LOG" TP4_TEST_SCP_LOG="$SCP_LOG" \
   PATH="$TMPD/bin:$PATH" "$FIXTURE/scripts/deploy-host.sh" \
-  --no-push --run tp4-gpu-clocks.sh --status >"$TMPD/gpu-status.out" 2>&1 || code=$?
+  --no-push --run dummy-host.sh --status >"$TMPD/other-status.out" 2>&1 || code=$?
 [ "$code" = 2 ]
-grep -q -- '--status supports only tp4-iommu.sh' "$TMPD/gpu-status.out"
+grep -q -- '--status supports only tp4-iommu.sh' "$TMPD/other-status.out"
 [ ! -s "$SSH_LOG" ]
 [ ! -s "$SCP_LOG" ]
 

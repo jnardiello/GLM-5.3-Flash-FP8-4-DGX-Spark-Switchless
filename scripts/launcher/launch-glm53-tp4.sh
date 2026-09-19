@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Single recipe of this repo: GLM-5.3-Flash FP8 weights + DFlash2 drafter. The F1 lane
+# Single recipe of this repo: GLM-5.3-Flash FP8 weights + DFlash2 drafter. The current recipe
 # (SPARKCACHE_MODE=on, cluster.env.example) serves the R10 SparkRing/SparkCache image
 # pinned by digest: the image content ID is checked, the kv-transfer config and the optional
-# connector override are verified by SHA-256 before Docker starts, --kv-transfer-config is
+# connector and encoder overrides are verified by SHA-256 before Docker starts, --kv-transfer-config is
 # owned by this launcher, the image's built-in indexer patch replaces the PATCH_FILE mount,
 # the SIRCL payload directory is verified against its deployed SHA256SUMS, and the image
 # healthcheck is disabled because the SIRCL entrypoint never writes its marker (/health is
-# the readiness definition). SPARKCACHE_MODE=off is the F0 lane (v11-dflash2 image).
-# Documented fallbacks for the F0 lane:
+# the readiness definition). SPARKCACHE_MODE=off is the September 11 recipe (v11-dflash2 image).
+# Documented fallbacks for the September 11 recipe:
 #
 #  a) the boot dies with "persistent_topk ... >=128KB smem": swap the single indexer
 #     patch mount below for the two v8-tuned indexer patch mounts, i.e. replace the
@@ -46,7 +46,7 @@ elif [ "$(basename "$HERE")" = launcher ] && [ "$(basename "$PARENT")" = scripts
      && [ -f "$PARENT/../cluster.env" ]; then
   ENV_DIR=$(cd "$PARENT/.." && pwd)
 else
-  echo "[launch] ERROR: cluster.env not found next to $0: copy cluster.env.example and fill it — see README § Start here" >&2
+  echo "[launch] ERROR: cluster.env not found next to $0: copy cluster.env.example and fill it — see README § Install with an agent" >&2
   exit 1
 fi
 
@@ -63,27 +63,27 @@ validate_recipe_shape() {
   local -a guard_nodes guard_mgmt
   case "${NODES:-} ${MGMT_IPS:-} ${MASTER_IP:-} ${RELAY_DEST:-}" in
     *'<'*'>'*)
-      echo "[launch] ERROR: $scope: a <...> placeholder is still unfilled — see README § Start here" >&2
+      echo "[launch] ERROR: $scope: a <...> placeholder is still unfilled — see README § Install with an agent" >&2
       exit 1 ;;
   esac
   if [ -z "${NODES:-}" ] || [ -z "${MGMT_IPS:-}" ] || [ -z "${MASTER_IP:-}" ]; then
-    echo "[launch] ERROR: $scope: NODES, MGMT_IPS and MASTER_IP must all be set — see README § Start here" >&2
+    echo "[launch] ERROR: $scope: NODES, MGMT_IPS and MASTER_IP must all be set — see README § Install with an agent" >&2
     exit 1
   fi
   if [ "$NODES" = "gx10-a gx10-b gx10-c gx10-d" ] \
      || [ "$MGMT_IPS" = "192.0.2.11 192.0.2.12 192.0.2.13 192.0.2.14" ] \
      || [ "$MASTER_IP" = "192.0.2.11" ]; then
-    echo "[launch] ERROR: $scope: NODES/MGMT_IPS/MASTER_IP still have the example values — see README § Start here" >&2
+    echo "[launch] ERROR: $scope: NODES/MGMT_IPS/MASTER_IP still have the example values — see README § Install with an agent" >&2
     exit 1
   fi
   read -r -a guard_nodes <<<"$NODES"
   read -r -a guard_mgmt <<<"$MGMT_IPS"
   if [ "${#guard_nodes[@]}" -ne 4 ] || [ "${#guard_mgmt[@]}" -ne 4 ]; then
-    echo "[launch] ERROR: $scope: NODES (${#guard_nodes[@]} entries) and MGMT_IPS (${#guard_mgmt[@]}) must have 4 entries each, one per rank — see README § Start here" >&2
+    echo "[launch] ERROR: $scope: NODES (${#guard_nodes[@]} entries) and MGMT_IPS (${#guard_mgmt[@]}) must have 4 entries each, one per rank — see README § Install with an agent" >&2
     exit 1
   fi
   if [ "$MASTER_IP" != "${guard_mgmt[0]}" ]; then
-    echo "[launch] ERROR: $scope: MASTER_IP must be MGMT_IPS[0] (the rendez-vous runs on rank 0) — see README § Start here" >&2
+    echo "[launch] ERROR: $scope: MASTER_IP must be MGMT_IPS[0] (the rendez-vous runs on rank 0) — see README § Install with an agent" >&2
     exit 1
   fi
   if ! [[ "${CONTAINER:-}" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]*$ ]]; then
@@ -94,7 +94,7 @@ validate_recipe_shape() {
     fabric_count=${#FABRIC_TARGETS[@]}
   fi
   if [ "$fabric_count" -ne 4 ]; then
-    echo "[launch] ERROR: $scope: FABRIC_TARGETS has $fabric_count entries, expected exactly 4 (one per rank) — see README § Start here" >&2
+    echo "[launch] ERROR: $scope: FABRIC_TARGETS has $fabric_count entries, expected exactly 4 (one per rank) — see README § Install with an agent" >&2
     exit 1
   fi
 }
@@ -186,6 +186,8 @@ esac
 SPARKCACHE_CONFIG=$(expand_home "${SPARKCACHE_CONFIG:-}")
 SPARKCACHE_CONNECTOR=$(expand_home "${SPARKCACHE_CONNECTOR:-}")
 SPARKCACHE_CONNECTOR_PATH=/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_connector.py
+SPARKCACHE_ENCODER=$(expand_home "${SPARKCACHE_ENCODER:-}")
+SPARKCACHE_ENCODER_PATH=/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_hybrid.py
 SIRCL_DIR=$(expand_home "${SIRCL_DIR:-}")
 
 # The rank space is the length of MGMT_IPS, not a hard-coded 0-3.
@@ -312,12 +314,14 @@ if [ "$SPARKCACHE_MODE" = "on" ]; then
   [ -n "$SPARKCACHE_CONFIG" ] \
     || { echo "[launch] ERROR: SPARKCACHE_MODE=on requires SPARKCACHE_CONFIG (cluster.env)" >&2; exit 1; }
   if [ "$DRY_RUN" = "1" ]; then
-    echo "[dry-run] would verify SparkCache config $SPARKCACHE_CONFIG${SPARKCACHE_CONNECTOR:+ and connector $SPARKCACHE_CONNECTOR}"
+    echo "[dry-run] would verify SparkCache config $SPARKCACHE_CONFIG${SPARKCACHE_CONNECTOR:+ and connector $SPARKCACHE_CONNECTOR}${SPARKCACHE_ENCODER:+ and encoder $SPARKCACHE_ENCODER}"
     KV_TRANSFER_JSON="<canonical JSON of $SPARKCACHE_CONFIG>"
   else
     verify_pinned_file "$SPARKCACHE_CONFIG" "${SPARKCACHE_CONFIG_SHA256:-}" "SparkCache config"
     [ -z "$SPARKCACHE_CONNECTOR" ] \
       || verify_pinned_file "$SPARKCACHE_CONNECTOR" "${SPARKCACHE_CONNECTOR_SHA256:-}" "SparkCache connector"
+    [ -z "$SPARKCACHE_ENCODER" ] \
+      || verify_pinned_file "$SPARKCACHE_ENCODER" "${SPARKCACHE_ENCODER_SHA256:-}" "SparkCache encoder"
     KV_TRANSFER_JSON=$(python3 -c 'import json,sys; print(json.dumps(json.load(open(sys.argv[1], encoding="utf-8")), separators=(",", ":"), sort_keys=True))' "$SPARKCACHE_CONFIG")
   fi
 fi
@@ -345,17 +349,27 @@ if [ -n "${EXTRA_DOCKER_ENV:-}" ]; then
   done
 fi
 
-# A named connector override must be mounted exactly once, at the image path, through
-# EXTRA_DOCKER_ENV: never twice, never elsewhere.
-if [ "$SPARKCACHE_MODE" = "on" ] && [ -n "$SPARKCACHE_CONNECTOR" ]; then
-  _SPARKCACHE_MOUNT="$SPARKCACHE_CONNECTOR:$SPARKCACHE_CONNECTOR_PATH:ro"
+# Each named SparkCache override must be mounted exactly once at its image path.
+verify_sparkcache_mount() {
+  local _source=$1 _target=$2 _label=$3 _ARG _i
+  local _SPARKCACHE_MOUNT="$_source:$_target:ro"
+  local _SPARKCACHE_MOUNT_COUNT=0 _SPARKCACHE_TARGET_COUNT=0
+  [ -n "$_source" ] || return 0
   _SPARKCACHE_MOUNT_COUNT=0
-  for _ARG in "${_XDE[@]}"; do
-    [ "$_ARG" = "$_SPARKCACHE_MOUNT" ] || continue
-    _SPARKCACHE_MOUNT_COUNT=$((_SPARKCACHE_MOUNT_COUNT + 1))
+  for _i in "${!_XDE[@]}"; do
+    [ "$_i" -gt 0 ] && [ "${_XDE[$((_i - 1))]}" = "-v" ] || continue
+    _ARG=${_XDE[$_i]}
+    case "$_ARG" in *:"$_target"|*:"$_target":*) _SPARKCACHE_TARGET_COUNT=$((_SPARKCACHE_TARGET_COUNT + 1)) ;; esac
+    if [ "$_ARG" = "$_SPARKCACHE_MOUNT" ]; then
+      _SPARKCACHE_MOUNT_COUNT=$((_SPARKCACHE_MOUNT_COUNT + 1))
+    fi
   done
-  [ "$_SPARKCACHE_MOUNT_COUNT" -eq 1 ] \
-    || { echo "[launch] ERROR: SparkCache connector must be mounted exactly once in EXTRA_DOCKER_ENV as $_SPARKCACHE_MOUNT" >&2; exit 1; }
+  [ "$_SPARKCACHE_MOUNT_COUNT" -eq 1 ] && [ "$_SPARKCACHE_TARGET_COUNT" -eq 1 ] \
+    || { echo "[launch] ERROR: SparkCache $_label must be mounted exactly once in EXTRA_DOCKER_ENV as $_SPARKCACHE_MOUNT" >&2; exit 1; }
+}
+if [ "$SPARKCACHE_MODE" = "on" ]; then
+  verify_sparkcache_mount "$SPARKCACHE_CONNECTOR" "$SPARKCACHE_CONNECTOR_PATH" connector
+  verify_sparkcache_mount "$SPARKCACHE_ENCODER" "$SPARKCACHE_ENCODER_PATH" encoder
 fi
 
 # These selectors are validated as one coherent HCA/GID decision. Docker's -e/--env forms

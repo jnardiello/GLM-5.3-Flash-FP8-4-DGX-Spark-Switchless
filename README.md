@@ -3,104 +3,119 @@
 [![Follow me on X](https://img.shields.io/badge/Follow%20me%20on%20X-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/jnardiello)
 
 Run GLM-5.3-Flash FP8 with vLLM across four NVIDIA GB10 systems, connected directly
-through a switchless ConnectX-7 RoCE ring. This repository provides the configuration,
-installation scripts, runtime patches, and operating procedures for the cluster.
-
-GLM-5.3-Flash is my daily driver for heavy coding workloads and parallel agent use.
-The deployment is tuned for code generation and concurrent requests, with a
-**256K context window (262,144 tokens)**. The verified hardware is four ASUS Ascent
-GX10 nodes; other GB10 systems may need different hardware and host settings.
-
-## Current configuration
-
-- **Model:** GLM-5.3-Flash FP8, tensor-parallel across four GPUs.
-- **Engine:** SparkRing/SparkCache vLLM image pinned by registry digest.
-- **Prefix reuse:** persistent SparkCache storage for long shared contexts.
-- **Speculative decoding:** DFlash2 with an adaptive verification length shared by
-  every request in a batch (`batch-uniform`).
-- **Communication:** SIRCL single-rail prefill transport and patched NCCL for the
-  switchless ring.
-
-The current configuration is the default in
-[`cluster.env.example`](cluster.env.example). The
-[production recipe](docs/production-recipe.md) explains its components and rollback.
-
-The SparkCache connector and SIRCL bundle/runtime are operator-supplied files, pinned
-by SHA-256 but not redistributed here. Read the
-[payload installation step](docs/install-from-zero.md#8-place-the-sparkcache-and-sircl-payload)
-and [third-party terms](CREDITS.md) before setting up this configuration. The DFlash2
-checkpoint used by this recipe carries non-commercial terms.
+through a switchless ConnectX-7 RoCE ring. This is my daily driver for coding and
+parallel agents, with a **256K context window (262,144 tokens)**. The repository
+contains the infrastructure as code, runtime patches, and guides to
+[install it with an agent](#install-with-an-agent) on compatible hardware.
 
 ## Measured performance
 
-**Current** is the configuration qualified on September 18, 2026. **Previous** is the
-configuration measured on September 11, before SparkCache and batch-uniform adaptive
-verification became the defaults. Each column reports medians across three native
-[Rigmark](https://github.com/alexellis/rigmark) runs from the same workstation.
+Native [Rigmark](https://github.com/alexellis/rigmark) measurements from the same
+workstation, shown as medians of per-run values. Dates use day/month/year.
 
 <div align="center">
 
-| Workload | Previous | Current |
-| --- | ---: | ---: |
-| Code decode, one request | 50.4 tok/s | 51.8 tok/s |
-| Code, one request (end-to-end) | 37.2 tok/s | 38.4 tok/s |
-| Code, two concurrent requests (aggregate, end-to-end) | 57.0 tok/s | 57.4 tok/s |
-| Code, four concurrent requests (aggregate, end-to-end) | 71.1 tok/s | 84.1 tok/s |
-| Code, four concurrent requests, per-stream TTFT | 0.94 s | 0.60 s |
-| Prose decode | 29.2 tok/s | 30.3 tok/s |
-| Prefill 8K / 32K, cached prefix replay | 4.6k / 21.5k tok/s | 9.7k / 32.0k tok/s |
-| Prefill 64K, cold | 2.2k tok/s | 2.3k tok/s |
+| Workload | 11/09/2026 | 18/09/2026 | 19/09/2026 |
+| --- | ---: | ---: | ---: |
+| Code decode, one request | 50.40 tok/s | 51.78 tok/s | 53.89 tok/s |
+| Prose decode | 29.22 tok/s | 30.27 tok/s | 31.88 tok/s |
+| Code, one request (end-to-end) | 37.22 tok/s | 38.43 tok/s | 40.30 tok/s |
+| Code, two concurrent requests (aggregate, end-to-end) | 57.01 tok/s | 57.39 tok/s | 57.25 tok/s |
+| Code, four concurrent requests (aggregate, end-to-end) | 71.08 tok/s | 84.05 tok/s | 87.53 tok/s |
+| Prefill 8K, cold | 2,112.2 tok/s | 2,393.4 tok/s | 2,354.7 tok/s |
+| Prefill 32K, cold | 2,202.0 tok/s | 2,502.1 tok/s | 2,534.1 tok/s |
+| Prefill 64K, cold | 2,201.3 tok/s | 2,254.0 tok/s | 2,421.7 tok/s |
+| Code, two concurrent requests, per-stream TTFT | 0.616 s | 0.447 s | 0.495 s |
+| Code, four concurrent requests, per-stream TTFT | 0.935 s | 0.597 s | 0.680 s |
 
 </div>
 
-Decode throughput measures generation after the first token; end-to-end throughput
-includes the initial wait. TTFT is time to first token. Concurrent-request tests use
-up to 256 output tokens per request, while the long decode tests allow up to 8192.
-These are inference benchmarks; they do not measure complete agent tasks. Cold prefill
-processes a new prefix, while replay reuses a cached prefix; each run uses a fresh
-`cache_salt`.
+September 11 and 18 each use **three runs**. September 19 uses **exactly two completed
+runs: 108/108 requests**, zero measurement/runtime errors, and 30/30 native output
+gates passing. Its third run was excluded entirely because of competing traffic.
+The records for [September 11](docs/baseline-f0.json), [September 18](docs/baseline-f1.json),
+and [September 19](docs/baseline-2026-09-19.json) include all 16 metrics and evidence hashes.
 
-The [current baseline](docs/baseline-f1.json) and
-[previous baseline](docs/baseline-f0.json) contain all metrics, per-run values, settings,
-and evidence hashes. Current qualification completed 162/162 requests with zero errors.
-The [qualification summary](docs/production-recipe.md#qualification-and-reproduction)
-also records reproduction through the repository's deployment scripts.
+Decode speed excludes the initial wait; end-to-end speed includes it. TTFT is time to
+first token. Concurrency tests cap output at 256 tokens per request; long decode tests
+allow 8192. These measure inference, not complete agent tasks. Cold prefill processes
+a new prefix, using a fresh `cache_salt` per run.
 
-## Hardware
+September 19 has higher code/prose throughput and longer concurrent-request TTFT,
+with **15 GiB KV per rank versus 16 GiB** previously. Allocator and host memory probes
+were active; their overhead was not isolated. Two runs give less repeatability evidence
+than three. A separate [one-run IaC reproduction](docs/reproduction-2026-09-19.json)
+records live deployment checks and 54 requests; the frozen medians above remain unchanged.
 
-<div align="center">
+The [current recipe](docs/production-recipe.md), encoded in
+[`cluster.env.example`](cluster.env.example), combines the digest-pinned SparkRing
+image, DFlash2 with adaptive verification, hybrid INT8/BF16 KDA projections,
+SparkCache prefix reuse, and SIRCL/patched NCCL transport.
 
-| Item | Verified configuration |
+## Install with an agent
+
+Start with a local checkout and an agent that can read its files and use SSH. The
+verified hardware is ASUS Ascent GX10; the agent must inventory your actual four
+nodes before creating the site configuration.
+
+| Prerequisite | What you need |
 | --- | --- |
-| Nodes | 4 × ASUS Ascent GX10, one NVIDIA GB10 and 128 GB unified memory each |
-| Storage | 1 TB NVMe per node; allow at least 330 GiB free for a fresh model fetch |
-| Fabric | one ConnectX-7 per node, two addressed ports, 4 × QSFP28 DAC, 200 Gb/s, MTU 9000 |
-| Topology | closed ring: rank 0 ↔ 1 ↔ 2 ↔ 3 ↔ 0, one private /24 per link |
-| Management | separate Ethernet or trusted VPN path for SSH and the rank-0 API |
+| Nodes | Four DGX Spark-class systems, one NVIDIA GB10 and 128 GB unified memory each |
+| Fabric | Two usable ConnectX-7/RoCE ports per node; four DACs in the ring 0 ↔ 1 ↔ 2 ↔ 3 ↔ 0; verified at 200 Gb/s and MTU 9000 |
+| Hosts and access | Ubuntu, NVIDIA driver, Docker with GPU support, `rdma-core`, and SSH access over a trusted management LAN/VPN |
+| Storage | At least 330 GiB free per node for a fresh model fetch, plus image and runtime-cache space |
+| Pinned artifacts | Image, target weights, drafter, and patched NCCL from the [installation procedure](docs/install-from-zero.md) |
+| Operator payload | Original SparkCache connector, encoder from the pinned image, and SIRCL bundle/runtime; follow [payload preparation](docs/install-from-zero.md#8-place-the-sparkcache-and-sircl-payload) |
 
-</div>
+The operator payload is pinned by hash and is not redistributed here. DFlash2 carries
+non-commercial terms; review [credits and licenses](CREDITS.md). The API has no
+authentication or TLS, so keep it on a trusted network or behind an authenticating
+proxy.
 
-Site addresses and hardware selections belong in the gitignored `cluster.env`, created
-from the public template. The API and fabric require a trusted private network. The
-API has no authentication, TLS, rate limit, or caller isolation; use a trusted VPN or
-an authenticating reverse proxy for access beyond that network.
+Replace the placeholders below, then give this prompt to the agent in the checkout:
 
-## Start here
+```text
+Install this repository's September 19, 2026 recipe on my four nodes.
+Read AGENTS.md, docs/install-from-zero.md, and docs/operations.md first.
+Use docs/baseline-2026-09-19.json and cluster.env.example as the reference.
 
-For installation, begin with four hosts running Ubuntu, NVIDIA drivers, Docker with
-GPU support, and `rdma-core`, then follow the installation guide in order. It covers
-preflight, site configuration, bootstrap, images, weights, payload, deployment, and
-post-boot verification. For an existing cluster, begin with the operations guide.
-Agents working in this repository must read [AGENTS.md](AGENTS.md) first.
+SSH targets in rank order:
+0: <user@rank0-host>
+1: <user@rank1-host>
+2: <user@rank2-host>
+3: <user@rank3-host>
+Authorized maintenance window and actions: <describe the agreed scope>
+
+Run the read-only preflight on all four targets and use their actual hardware
+and network mappings. Confirm the cable map and keep site values in ignored
+cluster.env. Follow the documented artifact preparation, deployment, startup,
+functional gates, and identity checks. Preserve the pinned recipe and hashes.
+If an operator payload is missing, report exactly what I must supply.
+Continue actions already authorized without asking again at each tool call;
+ask only about missing inputs or actions outside that scope.
+Do not run Rigmark or replace frozen measurements unless I request it.
+```
+
+The [agent contract](AGENTS.md#fresh-checkout-reproduction-contract) supplies the
+short execution checklist. The guides below own the complete procedures.
+
+## Documentation
 
 | Goal | Guide |
 | --- | --- |
+| Give an agent the repository contract | [Agent entry point](AGENTS.md) |
 | Install on prepared hosts | [Install from zero](docs/install-from-zero.md) |
 | Inspect, deploy, start, stop, recover, or roll back | [Operations](docs/operations.md) |
 | Cable, configure, or diagnose the RoCE ring | [Fabric](docs/fabric.md) |
 | Understand the current components and customizations | [Production recipe](docs/production-recipe.md) |
 | Understand files installed on the nodes | [Node assets](scripts/node/README.md) |
+| Check host/software pins and bootstrap | [Bootstrap pins](scripts/node/bootstrap/README.md) |
+| Manage host IOMMU configuration | [Host controls](scripts/node/host/README.md) |
+| Understand container patches | [Patch guide](scripts/node/patches/README.md) |
+| Generate site network files | [Netplan renderer](scripts/render-netplan.md) |
 | Build and install patched NCCL | [NCCL guide](scripts/node/nccl/README.md) |
+| Maintain workstation scripts | [Shared shell helpers](scripts/lib/README.md) |
+| Review changes and third-party terms | [Changelog](CHANGELOG.md), [credits](CREDITS.md), [license](LICENSE) |
 
 ## Use the endpoint
 
@@ -136,9 +151,3 @@ The check requires no GPU, Docker daemon, SSH connection, site configuration, or
 weights. It validates syntax, public documentation links, command help, manifests,
 chat-template rendering, host and controller lifecycle fixtures, preflight, and the
 adaptive-k policy.
-
-## Changes and credits
-
-[CHANGELOG.md](CHANGELOG.md) records changes to the deployment and tooling.
-[CREDITS.md](CREDITS.md) lists sources and third-party terms. Original project material
-is under [LICENSE](LICENSE); derived files and fetched artifacts retain their own terms.

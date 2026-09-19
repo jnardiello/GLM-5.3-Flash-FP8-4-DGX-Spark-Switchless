@@ -218,14 +218,49 @@ approved use, the revision differs, or any node is incomplete.
 
 ## 8. Place the SparkCache and SIRCL payload
 
-The Current configuration (`SPARKCACHE_MODE=on`) needs two operator-provided sets of files that carry
-no license and are therefore neither tracked nor fetched by this repository: the
-SparkCache connector module, and the SIRCL bundle and runtime. Obtain them from the
-owner's private archive and place them on every rank with the deployment account:
+The September 19 configuration (`SPARKCACHE_MODE=on`) needs operator-supplied
+SparkCache connector/encoder files and the SIRCL bundle/runtime. These payloads are
+not redistributed here; see [CREDITS](../CREDITS.md). Obtain the original connector
+from its provider or an authorized copy matching the input pin in
+[`prepare-sparkcache.py`](../scripts/prepare-sparkcache.py). The original hybrid
+encoder comes from the digest-pinned R10 image.
 
-| Payload | Node path (`cluster.env` key) | Manifest |
+On a host where that image is installed, copy the encoder out of a **stopped** temporary
+container; this does not launch inference or use the serving container:
+
+```sh
+# Source that host's cluster.env, or set IMAGE to the digest from cluster.env.example.
+. ./cluster.env
+payload_stage=$(mktemp -d)
+chmod 700 "$payload_stage"
+payload_container=$(sudo -n docker create --entrypoint /bin/true "$IMAGE")
+sudo -n docker cp "$payload_container:/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_hybrid.py" "$payload_stage/"
+sudo -n docker rm "$payload_container"
+sudo -n chown "$(id -u):$(id -g)" "$payload_stage/spark_context_cache_hybrid.py"
+```
+
+Copy that encoder and the original connector to private workstation storage, then run:
+
+```sh
+python3 scripts/prepare-sparkcache.py \
+  --connector <private-original-connector.py> \
+  --encoder <private-original-encoder.py> \
+  --output-dir <private-payload-directory>
+```
+
+The tool verifies both original hashes before writing, applies the two cache memory
+corrections, and verifies the exact resulting hashes used in the September 19 benchmark.
+It retains the original connector under a dated name for September 18 rollback. Repeating
+preparation accepts identical output and refuses to overwrite different files. It does
+not redistribute the input modules or change their terms.
+
+Place the prepared files and transport payload on **every** rank:
+
+| Payload | Node path (`cluster.env` key) | Verification |
 | --- | --- | --- |
-| connector | `~/tp4/sparkcache/spark_context_cache_connector.py` (`SPARKCACHE_CONNECTOR`) | `scripts/node/sparkcache/SHA256SUMS` |
+| corrected connector | `~/tp4/sparkcache/spark_context_cache_connector.py` (`SPARKCACHE_CONNECTOR`) | `scripts/node/sparkcache/SHA256SUMS` |
+| corrected hybrid encoder | `~/tp4/sparkcache/spark_context_cache_hybrid.py` (`SPARKCACHE_ENCODER`) | `scripts/node/sparkcache/SHA256SUMS` |
+| original connector for September 18 rollback | `~/tp4/sparkcache/spark_context_cache_connector-20260918.py` | pin in `scripts/node/reference/baseline-20260918.env` |
 | SIRCL bundle | `~/tp4/sircl/bundle/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS` |
 | SIRCL runtime and entrypoint | `~/tp4/sircl/runtime/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS` |
 | SIRCL per-rank peer/GID files, their runtime manifest and gate attestation | `~/tp4/sircl/runtime/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS.site` (gitignored) |
@@ -249,7 +284,7 @@ After the deploy in the next step has placed the manifests, verify every rank:
 ```
 
 Expected: the `sparkcache payload` and `sircl payload` rows are PASS on all four ranks.
-The launcher refuses to start a rank whose connector, config or SIRCL files do not
+The launcher refuses to start a rank whose connector, encoder, config or SIRCL files do not
 match the manifests; never edit a manifest to match a file. Do not commit, mirror or
 publish the payload.
 
@@ -272,7 +307,8 @@ state or exit code 4.
 
 ## 10. Verify and start
 
-Starting and exposing the endpoint needs a separate serving-window approval:
+Ensure the current authorization includes starting and exposing the endpoint; ask
+only when those actions are outside its scope:
 
 ```sh
 ./scripts/verify-node.sh --full-model
@@ -285,7 +321,7 @@ Starting and exposing the endpoint needs a separate serving-window approval:
 ```
 
 Expected: static verification passes; fabric-check sees two addressed MTU-9000 ports
-per node and eight successful jumbo pings; `/health` reaches 200; all six runtime
+per node and eight successful jumbo pings; `/health` reaches 200; all runtime
 signatures in [`operations.md`](operations.md) are present. Run the
 [post-boot functional gates](operations.md#post-boot-functional-gates) within two
 minutes of readiness.

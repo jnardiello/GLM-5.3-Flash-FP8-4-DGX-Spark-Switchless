@@ -27,9 +27,10 @@ $USAGE
   --host <alias>   push to (or check) one node of NODES/TP4_HOSTS only
 
 Managed files: cluster.env, scripts/launcher/launch-glm53-tp4.sh, scripts/tp4ctl, the
-regular-file F0 reference controller, the flusher,
+regular-file September 11 reference controller, September 18 rollback assets, the flusher,
 model and NCCL GID helpers/manifests, the indexer patch, scripts/node/patches/*.py (minus tests),
-scripts/node/moe-configs/*.json, and the TP4_ENV overlay when set. Host assets:
+scripts/node/moe-configs/*.json, vLLM overrides, payload manifests, and the TP4_ENV overlay
+when set. Operator-supplied SparkCache/SIRCL payloads are staged separately. Host assets:
 scripts/deploy-host.sh.
 EOF
 }
@@ -81,6 +82,8 @@ FILES=(
   "scripts/launcher/launch-glm53-tp4.sh:tp4/launch-glm53-tp4.sh"
   "scripts/tp4ctl:tp4/tp4ctl"
   "scripts/node/reference/tp4ctl-f0-20260912.sh:tp4/tp4ctl-f0-reference"
+  "scripts/node/reference/model-20260918.py:tp4/reference/model-20260918.py"
+  "scripts/node/reference/sparkcache-20260918.json:tp4/reference/sparkcache-20260918.json"
   "scripts/node/flusher-unconditional.sh:tp4/flusher-unconditional.sh"
   "scripts/node/sparse_attn_indexer_kpool_sm121.py:patches/sparse_attn_indexer_kpool.py"
   "scripts/fetch-fp8-weights.sh:tp4/scripts/fetch-fp8-weights.sh"
@@ -94,7 +97,7 @@ REFERENCE_EXECUTABLES="tp4/tp4ctl-f0-reference"
 SHELL_SCRIPTS="tp4/launch-glm53-tp4.sh tp4/tp4ctl tp4/tp4ctl-f0-reference tp4/flusher-unconditional.sh tp4/scripts/fetch-fp8-weights.sh tp4/scripts/lib/common.sh"
 
 # Extra remote directories to create before scp (relative to $HOME).
-REMOTE_DIRS=(tp4 patches tp4/scripts tp4/scripts/lib tp4/node/model-manifests)
+REMOTE_DIRS=(tp4 patches tp4/scripts tp4/scripts/lib tp4/node/model-manifests tp4/reference)
 
 # Complete immutable release manifests. Both the current and rollback revisions stay
 # available on the nodes so fetch and full verification never consult a moving URL.
@@ -116,8 +119,8 @@ for f in "$REPO"/scripts/node/patches/*.py; do
   patch_count=$((patch_count + 1))
 done
 
-# F1 SparkCache lane. The vLLM override files (Apache-2.0 derived, scripts/node/overrides/)
-# and the kv-transfer config are managed here; the connector and the SIRCL payload are not
+# SparkCache recipe. The vLLM override files (Apache-2.0 derived, scripts/node/overrides/)
+# and the kv-transfer config are managed here; connector, encoder and SIRCL payloads are not
 # redistributed (CREDITS.md), so only their SHA256SUMS travel and the launcher verifies the
 # operator-placed files against them before Docker starts.
 override_count=0

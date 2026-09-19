@@ -602,7 +602,7 @@ if [ -n "$RUN_SCRIPT" ]; then
     fi
   done
 
-  # Partial --apply: never leave the 4 nodes in mixed clock states.
+  # Partial --apply: never leave the 4 nodes with mixed host settings.
   if [ "$RUN_MODE" = --apply ] && [ "$ok" -gt 0 ] && [ "$bad" -gt 0 ]; then
     revert_list=""
     for i in "${!RES_HOSTS[@]}"; do

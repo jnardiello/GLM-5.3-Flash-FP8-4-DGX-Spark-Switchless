@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fast, read-only operational check of the running cluster against frozen F0."""
+"""Read-only operational identity check against the selected frozen baseline."""
 
 from __future__ import annotations
 
@@ -23,9 +23,7 @@ from typing import Any, Callable
 
 
 REPO = Path(__file__).resolve().parents[1]
-# The standing frozen baseline: F1 when present (docs/baseline-f1.json), else the historic F0.
-BASELINE = next((p for p in (REPO / "docs/baseline-f1.json", REPO / "docs/baseline-f0.json")
-                 if p.exists()), REPO / "docs/baseline-f0.json")
+BASELINE = REPO / "docs/baseline-2026-09-19.json"
 ADAPTIVE_DEFAULTS = {
     "VLLM_ADAPTIVE_K_ENABLE": "1", "VLLM_ADAPTIVE_K_LO": "3",
     "VLLM_ADAPTIVE_K_HI": "5", "VLLM_ADAPTIVE_K_MODE": "per-request",
@@ -82,6 +80,7 @@ emit max_num_seqs "$MAX_NUM_SEQS"; emit kv_cache_dtype "$KV_CACHE_DTYPE"
 emit batched_tokens "$BATCHED_TOKENS"; emit spec_tokens "$SPEC_TOKENS"
 emit spec_extra_json "${SPEC_EXTRA_JSON:-}"; emit async_scheduling "$ASYNC_SCHEDULING"
 emit extra_docker_env "${EXTRA_DOCKER_ENV:-}"; emit extra_vllm_args "${EXTRA_VLLM_ARGS:-}"
+emit sparkcache_mode "${SPARKCACHE_MODE:-off}"
 emit fabric_prefix_re "${FABRIC_PREFIX_RE:-}"
 for i in 0 1 2 3; do
   for prefix in base_fabric_target base_mgmt_if base_fabric_ifaces base_hca; do
@@ -98,13 +97,13 @@ done
 # One extra read-only probe complements verify-node.sh --quick: it checks live process,
 # container and fabric state that the static verifier deliberately does not own.
 REMOTE_PROBE = r'''
-import base64, json, os, re, subprocess, sys
+import base64, datetime as dt, json, os, re, subprocess, sys
 from pathlib import Path
 
 p = json.loads(base64.urlsafe_b64decode(sys.argv[1]).decode())
 errors = []
 
-def run(argv, accepted=(0,), timeout=10):
+def run(argv, accepted=(0,), timeout=10, include_stderr=False):
     try:
         c = subprocess.run(argv, capture_output=True, text=True, encoding="utf-8",
                            errors="replace", timeout=timeout, check=False)
@@ -113,7 +112,7 @@ def run(argv, accepted=(0,), timeout=10):
         return "", -1
     if c.returncode not in accepted:
         errors.append({"check": argv[0], "returncode": c.returncode})
-    return c.stdout.strip(), c.returncode
+    return (c.stdout + (c.stderr if include_stderr else "")).strip(), c.returncode
 
 ids_raw, _ = run(["sudo", "-n", "docker", "ps", "-q"])
 ids = ids_raw.splitlines() if ids_raw else []
@@ -146,6 +145,8 @@ safe_env_names = (
     "VLLM_ADAPTIVE_K_LOG_EVERY", "NCCL_ALGO", "NCCL_IB_HCA", "NCCL_IB_GID_INDEX",
     "NCCL_IB_ROCE_VERSION_NUM", "NCCL_IB_ADDR_FAMILY", "NCCL_IB_QPS_PER_CONNECTION",
 )
+identity = p.get("runtime_identity") or {}
+safe_env_names = set(safe_env_names) | set(identity.get("environment", {}))
 safe_environment = {key: environment[key] for key in safe_env_names if key in environment}
 foreign_gpu_container_count = sum(
     name(obj) != p["container"] and uses_gpu(obj) for obj in objects)
@@ -181,6 +182,7 @@ safe_options = (
     "--served-model-name", "--tensor-parallel-size", "--nnodes", "--node-rank",
     "--master-addr", "--master-port",
     "--max-model-len", "--max-num-seqs", "--max-num-batched-tokens", "--kv-cache-dtype",
+    "--kv-cache-memory-bytes", "--kv-cache-memory",
     "--scheduler-cls", "--moe-backend", "--speculative-config",
 )
 option_values = {key: [] for key in safe_options}
@@ -205,6 +207,55 @@ configured_pids = set()
 if container:
     top, _ = run(["sudo", "-n", "docker", "top", p["container"], "-eo", "pid"])
     configured_pids = {int(line) for line in top.splitlines()[1:] if line.strip().isdigit()}
+
+# Hash the files the running container actually sees, including bind mounts. This does
+# not import Python modules, initialize CUDA, or alter the serving process.
+runtime_files = {}
+paths = list(identity.get("container_file_sha256", {}))
+if container and paths:
+    hashes, _ = run(["sudo", "-n", "docker", "exec", p["container"],
+                     "sha256sum", "--", *paths], timeout=15)
+    for line in hashes.splitlines():
+        fields = line.split(None, 1)
+        if len(fields) == 2 and re.fullmatch(r"[0-9a-f]{64}", fields[0]):
+            runtime_files[fields[1].lstrip(" *")] = fields[0]
+
+runtime_workers = []
+if identity:
+    nccl_path = identity.get("environment", {}).get("VLLM_NCCL_SO_PATH")
+    for pid in configured_pids:
+        try: comm = Path(f"/proc/{pid}/comm").read_text().strip()
+        except OSError: continue
+        if not comm.startswith("VLLM::Worker"): continue
+        maps, _ = run(["sudo", "-n", "cat", f"/proc/{pid}/maps"])
+        runtime_workers.append({"pid": pid, "patched_nccl_loaded":
+                                bool(nccl_path and any(line.endswith(nccl_path)
+                                                       for line in maps.splitlines()))})
+
+runtime_receipts = {}
+if container and identity.get("kda_boot_receipt"):
+    # Bound the history to startup so a long-running memory probe cannot make this
+    # identity check grow indefinitely with the container's age.
+    started = (container.get("State") or {}).get("StartedAt", "")
+    try:
+        end = dt.datetime.fromisoformat(started.replace("Z", "+00:00")) + dt.timedelta(minutes=40)
+        logs, _ = run(["sudo", "-n", "docker", "logs", "--since", started,
+                       "--until", end.isoformat(), p["container"]], timeout=20, include_stderr=True)
+        for line in logs.splitlines():
+            if "E20_KDA_INPUT_W8A16_READY " in line:
+                try: runtime_receipts["kda"] = json.loads(line.split("E20_KDA_INPUT_W8A16_READY ", 1)[1])
+                except json.JSONDecodeError: pass
+    except ValueError:
+        errors.append({"check": "container start time", "error": "invalid timestamp"})
+if container and identity.get("memory_probe"):
+    logs, _ = run(["sudo", "-n", "docker", "logs", "--tail", "80", p["container"]],
+                  timeout=10, include_stderr=True)
+    for line in logs.splitlines():
+        if "E20_MEMORY_PROBE " in line:
+            try: sample = json.loads(line.split("E20_MEMORY_PROBE ", 1)[1])
+            except json.JSONDecodeError: continue
+            runtime_receipts["memory_probe"] = {
+                key: sample.get(key) for key in ("schema", "phase", "rank", "pid", "wall_time_ns")}
 gpu_raw, gpu_rc = run(["nvidia-smi", "--query-compute-apps=pid", "--format=csv,noheader,nounits"])
 gpu_pids = {int(line) for line in gpu_raw.splitlines() if line.strip().isdigit()}
 
@@ -234,6 +285,7 @@ print(json.dumps({
     "foreign_gpu_container_count": foreign_gpu_container_count,
     "foreign_gpu_pid_count": len(gpu_pids - configured_pids) if gpu_rc == 0 else None,
     "container": {"image_reference": config.get("Image", ""), "image_digests": digests,
+                  "image_id": container.get("Image", ""),
                   "model_path": command[0] if command else "", "options": option_values,
                   "async_flag_count": sum(item == "--async-scheduling" or
                                           item.startswith("--async-scheduling=") for item in command),
@@ -243,7 +295,9 @@ print(json.dumps({
                   "draft_metadata_present": draft_metadata_present,
                   "draft_config_sha": draft_config_sha,
                   "model_mount": mounts.get("/model") == os.path.expandvars(p["model_dir"]),
-                  "draft_mount": mounts.get("/draft") == os.path.expandvars(p["draft_dir"])},
+                  "draft_mount": mounts.get("/draft") == os.path.expandvars(p["draft_dir"]),
+                  "runtime_files": runtime_files, "runtime_receipts": runtime_receipts,
+                  "runtime_workers": runtime_workers},
     "flusher": {"unit_state": unit, "unit_rc": unit_rc, "legacy_process": legacy_rc == 0},
     "fabric_interfaces": interfaces, "jumbo_pings": jumbo,
 }, sort_keys=True))
@@ -283,7 +337,8 @@ def load_recipe(timeout: float) -> tuple[dict[str, str], dict[str, Any]]:
 
 
 def expected_f0(baseline: Path | None = None) -> dict[str, Any]:
-    system = json.loads((baseline or BASELINE).read_text(encoding="utf-8"))["system"]
+    record = json.loads((baseline or BASELINE).read_text(encoding="utf-8"))
+    system = record["system"]
     seqs = re.search(r"max sequences (\d+)", system["scheduler"])
     batched = re.search(r"max batched tokens (\d+)", system["scheduler"])
     if not seqs or not batched: raise CheckFailure("frozen baseline scheduler identity is not parseable")
@@ -295,8 +350,16 @@ def expected_f0(baseline: Path | None = None) -> dict[str, Any]:
                       ("VLLM_ADAPTIVE_K_HI", "k_hi"), ("VLLM_ADAPTIVE_K_UP", "up"),
                       ("VLLM_ADAPTIVE_K_DOWN", "down"), ("VLLM_ADAPTIVE_K_ALPHA", "alpha"),
                       ("VLLM_ADAPTIVE_K_SEED", "seed"), ("VLLM_ADAPTIVE_K_SIGNAL", "signal")):
-        if name in policy: adaptive[key] = str(policy[name])
+        if name in policy:
+            value = policy[name]
+            adaptive[key] = str(float(value)) if name in ("up", "down", "alpha", "seed") else str(value)
+    kv_bytes = system.get("kv_cache_memory_bytes_per_rank")
+    if kv_bytes is None:
+        match = re.search(r"\b(\d+)-byte pool per rank\b", system["kv_cache"])
+        if not match: raise CheckFailure("frozen baseline KV memory budget is not parseable")
+        kv_bytes = int(match.group(1))
     return {
+        "baseline_id": record["baseline_id"],
         "model_repo": system["model"], "model_rev": system["model_revision"],
         "draft_rev": system["drafter"]["revision"], "image_digest": image_digest,
         "max_model_len": str(system["context_limit_tokens"]), "max_num_seqs": seqs.group(1),
@@ -304,6 +367,10 @@ def expected_f0(baseline: Path | None = None) -> dict[str, Any]:
         "spec_tokens": str(system["drafter"]["draft_tokens"]),
         "adaptive_tokens": system["drafter"]["adaptive_verification_tokens"],
         "adaptive_env": adaptive,
+        "kv_cache_memory_bytes": str(kv_bytes),
+        "image_id": system.get("serving_image_id"),
+        "runtime_identity": system.get("operational_identity") or {},
+        "sparkcache_mode": "on" if system.get("sparkcache") else "off",
     }
 
 
@@ -342,7 +409,6 @@ def recipe_problems(recipe: dict[str, str], expected: dict[str, Any]) -> list[st
         "nodes", "tp4_hosts", "mgmt_ips", "hosts", "master_ip", "master_port",
         "api_port", "fabric_prefix_re",
         "container", "model_dir", "draft_dir", "served_name",
-        "extra_docker_env", "extra_vllm_args",
     )
     for key in protected:
         if recipe.get(key) != recipe.get("base_" + key):
@@ -356,27 +422,39 @@ def recipe_problems(recipe: dict[str, str], expected: dict[str, Any]) -> list[st
     for key in ("model_repo", "model_rev", "draft_rev", "image_digest", "max_model_len",
                 "max_num_seqs", "batched_tokens", "kv_cache_dtype", "spec_tokens"):
         if recipe.get(key) != str(expected[key]): problems.append(f"effective recipe mismatch: {key}")
-    base_env = adaptive_env(recipe.get("base_extra_docker_env", ""))
+    # A historical baseline may be selected by an overlay over the current base.
+    # Compare runtime policy with that selected baseline, not the unselected base;
+    # the site/container/topology protections above still apply to every overlay.
     env = adaptive_env(recipe.get("extra_docker_env", ""))
     for key, value in expected.get("adaptive_env", ADAPTIVE_DEFAULTS).items():
-        if base_env[key] != value: problems.append("base F0 adaptive policy: " + key)
-        if env[key] != value: problems.append("effective F0 adaptive policy: " + key)
+        if env[key] != value: problems.append("effective baseline adaptive policy: " + key)
     raw_env = docker_env(recipe.get("extra_docker_env", ""))
     if "NCCL_IB_QPS_PER_CONNECTION" in raw_env: problems.append("NQ2 QPS delta still present")
     args = shlex.split(recipe.get("extra_vllm_args", ""))
     if flag_values(args, "--scheduler-cls") != ["adaptive_k_scheduler.AdaptiveKScheduler"]:
-        problems.append("F0 scheduler class")
-    if flag_values(args, "--moe-backend") != ["triton"]: problems.append("F0 MoE backend")
+        problems.append("baseline scheduler class")
+    if flag_values(args, "--moe-backend") != ["triton"]: problems.append("baseline MoE backend")
+    if (flag_values(args, "--kv-cache-memory-bytes") + flag_values(args, "--kv-cache-memory")
+            != [expected["kv_cache_memory_bytes"]]):
+        problems.append("baseline KV memory budget")
+    if recipe.get("sparkcache_mode", "off") != expected["sparkcache_mode"]:
+        problems.append("baseline SparkCache mode")
+    identity = expected.get("runtime_identity") or {}
+    for key, value in identity.get("environment", {}).items():
+        # Launcher-owned values, such as NCCL GID and LD_PRELOAD, are checked on
+        # the actual container; only explicit EXTRA_DOCKER_ENV entries live here.
+        if key in raw_env and raw_env[key] != str(value):
+            problems.append("baseline runtime environment: " + key)
     try: table = json.loads("{" + recipe.get("spec_extra_json", "") + "}").get(
         "num_speculative_tokens_per_batch_size")
     except json.JSONDecodeError: table = None
     if table != [[1, 1, expected["adaptive_tokens"][1]], [2, 6, expected["adaptive_tokens"][0]]]:
-        problems.append("F0 adaptive graph table")
+        problems.append("baseline adaptive graph table")
     if recipe.get("async_scheduling") != "0": problems.append("optional async CLI flag present")
     if len(recipe.get("hosts", "").split()) != 4: problems.append("expected four SSH ranks")
     for rank in range(4):
-        if not recipe.get(f"hca_{rank}"): problems.append(f"rank {rank}: missing F0 HCA")
-        if recipe.get(f"gid_index_{rank}") != "-1": problems.append(f"rank {rank}: F0 GID mode")
+        if not recipe.get(f"hca_{rank}"): problems.append(f"rank {rank}: missing baseline HCA")
+        if recipe.get(f"gid_index_{rank}") != "-1": problems.append(f"rank {rank}: baseline GID mode")
         targets = recipe.get(f"fabric_target_{rank}", "").split()
         if len(targets) != 2: problems.append(f"rank {rank}: fabric target count")
         for target in targets:
@@ -398,6 +476,7 @@ def probe_rank(rank: int, host: str, recipe: dict[str, str], timeout: float) -> 
         "container": recipe["container"], "fabric_prefix_re": fabric_prefix(recipe),
         "fabric_targets": recipe[f"fabric_target_{rank}"].split(),
         "model_dir": recipe["model_dir"], "draft_dir": recipe["draft_dir"],
+        "runtime_identity": recipe.get("runtime_identity", {}),
     }).encode()).decode()
     ssh = ["ssh", "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=yes",
            "-o", f"ConnectTimeout={max(1, min(10, int(timeout)))}",
@@ -476,8 +555,12 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
         if remote.get("running_container_count") != 1: problems.append(f"rank {rank}: running container count")
         container = remote.get("container") or {}; options = container.get("options") or {}
         if container.get("image_reference") != recipe.get("image"): problems.append(f"rank {rank}: image reference")
-        if expected["image_digest"] not in (container.get("image_digests") or []):
+        image_id_matches = (expected.get("image_id") is not None and
+                            container.get("image_id") == expected["image_id"])
+        if expected["image_digest"] not in (container.get("image_digests") or []) and not image_id_matches:
             problems.append(f"rank {rank}: running image digest")
+        if expected.get("image_id") and not image_id_matches:
+            problems.append(f"rank {rank}: running image content ID")
         if container.get("model_marker") != expected["model_rev"]:
             problems.append(f"rank {rank}: model revision marker")
         if not container.get("model_mount") or not container.get("draft_mount"):
@@ -495,6 +578,9 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
                           "--moe-backend": "triton"}
         for option, value in expected_flags.items():
             if options.get(option) != [value]: problems.append(f"rank {rank}: command {option}")
+        if (options.get("--kv-cache-memory-bytes", []) + options.get("--kv-cache-memory", [])
+                != [expected["kv_cache_memory_bytes"]]):
+            problems.append(f"rank {rank}: command --kv-cache-memory-bytes")
         speculative = container.get("speculative") or {}
         if (speculative.get("method"), speculative.get("model"),
                 speculative.get("num_speculative_tokens")) != ("dflash", "/draft", int(expected["spec_tokens"])):
@@ -511,7 +597,36 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
                      "NCCL_IB_GID_INDEX": "-1", "NCCL_IB_ROCE_VERSION_NUM": "2",
                      "NCCL_IB_ADDR_FAMILY": "AF_INET"}
         if any(env.get(key) != value for key, value in selectors.items()):
-            problems.append(f"rank {rank}: F0 collective identity")
+            problems.append(f"rank {rank}: baseline collective identity")
+        identity = expected.get("runtime_identity") or {}
+        if identity:
+            workers = container.get("runtime_workers") or []
+            if len(workers) != 1:
+                problems.append(f"rank {rank}: runtime GPU worker count")
+            elif (identity.get("environment", {}).get("VLLM_NCCL_SO_PATH") and
+                  not workers[0].get("patched_nccl_loaded")):
+                problems.append(f"rank {rank}: patched NCCL not loaded by GPU worker")
+        for key, value in identity.get("environment", {}).items():
+            if env.get(key) != str(value):
+                problems.append(f"rank {rank}: runtime environment {key}")
+        for path, sha in identity.get("container_file_sha256", {}).items():
+            if container.get("runtime_files", {}).get(path) != sha:
+                problems.append(f"rank {rank}: runtime file {path}")
+        receipts = container.get("runtime_receipts") or {}
+        kda = receipts.get("kda") or {}
+        for key, value in identity.get("kda_boot_receipt", {}).items():
+            if key == "padded_n":
+                modules = kda.get("receipts") or []
+                if (len(modules) != identity["kda_boot_receipt"].get("modules") or
+                        any(module.get("padded_n") != value for module in modules)):
+                    problems.append(f"rank {rank}: KDA padding receipt")
+            elif kda.get(key) != value:
+                problems.append(f"rank {rank}: KDA boot receipt {key}")
+        memory_probe = receipts.get("memory_probe") or {}
+        if identity.get("memory_probe"):
+            if (any(memory_probe.get(key) != value for key, value in identity["memory_probe"].items())
+                    or memory_probe.get("rank") != rank):
+                problems.append(f"rank {rank}: memory probe identity")
         if (remote.get("foreign_gpu_container_count") != 0
                 or remote.get("foreign_gpu_pid_count") != 0):
             problems.append(f"rank {rank}: foreign GPU workload")
@@ -566,8 +681,8 @@ def write_report(directory: Path, report: dict[str, Any]) -> Path:
     return path
 
 
-def print_summary(passed: bool) -> None:
-    print("F0 CHECK PASS" if passed else "F0 CHECK FAIL")
+def print_summary(passed: bool, baseline_id: str = "BASELINE") -> None:
+    print(f"{baseline_id} CHECK {'PASS' if passed else 'FAIL'}")
 
 
 def positive(value: str) -> float:
@@ -607,7 +722,8 @@ def main(argv: list[str] | None = None, *, rank_probe: Callable = probe_rank,
         return 1
     report: dict[str, Any] = {
         "schema": 1, "started_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-        "verified_scope": ["effective F0 recipe and verify-node static checks",
+        "baseline_file": str(args.baseline),
+        "verified_scope": ["selected baseline recipe and verify-node static checks",
                            "running containers, GPU work, flusher and key command identity",
                            "addressed MTU-9000 fabric and eight jumbo directions",
                            "GET /health 200 and endpoint idle metrics"],
@@ -618,7 +734,8 @@ def main(argv: list[str] | None = None, *, rank_probe: Callable = probe_rank,
     }
     passed = False
     try:
-        recipe, diagnostic = load_recipe(args.timeout); expected = expected_f0()
+        recipe, diagnostic = load_recipe(args.timeout); expected = expected_f0(args.baseline)
+        report["baseline_id"] = expected["baseline_id"]
         configuration_problems = recipe_problems(recipe, expected)
         if configuration_problems:
             report.update({"configuration_diagnostic": diagnostic,
@@ -628,13 +745,15 @@ def main(argv: list[str] | None = None, *, rank_probe: Callable = probe_rank,
         if len(hosts) != 4: raise CheckFailure("effective recipe does not resolve four SSH ranks")
         base_url = checked_base_url(
             args.base_url or f"http://{recipe['master_ip']}:{recipe['api_port']}")
+        # Pass the selected baseline's runtime pins to the remote read-only probe.
+        recipe["runtime_identity"] = expected.get("runtime_identity", {})
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
             futures = [pool.submit(rank_probe, rank, host, recipe, args.timeout)
                        for rank, host in enumerate(hosts)]
             endpoint = http_probe(base_url, args.timeout)
             ranks = [future.result() for future in futures]
         problems = evaluate(recipe, expected, ranks, endpoint); passed = not problems
-        report.update({"configuration_diagnostic": diagnostic, "expected_f0": expected,
+        report.update({"configuration_diagnostic": diagnostic, "expected_baseline": expected,
                        "rank_probes": [reportable_rank_probe(item) for item in ranks],
                        "endpoint": endpoint, "problems": problems})
     except Exception as exc:
@@ -643,7 +762,7 @@ def main(argv: list[str] | None = None, *, rank_probe: Callable = probe_rank,
             report["problems"] = [f"{type(exc).__name__}: {detail}"]
     report["status"] = "PASS" if passed else "FAIL"
     report["finished_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
-    write_report(directory, report); print_summary(passed)
+    write_report(directory, report); print_summary(passed, report.get("baseline_id", "BASELINE"))
     return 0 if passed else 1
 
 

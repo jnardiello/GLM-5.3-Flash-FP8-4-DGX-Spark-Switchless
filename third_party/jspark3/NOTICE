@@ -1,0 +1,11 @@
+JSpark3 v1
+Copyright 2026 JSpark3 authors
+
+This product includes original serving-recipe code, tooling, and documentation
+licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It references, but does not include or relicense, third-party model
+checkpoints, a container image, and upstream source revisions. Their terms are
+listed in THIRD_PARTY_NOTICES.md. The ShapleyMcg attribution in
+REQUIRED_ATTRIBUTION.md must remain byte-for-byte intact in copies and
+generated reports.

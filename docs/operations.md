@@ -74,7 +74,7 @@ LAN, run the health probe from rank 0 because the local `MASTER_IP` may be unrea
 ssh <ALIAS_RANK0> 'curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8000/health'
 ```
 
-Then verify six signatures that `docker ps` does not prove:
+Then verify these signatures that `docker ps` does not prove:
 
 | Signature | Read-only check | Expected result |
 | --- | --- | --- |
@@ -83,7 +83,8 @@ Then verify six signatures that `docker ps` does not prove:
 | Host IOMMU tier | `deploy-host.sh ... tp4-iommu.sh --status` | passthrough on all four ranks, drop-in installed, GRUB synchronized |
 | NCCL HCA/GID selection | `./scripts/verify-node.sh` | every configured HCA has an active IPv4-mapped RoCEv2 GID on its addressed fabric netdev; explicit index or automatic `-1` mode is identified |
 | Adaptive scheduler | rank-0 log | `AdaptiveKScheduler active (enabled=1 … mode=batch-uniform engine_k=5 async=True)` and a `num_speculative_tokens_per_batch_size` table in engine initialization |
-| SparkCache lane | `docker inspect`, `./scripts/verify-node.sh` | `--kv-transfer-config` naming `SparkContextCacheConnector` in the command, entrypoint `/opt/sircl-serving/entrypoint.sh`, the connector, override and SIRCL mounts present, `sparkcache payload` and `sircl payload` rows PASS; `docker ps` shows no health state because the lane runs with `--no-healthcheck` |
+| SparkCache lane | `docker inspect`, `./scripts/verify-node.sh` | `--kv-transfer-config` naming `SparkContextCacheConnector` in the command, entrypoint `/opt/sircl-serving/entrypoint.sh`, the connector, encoder, engine override and SIRCL mounts present, `sparkcache payload` and `sircl payload` rows PASS; `docker ps` shows no health state because the lane runs with `--no-healthcheck` |
+| Hybrid KDA and KV pool | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E20_KDA_INPUT_W8A16_READY` on every rank: 34 modules, group 128, padded N=6400, threshold 2048, shared scratch 51,515,392 bytes; `--kv-cache-memory-bytes=16106127360`; matching source hashes and `E20_MEMORY_PROBE` records |
 
 For a boot caused by rank-0 autostart, inspect the units too:
 
@@ -105,19 +106,22 @@ verdict is needed:
 ```sh
 ./scripts/check-f0.py
 ./scripts/check-f0.py --base-url http://127.0.0.1:8000
+./scripts/check-f0.py --baseline docs/baseline-f1.json
 ./scripts/check-f0.py --baseline docs/baseline-f0.json
 ```
 
 The second form uses an already-established localhost SSH tunnel when the management LAN
 is not directly reachable. The checker reads the local `cluster.env` and honors `TP4_ENV`
-as the effective delta. By default it validates the frozen **Current** identity from
-[Current baseline](baseline-f1.json) (registry image digest, adaptive-k
-`batch-uniform` parameters); the third form validates the Previous configuration instead. A
-baseline-changing delta fails the check.
+as the effective delta. By default it validates the **September 19** identity from
+[the current baseline](baseline-2026-09-19.json), including the hybrid sources, cache
+fixes, KV byte budget, image content ID and adaptive-k parameters. The last two forms
+select September 18 and September 11 explicitly; select the matching runtime recipe
+as well. A baseline-changing delta fails the check.
 
 The checker runs bounded SSH probes for all four ranks in parallel with strict host-key checking.
 It verifies the effective recipe against the selected baseline's pins, the configured running
-container and key command/environment identity, image digest and model marker, unfiltered
+container and key command/environment identity, image digest and model marker, the
+selected baseline’s runtime source hashes and boot receipts, unfiltered
 GPU containers and processes, inactive flusher, addressed MTU-9000 interfaces, all eight
 jumbo directions, `/health` 200, and zero running/waiting requests. Stdout is exactly one
 concise `F0 CHECK PASS` or `F0 CHECK FAIL` line; details and command errors go to a
@@ -130,11 +134,12 @@ replay engine async metadata, or send the coherent-response and tool-call reques
 
 ### Frozen previous rollback reference
 
-This archive tool captures the **Previous** configuration. Use it only when that
-configuration is serving; it cannot capture Current. Current is reproduced through
-the base IaC recipe and its payload manifests. For a Previous capture, use a new
+This archive tool captures the **September 11** configuration. Use it only when that
+configuration is serving; it cannot capture either newer baseline. The newer baselines use their IaC recipe and payload manifests; the
+[qualification record](production-recipe.md#qualification-and-reproduction) distinguishes
+measured configurations from any later reproduction run. For a September 11 capture, use a new
 private archive outside the checkout. The tracked portable part is
-`scripts/node/reference/f0-20260912.env`; it freezes every non-site Previous runtime knob,
+`scripts/node/reference/f0-20260912.env`; it freezes every non-site September 11 runtime knob,
 automatic GID selection, image and artifact pins without changing `CONTAINER`. The
 private archive adds the resolved addresses, aliases, interfaces, HCA choices, renderer,
 ports, exact installed configuration and the observed unit state. It also keeps the
@@ -182,25 +187,26 @@ commands to a new private report. It never executes those commands. If the live 
 differs, give `--current-overlay <relative-path>` only after confirming that it is the
 overlay of the currently running process; otherwise the coordinated `down` command is
 left blocked. The generated order first stages a SHA-verified controller as a regular
-file, stops all four ranks with the currently serving overlay, then selects Previous, deploys
+file, stops all four ranks with the currently serving overlay, then selects September 11, deploys
 the archived IaC, atomically installs the archived NCCL bytes, and prepares autostart.
 The reference overlay is deployed at the same relative path by setting
 `TP4_ENV=scripts/node/reference/f0-20260912.env` on `scripts/deploy.sh`.
 
 The live launcher supports the Current configuration, so the manifest pins the exact
-Previous launcher bytes as the frozen copy `scripts/node/reference/launch-glm53-tp4-f0-20260912.sh`
+September 11 launcher bytes as the frozen copy `scripts/node/reference/launch-glm53-tp4-f0-20260912.sh`
 (same SHA-256 as before). Its controller is independently frozen at
 `scripts/node/reference/tp4ctl-f0-20260912.sh`, also with its original SHA-256.
 Deployment installs that copy as `tp4ctl-f0-reference`; fixes to the operational
-`scripts/tp4ctl` do not change Previous. Restore plans use the controller inside the
+`scripts/tp4ctl` do not change September 11. Restore plans use the controller inside the
 verified archive, including the original `scripts/tp4ctl` path in older sealed archives.
-Existing archive files and manifests stay unchanged. The Previous overlay is valid
-only together with the archived Previous IaC that `plan-restore` deploys; on top of
+Existing archive files and manifests stay unchanged. The September 11 overlay is valid
+only together with the archived September 11 IaC that `plan-restore` deploys; on top of
 the Current base `cluster.env` it inherits
-`SPARKCACHE_MODE=on` and `IMAGE_ID`, and the launcher refuses the Previous image (fail-closed).
-For a lighter Previous return use the rollback comments in `cluster.env.example` (see the
-[recovery table](#recovery-and-rollback)). `f0-reference.py capture` always validates
-against `docs/baseline-f0.json`.
+`SPARKCACHE_MODE=on` and `IMAGE_ID`, and the launcher refuses the September 11 image (fail-closed).
+Use that verified archive workflow for a September 11 return; do not reconstruct
+its recipe by mixing individual historical values with the current base.
+`f0-reference.py capture` and the generated restore checks explicitly select
+`docs/baseline-f0.json`.
 
 ## Post-boot functional gates
 
@@ -263,21 +269,22 @@ content or touching a running container. It does replace `~/tp4/cluster.env`, wh
 what rank-0 autostart uses next. `restart` is disruptive and always cycles all ranks.
 
 `EXTRA_DOCKER_ENV` is one word-split string carrying the tuned MoE JSON, the adaptive
-scheduler mount, `PYTHONPATH`, policy variables, the six vLLM override mounts, the
-SIRCL bundle/runtime mounts with their entrypoint, and the connector mount. An overlay
+scheduler mount, `PYTHONPATH`, policy variables, the nine vLLM override mounts, the
+SIRCL bundle/runtime mounts with their entrypoint, and the connector and encoder mounts. An overlay
 replaces the complete value. Preserve every unrelated entry, avoid spaces/globs in
 values, and never clear the string while `--scheduler-cls
 adaptive_k_scheduler.AdaptiveKScheduler` remains in `EXTRA_VLLM_ARGS`.
 
-The Current configuration adds `scripts/node/overrides/`, `scripts/node/sparkcache/kv-transfer-config.json`
-and the two `SHA256SUMS` manifests to the deploy set. The SparkCache connector and the
-SIRCL bundle/runtime are not deployed by `deploy.sh`: place them once per rank at
-`SPARKCACHE_CONNECTOR` and `SIRCL_DIR` (see
+The September 19 configuration includes `scripts/node/overrides/`, `scripts/node/sparkcache/kv-transfer-config.json`
+and payload `SHA256SUMS` manifests in the deploy set. It also stages the frozen
+September 18 model and cache config for rollback. The SparkCache connector/encoder and
+SIRCL bundle/runtime are operator payload: prepare and place the pinned versions on
+every rank at `SPARKCACHE_CONNECTOR`, `SPARKCACHE_ENCODER` and `SIRCL_DIR` (see
 [`install-from-zero.md`](install-from-zero.md#8-place-the-sparkcache-and-sircl-payload))
 and let `./scripts/verify-node.sh` confirm both payload rows before `restart`.
 
 Expected: every copied file matches its source, all ranks launch in order 3→2→1→0,
-`/health` reaches 200, and the six signatures return. Run the
+`/health` reaches 200, and all runtime signatures return. Run the
 [post-boot functional gates](#post-boot-functional-gates) within two minutes, followed
 by any task-specific verification. Stop the stack immediately if a gate fails.
 
@@ -336,6 +343,10 @@ TP4_ENV=path/to/window.env ./scripts/verify-node.sh
 TP4_ENV=path/to/window.env ./scripts/tp4ctl down
 ```
 
+Derive each new overlay from the Current base recipe. An overlay prepared for an older
+base may duplicate connector or transport configuration already supplied by Current.
+Reapply only the intended delta and review the merged configuration before deployment.
+
 Use the same `TP4_ENV` on every command in that window. Keep `CONTAINER` unchanged so
 plain production commands still find exactly one stack. To leave the window, restart
 with no `TP4_ENV`; the base recipe is sourced again.
@@ -361,8 +372,9 @@ below is full-cluster and must fall within an authorized service window.
 | Condition | Recovery | Verification |
 | --- | --- | --- |
 | Overlay result is bad | `./scripts/tp4ctl restart` with no `TP4_ENV` | base `cluster.env` signatures and gates return |
-| Production engine knob is bad | restore the rollback documented beside the value in `cluster.env.example`, update local `cluster.env`, deploy, restart | six signatures plus task gate |
-| Current configuration must be rolled back to Previous | apply every Previous value named in the rollback comments of `cluster.env.example` (tagged image and empty `IMAGE_ID`, `SPARKCACHE_MODE=off`, `NCCL_IB_GID_INDEX=3`, `SPEC_EXTRA_JSON`, `EXTRA_DOCKER_ENV`, `EXTRA_VLLM_ARGS`) in `cluster.env`, deploy, restart; the deeper alternative is the [frozen Previous archive restore](#restore-from-the-frozen-previous-archive) | `PATCH_FILE` mount present, no `--kv-transfer-config`, `mode=per-request`, `./scripts/check-f0.py --baseline docs/baseline-f0.json` PASS, both gates |
+| Production engine knob is bad | restore the rollback documented beside the value in `cluster.env.example`, update local `cluster.env`, deploy, restart | all runtime signatures plus task gate |
+| Restore the September 18 baseline | use the complete [September 18 overlay](#restore-the-september-18-baseline) for deploy and the coordinated transition | 16 GiB KV, original KDA model and connector, original cache namespace, no hybrid helper/encoder/probe mounts; `./scripts/check-f0.py --baseline docs/baseline-f1.json` with the same overlay, both gates |
+| Restore the September 11 baseline | use the [frozen archive restore](#restore-from-the-frozen-previous-archive): verify the archive and run its prepared restore plan, including the original base and overlay | `PATCH_FILE` mount present, no `--kv-transfer-config`, `mode=per-request`, automatic GID selection, `./scripts/check-f0.py --baseline docs/baseline-f0.json` PASS, both gates |
 | Model revision is bad | restore the previous pinned revision and manifest named beside `MODEL_REV`, deploy fetch tooling, rerun the manifest fetch and `verify-node.sh --full-model`, then restart | identical revision markers and complete hashes on all ranks |
 | Adaptive scheduler must be removed | apply the coupled rollback beside its settings: scheduler flag, mount, policy env, speculative length/table; preserve the MoE mount | no adaptive line, intended fixed-k init, MoE config still loaded |
 | Tuned MoE config must be removed | remove only its mount; preserve scheduler entries | expected default-MoE line, Triton backend and adaptive scheduler remain |
@@ -375,9 +387,40 @@ An IOMMU revert exit code 4 means GRUB was not safely regenerated: do not reboot
 Never use `EXTRA_DOCKER_ENV=""` as a generic rollback. Never purge a model to recover
 space without a fresh disk census and explicit owner decision.
 
+### Restore the September 18 baseline
+
+The immediate rollback is the complete non-site overlay
+[`baseline-20260918.env`](../scripts/node/reference/baseline-20260918.env). It restores
+the original model module and cache namespace, the 16 GiB pool, and the original
+connector. The image, scheduler, SIRCL transport and checkpoint revisions are unchanged.
+Prepare the original connector as `spark_context_cache_connector-20260918.py` with
+[`prepare-sparkcache.py`](../scripts/prepare-sparkcache.py) and stage it beside the
+current payload on all four ranks before the maintenance window. Deployment installs
+the frozen model and cache JSON under `~/tp4/reference/`.
+
+Within an authorized window, stop using the currently serving delta (if any), then
+select the rollback for all subsequent commands:
+
+```sh
+# First down uses the currently serving TP4_ENV, or none for the base recipe.
+./scripts/tp4ctl down
+export TP4_ENV=scripts/node/reference/baseline-20260918.env
+./scripts/deploy.sh
+./scripts/tp4ctl up
+# Complete both post-boot functional gates within two minutes of /health 200.
+./scripts/check-f0.py --baseline docs/baseline-f1.json
+```
+
+Keep this overlay for later lifecycle commands. For unattended autostart, install a
+systemd drop-in that sets this same `TP4_ENV` and run `systemctl daemon-reload`; otherwise
+a later reboot would select the base September 19 recipe. Returning to September 19
+requires a coordinated transition with no overlay and removal of that drop-in. Preserve
+both persistent-cache directories; do not reuse their contents across quantization
+recipes. The frozen baseline medians are not remeasured as part of rollback.
+
 ### Restore from the frozen previous archive
 
-Treat runtime restoration and host restoration as separate decisions. For runtime Previous:
+Treat runtime restoration and host restoration as separate decisions. For runtime September 11:
 
 1. select one archive, verify its SHA manifest offline, compare it live, and confirm the
    four intended targets plus image, model, drafter and exact NCCL availability;
@@ -388,14 +431,14 @@ Treat runtime restoration and host restoration as separate decisions. For runtim
 4. restore only the archived repository-managed runtime assets through `scripts/deploy.sh`
    and the NCCL atomic installer, checking every destination hash;
 5. render the prepared autostart drop-in with the deployment user. It explicitly selects
-   the Previous overlay and its verified reference controller for both start and stop. Install it
+   the September 11 overlay and its verified reference controller for both start and stop. Install it
    only after review and run `systemctl daemon-reload`; do not treat the previously loaded
    unit as if it already contained the disk changes;
 6. require two addressed MTU-9000 ports per rank, all eight jumbo pings, Ethernet speed,
    RDMA/HCA/GID checks and absence of a second stack or foreign GPU work; then run one
    coordinated four-rank `up`;
 7. from the first `/health` 200, run both functional gates above within 120 seconds and
-   finish with the Previous operational check. A failed gate requires full-cluster stop and a
+   finish with the September 11 operational check. A failed gate requires full-cluster stop and a
    report, never single-rank repair.
 
 The captured host state is comparison evidence, not an unattended host restore program.
@@ -406,7 +449,7 @@ configuration. Any host or fabric change needs its own authorization, an exact o
 diff, and verified independent recovery access or the owner's physical availability. If a
 reboot is later approved, stop all four ranks first and reboot rank 0 last.
 
-The archive records what was observed and what the prepared Previous restore would install.
+The archive records what was observed and what the prepared September 11 restore would install.
 Creating and verifying it does not rehearse a full restore and does not prove unattended
 recovery from kernel, driver, firmware, boot-loader or network failure.
 
@@ -414,8 +457,9 @@ recovery from kernel, driver, firmware, boot-loader or network failure.
 
 After the owner accepts a recipe change, persist the value and rollback in its source
 file, update any affected runtime signature and `CHANGELOG.md`, and run
-`./scripts/check.sh`. Evaluation tooling and result records remain outside this
-repository.
+`./scripts/check.sh`. Run native Rigmark from its independent checkout. Raw logs,
+payloads, site configuration and working records stay private; a sanitized frozen
+baseline record may be published under `docs/` with dates, counts and evidence hashes.
 
 Do not expose node addresses, private paths, or logs in public documents. A commit,
 tag, release, or public announcement remains a separate explicit action.

@@ -17,6 +17,10 @@ rank and recording the effect in `CHANGELOG.md`.
 An absent optional pin produces `SKIP`. `WARN` is reported but does not fail the
 verifier; only `FAIL` changes its exit status. The image comes from `cluster.env` and
 the NCCL checksum from `scripts/node/nccl/SHA256SUMS`, avoiding duplicate values here.
+The `IMAGE_DIGEST` retained in `versions.env` pins the September 11 tagged-image
+rollback. Digest-qualified `IMAGE` values in `cluster.env` supply their own pin;
+`IMAGE_ID` additionally identifies the current image content. The frozen host-pin file
+is also part of the historical restore manifest.
 
 ```sh
 ./scripts/bootstrap-node.sh <alias> --rank <n> --check

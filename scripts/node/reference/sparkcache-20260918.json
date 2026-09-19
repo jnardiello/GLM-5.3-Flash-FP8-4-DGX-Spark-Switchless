@@ -8,7 +8,7 @@
     "spark_cache_min_span_tokens": 4096,
     "spark_cache_model_profile": "glm53-flash-hybrid",
     "spark_cache_restore": true,
-    "spark_cache_root": "/cache/jit/sparkcache-e20-hybrid-3c7f1650c1f8-f4368638",
+    "spark_cache_root": "/cache/jit/sparkcache-context",
     "spark_cache_scheduler_probe": "none",
     "spark_cache_store": true,
     "spark_cache_streaming_snapshots": false,

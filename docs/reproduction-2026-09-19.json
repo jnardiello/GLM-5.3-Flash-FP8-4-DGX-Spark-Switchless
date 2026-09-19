@@ -1,0 +1,534 @@
+{
+  "schema": 1,
+  "record_type": "iac_reproduction",
+  "reproduction_id": "2026-09-19",
+  "measured_on": "2026-09-19",
+  "baseline_reference": {
+    "record": "docs/baseline-2026-09-19.json",
+    "sha256": "c9c5eaf3188f82ce6f9cb044b67ccc94286034f52320df9c2be5be6046616d5e",
+    "included_runs": 2,
+    "measured_requests": 108,
+    "modified_or_extended": false
+  },
+  "status": {
+    "deployment_and_operational_identity": "PASS",
+    "measurement_integrity": "PASS",
+    "performance": "mixed_observed_changes_single_run"
+  },
+  "scope": "One native full-suite Rigmark run following deployment of the published base recipe on four prepared nodes; compared with the fixed medians of two accepted baseline runs.",
+  "deployment": {
+    "recipe_source": "cluster.env.example",
+    "experiment_overlay": null,
+    "rank_count": 4,
+    "procedure": "Repository deploy.sh and deploy-host.sh, then a coordinated native four-rank restart with TP4_ENV unset.",
+    "preexisting_artifacts": [
+      "container image",
+      "target model weights",
+      "drafter weights",
+      "operator-supplied SparkCache and SIRCL payloads"
+    ],
+    "fresh_bare_metal_installation_tested": false,
+    "node_verification": {
+      "pass": 166,
+      "fail": 0,
+      "warn": 2,
+      "skip": 7,
+      "returncode": 0,
+      "scope": "Native verify-node checks; skipped checks and warnings remain counted."
+    },
+    "operational_identity": {
+      "before_benchmark": "PASS",
+      "after_benchmark": "PASS",
+      "baseline_id": "2026-09-19"
+    },
+    "post_boot_gates": {
+      "passed": 2,
+      "total": 2,
+      "coherent_response": "PASS",
+      "tool_call": "PASS",
+      "health_200_at_utc": "2026-09-19T02:21:15.623524+00:00",
+      "completed_within_seconds_of_health": 3.877,
+      "required_window_seconds": 120
+    },
+    "container_continuity": {
+      "passed": 4,
+      "total": 4,
+      "running_after_benchmark": true,
+      "all_started_before_benchmark": true,
+      "restart_count_each": 0
+    }
+  },
+  "rigmark": {
+    "run_count": 1,
+    "request_count": 54,
+    "started_at_utc": "2026-09-19T02:24:46.033812+00:00",
+    "finished_at_utc": "2026-09-19T02:34:42.710491+00:00",
+    "process_returncode": 0,
+    "protocol": {
+      "version": "1.1.0",
+      "repository_revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+      "repository_dirty": false,
+      "repository_source": "git-worktree",
+      "repository_source_sha256": "e0e92cff99f74ffa43d0a82541cf9db6010dd0a4ef3e8e7b84c5e1abd13a867f",
+      "prompts_version": "1.0.0",
+      "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb"
+    },
+    "protocol_canonical_sha256": "e299b859ba802a3fcbdd0e1eac0591f14ff3b201b933796d3d95b915d5f5f679",
+    "settings_without_cache_salt": {
+      "concurrency": [
+        1,
+        2,
+        4
+      ],
+      "concurrency_runs": 3,
+      "concurrency_tokens": 256,
+      "concurrency_workload": "code",
+      "decode_tokens": 8192,
+      "prefill_depths": [
+        8192,
+        32768,
+        65536
+      ],
+      "prefill_runs": 3,
+      "runs": 5,
+      "seed": 20260905,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      }
+    },
+    "settings_without_cache_salt_canonical_sha256": "82b49496ea9a49605c80f8794dd6ef963fffbc809199fed40d1a721c06f7364f",
+    "settings_including_private_cache_salt_canonical_sha256": "b23d825c8592defa8021e42eb32d141f170773c1b7657414e8205230c9e15c88",
+    "canonical_hash_encoding": "UTF-8 JSON sorted keys, compact separators, ensure_ascii false",
+    "cache_salt": {
+      "fresh_for_this_run": true,
+      "sha256": "01289d8dc7dd22cfe4b7479c9e1d2707d5062c1dcccd23c1cfd1c9a866f0e652",
+      "raw_value_omitted": true
+    },
+    "reference_comparability": {
+      "protocol_and_prompts_match": true,
+      "settings_except_cache_salt_match": true,
+      "note": "The native comparison reports settings.extra_body as different because the cache_salt is intentionally fresh; all other settings match both accepted reference runs."
+    },
+    "native_validator": {
+      "source": "receipt.py",
+      "source_sha256": "58e453d0ae46e2e770b8281ee24f9fd33978bb2e0687fd64fa2eff9cc4adeb3f",
+      "error_count": 0
+    }
+  },
+  "performance": {
+    "aggregation": "The reproduction column contains one native per-run summary for each metric, compared with the unchanged median of two accepted baseline per-run summaries. No pooled requests or new cross-run median.",
+    "metric_count": 16,
+    "metrics": [
+      {
+        "key": "code_decode_throughput",
+        "source_path": [
+          "decode",
+          "code",
+          "decode_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "baseline_median_of_two_runs": 53.8905,
+        "reproduction_single_run_value": 54.917,
+        "delta_percent": 1.904788
+      },
+      {
+        "key": "code_c1_aggregate_end_to_end_throughput",
+        "source_path": [
+          "concurrency",
+          "1",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "baseline_median_of_two_runs": 40.3,
+        "reproduction_single_run_value": 39.379,
+        "delta_percent": -2.28536
+      },
+      {
+        "key": "code_c2_aggregate_end_to_end_throughput",
+        "source_path": [
+          "concurrency",
+          "2",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "baseline_median_of_two_runs": 57.252,
+        "reproduction_single_run_value": 58.621,
+        "delta_percent": 2.391183
+      },
+      {
+        "key": "code_c4_aggregate_end_to_end_throughput",
+        "source_path": [
+          "concurrency",
+          "4",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "baseline_median_of_two_runs": 87.527,
+        "reproduction_single_run_value": 83.058,
+        "delta_percent": -5.105853
+      },
+      {
+        "key": "prose_decode_throughput",
+        "source_path": [
+          "decode",
+          "prose",
+          "decode_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "baseline_median_of_two_runs": 31.878,
+        "reproduction_single_run_value": 31.787,
+        "delta_percent": -0.285463
+      },
+      {
+        "key": "code_ttft",
+        "source_path": [
+          "decode",
+          "code",
+          "ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "baseline_median_of_two_runs": 0.4015,
+        "reproduction_single_run_value": 0.395,
+        "delta_percent": -1.618929
+      },
+      {
+        "key": "prose_ttft",
+        "source_path": [
+          "decode",
+          "prose",
+          "ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "baseline_median_of_two_runs": 0.38,
+        "reproduction_single_run_value": 0.381,
+        "delta_percent": 0.263158
+      },
+      {
+        "key": "code_c1_per_stream_ttft",
+        "source_path": [
+          "concurrency",
+          "1",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "baseline_median_of_two_runs": 0.3995,
+        "reproduction_single_run_value": 0.338,
+        "delta_percent": -15.394243
+      },
+      {
+        "key": "code_c2_per_stream_ttft",
+        "source_path": [
+          "concurrency",
+          "2",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "baseline_median_of_two_runs": 0.495,
+        "reproduction_single_run_value": 0.457,
+        "delta_percent": -7.676768
+      },
+      {
+        "key": "code_c4_per_stream_ttft",
+        "source_path": [
+          "concurrency",
+          "4",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "unit": "seconds",
+        "baseline_median_of_two_runs": 0.6795,
+        "reproduction_single_run_value": 0.686,
+        "delta_percent": 0.956586
+      },
+      {
+        "key": "prefill_8k_cold_throughput",
+        "source_path": [
+          "prefill",
+          "8192",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "baseline_median_of_two_runs": 2354.6655,
+        "reproduction_single_run_value": 2376.513,
+        "delta_percent": 0.927839
+      },
+      {
+        "key": "prefill_8k_replay_throughput",
+        "source_path": [
+          "prefill",
+          "8192",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "baseline_median_of_two_runs": 9557.8985,
+        "reproduction_single_run_value": 9808.758,
+        "delta_percent": 2.62463
+      },
+      {
+        "key": "prefill_32k_cold_throughput",
+        "source_path": [
+          "prefill",
+          "32768",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "baseline_median_of_two_runs": 2534.0805,
+        "reproduction_single_run_value": 2540.4,
+        "delta_percent": 0.24938
+      },
+      {
+        "key": "prefill_32k_replay_throughput",
+        "source_path": [
+          "prefill",
+          "32768",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "baseline_median_of_two_runs": 35245.167,
+        "reproduction_single_run_value": 36396.191,
+        "delta_percent": 3.265764
+      },
+      {
+        "key": "prefill_64k_cold_throughput",
+        "source_path": [
+          "prefill",
+          "65536",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "baseline_median_of_two_runs": 2421.7325,
+        "reproduction_single_run_value": 2466.694,
+        "delta_percent": 1.856584
+      },
+      {
+        "key": "prefill_64k_replay_throughput",
+        "source_path": [
+          "prefill",
+          "65536",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "unit": "tokens_per_second",
+        "baseline_median_of_two_runs": 35440.6915,
+        "reproduction_single_run_value": 36034.926,
+        "delta_percent": 1.676701
+      }
+    ],
+    "assessment": "Code decode and C2 throughput increased; C1 and C4 aggregate throughput decreased by 2.29% and 5.11%, respectively. A single reproduction run does not establish performance parity, repeatability or the cause of the changes.",
+    "concurrency_context": "Observed C1 and C4 round ranges overlap the accepted baseline rounds. This overlap does not erase the lower per-run medians or establish statistical parity."
+  },
+  "functional": {
+    "completed_runs": {
+      "count": 1,
+      "expected": 1
+    },
+    "measured_requests": {
+      "count": 54,
+      "expected": 54
+    },
+    "request_breakdown": {
+      "decode": 15,
+      "prefill": 18,
+      "concurrency_streams": 21,
+      "excluded_from_counts": [
+        "tokenization calls",
+        "operational gates",
+        "health requests",
+        "reference and excluded historical requests"
+      ]
+    },
+    "native_validation_errors": {
+      "count": 0,
+      "denominator": 54
+    },
+    "runtime_errors": {
+      "count": 0,
+      "run_denominator": 1
+    },
+    "stream_done_markers": {
+      "passed": 54,
+      "total": 54
+    },
+    "visible_responses": {
+      "passed": 54,
+      "total": 54
+    },
+    "first_visible_latency_unavailable": {
+      "count": 0,
+      "denominator": 54
+    },
+    "native_decode_output_gates": {
+      "passed": 15,
+      "total": 15,
+      "by_workload": {
+        "code": {
+          "passed": 5,
+          "total": 5
+        },
+        "prose": {
+          "passed": 5,
+          "total": 5
+        },
+        "structured": {
+          "passed": 5,
+          "total": 5
+        }
+      }
+    },
+    "finish_reasons": {
+      "stop": 15,
+      "length": 39,
+      "denominator": 54,
+      "length_note": "Normal prefill and concurrency output caps; not transport failures."
+    },
+    "code_length_caps": {
+      "count": 0,
+      "denominator": 5
+    },
+    "prefill_exact_token_counts": {
+      "passed": 18,
+      "total": 18
+    },
+    "token_usage": {
+      "prompt_tokens": 643621,
+      "completion_tokens": 22324
+    }
+  },
+  "instrumentation": {
+    "matches_accepted_baseline": true,
+    "gpu_worker_probe": {
+      "enabled": true,
+      "schema": "e20-memory-probe-v1",
+      "interval_seconds": 1,
+      "source_sha256": "46aa3a7ea68948cc16c78ebeb3b8aff0de6d9583657d75711e8231ed4209ed9d"
+    },
+    "external_host_observer": {
+      "enabled_ranks": 4,
+      "source_sha256": "7e01cf319e1b1ab1c907edfd4933df00a6e0e6139482b23b4283279433066499",
+      "meminfo_interval_seconds": 0.2,
+      "pressure_interval_seconds": 1,
+      "process_pss_interval_seconds": 5,
+      "smaps_interval_seconds": 30
+    },
+    "nsight_enabled": false,
+    "overhead_isolated": false
+  },
+  "evidence": {
+    "private_receipts_sha256": {
+      "native_rigmark_receipt": "b7fb9d6ea7b1017e74a7cf20b45d92d6a52cb6fa2c407a61358cb61f111180a6",
+      "native_execution_receipt": "f2bfecb5edaec97958403cd8c85791e05dd998103d197532527d3b3ed84cbbe8",
+      "native_metadata": "2578851521b030f4dd76c943c7fa767180c41048598589748a76e1cdb98f84d9",
+      "integrity_analysis": "8da6a400122802e8523b8975d7160d063b9e92bc720538b3311df81c0d5f9baa",
+      "performance_comparison": "030639703961acf49d50c5e4d7e8db5fbac437bf3088646f595f76cadfca581e",
+      "deployed_source_manifest": "06e664ad0d4bdd1f27fe22c5c2c77664b413ba7b2807d7bd34d593b84a402e9a",
+      "node_verification_log": "43ce1e7ca1e15cb05c6325a73c87faa58b71234286cb5228ad44f851e889e7c4",
+      "post_boot_gates": "10736edfff6c6ee05d0eeeedab1897d6300b87235cd96251b280d9111898122e",
+      "operational_identity_before_benchmark": "16d0e9443a7f6de31e5bce72c97369e0dd39cf42248649aac01cff5d2b6621f4",
+      "operational_identity_after_benchmark": "f89a6b122f03d22c281ff5c1e1f768bf6e5c9c427b127cdeadf57262533aabf2",
+      "container_continuity": "c2c7ccd93fc4bdb24f515476a66e2bf76f57f05967a9dc563f979df031671b1c",
+      "memory_summary": "279202b1aa2c4fc0923a74527ce775a9d373c756c8f52aa8281373f91c4698a7"
+    },
+    "publication_policy": "Only receipt digests and selected measurements are public; site addresses, aliases, private paths and raw cache salts are omitted."
+  },
+  "limits": [
+    "One reproduction run gives no new estimate of repeatability and does not replace or extend the frozen two-run baseline.",
+    "Deployment and integrity PASS are separate from the mixed observed performance changes; no blanket performance parity is claimed.",
+    "C1 and C4 aggregate throughput are below both accepted per-run medians. Round overlap and different generated sequences do not prove a cause.",
+    "This test reused prepared hosts and existing artifacts; it is not evidence of a fresh bare-metal installation.",
+    "The measured GPU allocator and external host observers were active as in the accepted baseline; their overhead was not isolated.",
+    "Concurrency outputs are capped at 256 tokens. The results do not establish performance for long parallel generations or complete agent tasks.",
+    "The 15 GiB KV budget per rank, 262144-token per-request context limit and pooled-capacity interpretation remain those of the frozen baseline.",
+    "Native output gates and normal finish reasons are recorded without treating them as independent answer-quality validation."
+  ],
+  "memory_observations": {
+    "scope": "Sampled observations within this reproduction run; host-wide kernel counters and worker allocator counters.",
+    "per_rank": [
+      {
+        "rank": 0,
+        "minimum_sampled_memavailable_mib": 2247.25,
+        "kernel_oom_kill_delta": 0,
+        "gpu_allocator_oom_delta": 0,
+        "gpu_allocator_oom_rejection_delta": 0,
+        "gpu_allocator_retry_delta": 0,
+        "worker_identity_stable": true,
+        "sparkcache_shard_commits": 9,
+        "sparkcache_shard_restores": 9,
+        "meminfo_samples": 2968,
+        "maximum_meminfo_sample_gap_ms": 687.5080000027083
+      },
+      {
+        "rank": 1,
+        "minimum_sampled_memavailable_mib": 6131.05,
+        "kernel_oom_kill_delta": 0,
+        "gpu_allocator_oom_delta": 0,
+        "gpu_allocator_oom_rejection_delta": 0,
+        "gpu_allocator_retry_delta": 0,
+        "worker_identity_stable": true,
+        "sparkcache_shard_commits": 9,
+        "sparkcache_shard_restores": 9,
+        "meminfo_samples": 2983,
+        "maximum_meminfo_sample_gap_ms": 400.4449999774806
+      },
+      {
+        "rank": 2,
+        "minimum_sampled_memavailable_mib": 6294.76,
+        "kernel_oom_kill_delta": 0,
+        "gpu_allocator_oom_delta": 0,
+        "gpu_allocator_oom_rejection_delta": 0,
+        "gpu_allocator_retry_delta": 0,
+        "worker_identity_stable": true,
+        "sparkcache_shard_commits": 9,
+        "sparkcache_shard_restores": 9,
+        "meminfo_samples": 2983,
+        "maximum_meminfo_sample_gap_ms": 370.5260000133421
+      },
+      {
+        "rank": 3,
+        "minimum_sampled_memavailable_mib": 6552.32,
+        "kernel_oom_kill_delta": 0,
+        "gpu_allocator_oom_delta": 0,
+        "gpu_allocator_oom_rejection_delta": 0,
+        "gpu_allocator_retry_delta": 0,
+        "worker_identity_stable": true,
+        "sparkcache_shard_commits": 9,
+        "sparkcache_shard_restores": 9,
+        "meminfo_samples": 2983,
+        "maximum_meminfo_sample_gap_ms": 304.6549999853596
+      }
+    ],
+    "sparkcache_total_shard_operations": {
+      "commits": 36,
+      "restores": 36
+    },
+    "limits": [
+      "MemAvailable minima are sampled observations; short unsampled pressure spikes are not excluded.",
+      "Host reads are sequential. The target meminfo interval is 200 milliseconds; actual maximum gaps are recorded for each rank.",
+      "PyTorch allocator counters do not cover all driver, NCCL or SIRCL allocations; host PSS is not total unified-memory consumption.",
+      "These observations do not establish a cause for the measured performance differences."
+    ]
+  }
+}

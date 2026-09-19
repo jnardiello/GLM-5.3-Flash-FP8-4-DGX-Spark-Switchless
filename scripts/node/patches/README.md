@@ -6,7 +6,7 @@ deployed to `~/patches/`; a patch becomes active only when the launcher or
 
 | File | Role | Activation |
 | --- | --- | --- |
-| `../sparse_attn_indexer_kpool_sm121.py` | Apache-2.0-derived SM121 sparse-attention K-pool fix | deployed as `~/patches/sparse_attn_indexer_kpool.py` and mounted by the launcher only for the Previous configuration (`SPARKCACHE_MODE=off`) |
+| `../sparse_attn_indexer_kpool_sm121.py` | Apache-2.0-derived SM121 sparse-attention K-pool fix | deployed as `~/patches/sparse_attn_indexer_kpool.py` and mounted by the launcher only for the September 11 configuration (`SPARKCACHE_MODE=off`) |
 | `adaptive_k_scheduler.py` | Apache-2.0-derived adaptive speculative verification scheduler | mounted at `/opt/tp4/adaptive_k_scheduler.py`, added to `PYTHONPATH`, and selected by `--scheduler-cls` in `cluster.env` |
 | `test_adaptive_k_policy.py` | CPU-only policy and observation-gate tests | workstation only; `scripts/deploy.sh` skips `test_*.py` |
 
@@ -16,9 +16,10 @@ both. It derives from the pinned vLLM `AsyncScheduler` interface and disables th
 optimization if that path is unavailable. Exceptions in policy logic fall back to base
 scheduling rather than stopping the endpoint.
 
-`EXTRA_DOCKER_ENV` also carries the tuned MoE mount. A scheduler rollback must remove
+`EXTRA_DOCKER_ENV` also carries the tuned MoE, engine override, SparkCache and SIRCL
+mounts. A scheduler rollback must remove
 its class flag, mount, `PYTHONPATH`, policy variables, and coupled speculative settings
-while preserving the MoE entry. See [`docs/operations.md`](../../../docs/operations.md).
+while preserving all unrelated entries. See [`docs/operations.md`](../../../docs/operations.md).
 
 ```sh
 python3 scripts/node/patches/test_adaptive_k_policy.py

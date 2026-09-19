@@ -1,8 +1,10 @@
 # Agent entry point
 
-This public repository distributes a general purpose installer for GLM-5.3-Flash
-on four DGX Spark nodes using TP4. Read the one document for the requested task
-before substantive work:
+This repository is infrastructure as code for an agent starting from a fresh checkout
+to reproduce the documented GLM-5.3-Flash service on four compatible NVIDIA GB10 nodes
+using TP4. The verified hardware is ASUS Ascent GX10; discover each target's interfaces
+and host configuration before adapting the site template. Read the required document
+for each part of the requested task before substantive work:
 
 | Task | Required document |
 | --- | --- |
@@ -11,6 +13,70 @@ before substantive work:
 | Cabling, addressing, MTU, RoCE, HCA/GID or NCCL failure | [`docs/fabric.md`](docs/fabric.md) |
 | Current model, image, scheduler, patches or host recipe | [`docs/production-recipe.md`](docs/production-recipe.md) |
 | Local code or documentation only | relevant row above, then `CHANGELOG.md` and `./scripts/check.sh`; do not probe the cluster automatically |
+
+## Fresh-checkout reproduction contract
+
+For installation, read both [`docs/install-from-zero.md`](docs/install-from-zero.md)
+and [`docs/operations.md`](docs/operations.md). The default recipe is
+[`cluster.env.example`](cluster.env.example); its measured identity and performance
+record is [`docs/baseline-2026-09-19.json`](docs/baseline-2026-09-19.json). Preserve its
+non-site settings unless the owner requests a variant. Use this checklist to navigate
+the existing procedures:
+
+1. **Establish scope and check the checkout.** Identify the four targets in rank order,
+   deployment account, intended service, and actions already authorized. Run
+   `./scripts/check.sh` locally. An installation window that already covers downloads,
+   bootstrap, deploy, and service startup covers those steps throughout the runbook;
+   ask only for missing scope, not again at each step.
+2. **Inventory all four nodes.** Once the targets are in scope, run
+   `TP4_HOSTS='<rank0> <rank1> <rank2> <rank3>' ./scripts/agent-preflight.sh --report <absolute-private-path>`.
+   Use its per-node inventory and `proposed_config` to establish GPU/RAM/disk capacity,
+   OS/driver/tooling, management interfaces, RDMA ports, HCA/GID mappings, and renderer.
+   Confirm the physical ring and private subnets with the owner; discovery cannot infer
+   an unverified cable map. Preserve existing workloads during inspection.
+3. **Resolve the site configuration.** Copy the annotated template to ignored
+   `cluster.env`. Fill `NODES`, `NODE_HOSTNAMES`, `MGMT_IPS`, `MASTER_IP`, fabric peers,
+   paths, and the deployment account's transfer destination. Set the documented
+   `MGMT_IF`, `FABRIC_IFACES`, `NCCL_IB_HCA`, `NCCL_IB_GID_INDEX`, and
+   `NETPLAN_RENDERER` scalars or four-element `*_BY_RANK` arrays from that inventory.
+   Retain the default automatic GID selection where its validated prerequisites hold.
+   Generate files with `scripts/render-netplan.sh --write`, then `--check`; never copy
+   the maintainer's site values or hand-edit generated files.
+4. **Account for every artifact before startup.** Follow the installation guide for
+   host pins, the image digest/content ID, target model manifest, drafter revision,
+   patched NCCL, and deployed runtime overrides. Prepare the operator-supplied
+   SparkCache connector and encoder with `scripts/prepare-sparkcache.py`; its inputs
+   and outputs must match the recorded hashes. Supply the SIRCL bundle/runtime and
+   verify its private per-rank peer/GID files as described in
+   [payload installation](docs/install-from-zero.md#8-place-the-sparkcache-and-sircl-payload).
+   Check [`CREDITS.md`](CREDITS.md) for acquisition and use terms. Required operator
+   payload is not included in the checkout. If it is missing, name the exact artifact,
+   expected pin, and acquisition/preparation step; continue independent preparation.
+   Never fabricate payload or change a checksum to accept a substitute. A rebuilt NCCL
+   binary follows its documented candidate procedure, not automatic pin replacement.
+5. **Preview, install, and verify.** With `cluster.env` complete and no `TP4_ENV` for
+   the default recipe, preview each native launcher command locally:
+
+   ```sh
+   for rank in 0 1 2 3; do
+     TP4_DRY_RUN=1 bash scripts/launcher/launch-glm53-tp4.sh "$rank"
+   done
+   ```
+
+   Keep this output private because it contains site values. Dry-run checks command
+   construction; it does not establish artifact or hardware readiness. Continue the
+   authorized bootstrap, artifact installation, deployment, and coordinated startup
+   in the installation guide's order. Use its existing static/fabric checks, wait for
+   `/health` 200, complete both documented functional gates within two minutes, and
+   verify the current identity with `scripts/check-f0.py`. If autostart is already
+   loading or serving, follow the guide without launching a second stack.
+6. **Report the actual result.** Record the effective recipe, four-rank identity,
+   gate results, and any remaining limitation in private evidence. Keep a healthy
+   service running unless another lifecycle action is authorized and required.
+   Installation does not automatically authorize performance measurement: run native
+   Rigmark only when requested, keep new results separate, and never remeasure or
+   replace the frozen reference automatically. Successful installation establishes
+   the verified service state; throughput reproduction requires its own measurements.
 
 ## Public purpose and documentation
 
@@ -73,30 +139,32 @@ for resuming performance measurements.
 
 ## Optimization workflow
 
-Use the independent Rigmark suite at `~/workspace/jacopo/rigmark` directly as the
+Use the independent Rigmark suite from the operator’s Rigmark checkout directly as the
 benchmark interface. Do not recreate it with private wrapper scripts, blanket campaign
 qualification prerequisites, or a parallel benchmark/admission framework; necessary
 measurement fixes belong in Rigmark.
 
-Run one experiment at a time. Use the frozen baseline **F1** recorded in
-[`docs/baseline-f1.json`](docs/baseline-f1.json) for every future comparison; its three
-native Rigmark runs and fixed medians, measured from the same workstation with a fresh
-`cache_salt` per run, are the standing reference. Do not rerun or replace that baseline
-without an explicit owner request. F1 is the IaC base recipe in `cluster.env.example`
-(image pinned by registry digest, `SPARKCACHE_MODE=on`): restore it with a plain
-`scripts/deploy.sh` and a coordinated restart without `TP4_ENV`. Use
-`scripts/check-f0.py` for a fast, read-only operational identity check against F1 (it
-does not rerun Rigmark or send inference requests). [`docs/baseline-f0.json`](docs/baseline-f0.json)
-is the historic F0 record; its lane stays reachable through the rollback comments in
-`cluster.env.example` and `scripts/check-f0.py --baseline docs/baseline-f0.json`.
+Run one experiment at a time. Use the frozen **September 19, 2026** baseline in
+[`docs/baseline-2026-09-19.json`](docs/baseline-2026-09-19.json) for future comparisons.
+Its fixed medians use exactly two valid native Rigmark runs (108 requests), accepted by
+the owner after a third run was excluded for competing traffic. Do not call this a
+three-run median or rerun/replace the reference without an explicit owner request.
+The current IaC base is `cluster.env.example`: hybrid KDA input projections, corrected
+SparkCache allocations and 15 GiB KV per rank. `scripts/check-f0.py` checks this identity
+by default without inference requests. The [September 18 record](docs/baseline-f1.json)
+and [September 11 record](docs/baseline-f0.json) remain immutable historical references;
+select them explicitly with `--baseline`. The immediate rollback uses
+`scripts/node/reference/baseline-20260918.env`; the older archive workflow remains in
+`docs/operations.md`. Source parity of the new defaults does not by itself establish
+live IaC reproduction: record any later deploy and benchmark separately.
 Agree the variant repetition count with
 the owner only when explicit later direction changes the standing protocol. By default,
-run every variant three consecutive times. Manually apply it to all four Beast nodes in
+run every variant three consecutive times. Manually apply it to all four nodes in
 one coordinated transition, load its weights once, and preserve that process across all
 three runs. Use the same Rigmark version, suites, prompts, and parameters under comparable
 idle, warmup, and cache conditions.
 
-For every performance metric, compare the fixed F1 median with the median of the three
+For every performance metric, compare the fixed current-baseline median with the median of the three
 native per-run variant values. Label the actual variant run and request counts. Keep
 measurement-integrity and error results as explicit counts or totals with denominators
 rather than medians. The results report requires fixed-baseline and variant-median columns; delta
@@ -107,9 +175,9 @@ then classify the outcome as promote, discard, or unresolved. Restore the refere
 discarded or unresolved unless the next candidate is already prepared and authorized.
 An owner stop may end the three-run series early; report the actual run and request counts
 and do not claim a three-run median. A direct transition to the next candidate needs no
-intermediate reference reload: derive its complete recipe from F1, remove the previous
+intermediate reference reload: derive its complete recipe from the current baseline, remove the previous
 delta, and use the usual coordinated four-rank transition and functional gates. Continue
-to compare against the fixed F1 medians. Restore the F1 state whenever work stops without
+to compare against the fixed current-baseline medians. Restore the current baseline state whenever work stops without
 a prepared next candidate.
 
 A promote decision requires encoding the tested change in existing repository IaC;

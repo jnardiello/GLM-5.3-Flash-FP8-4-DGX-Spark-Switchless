@@ -191,7 +191,7 @@ tp4_check_env() {
   [ -z "$_tp4_v" ] || _tp4_probs="$_tp4_probs$_tp4_v"
 
   [ -n "$_tp4_probs" ] || return 0
-  die "cluster.env: ${_tp4_probs#; } — see README § Start here"
+  die "cluster.env: ${_tp4_probs#; } — see README § Install with an agent"
 }
 
 # tp4_load_env <repo_root> [--require] [--overlay]
@@ -221,7 +221,7 @@ tp4_load_env() {
   done
 
   if [ "$_tp4_require" = 1 ] && [ ! -f "$_tp4_repo/cluster.env" ]; then
-    echo "$TP4_LOG_TAG ERROR: cluster.env missing: copy cluster.env.example and fill it — see README § Start here" >&2
+    echo "$TP4_LOG_TAG ERROR: cluster.env missing: copy cluster.env.example and fill it — see README § Install with an agent" >&2
     exit 1
   fi
   # shellcheck source=/dev/null

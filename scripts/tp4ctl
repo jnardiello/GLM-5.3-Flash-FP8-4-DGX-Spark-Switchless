@@ -46,7 +46,7 @@ if [ -f "$SCRIPT_DIR/cluster.env" ]; then
 elif [ "$(basename "$SCRIPT_DIR")" = scripts ] && [ -f "$SCRIPT_DIR/../cluster.env" ]; then
   HERE=$(cd "$SCRIPT_DIR/.." && pwd)
 else
-  echo "[tp4ctl] ERROR: cluster.env missing: create it from cluster.env.example — see README § Start here" >&2
+  echo "[tp4ctl] ERROR: cluster.env missing: create it from cluster.env.example — see README § Install with an agent" >&2
   exit 1
 fi
 # cluster.env is ALWAYS sourced first: it is the production recipe. TP4_ENV, when set,
@@ -64,27 +64,27 @@ validate_recipe_shape() {
   local -a guard_nodes guard_mgmt
   case "${NODES:-} ${MGMT_IPS:-} ${MASTER_IP:-} ${RELAY_DEST:-}" in
     *'<'*'>'*)
-      echo "[tp4ctl] ERROR: $scope: a <...> placeholder is still unfilled — see README § Start here" >&2
+      echo "[tp4ctl] ERROR: $scope: a <...> placeholder is still unfilled — see README § Install with an agent" >&2
       exit 1 ;;
   esac
   if [ -z "${NODES:-}" ] || [ -z "${MGMT_IPS:-}" ] || [ -z "${MASTER_IP:-}" ]; then
-    echo "[tp4ctl] ERROR: $scope: NODES, MGMT_IPS and MASTER_IP must all be set — see README § Start here" >&2
+    echo "[tp4ctl] ERROR: $scope: NODES, MGMT_IPS and MASTER_IP must all be set — see README § Install with an agent" >&2
     exit 1
   fi
   if [ "$NODES" = "gx10-a gx10-b gx10-c gx10-d" ] \
      || [ "$MGMT_IPS" = "192.0.2.11 192.0.2.12 192.0.2.13 192.0.2.14" ] \
      || [ "$MASTER_IP" = "192.0.2.11" ]; then
-    echo "[tp4ctl] ERROR: $scope: NODES/MGMT_IPS/MASTER_IP still have the example values — see README § Start here" >&2
+    echo "[tp4ctl] ERROR: $scope: NODES/MGMT_IPS/MASTER_IP still have the example values — see README § Install with an agent" >&2
     exit 1
   fi
   read -r -a guard_nodes <<<"$NODES"
   read -r -a guard_mgmt <<<"$MGMT_IPS"
   if [ "${#guard_nodes[@]}" -ne 4 ] || [ "${#guard_mgmt[@]}" -ne 4 ]; then
-    echo "[tp4ctl] ERROR: $scope: NODES (${#guard_nodes[@]} entries) and MGMT_IPS (${#guard_mgmt[@]}) must have 4 entries each, one per rank — see README § Start here" >&2
+    echo "[tp4ctl] ERROR: $scope: NODES (${#guard_nodes[@]} entries) and MGMT_IPS (${#guard_mgmt[@]}) must have 4 entries each, one per rank — see README § Install with an agent" >&2
     exit 1
   fi
   if [ "$MASTER_IP" != "${guard_mgmt[0]}" ]; then
-    echo "[tp4ctl] ERROR: $scope: MASTER_IP must be MGMT_IPS[0] (the rendez-vous runs on rank 0) — see README § Start here" >&2
+    echo "[tp4ctl] ERROR: $scope: MASTER_IP must be MGMT_IPS[0] (the rendez-vous runs on rank 0) — see README § Install with an agent" >&2
     exit 1
   fi
   if ! [[ "${CONTAINER:-}" =~ ^[A-Za-z0-9][A-Za-z0-9_.-]*$ ]]; then
@@ -95,7 +95,7 @@ validate_recipe_shape() {
     fabric_count=${#FABRIC_TARGETS[@]}
   fi
   if [ "$fabric_count" -ne 4 ]; then
-    echo "[tp4ctl] ERROR: $scope: FABRIC_TARGETS has $fabric_count entries, expected exactly 4 (one per rank) — see README § Start here" >&2
+    echo "[tp4ctl] ERROR: $scope: FABRIC_TARGETS has $fabric_count entries, expected exactly 4 (one per rank) — see README § Install with an agent" >&2
     exit 1
   fi
 }

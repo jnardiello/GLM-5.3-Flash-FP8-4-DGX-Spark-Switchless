@@ -708,7 +708,7 @@ def capture(args: argparse.Namespace, collector: Callable = collect_rank) -> int
                               "started_at": utcnow(), "status": "INCOMPLETE", "problems": []}
     try:
         problems = public_reference_problems(); recipe = load_recipe(args.timeout)
-        # This tool captures the historic F0 reference, never the standing F1 default.
+        # This tool captures the historic F0 reference, never the current default.
         problems.extend(CHECK_F0.recipe_problems(recipe, CHECK_F0.expected_f0(REPO / "docs/baseline-f0.json")))
         site_bytes = safe_config(REPO / "cluster.env")
         resolved_bytes = resolved_site_env(recipe)
@@ -1116,7 +1116,7 @@ def plan_restore(args: argparse.Namespace, collector: Callable = collect_rank) -
         shlex.join(["ssh", rank0, remote_dropin]),
         shlex.join(["ssh", rank0, remote_up]),
         shlex.join(["ssh", rank0, f"curl -fsS http://localhost:{recipe.get('api_port','8000')}/health"]),
-        f"cd {shlex.quote(work)} && TP4_ENV=scripts/node/reference/f0-20260912.env python3 scripts/check-f0.py",
+        f"cd {shlex.quote(work)} && TP4_ENV=scripts/node/reference/f0-20260912.env python3 scripts/check-f0.py --baseline docs/baseline-f0.json",
     ]
     if controller_problem:
         commands[2] = "BLOCKED: " + controller_problem
@@ -1138,7 +1138,7 @@ Captured operational readiness: {(state.get('operational_readiness') or {}).get(
 3. Use the currently running overlay for one coordinated four-rank `down`; reference F0 is selected only after the old process is stopped.
 4. Deploy the completed archived IaC and exact archived NCCL bytes through the repository's additive deploy/install procedures; verify every destination hash.
 5. Install the prepared autostart drop-in only after review, then daemon-reload. This selects the frozen overlay for the next boot.
-6. Run fabric prerequisites, one coordinated four-rank `up`, wait for `/health` 200, run both functional gates within 120 seconds, then `scripts/check-f0.py`.
+6. Run fabric prerequisites, one coordinated four-rank `up`, wait for `/health` 200, run both functional gates within 120 seconds, then `scripts/check-f0.py --baseline docs/baseline-f0.json`.
 
 ## Host and fabric state (deferred review, never automatic)
 

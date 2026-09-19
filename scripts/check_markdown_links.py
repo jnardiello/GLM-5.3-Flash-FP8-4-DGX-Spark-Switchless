@@ -30,6 +30,8 @@ HTML_TAG_RE = re.compile(r"<[^>]+>")
 
 def is_public(path: Path) -> bool:
     rel = path.relative_to(ROOT)
+    if rel.parts[:2] == ("docs", "internal"):
+        return False
     if rel.as_posix() in INTERNAL_DOCUMENTS:
         return False
     if any(part in SKIP_DIRS for part in rel.parts):

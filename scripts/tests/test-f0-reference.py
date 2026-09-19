@@ -217,6 +217,8 @@ with tempfile.TemporaryDirectory(prefix="f0-reference-test-") as temp:
     assert len(reports) == 1
     assert json.loads(reports[0].read_text())["restore_commands_executed"] is False
     assert stat.S_IMODE(reports[0].stat().st_mode) == 0o600
+    restore_plan = (reports[0].parent / "restore-plan.md").read_text()
+    assert restore_plan.count("scripts/check-f0.py --baseline docs/baseline-f0.json") == 2
 
     stage_cli = subprocess.run([
         "python3", str(REPO / "scripts/f0-reference.py"), "stage-source",

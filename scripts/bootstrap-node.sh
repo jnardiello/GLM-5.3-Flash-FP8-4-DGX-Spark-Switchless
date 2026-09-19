@@ -90,7 +90,7 @@ pre_die()   { echo "$TP4_LOG_TAG ERROR: $*" >&2; exit 3; }
 
 # --- recipe: sourced BEFORE the arguments are parsed, so cluster.env can never clobber
 # --- ALIAS / RANK / MODE / TMP (the parsed values are assigned after this point).
-[ -f "$REPO/cluster.env" ] || pre_die "cluster.env missing: copy cluster.env.example and fill it — see README § Start here"
+[ -f "$REPO/cluster.env" ] || pre_die "cluster.env missing: copy cluster.env.example and fill it — see README § Install with an agent"
 # --require adds the recipe validation of scripts/lib/common.sh (empty key, unfilled
 # `<...>` placeholder, site key still holding cluster.env.example's dummy value). It dies
 # with exit 1, not with the exit 3 of the preconditions above, which is why the

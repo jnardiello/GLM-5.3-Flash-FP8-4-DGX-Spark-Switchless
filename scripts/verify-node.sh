@@ -296,9 +296,24 @@ for m in $P_MOUNTS; do
   [ -e "$m" ] || mmiss="$mmiss ${m##*/}"
 done
 say mounts "${mmiss:-ok}"
+# Validate the operator payload selected by the effective recipe, including a
+# historical connector kept beside the current one for rollback.
+check_selected_payload() {
+  local path=$1 expected=$2 found
+  case "$path" in '$HOME/'*) path="$HOME/${path#\$HOME/}" ;; '~/'*) path="$HOME/${path#\~/}" ;; esac
+  if [ -z "$path" ]; then printf '%s' disabled
+  elif ! [[ "$expected" =~ ^[0-9a-f]{64}$ ]]; then printf '%s' invalid-pin
+  elif [ ! -f "$path" ]; then printf '%s' missing
+  else
+    found=$(sha256sum "$path" 2>/dev/null | awk '{print $1}')
+    if [ "$found" = "$expected" ]; then printf '%s' ok; else printf '%s' mismatch; fi
+  fi
+}
+say selected_connector "$(check_selected_payload "$P_SPARKCACHE_CONNECTOR" "$P_SPARKCACHE_CONNECTOR_SHA256")"
+say selected_encoder "$(check_selected_payload "$P_SPARKCACHE_ENCODER" "$P_SPARKCACHE_ENCODER_SHA256")"
 say freegib "$(df -BG --output=avail "$HOME" 2>/dev/null | tail -1 | tr -dc '0-9')"
 say psline "$(sudo -n docker ps --filter "name=$P_CONTAINER" --format '{{.Names}} {{.Status}}' 2>/dev/null | head -1)"
-# F1 SparkCache lane payloads: the deployed SHA256SUMS must be satisfied by operator-placed
+# SparkCache payloads: the deployed SHA256SUMS must be satisfied by operator-placed
 # files (the connector and the SIRCL bundle/runtime are not redistributed by the repository).
 # SHA256SUMS pins portable files; an optional SHA256SUMS.site pins site-generated files
 # (SIRCL per-rank peer/GID env) and is required for sircl.
@@ -317,6 +332,8 @@ probe_host() {
       P_SYSCTL='$SYSCTL_EXPECT' P_IFACES='$FAB_IFACES' P_MODEL='$MODEL_DIR' P_DRAFT='$DRAFT_DIR' \
       P_MGMT_IF='$RESOLVED_MGMT_IF' P_HCAS='$RESOLVED_HCAS' P_GID='$RESOLVED_GID' \
       P_GID_CHECK_SHA='$GID_CHECK_SHA' \
+      P_SPARKCACHE_CONNECTOR='${SPARKCACHE_CONNECTOR:-}' P_SPARKCACHE_CONNECTOR_SHA256='${SPARKCACHE_CONNECTOR_SHA256:-}' \
+      P_SPARKCACHE_ENCODER='${SPARKCACHE_ENCODER:-}' P_SPARKCACHE_ENCODER_SHA256='${SPARKCACHE_ENCODER_SHA256:-}' \
       P_RANK='$RESOLVED_RANK' \
       P_NCCL='$NCCL_DIR' P_IMAGE='$IMAGE' P_CONTAINER='$CONTAINER' P_MOUNTS='$MOUNT_SRCS' bash -s" \
       <"$PROBE_SCRIPT") || return 1
@@ -338,6 +355,7 @@ node_check_labels() {   # node_check_labels <rank>
                  "tailscale" "iommu passthrough" "model dir" "drafter dir" "weights fingerprint" \
                  "model revision" "chat template" "drafter revision" "docker image" "docker image digest" "patched NCCL sha" \
                  "patches/*.py" "EXTRA_DOCKER_ENV -v" "free disk"
+  printf '%s\n' "sparkcache payload" "sircl payload" "selected connector" "selected encoder"
   [ "$FULL_MODEL" != 1 ] || printf '%s\n' "model manifest"
   [ "$1" != 0 ] || printf '%s\n' "tp4-autostart (rank 0)"
   [ "$LIVE" != 1 ] || printf '%s\n' "container running"
@@ -578,6 +596,19 @@ check_node() {   # check_node <host> <rank>
     fi
   done
 
+  for d in connector encoder; do
+    v=$(pv "selected_$d")
+    if [ "${SPARKCACHE_MODE:-off}" != on ]; then
+      row "$host" "selected $d" SKIP "SparkCache disabled"
+    elif [ "$d" = encoder ] && [ -z "${SPARKCACHE_ENCODER:-}" ]; then
+      row "$host" "selected $d" SKIP "recipe uses the image's encoder"
+    else
+      rc=1; [ "$v" = ok ] && rc=0
+      verdict "$host" "selected $d" "$rc" \
+        "$([ "$rc" = 0 ] && echo 'file matches the effective recipe SHA-256' || echo "${v:-probe failed}")"
+    fi
+  done
+
   if [ "$FULL_MODEL" = 1 ]; then
     if [ -z "$MODEL_MANIFEST" ]; then
       row "$host" "model manifest" SKIP "MODEL_REV is not pinned"
@@ -608,7 +639,7 @@ check_node() {   # check_node <host> <rank>
   verdict "$host" "docker image" $rc "$([ "$rc" = 0 ] && echo "$((v / 1024 / 1024 / 1024)) GiB local" || echo "$IMAGE not pulled")"
 
   # The tag in IMAGE is mutable; the digest is what actually pins the serving stack. An IMAGE
-  # already written as name@sha256:... (the F1 lane) is its own pin; a tagged IMAGE (the F0
+  # already written as name@sha256:... is its own pin; a tagged IMAGE (the F0
   # rollback lane) is checked against IMAGE_DIGEST from versions.env.
   v=$(pv image_digest)
   case "$IMAGE" in *@sha256:*) IMAGE_DIGEST=$IMAGE; VERSIONS_SRC="IMAGE in cluster.env" ;; esac
@@ -693,7 +724,7 @@ else
     if grep -q -- '--check)' "$REPO/scripts/$s"; then
       out=$("$REPO/scripts/$s" --check 2>&1) && rc=0 || rc=$?
       verdict cluster "scripts/$s --check" "$rc" \
-        "exit $rc, $(printf '%s\n' "$out" | grep -cE 'MISSING|DRIFT|DIFF|FAIL' || true) MISSING/DRIFT line(s)"
+        "exit $rc, $(printf '%s\n' "$out" | grep -cE '^[[:space:]]*(MISSING|DRIFT|MODE-DRIFT|DIFF|FAIL|UNREADABLE|IDENTITY-MISMATCH)([[:space:]]|$)' || true) file failure row(s)"
     else
       cluster_skip "scripts/$s --check" "scripts/$s has no --check flag: nothing read-only to run"
     fi

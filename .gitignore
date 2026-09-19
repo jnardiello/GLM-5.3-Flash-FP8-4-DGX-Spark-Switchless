@@ -6,6 +6,8 @@ __pycache__/
 .claude/settings.local.json
 
 # Internal working documents; retained locally, excluded from public documentation.
+/docs/internal/
+# Keep legacy root locations private if restored from an older checkout or archive.
 /HANDOVER.md
 /OPTIMIZATION-PLAN.md
 /E09-ROOT-CAUSE-ANALYSIS-2026-09-17.md
@@ -25,7 +27,7 @@ scripts/node/ssh-config
 scripts/mirror-private-terms.txt
 .claude/
 
-# F1 SparkCache/SIRCL operator payload: unlicensed third-party files stay on the nodes.
+# SparkCache/SIRCL operator payload: unlicensed third-party files stay on the nodes.
 # Only the portable SHA-256 manifests and the repository's own kv-transfer-config.json are
 # tracked; sircl/SHA256SUMS.site pins this site's per-rank peer/GID files and stays local.
 /scripts/node/sparkcache/*

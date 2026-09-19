@@ -92,9 +92,10 @@ port with a RoCEv2 GID that is IPv4-mapped, names a configured fabric netdev, an
 exactly matches an IPv4 address on that netdev. A link-local RoCEv2 entry alone does
 not pass. This follows NVIDIA's [automatic GID selection guidance](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/troubleshooting/networking_troubleshooting.html).
 
-Current selects `-1` by default; the Previous base configuration used explicit index
-`3`. Verify the actual addressed ports and their GIDs before selecting an explicit
-index. For rollback, use the values documented in `cluster.env.example`, keeping the
+The September 19 and September 18 baselines select `-1`, as does the frozen
+September 11 runtime overlay. The older template also documented explicit index `3`
+as a hardware-specific fallback. Verify the actual addressed ports and their GIDs
+before selecting an explicit index. For rollback, use the values documented in `cluster.env.example`, keeping the
 same `TP4_ENV` for `down` when leaving an overlay.
 
 Keep `NCCL_RELAY_ENABLE` unset with automatic GID selection. The optional compiled

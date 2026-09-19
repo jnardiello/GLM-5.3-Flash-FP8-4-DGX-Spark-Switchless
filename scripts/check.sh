@@ -17,6 +17,7 @@ public_path() {
 required=(
   scripts/tp4ctl
   scripts/check-f0.py
+  scripts/prepare-sparkcache.py
   scripts/f0-reference.py
   scripts/launcher/launch-glm53-tp4.sh
   scripts/agent-preflight.sh
@@ -29,7 +30,6 @@ required=(
   scripts/verify-node.sh
   scripts/node/flusher-unconditional.sh
   scripts/node/sparse_attn_indexer_kpool_sm121.py
-  scripts/node/host/tp4-gpu-clocks.sh
   scripts/node/host/tp4-iommu.sh
   scripts/node/nccl/build.sh
   scripts/node/nccl/install-nccl.sh
@@ -61,6 +61,7 @@ python3 scripts/check_markdown_links.py
 
 ./scripts/tp4ctl --help >/dev/null
 python3 scripts/check-f0.py --help >/dev/null
+python3 scripts/prepare-sparkcache.py --help >/dev/null
 python3 scripts/f0-reference.py --help >/dev/null
 ./scripts/deploy.sh --help >/dev/null
 ./scripts/deploy-host.sh --help >/dev/null
@@ -73,13 +74,17 @@ scripts/node/nccl/build.sh --help >/dev/null
 scripts/node/nccl/install-nccl.sh --help >/dev/null
 echo "command-help: PASS"
 
-doc_count=$(find docs -type f -name '*.md' | wc -l | tr -d ' ')
-[ "$doc_count" = 4 ] || { echo "check: docs/ must contain exactly 4 Markdown files (got $doc_count)" >&2; exit 1; }
+doc_count=$(find docs -path docs/internal -prune -o -type f -name '*.md' -print | wc -l | tr -d ' ')
+[ "$doc_count" = 4 ] || { echo "check: docs/ must contain exactly 4 public Markdown files (got $doc_count)" >&2; exit 1; }
 
 ./scripts/tests/test-agent-preflight.sh
 python3 scripts/tests/test-nccl-gid-selection.py
 python3 scripts/tests/test-sircl-gid-selection.py
 python3 scripts/tests/test-check-f0.py
+python3 scripts/tests/test-verify-node.py
+python3 scripts/tests/test-prepare-sparkcache.py
+python3 scripts/tests/test-sparkcache-launcher.py
+python3 scripts/tests/test-kda-hybrid.py
 python3 scripts/tests/test-f0-reference.py
 ./scripts/tests/test-host-lifecycle.sh
 bash ./scripts/tests/test-controller-lifecycle.sh

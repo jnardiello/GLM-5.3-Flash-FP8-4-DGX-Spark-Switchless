@@ -5,6 +5,8 @@ import contextlib
 import importlib.util
 import io
 import json
+import os
+import shutil
 import stat
 import sys
 import tempfile
@@ -55,13 +57,16 @@ def recipe() -> dict[str, str]:
         "spec_tokens": "5",
         "spec_extra_json": '"num_speculative_tokens_per_batch_size":[[1,1,5],[2,6,3]]',
         "async_scheduling": "0",
+        "sparkcache_mode": "off",
         "extra_docker_env": "-e VLLM_ADAPTIVE_K_MODE=per-request",
         "base_extra_docker_env": "-e VLLM_ADAPTIVE_K_MODE=per-request",
         "extra_vllm_args": (
+            "--kv-cache-memory-bytes=17179869184 "
             "--moe-backend triton "
             "--scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler"
         ),
         "base_extra_vllm_args": (
+            "--kv-cache-memory-bytes=17179869184 "
             "--moe-backend triton "
             "--scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler"
         ),
@@ -86,7 +91,7 @@ def recipe() -> dict[str, str]:
 
 
 def expected() -> dict:
-    value = check.expected_f0()
+    value = check.expected_f0(REPO / "docs/baseline-f0.json")
     value["image_digest"] = "example/f0@sha256:abc"
     # The fixtures describe the per-request policy regardless of which frozen baseline the
     # checkout carries; the baseline-driven expectation is covered separately below.
@@ -96,7 +101,7 @@ def expected() -> dict:
 
 def test_baseline_adaptive_policy_is_read_from_the_baseline() -> None:
     with tempfile.TemporaryDirectory() as tmp:
-        data = json.loads(check.BASELINE.read_text(encoding="utf-8"))
+        data = json.loads((REPO / "docs/baseline-f0.json").read_text(encoding="utf-8"))
         data["system"]["adaptive_k"] = {"mode": "batch-uniform", "k_lo": 3, "k_hi": 5}
         data["system"]["serving_image_digest"] = "example/f1@sha256:def"
         path = Path(tmp) / "baseline.json"
@@ -125,6 +130,7 @@ def probe(rank: int) -> dict:
         "--max-num-seqs", exp["max_num_seqs"],
         "--max-num-batched-tokens", exp["batched_tokens"],
         "--kv-cache-dtype", exp["kv_cache_dtype"],
+        "--kv-cache-memory-bytes", exp["kv_cache_memory_bytes"],
         "--speculative-config", json.dumps({
             "method": "dflash",
             "model": "/draft",
@@ -139,6 +145,7 @@ def probe(rank: int) -> dict:
         "--master-addr", "--master-port",
         "--max-model-len", "--max-num-seqs", "--max-num-batched-tokens",
         "--kv-cache-dtype", "--scheduler-cls", "--moe-backend",
+        "--kv-cache-memory-bytes",
     )
     remote = {
         "errors": [],
@@ -218,13 +225,13 @@ for field in ("mgmt_if", "fabric_ifaces", "hca"):
                for item in check.recipe_problems(changed, exp))
 
 extra_env = deepcopy(rec)
-extra_env["extra_docker_env"] += " -e UNREVIEWED_FLAG=1"
-assert any("protected field: extra_docker_env" in item
+extra_env["extra_docker_env"] += " -e VLLM_ADAPTIVE_K_UP=0.9"
+assert any("effective baseline adaptive policy" in item
            for item in check.recipe_problems(extra_env, exp))
 
 extra_args = deepcopy(rec)
-extra_args["extra_vllm_args"] += " --unreviewed-flag"
-assert any("protected field: extra_vllm_args" in item
+extra_args["extra_vllm_args"] += " --kv-cache-memory-bytes=17179869184"
+assert any("baseline KV memory budget" in item
            for item in check.recipe_problems(extra_args, exp))
 
 duplicate = deepcopy(healthy)
@@ -352,7 +359,7 @@ with tempfile.TemporaryDirectory(prefix="tp4-check-f0-test.") as temp:
     output = io.StringIO()
     with contextlib.redirect_stdout(output):
         check.print_summary(False)
-    assert output.getvalue() == "F0 CHECK FAIL\n" and secret not in output.getvalue()
+    assert output.getvalue() == "BASELINE CHECK FAIL\n" and secret not in output.getvalue()
 
 try:
     check.make_report_dir(REPO, REPO / "tmp-report")
@@ -364,6 +371,164 @@ else:
 output = io.StringIO()
 with contextlib.redirect_stdout(output):
     assert check.main(["--report-root", str(REPO)]) == 1
-assert output.getvalue() == "F0 CHECK FAIL\n"
+assert output.getvalue() == "BASELINE CHECK FAIL\n"
+
+
+def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
+    exp = check.expected_f0(path)
+    rec = recipe()
+    rec.update(image=exp["image_digest"], image_digest=exp["image_digest"],
+               sparkcache_mode=exp["sparkcache_mode"])
+    for name in ("extra_docker_env", "base_extra_docker_env"):
+        rec[name] = " ".join(f"-e {key}={value}" for key, value in exp["adaptive_env"].items())
+    for name in ("extra_vllm_args", "base_extra_vllm_args"):
+        rec[name] = rec[name].replace("17179869184", exp["kv_cache_memory_bytes"])
+    ranks = [probe(rank) for rank in range(4)]
+    identity = exp["runtime_identity"]
+    for rank, item in enumerate(ranks):
+        c = item["remote"]["container"]
+        c.update(image_reference=rec["image"], image_digests=[exp["image_digest"]],
+                 image_id=exp["image_id"], runtime_files=deepcopy(identity.get("container_file_sha256", {})))
+        c["options"]["--kv-cache-memory-bytes"] = [exp["kv_cache_memory_bytes"]]
+        c["environment"].update(exp["adaptive_env"])
+        c["environment"].update(identity.get("environment", {}))
+        c["runtime_workers"] = [{"pid": 100 + rank, "patched_nccl_loaded": True}]
+        kda = deepcopy(identity.get("kda_boot_receipt", {}))
+        padded_n = kda.pop("padded_n", None)
+        if padded_n is not None:
+            kda["receipts"] = [{"padded_n": padded_n} for _ in range(kda["modules"])]
+        c["runtime_receipts"] = {"kda": kda, "memory_probe": {
+            **identity.get("memory_probe", {}), "rank": rank}}
+    return rec, exp, ranks
+
+
+assert check.BASELINE == REPO / "docs/baseline-2026-09-19.json"
+for name in ("baseline-f0.json", "baseline-f1.json", "baseline-2026-09-19.json"):
+    baseline_path = REPO / "docs" / name
+    baseline_recipe, baseline_expected, baseline_ranks = baseline_fixture(baseline_path)
+    assert check.evaluate(baseline_recipe, baseline_expected, baseline_ranks, endpoint()) == [], name
+
+current_recipe, current_expected, current_ranks = baseline_fixture(check.BASELINE)
+assert current_expected["baseline_id"] == "2026-09-19"
+assert current_expected["kv_cache_memory_bytes"] == "16106127360"
+assert current_expected["runtime_identity"]["kda_boot_receipt"]["prefill_bf16_min_tokens"] == 2048
+
+wrong_kv = deepcopy(current_recipe)
+for name in ("extra_vllm_args", "base_extra_vllm_args"):
+    wrong_kv[name] = wrong_kv[name].replace("16106127360", "17179869184")
+assert "baseline KV memory budget" in check.recipe_problems(wrong_kv, current_expected)
+wrong_live_kv = deepcopy(current_ranks)
+wrong_live_kv[2]["remote"]["container"]["options"]["--kv-cache-memory-bytes"] = ["17179869184"]
+assert any("rank 2: command --kv-cache-memory-bytes" in problem for problem in
+           check.evaluate(current_recipe, current_expected, wrong_live_kv, endpoint()))
+
+for path in current_expected["runtime_identity"]["container_file_sha256"]:
+    wrong_file = deepcopy(current_ranks)
+    wrong_file[1]["remote"]["container"]["runtime_files"][path] = "0" * 64
+    assert f"rank 1: runtime file {path}" in check.evaluate(
+        current_recipe, current_expected, wrong_file, endpoint())
+
+for field, value in (("modules", 33), ("prefill_bf16_min_tokens", 1024),
+                     ("shared_scratch_bytes", 0), ("packed_bytes", 0)):
+    wrong_kda = deepcopy(current_ranks)
+    wrong_kda[0]["remote"]["container"]["runtime_receipts"]["kda"][field] = value
+    assert f"rank 0: KDA boot receipt {field}" in check.evaluate(
+        current_recipe, current_expected, wrong_kda, endpoint())
+
+wrong_padding = deepcopy(current_ranks)
+wrong_padding[0]["remote"]["container"]["runtime_receipts"]["kda"]["receipts"][5]["padded_n"] = 6288
+assert "rank 0: KDA padding receipt" in check.evaluate(
+    current_recipe, current_expected, wrong_padding, endpoint())
+
+wrong_probe = deepcopy(current_ranks)
+wrong_probe[3]["remote"]["container"]["runtime_receipts"]["memory_probe"]["rank"] = 0
+assert "rank 3: memory probe identity" in check.evaluate(
+    current_recipe, current_expected, wrong_probe, endpoint())
+
+wrong_nccl = deepcopy(current_ranks)
+wrong_nccl[1]["remote"]["container"]["runtime_workers"][0]["patched_nccl_loaded"] = False
+assert "rank 1: patched NCCL not loaded by GPU worker" in check.evaluate(
+    current_recipe, current_expected, wrong_nccl, endpoint())
+
+oci_import = deepcopy(current_ranks)
+for item in oci_import:
+    item["remote"]["container"]["image_digests"] = []
+assert check.evaluate(current_recipe, current_expected, oci_import, endpoint()) == []
+oci_import[0]["remote"]["container"]["image_id"] = "sha256:wrong"
+assert "rank 0: running image content ID" in check.evaluate(
+    current_recipe, current_expected, oci_import, endpoint())
+
+# Exercise --baseline through main, not just the expectation loader: otherwise an
+# ignored CLI argument silently compares historical deployments with the default.
+original_load = check.load_recipe
+try:
+    with tempfile.TemporaryDirectory(prefix="tp4-baseline-selection.") as temp:
+        for name in ("baseline-f0.json", "baseline-f1.json", "baseline-2026-09-19.json"):
+            path = REPO / "docs" / name
+            rec, exp, ranks = baseline_fixture(path)
+            check.load_recipe = lambda timeout: (deepcopy(rec), {"returncode": 0})
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                rc = check.main(["--baseline", str(path), "--report-root", temp],
+                                rank_probe=lambda rank, host, recipe, timeout: deepcopy(ranks[rank]),
+                                http_probe=lambda url, timeout: endpoint())
+            assert rc == 0, name
+            assert output.getvalue() == f"{exp['baseline_id']} CHECK PASS\n"
+finally:
+    check.load_recipe = original_load
+
+compile(check.REMOTE_PROBE, "remote-identity-probe", "exec")
+
+# Load the real current template and the shipped historical overlays. The base
+# stays current while each overlay's effective runtime must match its own record.
+original_repo = check.REPO
+saved_overlay = os.environ.get("TP4_ENV")
+try:
+    with tempfile.TemporaryDirectory(prefix="tp4-baseline-overlay.") as temp:
+        isolated = Path(temp)
+        for relative in ("scripts/lib/common.sh", "scripts/node/bootstrap/versions.env",
+                         "scripts/node/reference/baseline-20260918.env",
+                         "scripts/node/reference/f0-20260912.env", "cluster.env.example"):
+            target = isolated / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(REPO / relative, target)
+        config = (REPO / "cluster.env.example").read_text(encoding="utf-8") + '''
+NODES="n0 n1 n2 n3"
+MGMT_IPS="192.0.2.21 192.0.2.22 192.0.2.23 192.0.2.24"
+MASTER_IP=192.0.2.21
+RELAY_DEST=operator@192.0.2.23
+'''
+        check.REPO = isolated
+        for overlay, baseline in (
+            (None, "baseline-2026-09-19.json"),
+            ("scripts/node/reference/baseline-20260918.env", "baseline-f1.json"),
+            ("scripts/node/reference/f0-20260912.env", "baseline-f0.json"),
+        ):
+            # The frozen F0 overlay predates SparkCache. An archived F0 source
+            # restores an OFF base; it is not a complete lane switch over ON.
+            base = config + ('\nSPARKCACHE_MODE=off\n' if baseline == "baseline-f0.json" else "")
+            (isolated / "cluster.env").write_text(base, encoding="utf-8")
+            if overlay:
+                os.environ["TP4_ENV"] = overlay
+            else:
+                os.environ.pop("TP4_ENV", None)
+            effective, diagnostic = check.load_recipe(10)
+            selected = check.expected_f0(REPO / "docs" / baseline)
+            assert diagnostic["returncode"] == 0
+            problems = check.recipe_problems(effective, selected)
+            assert problems == [], (baseline, problems)
+            if overlay:
+                assert effective["extra_docker_env"] != effective["base_extra_docker_env"]
+                assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]
+                assert "baseline KV memory budget" in check.recipe_problems(effective, current_expected)
+            changed_site = deepcopy(effective)
+            changed_site["container"] += "-other"
+            assert "TP4_ENV changed protected field: container" in check.recipe_problems(changed_site, selected)
+finally:
+    check.REPO = original_repo
+    if saved_overlay is None:
+        os.environ.pop("TP4_ENV", None)
+    else:
+        os.environ["TP4_ENV"] = saved_overlay
 
 print("test-check-f0: PASS")

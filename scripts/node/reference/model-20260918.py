@@ -1144,9 +1144,6 @@ class Glm5NextForCausalLM(
 
     def process_weights_after_loading(self) -> None:
         self.model.finalize_mhc_broadcast_weights()
-        from .e20_kda_w8a16 import finalize_kda_input_w8a16
-
-        finalize_kda_input_w8a16(self.model)
 
 
 @MULTIMODAL_REGISTRY.register_processor(
