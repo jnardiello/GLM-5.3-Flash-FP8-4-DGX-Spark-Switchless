@@ -15,20 +15,23 @@ workstation, shown as medians of per-run values. Dates use day/month/year.
 
 <div align="center">
 
-| Workload | 11/09/2026 | 18/09/2026 | 19/09/2026 |
-| --- | ---: | ---: | ---: |
-| Code decode, one request | 50.40 tok/s | 51.78 tok/s | 53.89 tok/s |
-| Prose decode | 29.22 tok/s | 30.27 tok/s | 31.88 tok/s |
-| Code, one request (end-to-end) | 37.22 tok/s | 38.43 tok/s | 40.30 tok/s |
-| Code, two concurrent requests (aggregate, end-to-end) | 57.01 tok/s | 57.39 tok/s | 57.25 tok/s |
-| Code, four concurrent requests (aggregate, end-to-end) | 71.08 tok/s | 84.05 tok/s | 87.53 tok/s |
-| Prefill 8K, cold | 2,112.2 tok/s | 2,393.4 tok/s | 2,354.7 tok/s |
-| Prefill 32K, cold | 2,202.0 tok/s | 2,502.1 tok/s | 2,534.1 tok/s |
-| Prefill 64K, cold | 2,201.3 tok/s | 2,254.0 tok/s | 2,421.7 tok/s |
-| Code, two concurrent requests, per-stream TTFT | 0.616 s | 0.447 s | 0.495 s |
-| Code, four concurrent requests, per-stream TTFT | 0.935 s | 0.597 s | 0.680 s |
+| Workload | 11/09/2026 | 18/09/2026 | 19/09/2026 | Change, 19/09 vs 11/09 |
+| --- | ---: | ---: | ---: | ---: |
+| Code decode, one request | 50.40 tok/s | 51.78 tok/s | 53.89 tok/s | +6.9% |
+| Prose decode | 29.22 tok/s | 30.27 tok/s | 31.88 tok/s | +9.1% |
+| Code, one request (end-to-end) | 37.22 tok/s | 38.43 tok/s | 40.30 tok/s | +8.3% |
+| Code, two concurrent requests (aggregate, end-to-end) | 57.01 tok/s | 57.39 tok/s | 57.25 tok/s | +0.4% |
+| Code, four concurrent requests (aggregate, end-to-end) | 71.08 tok/s | 84.05 tok/s | 87.53 tok/s | +23.1% |
+| Prefill 8K, cold | 2,112.2 tok/s | 2,393.4 tok/s | 2,354.7 tok/s | +11.5% |
+| Prefill 32K, cold | 2,202.0 tok/s | 2,502.1 tok/s | 2,534.1 tok/s | +15.1% |
+| Prefill 64K, cold | 2,201.3 tok/s | 2,254.0 tok/s | 2,421.7 tok/s | +10.0% |
+| Code, two concurrent requests, per-stream TTFT | 0.616 s | 0.447 s | 0.495 s | -19.6% |
+| Code, four concurrent requests, per-stream TTFT | 0.935 s | 0.597 s | 0.680 s | -27.3% |
 
 </div>
+
+Percentage changes use the unrounded medians and are relative to September 11.
+Higher throughput and lower TTFT are better.
 
 September 11 and 18 each use **three runs**. September 19 uses **exactly two completed
 runs: 108/108 requests**, zero measurement/runtime errors, and 30/30 native output
@@ -41,8 +44,8 @@ first token. Concurrency tests cap output at 256 tokens per request; long decode
 allow 8192. These measure inference, not complete agent tasks. Cold prefill processes
 a new prefix, using a fresh `cache_salt` per run.
 
-September 19 has higher code/prose throughput and longer concurrent-request TTFT,
-with **15 GiB KV per rank versus 16 GiB** previously. Allocator and host memory probes
+Compared with September 18, September 19 has higher code/prose throughput and longer
+concurrent-request TTFT, with **15 GiB KV per rank versus 16 GiB** previously. Allocator and host memory probes
 were active; their overhead was not isolated. Two runs give less repeatability evidence
 than three. A separate [one-run IaC reproduction](docs/reproduction-2026-09-19.json)
 records live deployment checks and 54 requests; the frozen medians above remain unchanged.

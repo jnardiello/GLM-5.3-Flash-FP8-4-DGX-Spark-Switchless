@@ -30,6 +30,8 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- Added percentage changes from the initial to the latest baseline in the README
+  performance table, calculated from unrounded medians with TTFT direction clarified.
 - Made the September 19 configuration the base IaC recipe: hybrid KDA execution,
   corrected cache allocations, a separate persistent-cache namespace and 15 GiB KV per
   rank. The per-request context limit remains 262,144 tokens. Live IaC reproduction
