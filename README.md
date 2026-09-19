@@ -15,26 +15,29 @@ with native [Rigmark](https://github.com/alexellis/rigmark). Frozen medians of
 **three complete runs: 162/162 requests**, zero measurement/runtime errors and
 45/45 native output gates passing.
 
-| Workload | Current · 19/09/2026 E03 | Change vs [📊 11/09/2026](docs/benchmarks/baselines/2026-09-11.md) |
-| --- | ---: | ---: |
-| Code decode, one request | 53.81 tok/s | +6.8% |
-| Code C1, end-to-end | 40.23 tok/s | +8.1% |
-| Code C2, aggregate end-to-end | 61.83 tok/s | +8.5% |
-| Code C4, aggregate end-to-end | 86.93 tok/s | +22.3% |
-| Prose decode | 31.19 tok/s | +6.7% |
-| Code TTFT | 0.396 s | -3.4% |
-| Prose TTFT | 0.381 s | -4.0% |
-| C1 per-stream TTFT | 0.343 s | -15.1% |
-| C2 per-stream TTFT | 0.449 s | -27.1% |
-| C4 per-stream TTFT | 0.572 s | -38.8% |
-| Prefill 8K, cold | 2,558.4 tok/s | +21.1% |
-| Prefill 8K, replay | 9,417.2 tok/s | +102.5% |
-| Prefill 32K, cold | 2,662.0 tok/s | +20.9% |
-| Prefill 32K, replay | 37,177.4 tok/s | +72.7% |
-| Prefill 64K, cold | 2,616.1 tok/s | +18.8% |
-| Prefill 64K, replay | 40,078.3 tok/s | +11.4% |
+| Workload | Current · 19/09/2026 E03 | Change vs initial [📊 11/09/2026](docs/benchmarks/baselines/2026-09-11.md) | Change vs previous [📊 19/09/2026](docs/benchmarks/baselines/2026-09-19.md) |
+| --- | ---: | ---: | ---: |
+| Code decode, one request | 53.81 tok/s | +6.8% | ≈ unchanged (-0.15%) |
+| Code C1, end-to-end | 40.23 tok/s | +8.1% | ≈ unchanged (-0.17%) |
+| Code C2, aggregate end-to-end | 61.83 tok/s | +8.5% | +8.00% |
+| Code C4, aggregate end-to-end | 86.93 tok/s | +22.3% | ≈ unchanged (-0.68%) |
+| Prose decode | 31.19 tok/s | +6.7% | ≈ unchanged (-2.17%) |
+| Code TTFT | 0.396 s | -3.4% | ≈ unchanged (-1.37%) |
+| Prose TTFT | 0.381 s | -4.0% | ≈ unchanged (+0.26%) |
+| C1 per-stream TTFT | 0.343 s | -15.1% | -14.14% |
+| C2 per-stream TTFT | 0.449 s | -27.1% | -9.29% |
+| C4 per-stream TTFT | 0.572 s | -38.8% | -15.82% |
+| Prefill 8K, cold | 2,558.4 tok/s | +21.1% | +8.65% |
+| Prefill 8K, replay | 9,417.2 tok/s | +102.5% | ≈ unchanged (-1.47%) |
+| Prefill 32K, cold | 2,662.0 tok/s | +20.9% | +5.05% |
+| Prefill 32K, replay | 37,177.4 tok/s | +72.7% | +5.48% |
+| Prefill 64K, cold | 2,616.1 tok/s | +18.8% | +8.02% |
+| Prefill 64K, replay | 40,078.3 tok/s | +11.4% | +13.09% |
 
-Percentages use unrounded medians relative to the initial September 11 baseline.
+Percentages use unrounded medians relative to the initial September 11 baseline and
+the previous September 19 base, before E03, replay views and the draft-budget cap.
+“≈ unchanged” marks owner-accepted changes of roughly 1–2%, with the exact delta
+retained; it does not establish statistical equivalence.
 Higher throughput and lower TTFT are better. C1/C2/C4 mean one, two or four concurrent
 requests. Decode excludes the initial wait; end-to-end speed includes it. TTFT is time
 to first token. Concurrency outputs cap at 256 tokens; long decode allows 8,192.
@@ -48,11 +51,12 @@ and isolated checks remain separately archived. The default recipe matches the m
 candidate; [deployment and reproduction of these new defaults](docs/historical_benchmarks/baselines/2026-09-19-e03/promotion.json)
 remain pending.
 
-The graphs show only the current accepted values. Click an image for its SVG version.
+The graphs compare current and previous September 19 medians side by side, with each
+delta calculated against the previous base. Click an image for its SVG version.
 
-[![Current baseline generation throughput and time to first token.](docs/plots/baselines/2026-09-19-e03/generation.png)](docs/plots/baselines/2026-09-19-e03/generation.svg)
+[![Current versus previous September 19 baseline: generation throughput, time to first token and percentage changes.](docs/plots/comparisons/2026-09-19-e03-vs-2026-09-19/generation.png)](docs/plots/comparisons/2026-09-19-e03-vs-2026-09-19/generation.svg)
 
-[![Current baseline cold prefill and immediate cache replay at 8K, 32K and 64K.](docs/plots/baselines/2026-09-19-e03/prefill.png)](docs/plots/baselines/2026-09-19-e03/prefill.svg)
+[![Current versus previous September 19 baseline: cold prefill, immediate replay and percentage changes at 8K, 32K and 64K.](docs/plots/comparisons/2026-09-19-e03-vs-2026-09-19/prefill.png)](docs/plots/comparisons/2026-09-19-e03-vs-2026-09-19/prefill.svg)
 
 The [benchmark archive](docs/benchmarks/README.md) retains earlier baselines, experiments
 and separate reproduction results. See [local Rigmark reports](docs/rigmark_reports/README.md)

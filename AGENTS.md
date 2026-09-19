@@ -251,13 +251,14 @@ If only a historic summary survives, label it as summary-only; do not invent rec
 Keep frozen JSON bytes and hashes unchanged when relocating records. Their original
 embedded path strings are provenance; use the index for current paths.
 
-The README shows **only the current baseline**, with simple current-only figures.
-Its percentage column remains relative to the **initial September 11 baseline**, linked
-through the dated Markdown report. This historical presentation reference does not
-replace the current operational baseline used to assess new experiments. Calculate
-percentages from unrounded frozen medians and format decimal labels consistently.
-Keep prior comparison tables, images and diagnostic probes in the archive, not in the
-README. Read [the benchmark index](docs/benchmarks/README.md) before publishing results.
+The README shows current accepted values, a historical delta column relative to the
+**initial September 11 baseline**, and a second delta column relative to the **immediately
+previous baseline**, with both dates and links to their reports. Its figures compare
+current and previous values side by side, with percentage deltas. These presentation
+references do not replace the current operational baseline used to assess new experiments.
+Calculate percentages from unrounded frozen medians and format decimal labels consistently.
+Keep older comparisons, original figures and diagnostic probes in the archive. Read
+[the benchmark index](docs/benchmarks/README.md) before publishing results.
 
 Rank success by these criteria:
 

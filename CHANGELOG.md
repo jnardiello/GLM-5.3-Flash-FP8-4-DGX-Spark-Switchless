@@ -7,6 +7,10 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Added a dated previous-baseline delta column to the README and PNG/SVG comparisons
+  of all 16 current versus previous September 19 metrics, with paired values, exact
+  percentage changes and the accepted approximately-unchanged labels. The historical
+  September 11 delta column, frozen records and original figures are retained.
 - Added a frozen accepted E03/replay/draft-budget reference from the final three native
   Rigmark suites (162 requests), with all 16 metrics, receipt hashes, variability and
   memory/error accounting. Earlier candidate series and isolated checks remain archived.
@@ -57,8 +61,8 @@ Versions and releases are created only at the owner's explicit request.
   rollback, node/patch guides and agent instructions. Live deployment/reproduction of
   the newly encoded defaults remains explicitly pending; the serving stack is retained.
 - Selected the new three-suite reference in the identity checker, README and plotting
-  tool. README percentages remain relative to September 11; the dated report includes
-  the previous September 19 base and exact deltas. Small changes of roughly 1–2% are
+  tool. The README retains historical percentages relative to September 11; the dated
+  report includes the previous September 19 base and exact deltas. Small changes of roughly 1–2% are
   labelled approximately unchanged where requested, without claiming statistical parity.
 - Moved frozen benchmark JSON and historical PNG/SVG figures into dated archives,
   preserving their bytes and hashes and updating operational references.

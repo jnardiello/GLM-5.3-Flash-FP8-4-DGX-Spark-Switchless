@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Render the current frozen baseline; requires matplotlib==3.11.2.
+"""Compare the current and previous frozen baselines; requires matplotlib==3.11.2.
 
-Reads the 16 saved medians only. No benchmark requests are sent.
-The historical CLI filename is retained for existing callers.
+Reads all 16 saved medians from each record. No benchmark requests are sent.
 """
 
 from __future__ import annotations
@@ -15,8 +14,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json"
-OUTPUT_DIR = ROOT / "docs/plots/baselines/2026-09-19-e03"
+PREVIOUS_BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-19/baseline.json"
+OUTPUT_DIR = ROOT / "docs/plots/comparisons/2026-09-19-e03-vs-2026-09-19"
 TEAL, INK, MUTED = "#087f74", "#172b46", "#536478"
+PREVIOUS_COLOR = "#92a5ba"
+# Match the owner's descriptive convention in the accepted report, including -2.17%.
+# This is a display choice, not a statistical test or a benchmark acceptance rule.
+APPROX_UNCHANGED = Decimal("2.2")
 
 GENERATION = [
     ("code_decode_throughput", "Code decode"),
@@ -36,37 +40,58 @@ COLD = [(f"prefill_{depth}k_cold_throughput", f"{depth}K tokens") for depth in (
 REPLAY = [(f"prefill_{depth}k_replay_throughput", f"{depth}K tokens") for depth in (8, 32, 64)]
 
 
-def read_baseline():
-    baseline = json.loads(BASELINE.read_text())
+def read_baseline(path, label):
+    baseline = json.loads(path.read_text(), parse_float=Decimal)
     metrics = baseline["performance"]["metrics"]
     expected = {key for key, _ in GENERATION + LATENCY + COLD + REPLAY}
     if len(metrics) != 16 or {row["key"] for row in metrics} != expected:
-        raise ValueError("The current frozen baseline must provide all 16 metrics")
-    medians = {row["key"]: Decimal(str(row["median"])) for row in metrics}
-    if any(not value.is_finite() or value < 0 for value in medians.values()):
-        raise ValueError("Baseline medians must be finite and nonnegative")
-    measured_on = date.fromisoformat(baseline["measured_on"]).strftime("%d %b %Y")
+        raise ValueError(f"{path}: the frozen baseline must provide all 16 metrics")
+    medians = {row["key"]: Decimal(row["median"]) for row in metrics}
+    if any(not value.is_finite() or value <= 0 for value in medians.values()):
+        raise ValueError(f"{path}: baseline medians must be finite and positive")
+    measured_on = date.fromisoformat(baseline["measured_on"]).strftime("%d/%m/%Y")
     runs = baseline["performance"]["included_run_count"]
     requests = baseline["functional"]["measured_requests"]["count"]
-    caption = f"{measured_on} · Median of {runs} accepted runs · {requests} requests"
+    caption = f"{label} · {measured_on}\n{runs} accepted runs · {requests} requests"
     return medians, caption
 
 
-def panel(ax, rows, medians, title, xlabel, *, seconds=False):
+def panel(ax, rows, current, previous, title, xlabel, *, seconds=False):
     from matplotlib.ticker import FuncFormatter, MaxNLocator
 
-    values = [float(medians[key]) for key, _ in rows]
-    ax.barh(range(len(rows)), values, height=0.55, color=TEAL, zorder=2)
+    maximum = 0
+    for medians, offset, color in ((previous, -0.17, PREVIOUS_COLOR),
+                                    (current, 0.17, TEAL)):
+        values = [float(medians[key]) for key, _ in rows]
+        positions = [index + offset for index in range(len(rows))]
+        maximum = max(maximum, *values)
+        ax.barh(positions, values, height=0.29, color=color, zorder=2)
+        for index, (key, _) in enumerate(rows):
+            precision = 4 if seconds else 1 if key.startswith("prefill_") else 2
+            label = f"{medians[key]:,.{precision}f}"
+            ax.annotate(label, (values[index], positions[index]), xytext=(7, 0),
+                        textcoords="offset points", va="center", fontsize=11.5,
+                        color=MUTED if offset < 0 else TEAL)
+
+    ax.text(1.21, 1.04, "Δ vs previous", transform=ax.transAxes,
+            ha="center", va="bottom", fontsize=11.5, color=INK, fontweight="bold")
     for index, (key, _) in enumerate(rows):
-        precision = 3 if seconds else 1 if key.startswith("prefill_") else 2
-        label = f"{medians[key]:,.{precision}f}"
-        ax.annotate(label, (values[index], index), xytext=(7, 0),
-                    textcoords="offset points", va="center", fontsize=11, color=TEAL)
+        delta = (current[key] / previous[key] - 1) * 100
+        unchanged = abs(delta) <= APPROX_UNCHANGED
+        improved = delta < 0 if seconds else delta > 0
+        color = MUTED if unchanged else TEAL if improved else "#b45309"
+        label = f"{delta:+.2f}%".replace("-", "−")
+        if unchanged:
+            label += "\n≈ unchanged"
+        ax.text(1.21, index, label, transform=ax.get_yaxis_transform(),
+                ha="center", va="center", fontsize=11.5, color=color,
+                fontweight="bold", linespacing=1.5)
+
     ax.set_title(title, loc="left", fontsize=15, color=INK, fontweight="bold", pad=20)
-    ax.set_yticks(range(len(rows)), [label for _, label in rows], fontsize=11, color=INK)
-    ax.set_ylim(len(rows) - 0.5, -0.5)
+    ax.set_yticks(range(len(rows)), [label for _, label in rows], fontsize=12, color=INK)
+    ax.set_ylim(len(rows) - 0.45, -0.55)
     ax.set_xscale("linear")
-    ax.set_xlim(0, max(values) * 1.25 or 1)
+    ax.set_xlim(0, maximum * 1.38)
     ax.xaxis.set_major_locator(MaxNLocator(nbins=5))
     ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{x:g}" if seconds else f"{x:,.0f}"))
     ax.set_xlabel(xlabel, fontsize=11, color=MUTED, labelpad=12)
@@ -77,21 +102,27 @@ def panel(ax, rows, medians, title, xlabel, *, seconds=False):
         spine.set_visible(False)
 
 
-def figure(output_dir, name, title, panels, medians, caption):
+def figure(output_dir, name, title, panels, current, previous, captions, note):
     import matplotlib.pyplot as plt
+    from matplotlib.patches import Patch
 
-    fig = plt.figure(figsize=(14.5, 7.4), facecolor="white")
-    axes = [fig.add_axes([0.15, 0.22, 0.30, 0.48]), fig.add_axes([0.64, 0.22, 0.31, 0.48])]
+    height = 9.4 if name == "generation" else 7.8
+    fig = plt.figure(figsize=(17.2, height), facecolor="white")
+    axes = [fig.add_axes([0.145, 0.23, 0.26, 0.47]), fig.add_axes([0.650, 0.23, 0.255, 0.47])]
     fig.text(0.035, 0.935, title, fontsize=23, fontweight="bold", color=INK)
-    fig.text(0.035, 0.88, "GLM-5.3-Flash · TP4 / four GB10 nodes · Native Rigmark",
+    fig.text(0.035, 0.88, "GLM-5.3-Flash · Four GB10 nodes · E03 + replay views + draft budget · Native Rigmark",
              fontsize=12, color=MUTED)
-    fig.text(0.035, 0.825, caption, fontsize=12, color=TEAL)
+    fig.legend(handles=[Patch(color=PREVIOUS_COLOR, label=captions[0]),
+                        Patch(color=TEAL, label=captions[1])],
+               loc="upper left", bbox_to_anchor=(0.03, 0.845), ncols=2,
+               frameon=False, fontsize=12, labelcolor=INK, columnspacing=4)
     for ax, (rows, heading, xlabel, seconds) in zip(axes, panels):
-        panel(ax, rows, medians, heading, xlabel, seconds=seconds)
-    fig.text(0.035, 0.11, "Bars and labels show the frozen baseline medians, matching the README table.",
+        panel(ax, rows, current, previous, heading, xlabel, seconds=seconds)
+    fig.text(0.035, 0.11, "Δ = (current / previous − 1) × 100, calculated from unrounded frozen medians.",
              fontsize=10.5, color=MUTED)
-    fig.text(0.035, 0.065, "Decode excludes the initial wait; end-to-end throughput includes it. K = 1,024 tokens.",
+    fig.text(0.035, 0.073, "≈ unchanged: owner-accepted changes of roughly 1–2%; this is not a statistical test.",
              fontsize=10.5, color=MUTED)
+    fig.text(0.035, 0.036, note, fontsize=10.5, color=MUTED)
     fig.savefig(output_dir / f"{name}.png", dpi=160, facecolor="white", metadata={"Software": "Matplotlib"})
     svg = output_dir / f"{name}.svg"
     fig.savefig(svg, facecolor="white", metadata={"Date": None, "Creator": "Matplotlib"})
@@ -103,22 +134,26 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
     args = parser.parse_args()
-    medians, caption = read_baseline()
+    current, current_caption = read_baseline(BASELINE, "Current E03")
+    previous, previous_caption = read_baseline(PREVIOUS_BASELINE, "Previous base")
     import matplotlib
 
     matplotlib.use("Agg")
     matplotlib.rcParams.update({"font.family": "DejaVu Sans", "font.size": 11,
-                                "svg.hashsalt": "tp4-rigmark-baseline", "svg.fonttype": "path"})
+                                "svg.hashsalt": "tp4-rigmark-current-vs-previous", "svg.fonttype": "path"})
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    figure(args.output_dir, "generation", "Generation throughput and first-token latency", [
-        (GENERATION, "Throughput · higher is better", "Tokens per second", False),
-        (LATENCY, "Time to first token · lower is better", "Seconds", True),
-    ], medians, caption)
-    figure(args.output_dir, "prefill", "Long-context prefill and prefix-cache reuse", [
-        (COLD, "Cold prefill · higher is better", "Effective prefill tokens per second", False),
-        (REPLAY, "Immediate replay · higher is better", "Effective prefill tokens per second", False),
-    ], medians, caption)
-    print(f"Rendered two figures from 16 current frozen medians to {args.output_dir}")
+    captions = previous_caption, current_caption
+    figure(args.output_dir, "generation", "Generation: current vs previous baseline", [
+        (GENERATION, "Generation throughput", "Tokens per second · higher is better", False),
+        (LATENCY, "First-token latency", "Seconds · lower is better", True),
+    ], current, previous, captions,
+        "Decode excludes initial wait; end-to-end throughput includes it. Concurrency TTFT is per stream.")
+    figure(args.output_dir, "prefill", "Prefill: current vs previous baseline", [
+        (COLD, "Cold prefill", "Effective tokens per second · higher is better", False),
+        (REPLAY, "Immediate replay", "Effective tokens per second · higher is better", False),
+    ], current, previous, captions,
+        "Cold prefill uses a fresh cache salt; replay reuses the prefix within each run. K = 1,024 tokens.")
+    print(f"Rendered two comparison figures from 16 frozen metrics per baseline to {args.output_dir}")
 
 
 if __name__ == "__main__":

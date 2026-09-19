@@ -14,11 +14,17 @@ Readable reports live here; machine-readable frozen records and portable experim
 
 [Historical comparison table and archived charts](comparisons/2026-09-19-vs-2026-09-11.md).
 
-The README's current-only figures are generated from the 16 saved baseline medians.
+The README's comparison figures show all 16 saved medians for the current E03 reference
+and the previous September 19 base, with percentage changes from unrounded values.
+The legends distinguish the same-date records: three accepted runs / 162 requests for
+current E03 and two / 108 for the previous base. Small changes retain exact deltas
+alongside the owner's “≈ unchanged” display convention.
 From the repository root, run `python3 scripts/plot-baseline-comparison.py` in an
 environment with `matplotlib==3.11.2`. It writes PNG/SVG files under
-`docs/plots/baselines/2026-09-19-e03/` without running inference. Historical comparison
-images are retained unchanged in `docs/plots/comparisons/`.
+`docs/plots/comparisons/2026-09-19-e03-vs-2026-09-19/` without running inference.
+The [dated current report](baselines/2026-09-19-e03.md) links the figures and both
+frozen sources. Original current-only figures remain unchanged in
+`docs/plots/baselines/2026-09-19-e03/`; older comparisons remain archived separately.
 
 ## Experiment outcomes
 
