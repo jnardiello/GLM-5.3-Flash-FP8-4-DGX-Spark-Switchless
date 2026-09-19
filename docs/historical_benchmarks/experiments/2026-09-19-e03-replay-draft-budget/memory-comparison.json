@@ -1,0 +1,178 @@
+{
+  "schema": "tp4-memory-comparison/v1",
+  "baseline_runs": 2,
+  "parent_replay_runs": 3,
+  "candidate_runs": 3,
+  "baseline_and_parent_memory_record_sha256": "d70aaaf6221ed7a3a5af034012b086bd5f04bed7b6ecccaea13ed249561b4745",
+  "observer_source_sha256": "7e01cf319e1b1ab1c907edfd4933df00a6e0e6139482b23b4283279433066499",
+  "same_intervals": true,
+  "ranks": [
+    {
+      "rank": 0,
+      "baseline_min_available_gib_per_run": [
+        2.2162513732910156,
+        2.2251434326171875
+      ],
+      "parent_replay_min_available_gib_per_run": [
+        2.577007293701172,
+        2.550445556640625,
+        2.8394813537597656
+      ],
+      "parent_replay_allocated_max_mib_per_run": [
+        99284.2763671875,
+        99338.69775390625,
+        99308.48291015625
+      ],
+      "parent_replay_reserved_max_mib_per_run": [
+        100782.0,
+        100782.0,
+        100782.0
+      ],
+      "candidate_min_available_gib_per_run": [
+        2.411304473876953,
+        2.8920822143554688,
+        2.6972618103027344
+      ],
+      "candidate_allocated_max_mib_per_run": [
+        99338.48681640625,
+        99338.48681640625,
+        99338.48681640625
+      ],
+      "candidate_reserved_max_mib_per_run": [
+        100782.0,
+        100782.0,
+        100782.0
+      ],
+      "cuda_oom_delta": 0,
+      "allocation_retry_delta": 0,
+      "host_oom_kill_delta": 0
+    },
+    {
+      "rank": 1,
+      "baseline_min_available_gib_per_run": [
+        5.827423095703125,
+        5.97320556640625
+      ],
+      "parent_replay_min_available_gib_per_run": [
+        6.569416046142578,
+        7.195442199707031,
+        7.361492156982422
+      ],
+      "parent_replay_allocated_max_mib_per_run": [
+        99308.37744140625,
+        99338.27587890625,
+        99297.58251953125
+      ],
+      "parent_replay_reserved_max_mib_per_run": [
+        100744.0,
+        100744.0,
+        100744.0
+      ],
+      "candidate_min_available_gib_per_run": [
+        6.740566253662109,
+        7.020343780517578,
+        6.664268493652344
+      ],
+      "candidate_allocated_max_mib_per_run": [
+        99338.48681640625,
+        99308.48291015625,
+        99314.58251953125
+      ],
+      "candidate_reserved_max_mib_per_run": [
+        100740.0,
+        100740.0,
+        100740.0
+      ],
+      "cuda_oom_delta": 0,
+      "allocation_retry_delta": 0,
+      "host_oom_kill_delta": 0
+    },
+    {
+      "rank": 2,
+      "baseline_min_available_gib_per_run": [
+        5.990264892578125,
+        6.393348693847656
+      ],
+      "parent_replay_min_available_gib_per_run": [
+        6.932361602783203,
+        7.083431243896484,
+        6.806293487548828
+      ],
+      "parent_replay_allocated_max_mib_per_run": [
+        99338.48681640625,
+        99338.48681640625,
+        99314.58251953125
+      ],
+      "parent_replay_reserved_max_mib_per_run": [
+        100742.0,
+        100742.0,
+        100742.0
+      ],
+      "candidate_min_available_gib_per_run": [
+        6.789043426513672,
+        7.248477935791016,
+        7.174468994140625
+      ],
+      "candidate_allocated_max_mib_per_run": [
+        99362.48291015625,
+        99312.59619140625,
+        99284.27587890625
+      ],
+      "candidate_reserved_max_mib_per_run": [
+        100742.0,
+        100742.0,
+        100742.0
+      ],
+      "cuda_oom_delta": 0,
+      "allocation_retry_delta": 0,
+      "host_oom_kill_delta": 0
+    },
+    {
+      "rank": 3,
+      "baseline_min_available_gib_per_run": [
+        6.409454345703125,
+        6.647453308105469
+      ],
+      "parent_replay_min_available_gib_per_run": [
+        6.416873931884766,
+        6.903038024902344,
+        6.917854309082031
+      ],
+      "parent_replay_allocated_max_mib_per_run": [
+        99338.27587890625,
+        99284.69775390625,
+        99362.48291015625
+      ],
+      "parent_replay_reserved_max_mib_per_run": [
+        100742.0,
+        100742.0,
+        100742.0
+      ],
+      "candidate_min_available_gib_per_run": [
+        6.573577880859375,
+        7.0607147216796875,
+        7.1104583740234375
+      ],
+      "candidate_allocated_max_mib_per_run": [
+        99314.58251953125,
+        99338.2744140625,
+        99310.27587890625
+      ],
+      "candidate_reserved_max_mib_per_run": [
+        100742.0,
+        100742.0,
+        100742.0
+      ],
+      "cuda_oom_delta": 0,
+      "allocation_retry_delta": 0,
+      "host_oom_kill_delta": 0
+    }
+  ],
+  "limits": [
+    "MemAvailable minima are sampled observations, not a guarantee about unsampled transients.",
+    "Host reads are sequential; meminfo target 5Hz, process PSS every5s, smaps every30s.",
+    "CUDA peak counters cover the entire worker lifetime without reset; current maxima are observed within this run.",
+    "PyTorch allocator counters omit driver/NCCL/SIRCL allocations; host PSS is not total unified-memory consumption.",
+    "PSI/vmstat are host-wide counters; they alone cannot establish a performance cause."
+  ]
+}

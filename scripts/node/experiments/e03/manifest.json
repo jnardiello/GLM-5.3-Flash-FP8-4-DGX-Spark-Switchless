@@ -1,0 +1,59 @@
+{
+  "schema": "tp4-e03-source/v1",
+  "upstream_repository": "https://github.com/FujitsuPolycom/sparkring",
+  "upstream_revision": "61f277bd0c97fbff892668e12ea04a330a45fa01",
+  "upstream_package": "runtime/glm53-spark-mtp3-mesh/performance/mhc-prefill",
+  "upstream_source_archive_sha256": "85698147823b11eae159bf8a7771e303e8d1a736baa12abd2bddc7ebcaa8799c",
+  "upstream_preimage_archive_sha256": "9c7aceccc33d2a26b680ae3804ba845346e907e290a2afec5b46f80ba14a5f30",
+  "base_image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+  "base_model_source": "scripts/node/overrides/vllm/models/glm5next/nvidia/model.py",
+  "adaptation": "Apply only mHC per-call deferral and ownership hunks to R10 live sources; qualify DCP1 instead of DCP4. Retain FP8 mapping, E20 hooks, original KDA checkpoints and memory corrections. Admit exactly 6912 eager target rows (1728 per rank) under the unchanged 8192-token R10 DFlash2 budget and 2304-token checkpoint alignment.",
+  "license": "Apache-2.0",
+  "files": {
+    "vllm/model_executor/layers/fused_moe/runner/moe_runner.py": {
+      "base_sha256": "80d4b53fdbbbaf2aa9408f22ea476bacbdbb9db5cef0e51fca62c36a4f384d25",
+      "candidate_sha256": "7f12a8923a80dab5639e6d1324b9c18509960e0d5bde00e74fc234f3b0e247d5",
+      "upstream_candidate_sha256": "7f12a8923a80dab5639e6d1324b9c18509960e0d5bde00e74fc234f3b0e247d5"
+    },
+    "vllm/model_executor/layers/fused_moe/runner/moe_runner_interface.py": {
+      "base_sha256": "189cad01611124eb44594713cbf5918d16fc70196dc81a525ae0a7a97a5fcc51",
+      "candidate_sha256": "6e57212e46964a5737e2fcea7c29e9bcf88fa7e22886c7c21208ad661b154feb",
+      "upstream_candidate_sha256": "6e57212e46964a5737e2fcea7c29e9bcf88fa7e22886c7c21208ad661b154feb"
+    },
+    "vllm/model_executor/layers/linear.py": {
+      "base_sha256": "d1e3a10f978e1201371de6aea840203c72bd0ab54dfffc0f85085a7979e425ba",
+      "candidate_sha256": "bed47ddb286f5e55a7ffcccf4243d92d7d489db858a6c90e91c81342b0b8e1ae",
+      "upstream_candidate_sha256": "bed47ddb286f5e55a7ffcccf4243d92d7d489db858a6c90e91c81342b0b8e1ae"
+    },
+    "vllm/model_executor/layers/mamba/gdn/kimi_gdn_linear_attn.py": {
+      "base_sha256": "efb07f928463fcf12a3c079f4da2ffa330d697a98a6afca3bea94a0a21825f58",
+      "candidate_sha256": "4f2b1604d02187bc684d88b074f8bd1288c90077d9dd7168d547244cafcd0272",
+      "upstream_candidate_sha256": "e2c415c0f7a21efc7dfd716418f8012f4c23bbe5175892e8fae222600784dba8"
+    },
+    "vllm/model_executor/layers/mla.py": {
+      "base_sha256": "0d1b61be1547cee3e4af70f805c5df83c950d84bad5be596c52f2509fd908084",
+      "candidate_sha256": "eddc5d57cf39468157300189a12f7a1e440886218444e7a111286c527c9de3bf",
+      "upstream_candidate_sha256": "eddc5d57cf39468157300189a12f7a1e440886218444e7a111286c527c9de3bf"
+    },
+    "vllm/models/glm5next/nvidia/attention.py": {
+      "base_sha256": "a6a6ea546b168707b5f1a7337b45ba12a7bd957fdbf278adba9cb6c092310b32",
+      "candidate_sha256": "c04298d14eedcb6cc329d161c182cfccf092113ee7f12e54d27ad233818df083",
+      "upstream_candidate_sha256": "c04298d14eedcb6cc329d161c182cfccf092113ee7f12e54d27ad233818df083"
+    },
+    "vllm/models/glm5next/nvidia/kda.py": {
+      "base_sha256": "a1af9132fcb5a54817670c40f4fd8844043f49c36f5554724318491175506b6e",
+      "candidate_sha256": "73da412cbd8d109c676cb6bcf37f5b5148dc72f4c9a4a09796c0cd4f2f4fbbd4",
+      "upstream_candidate_sha256": "73da412cbd8d109c676cb6bcf37f5b5148dc72f4c9a4a09796c0cd4f2f4fbbd4"
+    },
+    "vllm/models/glm5next/nvidia/mhc_prefill_sharding.py": {
+      "base_sha256": null,
+      "candidate_sha256": "bc809df101a4350fbe9d44d4b884ce0799d69606e99c108beeacd65bc125cb28",
+      "upstream_candidate_sha256": "24fd10059e53b0e7f5f4c86c45166cfa0020e14b7794486294b19d26742ad87b"
+    },
+    "vllm/models/glm5next/nvidia/model.py": {
+      "base_sha256": "6f4d22ca391ae948e8057d4ec9639281371a658fcd9a40684564732f6409ad87",
+      "candidate_sha256": "34d8161d0408b7e786b922e53829d0a45ca6c11c38470a128467fd8dd08f9ab4",
+      "upstream_candidate_sha256": "24f63d7c804625b85895bf39d793554db9dd6a8a2a04b8b9b6cfb0a7db1cadb5"
+    }
+  }
+}

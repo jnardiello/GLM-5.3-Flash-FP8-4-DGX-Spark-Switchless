@@ -88,6 +88,10 @@ python3 scripts/tests/test-verify-node.py
 python3 scripts/tests/test-prepare-sparkcache.py
 python3 scripts/tests/test-sparkcache-launcher.py
 python3 scripts/tests/test-kda-hybrid.py
+python3 scripts/tests/test-e03-config.py
+python3 scripts/tests/test-adaptive-draft-budget.py
+python3 scripts/tests/test-draft-budget-config.py
+python3 scripts/tests/test-accepted-recipe.py
 python3 scripts/tests/test-f0-reference.py
 ./scripts/tests/test-host-lifecycle.sh
 bash ./scripts/tests/test-controller-lifecycle.sh

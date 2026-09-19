@@ -1,0 +1,91 @@
+{
+  "run": "c4-screen",
+  "receipt_sha256": "7a89a1b231a743a50f8be66f47811b3592d8424de7c1b2b25d2e30357c181a7f",
+  "native_validation_errors": [],
+  "protocol_errors": [],
+  "runtime_error": null,
+  "request_count": 12,
+  "completed_streams": 12,
+  "visible_responses": 12,
+  "finish_reasons": {
+    "length": 12
+  },
+  "decode_output_gates": {},
+  "code_output_budget_stops": 0,
+  "prefill_token_matches": 0,
+  "prefill_requests": 0,
+  "request_groups": {
+    "concurrency/4": {
+      "requests": 12,
+      "finish_reasons": {
+        "length": 12
+      },
+      "completed_streams": 12,
+      "visible_responses": 12,
+      "native_first_visible_latency_unavailable": 0
+    }
+  },
+  "metrics": {
+    "code_decode_throughput": null,
+    "code_c1_aggregate_end_to_end_throughput": null,
+    "code_c2_aggregate_end_to_end_throughput": null,
+    "code_c4_aggregate_end_to_end_throughput": 91.563,
+    "prose_decode_throughput": null,
+    "code_ttft": null,
+    "prose_ttft": null,
+    "code_c1_per_stream_ttft": null,
+    "code_c2_per_stream_ttft": null,
+    "code_c4_per_stream_ttft": 0.523,
+    "prefill_8k_cold_throughput": null,
+    "prefill_8k_replay_throughput": null,
+    "prefill_32k_cold_throughput": null,
+    "prefill_32k_replay_throughput": null,
+    "prefill_64k_cold_throughput": null,
+    "prefill_64k_replay_throughput": null
+  },
+  "started_at": "2026-09-19T17:08:08.200503+00:00",
+  "finished_at": "2026-09-19T17:08:42.484138+00:00",
+  "cache_salt_sha256": "e048254f675ed12fe649e207a8e8abd7d4df41fe8e0b119963e8ee98b5dd8de4",
+  "scope": "Separate initial C4-only screen; excluded from full-suite aggregates",
+  "source_sha256": "3380f0dcb4254376f2e57422aa151ed73d37c43f02c1ef00699997a7ab7a67a6",
+  "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+  "request_counter_delta": {
+    "stop": 0.0,
+    "length": 12.0,
+    "abort": 0.0,
+    "error": 0.0,
+    "repetition": 0.0
+  },
+  "baseline_median": 87.527,
+  "parent_replay_median": 82.994,
+  "parent_separate_c4_repeat": 84.054,
+  "change_vs_baseline_pct": 4.611148559872946,
+  "change_vs_parent_pct": 10.324842759717567,
+  "cap_observed": true,
+  "container_continuity": true,
+  "rounds": [
+    {
+      "aggregate_end_to_end_tokens_per_second": 83.455,
+      "completion_tokens": 1024,
+      "round": 1,
+      "wall_seconds": 12.270054
+    },
+    {
+      "aggregate_end_to_end_tokens_per_second": 94.717,
+      "completion_tokens": 1024,
+      "round": 2,
+      "wall_seconds": 10.811151
+    },
+    {
+      "aggregate_end_to_end_tokens_per_second": 91.563,
+      "completion_tokens": 1024,
+      "round": 3,
+      "wall_seconds": 11.183567
+    }
+  ],
+  "terminal_card": {
+    "saved": false,
+    "native_warning": "could not render terminal report: 'code'",
+    "scope": "Presentation only; complete native JSON saved before the renderer, which expects the skipped decode/code block."
+  }
+}

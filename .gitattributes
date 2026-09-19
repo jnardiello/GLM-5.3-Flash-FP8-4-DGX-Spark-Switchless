@@ -1,0 +1,2 @@
+# Unified-diff blank context lines must retain their leading space.
+scripts/node/experiments/e03/source.patch whitespace=-blank-at-eol

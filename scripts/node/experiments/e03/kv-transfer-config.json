@@ -1,0 +1,21 @@
+{
+  "kv_connector": "SparkContextCacheConnector",
+  "kv_connector_extra_config": {
+    "spark_cache_cuda_restore": false,
+    "spark_cache_draft_checkpoint_sha256": "5d3e05d24de860b98fa172f480a859d808e3022731d0fda1e1a83ad8d776e1ff",
+    "spark_cache_draft_policy": "separate",
+    "spark_cache_max_span_tokens": 262144,
+    "spark_cache_min_span_tokens": 4096,
+    "spark_cache_model_profile": "glm53-flash-hybrid",
+    "spark_cache_restore": true,
+    "spark_cache_root": "/cache/jit/sparkcache-e03-mhc-fp8-20260919-6912",
+    "spark_cache_scheduler_probe": "none",
+    "spark_cache_store": true,
+    "spark_cache_streaming_snapshots": false,
+    "spark_cache_target_checkpoint_sha256": "c652a5964160ed137dce29253f7d8a6a1477f17c68a82042b65d94b1f97683f4",
+    "spark_cache_pending_wait_ms": 2000
+  },
+  "kv_connector_module_path": "sparkcache.spark_context_cache_connector",
+  "kv_load_failure_policy": "recompute",
+  "kv_role": "kv_both"
+}

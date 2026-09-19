@@ -1,0 +1,128 @@
+{
+  "schema": "tp4-c1-recheck/v1",
+  "owner_authorized": true,
+  "scope": "C1-only repeat replaces run 3 C1 block; all other measurements retained.",
+  "native_receipt_sha256": "ac8730377d35328f0f08520126bb12199fc4148fd6c9cf6b6de141a9816ef7b0",
+  "requests": 3,
+  "native_errors": 0,
+  "visible_completed_streams": 3,
+  "finish_reasons": {
+    "length": 3
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "wall_seconds": 6.433017,
+      "aggregate_tokens_per_second": 39.795,
+      "stream_ttft_seconds": 0.380487,
+      "prompt_tokens": 132,
+      "completion_tokens": 256
+    },
+    {
+      "round": 2,
+      "wall_seconds": 6.517126,
+      "aggregate_tokens_per_second": 39.281,
+      "stream_ttft_seconds": 0.362187,
+      "prompt_tokens": 135,
+      "completion_tokens": 256
+    },
+    {
+      "round": 3,
+      "wall_seconds": 6.150387,
+      "aggregate_tokens_per_second": 41.623,
+      "stream_ttft_seconds": 0.390859,
+      "prompt_tokens": 131,
+      "completion_tokens": 256
+    }
+  ],
+  "aggregate_tokens_per_second_median": 39.795,
+  "ttft_seconds_median": 0.38,
+  "protocol": {
+    "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+    "prompts_version": "1.0.0",
+    "repository_dirty": true,
+    "repository_revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+    "repository_source": "git-worktree",
+    "repository_source_sha256": "3380f0dcb4254376f2e57422aa151ed73d37c43f02c1ef00699997a7ab7a67a6",
+    "repository_worktree_sha256": "51154c4e1d3035452c6dd08b74294ff644745189466dfdab83ac0b4cf463b40a",
+    "version": "1.1.0"
+  },
+  "source_change": {
+    "native_flag": "--skip-decode",
+    "non_main_bench_functions_ast_identical": true,
+    "patch_sha256": "ba0b37db67d15558ad9cade2bfeab80dc39f64cc10f904ddc55412222faab342"
+  },
+  "settings": {
+    "concurrency": [
+      1
+    ],
+    "concurrency_runs": 3,
+    "concurrency_tokens": 256,
+    "concurrency_workload": "code",
+    "decode_tokens": 8192,
+    "prefill_depths": [],
+    "prefill_runs": 3,
+    "runs": 5,
+    "seed": 20260905,
+    "skip_decode": true,
+    "temperature": 0.0,
+    "top_p": 1.0
+  },
+  "extra_body_without_salt": {
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  },
+  "cache_salt_sha256": "883c58ad8412ad397dec5920ee487ebf9638a90bdd383d42bc138cbf8b1eac09",
+  "api_completed_delta": 3,
+  "api_access_log_requests": 3,
+  "unaccounted_requests": 0,
+  "same_container_identity": true,
+  "server_timing_sums_seconds": {
+    "vllm:time_to_first_token_seconds_sum": 1.0967967510223389,
+    "vllm:e2e_request_latency_seconds_sum": 19.06253218650818
+  },
+  "client_minus_server_ttft_sum_seconds": 0.036736248977661035,
+  "client_minus_server_wall_sum_seconds": 0.03581781349182123,
+  "sampled_memory": [
+    {
+      "rank": 0,
+      "min_available_gib": 4.11334228515625,
+      "cuda_ooms": 0,
+      "cuda_alloc_retries": 0
+    },
+    {
+      "rank": 1,
+      "min_available_gib": 8.562675476074219,
+      "cuda_ooms": 0,
+      "cuda_alloc_retries": 0
+    },
+    {
+      "rank": 2,
+      "min_available_gib": 8.52545166015625,
+      "cuda_ooms": 0,
+      "cuda_alloc_retries": 0
+    },
+    {
+      "rank": 3,
+      "min_available_gib": 8.517692565917969,
+      "cuda_ooms": 0,
+      "cuda_alloc_retries": 0
+    }
+  ],
+  "server_log_sha256": {
+    "rank0.stdout.log": "88873cdaf483d26c569a43ba076c9cabe275e4d1e8a100769a617295bacbd943",
+    "rank0.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rank1.stdout.log": "b294ba1c71985f76db6e1a38f0cfd0a14b067b2f7397f507e8abcb59c226295c",
+    "rank1.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rank2.stdout.log": "72bf93fca499fb4ce519c783c6ccaee9fd97288c5f874d0ffbd9c65d751e8a05",
+    "rank2.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rank3.stdout.log": "4cb90a60efe5cee69b4a0efdedac24688c0f3c8ae80d9197638dd60179212b27",
+    "rank3.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "limitations": [
+    "A targeted repeat has different preceding workload and idle duration from the original complete suite.",
+    "Same loaded model, request construction, timing implementation and instrumentation; native selector changes the recorded source hash.",
+    "Only C1 is replaced; no inference about excluding other measurements follows from this repeat."
+  ]
+}

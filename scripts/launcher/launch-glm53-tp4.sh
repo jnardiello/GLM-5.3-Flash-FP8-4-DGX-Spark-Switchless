@@ -438,6 +438,14 @@ fi
 
 # The current DFlash2 recipe leaves the optional async-scheduling flag disabled.
 ASYNCFLAG=""
+case "${SPARK_MHC_PREFILL_SHARD:-0}" in
+  0|1) ;;
+  *) echo "[launch] ERROR: SPARK_MHC_PREFILL_SHARD must be 0 or 1" >&2; exit 1 ;;
+esac
+if [ "${SPARK_MHC_PREFILL_SHARD:-0}" = 1 ] && [ "$DRY_RUN" != 1 ]; then
+  (cd "$ENV_DIR/experiments/e03" && sha256sum -c SHA256SUMS) \
+    || { echo "[launch] ERROR: E03 source manifest failed" >&2; exit 1; }
+fi
 if [ "$ASYNC_SCHEDULING" = "1" ]; then
   ASYNCFLAG="--async-scheduling"
 fi
@@ -482,6 +490,7 @@ DOCKER_CMD=(
   -e HF_HUB_OFFLINE=1
   -e TRANSFORMERS_OFFLINE=1
   -e PYTHONUNBUFFERED=1
+  -e SPARK_MHC_PREFILL_SHARD="${SPARK_MHC_PREFILL_SHARD:-0}"
   -e HF_HOME=/cache/hf
   -e XDG_CACHE_HOME=/cache
   -e VLLM_CACHE_ROOT=/cache/vllm

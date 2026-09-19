@@ -1,0 +1,64 @@
+{
+  "schema": "tp4-adaptive-draft-budget/v1",
+  "status": "prepared_not_measured",
+  "parent": "E03 (6912 target rows) plus replay views connector",
+  "base_scheduler": "scripts/node/patches/adaptive_k_scheduler.py",
+  "base_scheduler_sha256": "4cea8f55fa51b0371a52a4dd6eb5511ccb0bccbd81e435e6840f68f4ba641518",
+  "candidate_scheduler_sha256": "697f99bf1951535dcc3381776fa744ad8204d83d2606f341b617bac7a31949b4",
+  "activation": {
+    "mount_target": "/opt/tp4/adaptive_k_scheduler.py",
+    "scheduler_class": "adaptive_k_scheduler.AdaptiveKScheduler",
+    "environment": {
+      "VLLM_ADAPTIVE_K_RESPECT_DRAFT_BUDGET": "1"
+    }
+  },
+  "budget_source": "SchedulerOutput.resolve_num_spec_tokens_to_schedule(self._ak_engine_k); same output as R10 V2 worker",
+  "engine_sources_sha256": {
+    "vllm/v1/core/sched/async_scheduler.py": "d58ca33d48fb1eeddd7165327ea367be88752982023d58f0f831a0b90fad2c50",
+    "vllm/v1/core/sched/output.py": "9911b3f9d21815a185285852b5a6176e5484e1ab0ff5c30f7caaa68ea0fab543",
+    "vllm/v1/core/sched/scheduler.py": "122d9722b48f8cec267d2136a18c184b8901a5a0a46187eab7030d6227f1983d",
+    "vllm/v1/worker/gpu/model_runner.py": "f232398c93cf3193166136e823343840a41ebde8669253f56ce63a0023930cb4"
+  },
+  "preserved": {
+    "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "e03_manifest_sha256": "e8c2a8572309e5b6ef7ca56d52b9d29496135d44671d34fd4240a592d4583871",
+    "e03_source_manifest_sha256": "488ac1d481f2b0c7fb1d2c9ef8f1b48c6d71a1f8efa6aa99a11d484a05147352",
+    "e03_cache_config_sha256": "9a0520e0dc71d7e8cf9045065cff78226296305b25f0bc010c7830bb82019ed5",
+    "replay_connector_sha256": "5893f8747aa093874c46a0185f93c786265d99b5a4cd8da849a7471132422d66",
+    "kv_cache_memory_bytes_per_rank": 16106127360,
+    "context_tokens": 262144,
+    "num_speculative_tokens": 5,
+    "num_speculative_tokens_per_batch_size": [
+      [
+        1,
+        1,
+        5
+      ],
+      [
+        2,
+        6,
+        3
+      ]
+    ],
+    "mode": "batch-uniform",
+    "scheduler_policy": {
+      "k_lo": 3,
+      "k_hi": 5,
+      "up": 0.58,
+      "down": 0.42,
+      "alpha": 0.15,
+      "seed": 1,
+      "signal": "pos"
+    }
+  },
+  "overlay_parts_sha256": {
+    "scripts/node/experiments/e03/candidate.env": "521768fee2014d71354acc5af1ecdd4928d28eb4d57a7e0c1d18fec50a77f19b",
+    "scripts/node/experiments/e03/replay-views/delta.env": "1f20984d1c266f93bcd01040b4dcf1febe6b3e16913e7c3a8edc236153ac78e6",
+    "scripts/node/experiments/e03/draft-budget/delta.env": "e4c835a0480b04bfeda744451a22bd1955debbcf3dca4d6504ff8070c0cf360a"
+  },
+  "rollback": "Stop using the candidate overlay; deploy/start using E03 + replay views in an authorized coordinated window. Retain connector files, cache namespace and frozen scheduler.",
+  "limits": [
+    "CPU hook checks do not establish GPU graph execution or throughput improvement.",
+    "The original baseline shares the mismatch; this is not a demonstrated cause of the C4 difference."
+  ]
+}

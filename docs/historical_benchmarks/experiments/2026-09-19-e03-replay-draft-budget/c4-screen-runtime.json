@@ -1,0 +1,68 @@
+{
+  "native_receipt_sha256": "7a89a1b231a743a50f8be66f47811b3592d8424de7c1b2b25d2e30357c181a7f",
+  "request_denominator": 12,
+  "request_counter_delta": {
+    "stop": 0.0,
+    "length": 12.0,
+    "abort": 0.0,
+    "error": 0.0,
+    "repetition": 0.0
+  },
+  "api_post_count": 12,
+  "unaccounted_requests": 0,
+  "runtime_error_log_count": 0,
+  "health": 200,
+  "continuity": [
+    {
+      "rank": 0,
+      "same_container_start": true,
+      "restarts": 0,
+      "source_hashes_unchanged": true
+    },
+    {
+      "rank": 1,
+      "same_container_start": true,
+      "restarts": 0,
+      "source_hashes_unchanged": true
+    },
+    {
+      "rank": 2,
+      "same_container_start": true,
+      "restarts": 0,
+      "source_hashes_unchanged": true
+    },
+    {
+      "rank": 3,
+      "same_container_start": true,
+      "restarts": 0,
+      "source_hashes_unchanged": true
+    }
+  ],
+  "source_protocol": {
+    "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+    "prompts_version": "1.0.0",
+    "repository_dirty": true,
+    "repository_revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+    "repository_source": "git-worktree",
+    "repository_source_sha256": "3380f0dcb4254376f2e57422aa151ed73d37c43f02c1ef00699997a7ab7a67a6",
+    "repository_worktree_sha256": "51154c4e1d3035452c6dd08b74294ff644745189466dfdab83ac0b4cf463b40a",
+    "version": "1.1.0"
+  },
+  "last_logged_cumulative_cap_counters": {
+    "steps": 204,
+    "limited_steps": 32,
+    "limited_requests": 128,
+    "trimmed_tokens": 256
+  },
+  "cap_counter_scope": "Cumulative since this boot; periodic logs do not include the unlogged tail.",
+  "timing_seconds": {
+    "client_ttft_sum": 8.793262,
+    "server_ttft_sum": 8.623046398162842,
+    "client_wall_sum": 133.295302,
+    "server_e2e_sum": 133.13207173347473,
+    "server_queue_sum": 0.0001598879462108016,
+    "client_minus_server_ttft_sum": 0.17021560183715856,
+    "client_minus_server_duration_sum": 0.16323026652526096
+  },
+  "timing_limit": "Different client/server timing boundaries; aggregate differences do not locate an individual delay."
+}

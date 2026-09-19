@@ -1,0 +1,162 @@
+{
+  "run": "run-3",
+  "receipt_sha256": "b4f174e97bd8334ccff974c085b0407e31696ea0378d600570c92b2cdb468f43",
+  "native_validation_errors": [],
+  "protocol_errors": [],
+  "runtime_error": null,
+  "request_count": 54,
+  "completed_streams": 54,
+  "visible_responses": 54,
+  "finish_reasons": {
+    "stop": 15,
+    "length": 39
+  },
+  "decode_output_gates": {
+    "code": {
+      "passed": 5,
+      "total": 5
+    },
+    "prose": {
+      "passed": 5,
+      "total": 5
+    },
+    "structured": {
+      "passed": 5,
+      "total": 5
+    }
+  },
+  "code_output_budget_stops": 0,
+  "prefill_token_matches": 18,
+  "prefill_requests": 18,
+  "request_groups": {
+    "decode/code": {
+      "requests": 5,
+      "finish_reasons": {
+        "stop": 5
+      },
+      "completed_streams": 5,
+      "visible_responses": 5,
+      "native_first_visible_latency_unavailable": 0
+    },
+    "decode/prose": {
+      "requests": 5,
+      "finish_reasons": {
+        "stop": 5
+      },
+      "completed_streams": 5,
+      "visible_responses": 5,
+      "native_first_visible_latency_unavailable": 0
+    },
+    "decode/structured": {
+      "requests": 5,
+      "finish_reasons": {
+        "stop": 5
+      },
+      "completed_streams": 5,
+      "visible_responses": 5,
+      "native_first_visible_latency_unavailable": 0
+    },
+    "prefill/32768/cold": {
+      "requests": 3,
+      "finish_reasons": {
+        "length": 3
+      },
+      "completed_streams": 3,
+      "visible_responses": 3,
+      "native_first_visible_latency_unavailable": 0
+    },
+    "prefill/32768/warm_replay": {
+      "requests": 3,
+      "finish_reasons": {
+        "length": 3
+      },
+      "completed_streams": 3,
+      "visible_responses": 3,
+      "native_first_visible_latency_unavailable": 0
+    },
+    "prefill/65536/cold": {
+      "requests": 3,
+      "finish_reasons": {
+        "length": 3
+      },
+      "completed_streams": 3,
+      "visible_responses": 3,
+      "native_first_visible_latency_unavailable": 0
+    },
+    "prefill/65536/warm_replay": {
+      "requests": 3,
+      "finish_reasons": {
+        "length": 3
+      },
+      "completed_streams": 3,
+      "visible_responses": 3,
+      "native_first_visible_latency_unavailable": 0
+    },
+    "prefill/8192/cold": {
+      "requests": 3,
+      "finish_reasons": {
+        "length": 3
+      },
+      "completed_streams": 3,
+      "visible_responses": 3,
+      "native_first_visible_latency_unavailable": 0
+    },
+    "prefill/8192/warm_replay": {
+      "requests": 3,
+      "finish_reasons": {
+        "length": 3
+      },
+      "completed_streams": 3,
+      "visible_responses": 3,
+      "native_first_visible_latency_unavailable": 0
+    },
+    "concurrency/1": {
+      "requests": 3,
+      "finish_reasons": {
+        "length": 3
+      },
+      "completed_streams": 3,
+      "visible_responses": 3,
+      "native_first_visible_latency_unavailable": 0
+    },
+    "concurrency/2": {
+      "requests": 6,
+      "finish_reasons": {
+        "length": 6
+      },
+      "completed_streams": 6,
+      "visible_responses": 6,
+      "native_first_visible_latency_unavailable": 0
+    },
+    "concurrency/4": {
+      "requests": 12,
+      "finish_reasons": {
+        "length": 12
+      },
+      "completed_streams": 12,
+      "visible_responses": 12,
+      "native_first_visible_latency_unavailable": 0
+    }
+  },
+  "metrics": {
+    "code_decode_throughput": 53.735,
+    "code_c1_aggregate_end_to_end_throughput": 38.749,
+    "code_c2_aggregate_end_to_end_throughput": 60.951,
+    "code_c4_aggregate_end_to_end_throughput": 90.572,
+    "prose_decode_throughput": 31.718,
+    "code_ttft": 0.415,
+    "prose_ttft": 0.381,
+    "code_c1_per_stream_ttft": 0.4,
+    "code_c2_per_stream_ttft": 0.549,
+    "code_c4_per_stream_ttft": 0.523,
+    "prefill_8k_cold_throughput": 2407.872,
+    "prefill_8k_replay_throughput": 9637.624,
+    "prefill_32k_cold_throughput": 2674.728,
+    "prefill_32k_replay_throughput": 37189.665,
+    "prefill_64k_cold_throughput": 2593.238,
+    "prefill_64k_replay_throughput": 38964.019
+  },
+  "started_at": "2026-09-19T17:32:22.110080+00:00",
+  "finished_at": "2026-09-19T17:42:51.373906+00:00",
+  "cache_salt_sha256": "155911e417fa0bb44dfabc0020d69036914f4dc29cac4db238908292d6469e08"
+}

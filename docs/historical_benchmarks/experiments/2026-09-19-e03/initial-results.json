@@ -1,0 +1,95 @@
+{
+  "schema": "tp4-experiment-results/v1",
+  "experiment": "2026-09-19-e03",
+  "outcome": "unresolved",
+  "execution_status": "initial_candidate_validated_but_sharding_not_activated",
+  "comparison_reference": "docs/historical_benchmarks/baselines/2026-09-19/baseline.json",
+  "comparison_reference_sha256": "c9c5eaf3188f82ce6f9cb044b67ccc94286034f52320df9c2be5be6046616d5e",
+  "baseline_included_runs": 2,
+  "baseline_requests": 108,
+  "comparison_id": "glm53-nq2-3x-20260911-v1",
+  "planned_rigmark": {
+    "version": "1.1.0",
+    "source": {
+      "revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+      "repository_dirty": false,
+      "repository_source": "git-worktree",
+      "repository_source_sha256": "e0e92cff99f74ffa43d0a82541cf9db6010dd0a4ef3e8e7b84c5e1abd13a867f",
+      "comparison_note": "Source and prompt content match the 2026-09-18 reference. The 2026-09-11 record uses an earlier source hash and remains a historical comparison."
+    },
+    "prompts": {
+      "version": "1.0.0",
+      "sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb"
+    },
+    "cache_salt_policy": "Fresh per run; shared by its cold/replay pairs and forwarded to both chat and prefill requests. Raw salts are omitted; hashes identify the measured values.",
+    "settings": {
+      "concurrency": [
+        1,
+        2,
+        4
+      ],
+      "concurrency_runs": 3,
+      "concurrency_tokens": 256,
+      "concurrency_workload": "code",
+      "decode_tokens": 8192,
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      },
+      "prefill_depths": [
+        8192,
+        32768,
+        65536
+      ],
+      "prefill_runs": 3,
+      "runs": 5,
+      "seed": 20260905,
+      "temperature": 0,
+      "top_p": 1
+    }
+  },
+  "native_runs_started": 0,
+  "native_runs_completed": 0,
+  "native_requests": 0,
+  "planned_runs": 3,
+  "planned_requests": 162,
+  "accepted_runs": [],
+  "excluded_runs": [],
+  "performance_metrics": null,
+  "aggregation": "No E03 performance aggregate exists. Planned comparison is the median of three native per-run values against the fixed two-run September 19 medians.",
+  "preload_validation": {
+    "cpu_tests_passed": 11,
+    "cpu_tests_failed": 0,
+    "gpu_ranks_passed": 4,
+    "gpu_checks_passed": 88,
+    "gpu_checks_failed": 0
+  },
+  "serving_validation": {
+    "coordinated_transitions": 1,
+    "model_loads": 1,
+    "functional_gates_passed": 2,
+    "functional_gate_requests": 2,
+    "activation_requests": 1,
+    "activation_prompt_tokens": 8192,
+    "source_identity_ranks_passed": 4,
+    "sharding_activation_receipts": 0,
+    "kv_bytes_per_rank": 16106127360,
+    "reported_kv_capacity_tokens": 1344328,
+    "functional_gates_elapsed_seconds": 3.4795279502868652
+  },
+  "reason": "R10 reserves five DFlash2 slots per request within the 8192-token input budget. The target token upper bound is 8187 before Mamba alignment, so an 8192-row-only guard cannot activate. The unchanged scheduler alignment gives 6912 target rows in the documented cold-prefill examples.",
+  "next_decision": "Changing admission to the actual target chunk size would depart from the requested 8192-row-only contract. No corrective transition or benchmark was started without that decision.",
+  "limitations": [
+    "GPU checks exercised 8192 global rows and 2048 rows per rank, without model weights.",
+    "CPU and model-free GPU checks do not establish serving activation or performance.",
+    "The alignment examples omit additional publication stops; the 8187 upper bound does not depend on those stops.",
+    "No throughput, TTFT or benchmark memory comparison can be claimed."
+  ],
+  "receipt_sha256": {
+    "cpu-tests.log": "632f158c87eb5040d11c46cd9bddc07b1652d6e98e6b70cdad8e598308576def",
+    "gates.log": "643167bfb3654047c940be9172f2984bcb407dcfaf55e6ddd297b144ed38a9a8",
+    "activation.json": "17782c595584cbc9454b9ec2a034ac9a93f0e7735fb983a0184e953ce0684b88",
+    "gpu-summary.json": "173738c28eceb7dcd4e1634bb1610d2f5264afda204c332fdb795373056edf09"
+  }
+}

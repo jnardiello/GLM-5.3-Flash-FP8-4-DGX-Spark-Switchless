@@ -8,7 +8,8 @@ tables, measured recipes, decisions and evidence limits.
 | --- | --- |
 | [`baselines/2026-09-11/`](baselines/2026-09-11/baseline.json) | Initial Rigmark reference, three runs |
 | [`baselines/2026-09-18/`](baselines/2026-09-18/baseline.json) | Historical reference, three runs |
-| [`baselines/2026-09-19/`](baselines/2026-09-19/baseline.json) | Current reference, two accepted runs; separate reproduction and diagnostic probe records |
+| [`baselines/2026-09-19/`](baselines/2026-09-19/baseline.json) | Previous base, two accepted runs; separate reproduction and diagnostic probe records |
+| [`baselines/2026-09-19-e03/`](baselines/2026-09-19-e03/baseline.json) | Current accepted reference, three final full suites; separate [IaC promotion status](baselines/2026-09-19-e03/promotion.json) |
 | `experiments/<date-experiment>/` | Portable results for accepted, discarded, unresolved, incomplete or excluded measurements |
 
 Baseline JSON files are immutable. Their original embedded paths describe provenance;

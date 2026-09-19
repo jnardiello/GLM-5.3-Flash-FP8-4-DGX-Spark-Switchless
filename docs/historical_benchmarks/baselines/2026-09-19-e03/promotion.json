@@ -1,0 +1,42 @@
+{
+  "schema": "tp4-iac-promotion/v1",
+  "baseline_id": "2026-09-19-e03",
+  "owner_decision": "promote",
+  "status": "encoded_locally_live_reproduction_pending",
+  "measured_recipe_encoded": true,
+  "runtime_sources_unchanged": true,
+  "local_validation": {
+    "offline_check": "PASS",
+    "four_rank_command_parity_with_measured_overlay": "PASS",
+    "mounted_source_hashes": "PASS",
+    "complete_previous_base_rollback": "PASS",
+    "historical_identity_selection": "PASS",
+    "previous_json_records_unchanged": 72,
+    "whitespace_check": "PASS",
+    "figures_visually_reviewed": true,
+    "plotter_matplotlib_version": "3.11.2",
+    "figures_sha256": {
+      "docs/plots/baselines/2026-09-19-e03/generation.png": "a7a8009c558a47b72552fe99580b5fbec8ade687516044041c81cb79e535ae07",
+      "docs/plots/baselines/2026-09-19-e03/generation.svg": "fbdbe9e471ba5c50d9b80fda628024283800c1c524df9ce1207ec04a0a75a59a",
+      "docs/plots/baselines/2026-09-19-e03/prefill.png": "f7e94e22e9892fda0760b9ddc39e14967ea4e2b72576b6c94bb4f8851626ce3f",
+      "docs/plots/baselines/2026-09-19-e03/prefill.svg": "c71840c18f491fdb360a80fa8cd4a970d68650ff2bf48992eedb52460fb0b32c"
+    }
+  },
+  "new_deployments": 0,
+  "new_lifecycle_actions": 0,
+  "new_measurement_requests": 0,
+  "live_reproduction": {
+    "status": "not_performed",
+    "runs": 0,
+    "requests": 0
+  },
+  "baseline": {
+    "path": "docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json",
+    "sha256": "7aba7010faaffd23900ef0011df3395ca8d41d64a7257156780e0b93aff4f56f"
+  },
+  "rollback": "scripts/node/reference/baseline-20260919.env",
+  "notes": [
+    "No active site configuration or running service was changed by this repository update.",
+    "Use an authorized coordinated window to migrate an existing overlay deployment to these defaults, complete both gates, verify identity and record separate native Rigmark reproduction."
+  ]
+}

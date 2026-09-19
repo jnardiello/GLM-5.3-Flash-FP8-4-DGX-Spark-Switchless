@@ -86,6 +86,29 @@ Then verify these signatures that `docker ps` does not prove:
 | SparkCache lane | `docker inspect`, `./scripts/verify-node.sh` | `--kv-transfer-config` naming `SparkContextCacheConnector` in the command, entrypoint `/opt/sircl-serving/entrypoint.sh`, the connector, encoder, engine override and SIRCL mounts present, `sparkcache payload` and `sircl payload` rows PASS; `docker ps` shows no health state because the lane runs with `--no-healthcheck` |
 | Hybrid KDA and KV pool | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E20_KDA_INPUT_W8A16_READY` on every rank: 34 modules, group 128, padded N=6400, threshold 2048, shared scratch 51,515,392 bytes; `--kv-cache-memory-bytes=16106127360`; matching source hashes and `E20_MEMORY_PROBE` records |
 
+The default [accepted E03 recipe](benchmarks/baselines/2026-09-19-e03.md) retains those
+signatures and adds `SPARK_MHC_PREFILL_SHARD=1`, the measured source mounts and its
+separate cache namespace. Eligible eager long prefills log
+`SPARK_MHC_PREFILL rows=6912 owner_rows=1728 rs=90 ag=95 aux=5` on all four ranks;
+this is a workload activation receipt, not a requirement to run extra inference during
+an identity-only check. Runtime sources keep their `experiments/e03/` paths to preserve
+measured hashes. Do not append the historical experiment overlays to the new defaults.
+
+The selected replay connector SHA-256 is
+`5893f8747aa093874c46a0185f93c786265d99b5a4cd8da849a7471132422d66`.
+The scheduler SHA-256 is
+`697f99bf1951535dcc3381776fa744ad8204d83d2606f341b617bac7a31949b4`.
+Its rank-0 startup signature is
+`draft-budget active=1 source=SchedulerOutput.resolve_num_spec_tokens_to_schedule engine_k=5`,
+alongside the enabled batch-uniform async policy. When concurrent requests trigger a
+limit, expect `draft-budget first-cap budget=3` and aggregate `limited_requests` and
+`trimmed_tokens`. These count placeholder handouts, not accepted tokens or saved compute.
+An adaptive-policy fallback invalidates activation.
+
+The complete immediate return is `TP4_ENV=scripts/node/reference/baseline-20260919.env`:
+previous scheduler and model, previous connector and cache namespace, 15 GiB KV retained.
+Use the same effective recipe for all commands in a coordinated service window.
+
 For a boot caused by rank-0 autostart, inspect the units too:
 
 ```sh
@@ -106,17 +129,18 @@ verdict is needed:
 ```sh
 ./scripts/check-f0.py
 ./scripts/check-f0.py --base-url http://127.0.0.1:8000
-./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-18/baseline.json
+TP4_ENV=scripts/node/reference/baseline-20260919.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-19/baseline.json
+TP4_ENV=scripts/node/reference/baseline-20260918.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-18/baseline.json
 ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-11/baseline.json
 ```
 
 The second form uses an already-established localhost SSH tunnel when the management LAN
 is not directly reachable. The checker reads the local `cluster.env` and honors `TP4_ENV`
-as the effective delta. By default it validates the **September 19** identity from
-[the current baseline](historical_benchmarks/baselines/2026-09-19/baseline.json), including the hybrid sources, cache
-fixes, KV byte budget, image content ID and adaptive-k parameters. The last two forms
-select September 18 and September 11 explicitly; select the matching runtime recipe
-as well. A baseline-changing delta fails the check.
+as the effective delta. By default it validates the **September 19 E03** identity from
+[the current reference](historical_benchmarks/baselines/2026-09-19-e03/baseline.json), including
+the mHC sources/flag, replay connector, draft-budget scheduler/activation, hybrid KDA,
+KV byte budget and image content ID. Historical `--baseline` selection also requires
+the matching complete runtime recipe. A baseline-changing delta fails the check.
 
 The checker runs bounded SSH probes for all four ranks in parallel with strict host-key checking.
 It verifies the effective recipe against the selected baseline's pins, the configured running
@@ -270,13 +294,14 @@ content or touching a running container. It does replace `~/tp4/cluster.env`, wh
 what rank-0 autostart uses next. `restart` is disruptive and always cycles all ranks.
 
 `EXTRA_DOCKER_ENV` is one word-split string carrying the tuned MoE JSON, the adaptive
-scheduler mount, `PYTHONPATH`, policy variables, the nine vLLM override mounts, the
+scheduler mount, `PYTHONPATH`, policy variables, the retained base and E03 vLLM override mounts, the
 SIRCL bundle/runtime mounts with their entrypoint, and the connector and encoder mounts. An overlay
 replaces the complete value. Preserve every unrelated entry, avoid spaces/globs in
 values, and never clear the string while `--scheduler-cls
 adaptive_k_scheduler.AdaptiveKScheduler` remains in `EXTRA_VLLM_ARGS`.
 
-The September 19 configuration includes `scripts/node/overrides/`, `scripts/node/sparkcache/kv-transfer-config.json`
+The accepted configuration includes `scripts/node/overrides/`, the measured sources and
+config under `scripts/node/experiments/e03/`, `scripts/node/sparkcache/kv-transfer-config.json`
 and payload `SHA256SUMS` manifests in the deploy set. It also stages the frozen
 September 18 model and cache config for rollback. The SparkCache connector/encoder and
 SIRCL bundle/runtime are operator payload: prepare and place the pinned versions on
@@ -288,6 +313,30 @@ Expected: every copied file matches its source, all ranks launch in order 3â†’2â
 `/health` reaches 200, and all runtime signatures return. Run the
 [post-boot functional gates](#post-boot-functional-gates) within two minutes, followed
 by any task-specific verification. Stop the stack immediately if a gate fails.
+
+## Migrate the accepted overlay to defaults
+
+This is a coordinated lifecycle operation, separate from accepting measurements or
+committing IaC. Prepare a new ignored site configuration from `cluster.env.example`,
+preserving the current node addresses, accounts, paths, interfaces and topology.
+Retain the serving `cluster.env` and its exact overlay until the full-cluster stop:
+the frozen experiment overlays expect the previous base and will reject the new one.
+Prepare and verify the current payload and complete September 19 rollback first.
+
+In an authorized window:
+
+1. Stop all ranks using the still-active site configuration and serving `TP4_ENV`.
+2. Install the prepared site configuration locally, unset `TP4_ENV`, and deploy.
+   Remove any obsolete autostart overlay selection in the same window so its next
+   boot selects the same default recipe; reload systemd after a drop-in change.
+3. Verify the pinned payloads and all eight jumbo pings; start the four-rank service
+   once. Complete both functional gates within two minutes of `/health` 200.
+4. Run `./scripts/check-f0.py` and retain its four-rank identity report.
+5. When reproduction measurement is authorized, use native Rigmark with the current
+   frozen source/settings, fresh salts and unique absolute outputs. Record it separately
+   in the promotion directory; never overwrite the accepted candidate measurements.
+
+Local launcher parity and source hashes do not establish completion of these live steps.
 
 ## Start, stop, restart, logs, and power
 
@@ -374,6 +423,7 @@ below is full-cluster and must fall within an authorized service window.
 | --- | --- | --- |
 | Overlay result is bad | `./scripts/tp4ctl restart` with no `TP4_ENV` | base `cluster.env` signatures and gates return |
 | Production engine knob is bad | restore the rollback documented beside the value in `cluster.env.example`, update local `cluster.env`, deploy, restart | all runtime signatures plus task gate |
+| Restore the previous September 19 base | use the [complete September 19 rollback](#restore-the-previous-september-19-base) | original scheduler/model/connector/cache, mHC disabled, 15 GiB KV; historical identity check and both gates |
 | Restore the September 18 baseline | use the complete [September 18 overlay](#restore-the-september-18-baseline) for deploy and the coordinated transition | 16 GiB KV, original KDA model and connector, original cache namespace, no hybrid helper/encoder/probe mounts; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-18/baseline.json` with the same overlay, both gates |
 | Restore the September 11 baseline | use the [frozen archive restore](#restore-from-the-frozen-previous-archive): verify the archive and run its prepared restore plan, including the original base and overlay | `PATCH_FILE` mount present, no `--kv-transfer-config`, `mode=per-request`, automatic GID selection, generated identity-check command using the archived baseline path PASS, both gates |
 | Model revision is bad | restore the previous pinned revision and manifest named beside `MODEL_REV`, deploy fetch tooling, rerun the manifest fetch and `verify-node.sh --full-model`, then restart | identical revision markers and complete hashes on all ranks |
@@ -388,9 +438,33 @@ An IOMMU revert exit code 4 means GRUB was not safely regenerated: do not reboot
 Never use `EXTRA_DOCKER_ENV=""` as a generic rollback. Never purge a model to recover
 space without a fresh disk census and explicit owner decision.
 
+### Restore the previous September 19 base
+
+The immediate complete return is
+[`baseline-20260919.env`](../scripts/node/reference/baseline-20260919.env). It disables
+mHC sharding, restores the frozen adaptive scheduler and previous connector, and selects
+the previous cache namespace while retaining hybrid KDA, 15 GiB KV and the context limit.
+Keep both connectors, every source and both cache directories available.
+
+In the authorized window, first stop using the currently serving recipe. Then:
+
+```sh
+export TP4_ENV=scripts/node/reference/baseline-20260919.env
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Complete both functional gates within two minutes of /health 200.
+./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-19/baseline.json
+```
+
+Keep this overlay for subsequent lifecycle commands and configure autostart to use
+it before an unattended reboot. Returning to current defaults requires a coordinated
+stop with the rollback overlay, then deploy/start without it and removal of any
+rollback autostart selection. Neither direction deletes or reuses the other cache.
+
 ### Restore the September 18 baseline
 
-The immediate rollback is the complete non-site overlay
+This older rollback is the complete non-site overlay
 [`baseline-20260918.env`](../scripts/node/reference/baseline-20260918.env). It restores
 the original model module and cache namespace, the 16 GiB pool, and the original
 connector. The image, scheduler, SIRCL transport and checkpoint revisions are unchanged.
@@ -414,7 +488,7 @@ export TP4_ENV=scripts/node/reference/baseline-20260918.env
 
 Keep this overlay for later lifecycle commands. For unattended autostart, install a
 systemd drop-in that sets this same `TP4_ENV` and run `systemctl daemon-reload`; otherwise
-a later reboot would select the base September 19 recipe. Returning to September 19
+a later reboot would select the accepted E03 base recipe. Returning to the current defaults
 requires a coordinated transition with no overlay and removal of that drop-in. Preserve
 both persistent-cache directories; do not reuse their contents across quantization
 recipes. The frozen baseline medians are not remeasured as part of rollback.

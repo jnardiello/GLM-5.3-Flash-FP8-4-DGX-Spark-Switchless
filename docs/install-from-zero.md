@@ -246,19 +246,28 @@ python3 scripts/prepare-sparkcache.py \
   --connector <private-original-connector.py> \
   --encoder <private-original-encoder.py> \
   --output-dir <private-payload-directory>
+python3 scripts/node/experiments/e03/replay-views/prepare.py \
+  --connector <private-payload-directory>/spark_context_cache_connector.py \
+  --output <private-payload-directory>/spark_context_cache_connector-e03-replay-views.py
 ```
 
 The tool verifies both original hashes before writing, applies the two cache memory
 corrections, and verifies the exact resulting hashes used in the September 19 benchmark.
 It retains the original connector under a dated name for September 18 rollback. Repeating
 preparation accepts identical output and refuses to overwrite different files. It does
-not redistribute the input modules or change their terms.
+not redistribute the input modules or change their terms. The second command adds
+the current replay views connector with SHA-256
+`5893f8747aa093874c46a0185f93c786265d99b5a4cd8da849a7471132422d66`.
+It requires the corrected input pin and exclusive creation of a new output file;
+if that output already exists, verify its hash rather than overwrite it. Keep the
+corrected September 19 and original September 18 files for complete rollback.
 
 Place the prepared files and transport payload on **every** rank:
 
 | Payload | Node path (`cluster.env` key) | Verification |
 | --- | --- | --- |
-| corrected connector | `~/tp4/sparkcache/spark_context_cache_connector.py` (`SPARKCACHE_CONNECTOR`) | `scripts/node/sparkcache/SHA256SUMS` |
+| replay views connector | `~/tp4/sparkcache/spark_context_cache_connector-e03-replay-views.py` (`SPARKCACHE_CONNECTOR`) | `scripts/node/sparkcache/SHA256SUMS` |
+| corrected connector for September 19 rollback | `~/tp4/sparkcache/spark_context_cache_connector.py` | `scripts/node/sparkcache/SHA256SUMS` |
 | corrected hybrid encoder | `~/tp4/sparkcache/spark_context_cache_hybrid.py` (`SPARKCACHE_ENCODER`) | `scripts/node/sparkcache/SHA256SUMS` |
 | original connector for September 18 rollback | `~/tp4/sparkcache/spark_context_cache_connector-20260918.py` | pin in `scripts/node/reference/baseline-20260918.env` |
 | SIRCL bundle | `~/tp4/sircl/bundle/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS` |
@@ -322,9 +331,11 @@ only when those actions are outside its scope:
 
 Expected: static verification passes; fabric-check sees two addressed MTU-9000 ports
 per node and eight successful jumbo pings; `/health` reaches 200; all runtime
-signatures in [`operations.md`](operations.md) are present. Run the
+signatures in [`operations.md`](operations.md) are present, including the mHC flag,
+replay connector pin and draft-budget scheduler startup marker. Run the
 [post-boot functional gates](operations.md#post-boot-functional-gates) within two
-minutes of readiness.
+minutes of readiness, then verify the accepted identity with `./scripts/check-f0.py`.
+Save installation evidence separately from the frozen performance reference.
 
 If status or the rank-0 unit shows that autostart is already loading, wait for that
 attempt and skip `up`. If it is already serving, proceed directly to live verification

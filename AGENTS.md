@@ -19,7 +19,7 @@ for each part of the requested task before substantive work:
 For installation, read both [`docs/install-from-zero.md`](docs/install-from-zero.md)
 and [`docs/operations.md`](docs/operations.md). The default recipe is
 [`cluster.env.example`](cluster.env.example); its measured identity and performance
-record is [`docs/historical_benchmarks/baselines/2026-09-19/baseline.json`](docs/historical_benchmarks/baselines/2026-09-19/baseline.json). Preserve its
+record is [`docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json`](docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json). Preserve its
 non-site settings unless the owner requests a variant. Use this checklist to navigate
 the existing procedures:
 
@@ -144,19 +144,30 @@ benchmark interface. Do not recreate it with private wrapper scripts, blanket ca
 qualification prerequisites, or a parallel benchmark/admission framework; necessary
 measurement fixes belong in Rigmark.
 
-Run one experiment at a time. Use the frozen **September 19, 2026** baseline in
-[`docs/historical_benchmarks/baselines/2026-09-19/baseline.json`](docs/historical_benchmarks/baselines/2026-09-19/baseline.json) for future comparisons.
-Its fixed medians use exactly two valid native Rigmark runs (108 requests), accepted by
-the owner after a third run was excluded for competing traffic. Do not call this a
-three-run median or rerun/replace the reference without an explicit owner request.
-The current IaC base is `cluster.env.example`: hybrid KDA input projections, corrected
-SparkCache allocations and 15 GiB KV per rank. `scripts/check-f0.py` checks this identity
-by default without inference requests. The [September 18 record](docs/historical_benchmarks/baselines/2026-09-18/baseline.json)
-and [September 11 record](docs/historical_benchmarks/baselines/2026-09-11/baseline.json) remain immutable historical references;
-select them explicitly with `--baseline`. The immediate rollback uses
-`scripts/node/reference/baseline-20260918.env`; the older archive workflow remains in
-`docs/operations.md`. Source parity of the new defaults does not by itself establish
-live IaC reproduction: record any later deploy and benchmark separately.
+Run one experiment at a time. Use the owner-accepted **September 19, 2026 E03**
+reference in [`docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json`](docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json)
+for future comparisons. Its fixed medians use exactly three final native Rigmark
+suites (162 requests) from the retained E03/replay/draft-budget candidate. The earlier
+three candidate suites and nine isolated C1 requests remain separate; this is not a
+six-run median. The owner accepts the recorded small tradeoffs even if systematic.
+Do not treat that decision as proof that all decreases are noise or that the initial
+C1 slowdown has a proven fix.
+
+The IaC defaults in `cluster.env.example` select those measured sources, mHC 6,912-row
+prefill, replay views and the effective draft-budget cap, retaining hybrid KDA and
+15 GiB KV per rank. `scripts/check-f0.py` selects this identity by default without
+inference. Encoding the recipe does not establish live redeployment or reproduction;
+record those separately in the [promotion record](docs/historical_benchmarks/baselines/2026-09-19-e03/promotion.json).
+The immediate rollback is `scripts/node/reference/baseline-20260919.env`.
+
+The [earlier September 19 base](docs/historical_benchmarks/baselines/2026-09-19/baseline.json)
+remains immutable at exactly two accepted native runs / 108 requests; its third run
+was excluded for competing traffic. The [September 18](docs/historical_benchmarks/baselines/2026-09-18/baseline.json)
+and [September 11](docs/historical_benchmarks/baselines/2026-09-11/baseline.json) records also
+remain immutable. Select a historical identity explicitly with `--baseline` and its
+matching complete rollback recipe. Never remeasure or replace a frozen record without
+an explicit owner request.
+
 ### Run the benchmark
 
 Use the selected frozen record's `rigmark.source`, prompts and settings as the

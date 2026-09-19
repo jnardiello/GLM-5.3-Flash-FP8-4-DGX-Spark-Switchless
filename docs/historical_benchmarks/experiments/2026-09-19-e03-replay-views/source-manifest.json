@@ -1,0 +1,48 @@
+{
+  "base_connector_sha256": "23c1e05cc3bbabecd6b377b493bddfdd3125341d4a6cf63534d07419fdd73b9c",
+  "candidate_connector_sha256": "5893f8747aa093874c46a0185f93c786265d99b5a4cd8da849a7471132422d66",
+  "files": {
+    "check.py": "f384bf7b4de4f3c349fcc98ec86ac7baa5ea72a3e1c3e9ec8864a529c00f37de",
+    "delta.env": "1f20984d1c266f93bcd01040b4dcf1febe6b3e16913e7c3a8edc236153ac78e6",
+    "README.md": "2832a499a4048db79f5a2f413992e1c9da186f84cda27f9903084f6c6d2777d8",
+    "prepare.py": "4327a6ef5037074fbb747dbe26bf5598cb5075d709936dd57b9686b845f02672"
+  },
+  "standalone_overlay_sha256": "eb819840db345251fff34f57785fca8935cd64f713342f5b62d39ab402e27851",
+  "rigmark_c1_selector": {
+    "source_identity": {
+      "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+      "prompts_version": "1.0.0",
+      "repository_dirty": true,
+      "repository_revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+      "repository_source": "git-worktree",
+      "repository_source_sha256": "3380f0dcb4254376f2e57422aa151ed73d37c43f02c1ef00699997a7ab7a67a6",
+      "repository_worktree_sha256": "51154c4e1d3035452c6dd08b74294ff644745189466dfdab83ac0b4cf463b40a",
+      "version": "1.1.0"
+    },
+    "patch_sha256": "ba0b37db67d15558ad9cade2bfeab80dc39f64cc10f904ddc55412222faab342",
+    "files": {
+      "bench.py": {
+        "before_sha256": "84601c0d6f6d2d4df9476e1b6f05dba62b6057a4bda54ba0c79df51d8af9db7f",
+        "after_sha256": "d78839954d18a1fa539f94e49f9a47f610d4e17dc97d61963e96abffc994fbb0"
+      },
+      "receipt.py": {
+        "before_sha256": "58e453d0ae46e2e770b8281ee24f9fd33978bb2e0687fd64fa2eff9cc4adeb3f",
+        "after_sha256": "da9cf79b365ac0b9e4c12075557e1c2446add23e251bbc63d82b0aa34625ebfa"
+      },
+      "tests/test_bench.py": {
+        "before_sha256": "2e1d2f82d12dfcc9d7325d1130dfe7500c00071f7ae4b07c9405b1aea3b55eb0",
+        "after_sha256": "2d5b020261ba613d456b395d8f3b801470e795713b14fee0601639ff51980431"
+      },
+      "tests/test_receipt.py": {
+        "before_sha256": "ab96ca6cb1e1333acc81f45f8398623b1e672eac56dcb6a50de55a5781735f19",
+        "after_sha256": "127090bdac7268f47c7280a14b01741d31e908be7c4a10930361d4fe1054b9d7"
+      },
+      "README.md": {
+        "before_sha256": "0d895dd019057db613724b07a273c9b475545ccbe361330f64e0eeb98a02ae55",
+        "after_sha256": "ced8db20e3cba1b5037330ab963abe89119e430a60cae131392598f5e5626762"
+      }
+    },
+    "all_non_main_bench_functions_ast_identical": true,
+    "local_tests_passed": 59
+  }
+}

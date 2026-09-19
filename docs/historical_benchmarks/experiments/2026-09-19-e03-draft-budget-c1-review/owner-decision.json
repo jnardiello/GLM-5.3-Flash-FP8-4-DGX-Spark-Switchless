@@ -1,0 +1,52 @@
+{
+  "schema": "tp4-experiment-owner-decision/v1",
+  "experiment": "2026-09-19-e03-draft-budget-c1-review",
+  "candidate": "E03 plus replay views plus effective draft-budget scheduler",
+  "outcome": "promote",
+  "decision": "Owner accepts the measured candidate and its remaining observed performance decreases, including the possibility that they are systematic, in exchange for the recorded gains.",
+  "acceptance_status": "accepted_by_owner",
+  "iac_promotion_status": "pending",
+  "post_promotion_reproduction_status": "not_performed",
+  "baseline": {
+    "path": "docs/historical_benchmarks/baselines/2026-09-19/baseline.json",
+    "sha256": "c9c5eaf3188f82ce6f9cb044b67ccc94286034f52320df9c2be5be6046616d5e",
+    "runs": 2,
+    "requests": 108,
+    "unchanged": true
+  },
+  "original_measurements": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-19-e03-replay-draft-budget/results.json",
+    "sha256": "6b54b6e885268825e3b17a48fbad382e7781e0f33f376b3b5803bc0fa8c15fd2",
+    "measurement_assessment": "decision_required",
+    "unchanged": true
+  },
+  "followup_measurements": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-19-e03-draft-budget-c1-review/results.json",
+    "sha256": "e66bd76e5731def3cf7235df15b05d13afbe171df24d0b5dc8e361dbaf6f8ad0",
+    "measurement_assessment": "unresolved",
+    "unchanged": true
+  },
+  "final_table": {
+    "source": "followup_measurements.performance_metrics",
+    "aggregation": "Median of the native per-run values from the three complete follow-up suites, compared with the frozen baseline medians.",
+    "full_runs": 3,
+    "requests": 162,
+    "isolated_c1_requests_kept_separate": 9,
+    "original_series_kept_separate": true
+  },
+  "presentation": {
+    "small_change_label": "approximately unchanged",
+    "policy": "The owner requests that small decreases of roughly 1–2% be shown as approximately unchanged. Exact percentage deltas remain visible; the label is a presentation convention, not a statistical equivalence finding.",
+    "applies_to": "final accepted-state comparison"
+  },
+  "limits": [
+    "Acceptance is an owner decision about the measured tradeoffs; it does not establish that every decrease is noise.",
+    "The cause of the initial C1 slowdown remains unisolated; the follow-up changed no serving code or configuration.",
+    "The decision does not replace the frozen baseline or establish completed IaC promotion and reproduction."
+  ],
+  "actions_for_this_record": {
+    "new_measurements": 0,
+    "new_runtime_changes": 0,
+    "new_lifecycle_actions": 0
+  }
+}

@@ -23,13 +23,14 @@ from typing import Any, Callable
 
 
 REPO = Path(__file__).resolve().parents[1]
-BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-19/baseline.json"
+BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json"
 ADAPTIVE_DEFAULTS = {
     "VLLM_ADAPTIVE_K_ENABLE": "1", "VLLM_ADAPTIVE_K_LO": "3",
     "VLLM_ADAPTIVE_K_HI": "5", "VLLM_ADAPTIVE_K_MODE": "per-request",
     "VLLM_ADAPTIVE_K_SEED": "1.0", "VLLM_ADAPTIVE_K_DOWN": "0.42",
     "VLLM_ADAPTIVE_K_UP": "0.58", "VLLM_ADAPTIVE_K_ALPHA": "0.15",
     "VLLM_ADAPTIVE_K_SIGNAL": "pos", "VLLM_ADAPTIVE_K_LOG_EVERY": "200",
+    "VLLM_ADAPTIVE_K_RESPECT_DRAFT_BUDGET": "0",
 }
 
 LOAD_RECIPE = r'''
@@ -81,6 +82,10 @@ emit batched_tokens "$BATCHED_TOKENS"; emit spec_tokens "$SPEC_TOKENS"
 emit spec_extra_json "${SPEC_EXTRA_JSON:-}"; emit async_scheduling "$ASYNC_SCHEDULING"
 emit extra_docker_env "${EXTRA_DOCKER_ENV:-}"; emit extra_vllm_args "${EXTRA_VLLM_ARGS:-}"
 emit sparkcache_mode "${SPARKCACHE_MODE:-off}"
+emit spark_mhc_prefill_shard "${SPARK_MHC_PREFILL_SHARD:-0}"
+emit sparkcache_config_sha256 "${SPARKCACHE_CONFIG_SHA256:-}"
+emit sparkcache_connector_sha256 "${SPARKCACHE_CONNECTOR_SHA256:-}"
+emit sparkcache_encoder_sha256 "${SPARKCACHE_ENCODER_SHA256:-}"
 emit fabric_prefix_re "${FABRIC_PREFIX_RE:-}"
 for i in 0 1 2 3; do
   for prefix in base_fabric_target base_mgmt_if base_fabric_ifaces base_hca; do
@@ -242,6 +247,9 @@ if container and identity.get("kda_boot_receipt"):
         logs, _ = run(["sudo", "-n", "docker", "logs", "--since", started,
                        "--until", end.isoformat(), p["container"]], timeout=20, include_stderr=True)
         for line in logs.splitlines():
+            if (p.get("rank") == 0 and identity.get("scheduler_boot_signature")
+                    and identity["scheduler_boot_signature"] in line):
+                runtime_receipts["scheduler_boot_signature"] = True
             if "E20_KDA_INPUT_W8A16_READY " in line:
                 try: runtime_receipts["kda"] = json.loads(line.split("E20_KDA_INPUT_W8A16_READY ", 1)[1])
                 except json.JSONDecodeError: pass
@@ -346,6 +354,7 @@ def expected_f0(baseline: Path | None = None) -> dict[str, Any]:
     image_digest = system.get("serving_image_digest") or system["serving_image"]
     adaptive = dict(ADAPTIVE_DEFAULTS)
     policy = system.get("adaptive_k") or {}
+    adaptive["VLLM_ADAPTIVE_K_RESPECT_DRAFT_BUDGET"] = str(int(policy.get("respect_draft_budget", False)))
     for key, name in (("VLLM_ADAPTIVE_K_MODE", "mode"), ("VLLM_ADAPTIVE_K_LO", "k_lo"),
                       ("VLLM_ADAPTIVE_K_HI", "k_hi"), ("VLLM_ADAPTIVE_K_UP", "up"),
                       ("VLLM_ADAPTIVE_K_DOWN", "down"), ("VLLM_ADAPTIVE_K_ALPHA", "alpha"),
@@ -371,6 +380,12 @@ def expected_f0(baseline: Path | None = None) -> dict[str, Any]:
         "image_id": system.get("serving_image_id"),
         "runtime_identity": system.get("operational_identity") or {},
         "sparkcache_mode": "on" if system.get("sparkcache") else "off",
+        "spark_mhc_prefill_shard": str(int(system.get("mhc_prefill", {}).get("enabled", False))),
+        "payload_pins": {key: value for key, value in {
+            "sparkcache_config_sha256": system.get("sparkcache", {}).get("kv_transfer_config_sha256"),
+            "sparkcache_connector_sha256": system.get("sparkcache", {}).get("connector_sha256"),
+            "sparkcache_encoder_sha256": system.get("sparkcache", {}).get("hybrid_encoder_sha256"),
+        }.items() if value},
     }
 
 
@@ -439,6 +454,11 @@ def recipe_problems(recipe: dict[str, str], expected: dict[str, Any]) -> list[st
         problems.append("baseline KV memory budget")
     if recipe.get("sparkcache_mode", "off") != expected["sparkcache_mode"]:
         problems.append("baseline SparkCache mode")
+    if recipe.get("spark_mhc_prefill_shard", "0") != expected["spark_mhc_prefill_shard"]:
+        problems.append("baseline mHC prefill flag")
+    for key, value in expected.get("payload_pins", {}).items():
+        if recipe.get(key) != value:
+            problems.append("baseline payload pin: " + key)
     identity = expected.get("runtime_identity") or {}
     for key, value in identity.get("environment", {}).items():
         # Launcher-owned values, such as NCCL GID and LD_PRELOAD, are checked on
@@ -473,7 +493,7 @@ def fabric_prefix(recipe: dict[str, str]) -> str:
 def probe_rank(rank: int, host: str, recipe: dict[str, str], timeout: float) -> dict[str, Any]:
     verify = run_command([str(REPO / "scripts/verify-node.sh"), "--quick", "--host", host], timeout=timeout)
     payload = base64.urlsafe_b64encode(json.dumps({
-        "container": recipe["container"], "fabric_prefix_re": fabric_prefix(recipe),
+        "rank": rank, "container": recipe["container"], "fabric_prefix_re": fabric_prefix(recipe),
         "fabric_targets": recipe[f"fabric_target_{rank}"].split(),
         "model_dir": recipe["model_dir"], "draft_dir": recipe["draft_dir"],
         "runtime_identity": recipe.get("runtime_identity", {}),
@@ -613,6 +633,9 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
             if container.get("runtime_files", {}).get(path) != sha:
                 problems.append(f"rank {rank}: runtime file {path}")
         receipts = container.get("runtime_receipts") or {}
+        if (rank == 0 and identity.get("scheduler_boot_signature")
+                and not receipts.get("scheduler_boot_signature")):
+            problems.append("rank 0: draft-budget scheduler boot signature")
         kda = receipts.get("kda") or {}
         for key, value in identity.get("kda_boot_receipt", {}).items():
             if key == "padded_n":

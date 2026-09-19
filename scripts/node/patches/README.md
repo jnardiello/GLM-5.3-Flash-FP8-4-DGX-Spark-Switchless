@@ -7,8 +7,14 @@ deployed to `~/patches/`; a patch becomes active only when the launcher or
 | File | Role | Activation |
 | --- | --- | --- |
 | `../sparse_attn_indexer_kpool_sm121.py` | Apache-2.0-derived SM121 sparse-attention K-pool fix | deployed as `~/patches/sparse_attn_indexer_kpool.py` and mounted by the launcher only for the September 11 configuration (`SPARKCACHE_MODE=off`) |
-| `adaptive_k_scheduler.py` | Apache-2.0-derived adaptive speculative verification scheduler | mounted at `/opt/tp4/adaptive_k_scheduler.py`, added to `PYTHONPATH`, and selected by `--scheduler-cls` in `cluster.env` |
+| `adaptive_k_scheduler.py` | frozen previous adaptive speculative verification scheduler, retained for rollback | historical recipes mount it at `/opt/tp4/adaptive_k_scheduler.py`, added to `PYTHONPATH`, and selected by `--scheduler-cls` in `cluster.env` |
 | `test_adaptive_k_policy.py` | CPU-only policy and observation-gate tests | workstation only; `scripts/deploy.sh` skips `test_*.py` |
+
+The current defaults mount the measured scheduler at
+[`../experiments/e03/draft-budget/adaptive_k_scheduler.py`](../experiments/e03/draft-budget/adaptive_k_scheduler.py).
+It preserves the original policy and caps placeholders by the producing output's
+engine budget. Its flag, source pin and complete previous-base rollback are in
+`cluster.env.example`; the original module here keeps its historical bytes and hash.
 
 The scheduler tracks each request's acceptance history and chooses the configured low
 or high verify length. The dynamic speculation table captures CUDA-graph families for

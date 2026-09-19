@@ -1,0 +1,245 @@
+{
+  "schema": "tp4-c4-recheck/v1",
+  "owner_authorized": true,
+  "scope": "C4-only consistency check; all prior measurements and accepted aggregates retained.",
+  "native_receipt_sha256": "5936faf8eded8175344a0734cea38e90c5a3eaf220f77ff1fe103c1e95b14b94",
+  "requests": 12,
+  "native_errors": 0,
+  "visible_completed_streams": 12,
+  "finish_reasons": {
+    "length": 12
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "wall_seconds": 12.69877,
+      "aggregate_tokens_per_second": 80.638,
+      "completion_tokens": 1024,
+      "streams": [
+        {
+          "prompt_tokens": 130,
+          "completion_tokens": 256,
+          "ttft_seconds": 1.246396,
+          "wall_seconds": 12.697115,
+          "decode_tokens_per_second": 22.269,
+          "finish_reason": "length"
+        },
+        {
+          "prompt_tokens": 134,
+          "completion_tokens": 256,
+          "ttft_seconds": 0.436386,
+          "wall_seconds": 11.763641,
+          "decode_tokens_per_second": 22.512,
+          "finish_reason": "length"
+        },
+        {
+          "prompt_tokens": 132,
+          "completion_tokens": 256,
+          "ttft_seconds": 1.246331,
+          "wall_seconds": 12.416912,
+          "decode_tokens_per_second": 22.828,
+          "finish_reason": "length"
+        },
+        {
+          "prompt_tokens": 135,
+          "completion_tokens": 256,
+          "ttft_seconds": 0.436634,
+          "wall_seconds": 12.417611,
+          "decode_tokens_per_second": 21.284,
+          "finish_reason": "length"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "wall_seconds": 11.361603,
+      "aggregate_tokens_per_second": 90.128,
+      "completion_tokens": 1024,
+      "streams": [
+        {
+          "prompt_tokens": 133,
+          "completion_tokens": 256,
+          "ttft_seconds": 0.535812,
+          "wall_seconds": 10.892658,
+          "decode_tokens_per_second": 24.622,
+          "finish_reason": "length"
+        },
+        {
+          "prompt_tokens": 134,
+          "completion_tokens": 256,
+          "ttft_seconds": 0.535515,
+          "wall_seconds": 11.067219,
+          "decode_tokens_per_second": 24.213,
+          "finish_reason": "length"
+        },
+        {
+          "prompt_tokens": 131,
+          "completion_tokens": 256,
+          "ttft_seconds": 0.535164,
+          "wall_seconds": 11.360304,
+          "decode_tokens_per_second": 23.557,
+          "finish_reason": "length"
+        },
+        {
+          "prompt_tokens": 132,
+          "completion_tokens": 256,
+          "ttft_seconds": 0.535661,
+          "wall_seconds": 11.235031,
+          "decode_tokens_per_second": 23.833,
+          "finish_reason": "length"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "wall_seconds": 12.182604,
+      "aggregate_tokens_per_second": 84.054,
+      "completion_tokens": 1024,
+      "streams": [
+        {
+          "prompt_tokens": 133,
+          "completion_tokens": 256,
+          "ttft_seconds": 0.8421,
+          "wall_seconds": 12.086257,
+          "decode_tokens_per_second": 22.679,
+          "finish_reason": "length"
+        },
+        {
+          "prompt_tokens": 131,
+          "completion_tokens": 256,
+          "ttft_seconds": 0.337614,
+          "wall_seconds": 11.568533,
+          "decode_tokens_per_second": 22.705,
+          "finish_reason": "length"
+        },
+        {
+          "prompt_tokens": 134,
+          "completion_tokens": 256,
+          "ttft_seconds": 0.841595,
+          "wall_seconds": 12.180881,
+          "decode_tokens_per_second": 22.488,
+          "finish_reason": "length"
+        },
+        {
+          "prompt_tokens": 132,
+          "completion_tokens": 256,
+          "ttft_seconds": 0.84223,
+          "wall_seconds": 11.999678,
+          "decode_tokens_per_second": 22.855,
+          "finish_reason": "length"
+        }
+      ]
+    }
+  ],
+  "aggregate_tokens_per_second_median": 84.054,
+  "ttft_seconds_median": 0.536,
+  "comparison": {
+    "baseline_aggregate": 87.527,
+    "e03_aggregate": 86.342,
+    "original_candidate_aggregate": 82.994,
+    "original_candidate_per_run": [
+      86.248,
+      82.994,
+      79.767
+    ],
+    "change_vs_baseline_pct": -3.967918470871845,
+    "change_vs_e03_pct": -2.6499270343517622,
+    "change_vs_original_candidate_pct": 1.2772007615008407,
+    "baseline_ttft_seconds": 0.6795,
+    "e03_ttft_seconds": 0.524,
+    "original_candidate_ttft_seconds": 0.684,
+    "ttft_change_vs_baseline_ms": -143.49999999999997,
+    "ttft_change_vs_e03_ms": 12.00000000000001
+  },
+  "protocol": {
+    "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+    "prompts_version": "1.0.0",
+    "repository_dirty": true,
+    "repository_revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+    "repository_source": "git-worktree",
+    "repository_source_sha256": "3380f0dcb4254376f2e57422aa151ed73d37c43f02c1ef00699997a7ab7a67a6",
+    "repository_worktree_sha256": "51154c4e1d3035452c6dd08b74294ff644745189466dfdab83ac0b4cf463b40a",
+    "version": "1.1.0"
+  },
+  "source_change": {
+    "native_flag": "--skip-decode",
+    "non_main_bench_functions_ast_identical": true,
+    "patch_sha256": "ba0b37db67d15558ad9cade2bfeab80dc39f64cc10f904ddc55412222faab342"
+  },
+  "settings": {
+    "concurrency": [
+      4
+    ],
+    "concurrency_runs": 3,
+    "concurrency_tokens": 256,
+    "concurrency_workload": "code",
+    "decode_tokens": 8192,
+    "prefill_depths": [],
+    "prefill_runs": 3,
+    "runs": 5,
+    "seed": 20260905,
+    "skip_decode": true,
+    "temperature": 0.0,
+    "top_p": 1.0
+  },
+  "extra_body_without_salt": {
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  },
+  "cache_salt_sha256": "acddbe4649c3578be9b9317b2a333619ee785ce14ea456dfa8bd415fbedae329",
+  "api_completed_delta": 12,
+  "api_access_log_requests": 12,
+  "unaccounted_requests": 0,
+  "same_container_identity": true,
+  "server_timing_sums_seconds": {
+    "vllm:time_to_first_token_seconds_sum": 8.202301502227783,
+    "vllm:e2e_request_latency_seconds_sum": 141.52579402923584,
+    "vllm:request_queue_time_seconds_sum": 0.0002519820991437882
+  },
+  "client_minus_server_ttft_sum_seconds": 0.1691364977722163,
+  "client_minus_server_wall_sum_seconds": 0.16004597076414484,
+  "sampled_memory": [
+    {
+      "rank": 0,
+      "min_available_gib": 4.089836120605469,
+      "cuda_ooms": 0,
+      "cuda_alloc_retries": 0
+    },
+    {
+      "rank": 1,
+      "min_available_gib": 8.546241760253906,
+      "cuda_ooms": 0,
+      "cuda_alloc_retries": 0
+    },
+    {
+      "rank": 2,
+      "min_available_gib": 8.510753631591797,
+      "cuda_ooms": 0,
+      "cuda_alloc_retries": 0
+    },
+    {
+      "rank": 3,
+      "min_available_gib": 8.48250961303711,
+      "cuda_ooms": 0,
+      "cuda_alloc_retries": 0
+    }
+  ],
+  "server_log_sha256": {
+    "rank0.stdout.log": "71d8956a980f9327cef4a4c63168d9728b4eb2c74486caee52e065195be36893",
+    "rank0.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rank1.stdout.log": "2b3c3e1941f8bb192db05762ea1ca1d8210dad27db64ed131cca285ea31865ad",
+    "rank1.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rank2.stdout.log": "9b092daa682a7b27fb148531d1f946f54e5557e30719eea5cc7f227532703344",
+    "rank2.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rank3.stdout.log": "aa43a23b00ece02b1cf2f5ddf352f136012f9c13eb742dba8d1dc27827c41140",
+    "rank3.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "assessment": "The repeat is 1.28% above the prior candidate median but remains 3.97% below baseline throughput. TTFT returns close to E03. Large client/server timing discrepancy does not recur; throughput difference remains an observed concern with unresolved cause.",
+  "limitations": [
+    "One native C4-only execution with three rounds, not a fourth full suite.",
+    "Different preceding workload and idle duration from the original complete suites.",
+    "Observed variability and non-contemporaneous references limit attribution; no formal confidence interval or proven connector cause.",
+    "No original C4 value is excluded or replaced."
+  ]
+}

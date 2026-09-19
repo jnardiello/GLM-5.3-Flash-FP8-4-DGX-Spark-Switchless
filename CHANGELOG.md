@@ -7,6 +7,17 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Added a frozen accepted E03/replay/draft-budget reference from the final three native
+  Rigmark suites (162 requests), with all 16 metrics, receipt hashes, variability and
+  memory/error accounting. Earlier candidate series and isolated checks remain archived.
+- Added current-only generation/latency and cold/replay PNG/SVG figures, linked from the
+  README and the dated report; historical figures and frozen baseline bytes are retained.
+- Added the complete previous September 19 rollback and offline four-rank equivalence
+  checks between the new defaults and the measured candidate, including mounted hashes,
+  feature activation, payload pins and historical identity selection.
+- Added the measured Apache-2.0 E03 mHC TP4/DCP1 port and draft-budget scheduler, their
+  source manifests and CPU tests, plus hash-checked replay connector preparation from
+  operator-supplied payload. Licenses and upstream notices remain attached.
 - Added dated benchmark reports and result archives for baselines, reproductions and
   experiments, preserving incomplete and excluded evidence with explicit outcomes.
 - Added a local native-report directory and a mandatory absolute `--output` convention
@@ -40,6 +51,15 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- Made the accepted E03 mHC 6,912-row path, replay views and effective draft-budget
+  scheduler the default IaC recipe, preserving measured runtime hashes, FP8/DFlash2,
+  hybrid KDA, graph budgets, 15 GiB KV and context. Updated installation, boot signatures,
+  rollback, node/patch guides and agent instructions. Live deployment/reproduction of
+  the newly encoded defaults remains explicitly pending; the serving stack is retained.
+- Selected the new three-suite reference in the identity checker, README and plotting
+  tool. README percentages remain relative to September 11; the dated report includes
+  the previous September 19 base and exact deltas. Small changes of roughly 1–2% are
+  labelled approximately unchanged where requested, without claiming statistical parity.
 - Moved frozen benchmark JSON and historical PNG/SVG figures into dated archives,
   preserving their bytes and hashes and updating operational references.
 - Simplified the README to current-baseline values and figures, retaining percentage

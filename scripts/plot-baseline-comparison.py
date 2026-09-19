@@ -14,8 +14,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-19/baseline.json"
-OUTPUT_DIR = ROOT / "docs/plots/baselines/2026-09-19"
+BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json"
+OUTPUT_DIR = ROOT / "docs/plots/baselines/2026-09-19-e03"
 TEAL, INK, MUTED = "#087f74", "#172b46", "#536478"
 
 GENERATION = [

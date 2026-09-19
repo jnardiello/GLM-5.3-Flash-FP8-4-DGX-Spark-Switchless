@@ -1,0 +1,67 @@
+{
+  "native_receipt_sha256": "b4f174e97bd8334ccff974c085b0407e31696ea0378d600570c92b2cdb468f43",
+  "request_denominator": 54,
+  "request_counter_delta": {
+    "stop": 15.0,
+    "length": 39.0,
+    "abort": 0.0,
+    "error": 0.0,
+    "repetition": 0.0
+  },
+  "api_post_count": 54,
+  "unaccounted_requests": 0,
+  "runtime_error_log_count": 0,
+  "health": 200,
+  "continuity": [
+    {
+      "rank": 0,
+      "same_container_start": true,
+      "restarts": 0,
+      "source_hashes_unchanged": true
+    },
+    {
+      "rank": 1,
+      "same_container_start": true,
+      "restarts": 0,
+      "source_hashes_unchanged": true
+    },
+    {
+      "rank": 2,
+      "same_container_start": true,
+      "restarts": 0,
+      "source_hashes_unchanged": true
+    },
+    {
+      "rank": 3,
+      "same_container_start": true,
+      "restarts": 0,
+      "source_hashes_unchanged": true
+    }
+  ],
+  "source_protocol": {
+    "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+    "prompts_version": "1.0.0",
+    "repository_dirty": false,
+    "repository_revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+    "repository_source": "git-worktree",
+    "repository_source_sha256": "e0e92cff99f74ffa43d0a82541cf9db6010dd0a4ef3e8e7b84c5e1abd13a867f",
+    "version": "1.1.0"
+  },
+  "last_logged_cumulative_cap_counters": {
+    "steps": 18932,
+    "limited_steps": 393,
+    "limited_requests": 1201,
+    "trimmed_tokens": 2402
+  },
+  "cap_counter_scope": "Cumulative since this boot; periodic logs do not include the unlogged tail.",
+  "timing_seconds": {
+    "client_ttft_sum": 149.687052,
+    "server_ttft_sum": 148.2296462059021,
+    "client_wall_sum": 753.12519,
+    "server_e2e_sum": 752.4949641227722,
+    "server_queue_sum": 4.699664967163699,
+    "client_minus_server_ttft_sum": 1.4574057940978946,
+    "client_minus_server_duration_sum": 0.6302258772277582
+  },
+  "timing_limit": "Different client/server timing boundaries; aggregate differences do not locate an individual delay."
+}

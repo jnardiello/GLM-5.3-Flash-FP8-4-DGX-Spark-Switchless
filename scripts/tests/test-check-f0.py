@@ -379,7 +379,8 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
     exp = check.expected_f0(path)
     rec = recipe()
     rec.update(image=exp["image_digest"], image_digest=exp["image_digest"],
-               sparkcache_mode=exp["sparkcache_mode"])
+               sparkcache_mode=exp["sparkcache_mode"],
+               spark_mhc_prefill_shard=exp["spark_mhc_prefill_shard"], **exp["payload_pins"])
     for name in ("extra_docker_env", "base_extra_docker_env"):
         rec[name] = " ".join(f"-e {key}={value}" for key, value in exp["adaptive_env"].items())
     for name in ("extra_vllm_args", "base_extra_vllm_args"):
@@ -398,19 +399,19 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
         padded_n = kda.pop("padded_n", None)
         if padded_n is not None:
             kda["receipts"] = [{"padded_n": padded_n} for _ in range(kda["modules"])]
-        c["runtime_receipts"] = {"kda": kda, "memory_probe": {
+        c["runtime_receipts"] = {"scheduler_boot_signature": True, "kda": kda, "memory_probe": {
             **identity.get("memory_probe", {}), "rank": rank}}
     return rec, exp, ranks
 
 
-assert check.BASELINE == BASELINES / "2026-09-19/baseline.json"
-for name in ("2026-09-11", "2026-09-18", "2026-09-19"):
+assert check.BASELINE == BASELINES / "2026-09-19-e03/baseline.json"
+for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03"):
     baseline_path = BASELINES / name / "baseline.json"
     baseline_recipe, baseline_expected, baseline_ranks = baseline_fixture(baseline_path)
     assert check.evaluate(baseline_recipe, baseline_expected, baseline_ranks, endpoint()) == [], name
 
 current_recipe, current_expected, current_ranks = baseline_fixture(check.BASELINE)
-assert current_expected["baseline_id"] == "2026-09-19"
+assert current_expected["baseline_id"] == "2026-09-19-e03"
 assert current_expected["kv_cache_memory_bytes"] == "16106127360"
 assert current_expected["runtime_identity"]["kda_boot_receipt"]["prefill_bf16_min_tokens"] == 2048
 
@@ -464,7 +465,7 @@ assert "rank 0: running image content ID" in check.evaluate(
 original_load = check.load_recipe
 try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-selection.") as temp:
-        for name in ("2026-09-11", "2026-09-18", "2026-09-19"):
+        for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03"):
             path = BASELINES / name / "baseline.json"
             rec, exp, ranks = baseline_fixture(path)
             check.load_recipe = lambda timeout: (deepcopy(rec), {"returncode": 0})
@@ -488,6 +489,7 @@ try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-overlay.") as temp:
         isolated = Path(temp)
         for relative in ("scripts/lib/common.sh", "scripts/node/bootstrap/versions.env",
+                         "scripts/node/reference/baseline-20260919.env",
                          "scripts/node/reference/baseline-20260918.env",
                          "scripts/node/reference/f0-20260912.env", "cluster.env.example"):
             target = isolated / relative
@@ -501,13 +503,14 @@ RELAY_DEST=operator@192.0.2.23
 '''
         check.REPO = isolated
         for overlay, baseline in (
-            (None, "2026-09-19"),
+            (None, "2026-09-19-e03"),
+            ("scripts/node/reference/baseline-20260919.env", "2026-09-19"),
             ("scripts/node/reference/baseline-20260918.env", "2026-09-18"),
             ("scripts/node/reference/f0-20260912.env", "2026-09-11"),
         ):
             # The frozen F0 overlay predates SparkCache. An archived F0 source
             # restores an OFF base; it is not a complete lane switch over ON.
-            base = config + ('\nSPARKCACHE_MODE=off\n' if baseline == "2026-09-11" else "")
+            base = config + ('\nSPARKCACHE_MODE=off\nSPARK_MHC_PREFILL_SHARD=0\n' if baseline == "2026-09-11" else "")
             (isolated / "cluster.env").write_text(base, encoding="utf-8")
             if overlay:
                 os.environ["TP4_ENV"] = overlay
@@ -520,8 +523,11 @@ RELAY_DEST=operator@192.0.2.23
             assert problems == [], (baseline, problems)
             if overlay:
                 assert effective["extra_docker_env"] != effective["base_extra_docker_env"]
-                assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]
-                assert "baseline KV memory budget" in check.recipe_problems(effective, current_expected)
+                if baseline == "2026-09-19":
+                    assert "baseline mHC prefill flag" in check.recipe_problems(effective, current_expected)
+                else:
+                    assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]
+                    assert "baseline KV memory budget" in check.recipe_problems(effective, current_expected)
             changed_site = deepcopy(effective)
             changed_site["container"] += "-other"
             assert "TP4_ENV changed protected field: container" in check.recipe_problems(changed_site, selected)
@@ -533,3 +539,19 @@ finally:
         os.environ["TP4_ENV"] = saved_overlay
 
 print("test-check-f0: PASS")
+
+# The accepted features and payloads must fail closed when disabled or mismatched.
+for key, value in current_expected["payload_pins"].items():
+    wrong = deepcopy(current_recipe)
+    wrong[key] = "0" * 64
+    assert "baseline payload pin: " + key in check.recipe_problems(wrong, current_expected)
+wrong = deepcopy(current_recipe)
+wrong["spark_mhc_prefill_shard"] = "0"
+assert "baseline mHC prefill flag" in check.recipe_problems(wrong, current_expected)
+for key in ("SPARK_MHC_PREFILL_SHARD", "VLLM_ADAPTIVE_K_RESPECT_DRAFT_BUDGET"):
+    wrong = deepcopy(current_ranks)
+    wrong[2]["remote"]["container"]["environment"][key] = "0"
+    assert any(key in error for error in check.evaluate(current_recipe, current_expected, wrong, endpoint()))
+wrong = deepcopy(current_ranks)
+wrong[0]["remote"]["container"]["runtime_receipts"].pop("scheduler_boot_signature")
+assert "rank 0: draft-budget scheduler boot signature" in check.evaluate(current_recipe, current_expected, wrong, endpoint())

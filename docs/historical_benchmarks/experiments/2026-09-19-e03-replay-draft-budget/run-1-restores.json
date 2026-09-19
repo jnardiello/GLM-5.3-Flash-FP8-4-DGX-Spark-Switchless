@@ -1,0 +1,108 @@
+{
+  "run": "run-1",
+  "native_receipt_sha256": "8a5ade446a3104d911a5f13780e30d23158db3ff155fe903cecff520856cb531",
+  "verified_replay_requests": 9,
+  "rank_restores": 36,
+  "depths": [
+    {
+      "prompt_tokens": 8192,
+      "restored_tokens": 6912,
+      "bytes_mib_per_rank_rounded": 88.2,
+      "max_rank_restore_ms_per_pair": [
+        196.5,
+        192.2,
+        191.8
+      ],
+      "max_rank_restore_median_ms": 192.2,
+      "per_rank": [
+        [
+          196.5,
+          192.2,
+          191.8
+        ],
+        [
+          187.0,
+          176.6,
+          188.0
+        ],
+        [
+          174.4,
+          169.8,
+          169.5
+        ],
+        [
+          193.2,
+          184.3,
+          180.7
+        ]
+      ]
+    },
+    {
+      "prompt_tokens": 32768,
+      "restored_tokens": 32256,
+      "bytes_mib_per_rank_rounded": 237.4,
+      "max_rank_restore_ms_per_pair": [
+        449.9,
+        446.4,
+        446.3
+      ],
+      "max_rank_restore_median_ms": 446.4,
+      "per_rank": [
+        [
+          449.9,
+          444.7,
+          440.7
+        ],
+        [
+          437.0,
+          446.4,
+          446.3
+        ],
+        [
+          428.4,
+          422.0,
+          428.2
+        ],
+        [
+          432.7,
+          438.5,
+          435.3
+        ]
+      ]
+    },
+    {
+      "prompt_tokens": 65536,
+      "restored_tokens": 64512,
+      "bytes_mib_per_rank_rounded": 427.2,
+      "max_rank_restore_ms_per_pair": [
+        864.6,
+        866.5,
+        889.3
+      ],
+      "max_rank_restore_median_ms": 866.5,
+      "per_rank": [
+        [
+          864.6,
+          866.5,
+          888.5
+        ],
+        [
+          807.7,
+          817.8,
+          889.3
+        ],
+        [
+          816.7,
+          710.0,
+          739.6
+        ],
+        [
+          843.3,
+          837.9,
+          869.8
+        ]
+      ]
+    }
+  ],
+  "limits": "Logged per-rank durations; slowest rank selected per replay, then median of three pairs. No cross-host timestamp subtraction."
+}

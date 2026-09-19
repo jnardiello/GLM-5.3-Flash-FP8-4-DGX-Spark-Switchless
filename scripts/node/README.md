@@ -5,8 +5,8 @@ artifacts for the four cluster hosts. Nothing in this directory runs merely beca
 it exists in the repository; deploy, bootstrap, launcher, and configuration choices
 select the files explicitly.
 
-The base configuration is the [September 19, 2026 recipe](../../docs/historical_benchmarks/baselines/2026-09-19/baseline.json).
-September 18 and September 11 remain separate historical references with their own
+The base configuration is the [accepted September 19 E03 recipe](../../docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json).
+The previous September 19 base, September 18 and September 11 remain historical references with their own
 rollback assets; the September 12 filenames below belong to the September 11
 reference's later capture.
 
@@ -18,10 +18,11 @@ reference's later capture.
 | `model-manifests/` | immutable filename, size, and SHA-256 manifests for supported model snapshots |
 | `moe-configs/` | GB10 fused-MoE tuning JSON mounted into vLLM |
 | `nccl/` | pinned NCCL build, switchless overlay, shape/checksum record, and atomic installer |
-| `overrides/` | nine Current vLLM modules, including hybrid KDA execution and the measured GPU allocator probe, bind-mounted over the R10 image |
-| `patches/` | container-side Python scheduler patch and CPU-only policy tests |
-| `reference/` | complete September 18 overlay, original GLM model and cache JSON; separate frozen September 11 overlay, launcher/controller, artifact pins and private-archive autostart template |
-| `sparkcache/` | exact measured `kv-transfer-config.json` and SHA-256 manifest for the untracked corrected connector and encoder |
+| `overrides/` | retained base vLLM modules, including hybrid KDA execution and the GPU allocator probe; the original model remains for rollback |
+| `experiments/e03/` | accepted mHC modules, cache config and draft-budget scheduler, retaining measured paths/hashes; archived preparation overlays and checks |
+| `patches/` | frozen previous adaptive scheduler and CPU-only policy tests, retained for rollback |
+| `reference/` | complete previous September 19 and September 18 overlays, original GLM model and cache JSON; separate frozen September 11 overlay, launcher/controller, artifact pins and private-archive autostart template |
+| `sparkcache/` | previous base cache JSON and manifest for current replay views plus rollback connector/encoder payloads |
 | `sircl/` | SHA-256 manifest of the untracked SIRCL bundle/runtime payload |
 | `flusher-unconditional.sh` | temporary page-cache flusher used while model weights load |
 | `sparse_attn_indexer_kpool_sm121.py` | SM121 sparse-attention patch deployed as `sparse_attn_indexer_kpool.py`; mounted only in the September 11 configuration (`SPARKCACHE_MODE=off`) |
@@ -43,10 +44,12 @@ reference's later capture.
 | shared `scripts/node/etc/common/` files | `/etc/sysctl.d/`, `/etc/sudoers.d/`, `/usr/local/sbin/`, `/etc/systemd/system/` | bootstrap/deploy-host |
 | GRUB drop-in | `/etc/default/grub.d/zz-tp4-perf.cfg` | bootstrap/deploy-host and `tp4-iommu.sh` |
 | built NCCL library | `$NCCL_DIR/libnccl.so.2` | `scripts/node/nccl/install-nccl.sh` |
+| September 19 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260919.env` | `scripts/deploy.sh` |
 | September 18 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260918.env` | `scripts/deploy.sh` |
 | `reference/model-20260918.py` and `reference/sparkcache-20260918.json` | `~/tp4/reference/` | `scripts/deploy.sh` |
 | September 11 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/f0-20260912.env` | `scripts/deploy.sh` |
 | Frozen `reference/tp4ctl-f0-20260912.sh` controller | `~/tp4/tp4ctl-f0-reference` | `scripts/deploy.sh` |
+| `scripts/node/experiments/e03/` Python, JSON and source manifests | `~/tp4/experiments/e03/` (same relative layout) | `scripts/deploy.sh` |
 | `scripts/node/overrides/**/*.py` | `~/tp4/overrides/…` (same relative layout) | `scripts/deploy.sh` |
 | `scripts/node/sparkcache/kv-transfer-config.json` and `SHA256SUMS` | `~/tp4/sparkcache/` | `scripts/deploy.sh` |
 | `scripts/node/sircl/SHA256SUMS` and the gitignored per-site `SHA256SUMS.site` | `~/tp4/sircl/` | `scripts/deploy.sh` |
@@ -60,9 +63,10 @@ script activates `/etc` state only under `--apply`; it never reboots a node.
 
 ## Current engine and cache payload
 
-The nine vLLM modules cover the cache interface and allocation utilities, worker
-utilities, GPU worker, GLM model, pooled indexer and kpool operation, KDA conversion,
-and shared BF16 scratch. The hybrid path converts 34 KDA input projections to
+The current recipe mounts 17 vLLM modules: retained cache allocation, worker/probe,
+indexer and hybrid-KDA sources, plus the E03 model and mHC per-call sharding modules.
+E03 applies only to 6,912-row pure eager prefills under TP4/DCP1, leaving decode and
+CUDA graph paths ordinary. All measured source bytes and paths are retained. The hybrid path converts 34 KDA input projections to
 group-128 INT8 storage, pads their TP-local `[6288, 4096]` shape to `[6400, 4096]`,
 and uses Marlin below 2,048 flattened input tokens. At or above that threshold it
 dequantizes the same weights into a shared scratch and runs BF16 linear execution.
@@ -83,22 +87,32 @@ python3 scripts/prepare-sparkcache.py \
   --connector /path/to/original/spark_context_cache_connector.py \
   --encoder /path/to/original/spark_context_cache_hybrid.py \
   --output-dir /path/to/private/prepared-payload
+python3 scripts/node/experiments/e03/replay-views/prepare.py \
+  --connector /path/to/private/prepared-payload/spark_context_cache_connector.py \
+  --output /path/to/private/prepared-payload/spark_context_cache_connector-e03-replay-views.py
 ```
 
 The preparer verifies both source hashes and resulting hashes. Its connector
 correction releases completed saver items through a per-item function scope; its
 encoder correction uses one join with identical output bytes. It emits those two files plus
 `spark_context_cache_connector-20260918.py`, preserving the original for rollback.
-Stage these outputs on all four nodes at the configured paths; deployment does
+The second command emits the separate current replay views connector; it verifies both
+input/output pins and refuses to replace an existing file. Preserve the corrected base
+connector for September 19 rollback as well. Stage all outputs on the configured paths; deployment does
 not distribute unlicensed operator payload automatically.
 
 `SPARKCACHE_CONNECTOR_SHA256` and `SPARKCACHE_ENCODER_SHA256` pin the selected
 modules, and `SPARKCACHE_CONFIG_SHA256` pins the tracked JSON. Keep those values
 consistent with `sparkcache/SHA256SUMS`. Preserve the JSON's measured cache namespace
-when reproducing the Current recipe: it is separate from the unconverted-weight
-cache used on September 18, and its spelling is part of the configuration hash.
+when reproducing the Current recipe: its E03 JSON lives under `experiments/e03/`,
+separate from both earlier cache computations, and its spelling is part of the hash.
 
-For September 18 rollback, use
+For the immediate previous-base return, use
+[`reference/baseline-20260919.env`](reference/baseline-20260919.env). It restores the
+original model, scheduler, corrected connector and cache namespace, disables mHC,
+and retains hybrid KDA and 15 GiB KV. See the coordinated procedure in operations.
+
+For the older September 18 rollback, use
 [`reference/baseline-20260918.env`](reference/baseline-20260918.env) with the same
 `TP4_ENV` for deploy and the full coordinated transition. The overlay selects the
 frozen model and JSON, the original connector, the image's encoder, the 16 GiB KV
@@ -152,4 +166,4 @@ The first three inspect deployed nodes and require site configuration. The final
 command is fully offline and validates source syntax, manifests, templates, links,
 fixtures, the adaptive-k policy, hybrid dispatch contracts, and payload preparation
 without SSH, Docker, a GPU, or `cluster.env`. Offline checks do not constitute a new
-live deployment or benchmark reproduction of the September 19 baseline.
+live deployment or benchmark reproduction of the accepted E03 defaults.

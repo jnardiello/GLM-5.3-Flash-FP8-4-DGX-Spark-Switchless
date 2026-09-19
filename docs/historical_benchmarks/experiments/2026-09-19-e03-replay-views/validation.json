@@ -1,0 +1,69 @@
+{
+  "status": "PASS",
+  "coordinated_candidate_loads": 1,
+  "gpu_ranks_passed": 4,
+  "gpu_receipt_sha256": "9bcf65b72352c7fcf3a4bae648dc468cfab51590a18c9859c14f9268389efb67",
+  "functional_gates": {
+    "status": "PASS",
+    "elapsed_seconds": 3.212759494781494,
+    "finished_at": "2026-09-19T14:16:48.604113+00:00"
+  },
+  "validation_requests": 3,
+  "same_activation_warmup_as_e03": true,
+  "mhc_rows": 6912,
+  "owner_rows": 1728,
+  "reduce_scatter_per_rank": 90,
+  "all_gather_per_rank": 95,
+  "auxiliary_gather_per_rank": 5,
+  "healthy_ranks": 4,
+  "health": 200,
+  "kv_bytes_per_rank": 16106127360,
+  "kv_capacity_tokens": 1344328,
+  "ranks": [
+    {
+      "rank": 0,
+      "source_identity_verified": true,
+      "postboot_receipt_sha256": "a2bc07666c30aaba512358757f146192a21f52f043ef3ae5d6bd85c8442d8620",
+      "pre_run_receipt_sha256": "7e1955dde90516cdc123ba4328d142c757ab36f9f7c2afe354a745396c9df31e"
+    },
+    {
+      "rank": 1,
+      "source_identity_verified": true,
+      "postboot_receipt_sha256": "15d4df43ce86e7810dc8b0fab2a12afe75dc1f826aaa4e924ac4410650d3190b",
+      "pre_run_receipt_sha256": "ddeeeec5ef29b661f04967e33cfb0fe91cb9dfbcf513995a4c3c98d8f7f775df"
+    },
+    {
+      "rank": 2,
+      "source_identity_verified": true,
+      "postboot_receipt_sha256": "b83a1c225d6416aa9568564285f74a680af780c5c662ea8a345f98c51ee10791",
+      "pre_run_receipt_sha256": "8cd602f175ff1cd888aac2f03010ddc92dbc1ecf6acef90ae25a4bf2a6859163"
+    },
+    {
+      "rank": 3,
+      "source_identity_verified": true,
+      "postboot_receipt_sha256": "70c16991ee26d60a9c3ea6ffa8567e7ef23c875d719c7f737a5d0e46b387c11a",
+      "pre_run_receipt_sha256": "699e2bbfd8b50f5073ebe93de728c9ce21e0448addc6f16b2363b3528fe06a10"
+    }
+  ],
+  "final_offline_validation": {
+    "repository_check": "PASS",
+    "repository_check_log_sha256": "af31a04a5f218d941672c4c5fda5228125a3fc59542471e7918cb1b6e21a2dc8",
+    "rigmark_selector_tests": 59,
+    "rigmark_selector_tests_status": "PASS",
+    "all_16_median_and_count_checks": "PASS",
+    "original_native_receipts_and_frozen_baseline_hashes": "unchanged",
+    "c1_repeat": "c1-recheck.json"
+  },
+  "c4_consistency_check": {
+    "record": "c4-recheck.json",
+    "native_requests": 12,
+    "api_completed_delta": 12,
+    "native_validation_errors": 0,
+    "health": 200,
+    "healthy_ranks": 4,
+    "temporary_observers_stopped": true,
+    "same_source_as_c1_repeat": true,
+    "repository_check": "PASS",
+    "repository_check_log_sha256": "3b2f88060820fb306cf91643f25fc3ee25e23f0ee8a5b647eedbaf8b91367b01"
+  }
+}

@@ -1,0 +1,1775 @@
+{
+  "schema": "tp4-experiment/v1",
+  "experiment": "2026-09-19-e03-replay-draft-budget",
+  "outcome": "decision_required",
+  "assessment": {
+    "outcome": "decision_required",
+    "reason": "C4 exceeds the frozen target in all three suites and C2 improves, while C1 throughput is lower in all three; the conflicting primary outcomes require an owner decision.",
+    "service_state": "The healthy E03 plus replay views plus draft-budget candidate remains loaded and idle on all four ranks. Temporary host observers and the task tunnel are stopped. No promotion, rollback, commit or push was performed. A later lifecycle transition needs a new coordinated authorization.",
+    "c4_target_tok_s": 87.527,
+    "c4_runs_meeting_target": 3,
+    "c4_run_denominator": 3,
+    "c1_measured_reduction_all_runs": true,
+    "causal_limit": "The one-request budget and policy are unchanged in CPU checks. These noncontemporaneous measurements establish an observed C1 tradeoff, not its cause.",
+    "detail_paragraphs": [
+      "**C4 recovery is repeatable in this series:** 88.783 / 92.596 / 90.572 tok/s, all above the 87.527 target and the baseline\u2019s observed 87.031\u201388.023 range. The median is **90.572 tok/s (+3.48% versus baseline, +9.13% versus E03 plus replay)**. C2 also improves in every suite: its 62.094 tok/s median is **+8.46% / +3.42%** versus those references.",
+      "",
+      "**C1 is the primary tradeoff:** 39.159 / 38.762 / 38.749 tok/s, all below both reference ranges. Its **38.762 tok/s** median is **\u22123.82% versus baseline and \u22122.60% versus the parent**. The one-request budget remains five and CPU checks preserve its original adaptive decisions; this does not establish the cause of the measured decrease. C2/C4 gains do not automatically outweigh the repeated C1 reduction, so the outcome is **decision_required**.",
+      "",
+      "Code decode (\u22120.29% versus baseline) and prose (\u22120.50%) have overlapping observed ranges with the baseline. Code TTFT is 12.5 ms higher at the median. Long replay gains are retained: 32K TTFT is **0.881 s**, versus 0.910 s in the parent and 0.930 s in the baseline; 64K is **1.655 s**, versus 1.669 s and 1.849 s. The 64K difference from the parent is within its observed range.",
+      "",
+      "8K replay is less consistent: native per-run throughput is **9,436.190 / 7,757.561 / 9,637.624 tok/s**, with a median **\u22121.27% versus baseline / \u22121.82% versus the parent**. The second run\u2019s slower samples remain included. Cold 8K is \u22122.45% versus the parent but +9.22% versus baseline. No sample, metric block or complete run was excluded.",
+      "",
+      "Client-minus-server summed request duration is **0.622 / 0.643 / 0.630 s** across the respective 54-request suites; TTFT differences are **1.422 / 1.416 / 1.457 s**. Exact API counts match all three suites, and the much larger parent timing anomaly did not recur. These aggregate counters do not identify the cause of individual timing variations."
+    ]
+  },
+  "execution_status": "series_complete",
+  "reference": {
+    "baseline": "2026-09-19",
+    "accepted_runs": 2,
+    "requests": 108,
+    "sha256": "c9c5eaf3188f82ce6f9cb044b67ccc94286034f52320df9c2be5be6046616d5e"
+  },
+  "parent_replay": {
+    "record_sha256": "92e97db56aefe931417e7298dc9cf095cf0524c7d07dbab5900fff1691b9aae1",
+    "accepted_metric_requests": 162,
+    "full_runs": 3,
+    "c1_note": "Parent C1 throughput/TTFT use runs 1 and 2 and the owner-approved C1 repeat; all other metrics use its three full runs.",
+    "separate_c4_repeat_tok_s": 84.054,
+    "separate_c4_repeat_excluded_from_main_comparison": true
+  },
+  "accepted_runs": [
+    {
+      "run": "run-1",
+      "receipt_sha256": "8a5ade446a3104d911a5f13780e30d23158db3ff155fe903cecff520856cb531",
+      "native_validation_errors": [],
+      "protocol_errors": [],
+      "runtime_error": null,
+      "request_count": 54,
+      "completed_streams": 54,
+      "visible_responses": 54,
+      "finish_reasons": {
+        "stop": 15,
+        "length": 39
+      },
+      "decode_output_gates": {
+        "code": {
+          "passed": 5,
+          "total": 5
+        },
+        "prose": {
+          "passed": 5,
+          "total": 5
+        },
+        "structured": {
+          "passed": 5,
+          "total": 5
+        }
+      },
+      "code_output_budget_stops": 0,
+      "prefill_token_matches": 18,
+      "prefill_requests": 18,
+      "request_groups": {
+        "decode/code": {
+          "requests": 5,
+          "finish_reasons": {
+            "stop": 5
+          },
+          "completed_streams": 5,
+          "visible_responses": 5,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "decode/prose": {
+          "requests": 5,
+          "finish_reasons": {
+            "stop": 5
+          },
+          "completed_streams": 5,
+          "visible_responses": 5,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "decode/structured": {
+          "requests": 5,
+          "finish_reasons": {
+            "stop": 5
+          },
+          "completed_streams": 5,
+          "visible_responses": 5,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/32768/cold": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/32768/warm_replay": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/65536/cold": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/65536/warm_replay": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/8192/cold": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/8192/warm_replay": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "concurrency/1": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "concurrency/2": {
+          "requests": 6,
+          "finish_reasons": {
+            "length": 6
+          },
+          "completed_streams": 6,
+          "visible_responses": 6,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "concurrency/4": {
+          "requests": 12,
+          "finish_reasons": {
+            "length": 12
+          },
+          "completed_streams": 12,
+          "visible_responses": 12,
+          "native_first_visible_latency_unavailable": 0
+        }
+      },
+      "metrics": {
+        "code_decode_throughput": 54.415,
+        "code_c1_aggregate_end_to_end_throughput": 39.159,
+        "code_c2_aggregate_end_to_end_throughput": 62.094,
+        "code_c4_aggregate_end_to_end_throughput": 88.783,
+        "prose_decode_throughput": 31.915,
+        "code_ttft": 0.393,
+        "prose_ttft": 0.38,
+        "code_c1_per_stream_ttft": 0.39,
+        "code_c2_per_stream_ttft": 0.468,
+        "code_c4_per_stream_ttft": 0.695,
+        "prefill_8k_cold_throughput": 2573.133,
+        "prefill_8k_replay_throughput": 9436.19,
+        "prefill_32k_cold_throughput": 2784.779,
+        "prefill_32k_replay_throughput": 38015.773,
+        "prefill_64k_cold_throughput": 2707.803,
+        "prefill_64k_replay_throughput": 39592.667
+      },
+      "started_at": "2026-09-19T17:10:19.672868+00:00",
+      "finished_at": "2026-09-19T17:20:23.414463+00:00",
+      "cache_salt_sha256": "ed70ee738f6f6c3fac36437102a8158bb2793f6ea5b7e95c2b8aa1bb5ac76c29"
+    },
+    {
+      "run": "run-2",
+      "receipt_sha256": "2b712d4487e19c140aa5311792561726e348acada7afa5240b48f56319427897",
+      "native_validation_errors": [],
+      "protocol_errors": [],
+      "runtime_error": null,
+      "request_count": 54,
+      "completed_streams": 54,
+      "visible_responses": 54,
+      "finish_reasons": {
+        "stop": 15,
+        "length": 39
+      },
+      "decode_output_gates": {
+        "code": {
+          "passed": 5,
+          "total": 5
+        },
+        "prose": {
+          "passed": 5,
+          "total": 5
+        },
+        "structured": {
+          "passed": 5,
+          "total": 5
+        }
+      },
+      "code_output_budget_stops": 0,
+      "prefill_token_matches": 18,
+      "prefill_requests": 18,
+      "request_groups": {
+        "decode/code": {
+          "requests": 5,
+          "finish_reasons": {
+            "stop": 5
+          },
+          "completed_streams": 5,
+          "visible_responses": 5,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "decode/prose": {
+          "requests": 5,
+          "finish_reasons": {
+            "stop": 5
+          },
+          "completed_streams": 5,
+          "visible_responses": 5,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "decode/structured": {
+          "requests": 5,
+          "finish_reasons": {
+            "stop": 5
+          },
+          "completed_streams": 5,
+          "visible_responses": 5,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/32768/cold": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/32768/warm_replay": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/65536/cold": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/65536/warm_replay": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/8192/cold": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/8192/warm_replay": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "concurrency/1": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "concurrency/2": {
+          "requests": 6,
+          "finish_reasons": {
+            "length": 6
+          },
+          "completed_streams": 6,
+          "visible_responses": 6,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "concurrency/4": {
+          "requests": 12,
+          "finish_reasons": {
+            "length": 12
+          },
+          "completed_streams": 12,
+          "visible_responses": 12,
+          "native_first_visible_latency_unavailable": 0
+        }
+      },
+      "metrics": {
+        "code_decode_throughput": 52.844,
+        "code_c1_aggregate_end_to_end_throughput": 38.762,
+        "code_c2_aggregate_end_to_end_throughput": 63.523,
+        "code_c4_aggregate_end_to_end_throughput": 92.596,
+        "prose_decode_throughput": 31.327,
+        "code_ttft": 0.414,
+        "prose_ttft": 0.381,
+        "code_c1_per_stream_ttft": 0.341,
+        "code_c2_per_stream_ttft": 0.45,
+        "code_c4_per_stream_ttft": 0.524,
+        "prefill_8k_cold_throughput": 2571.838,
+        "prefill_8k_replay_throughput": 7757.561,
+        "prefill_32k_cold_throughput": 2611.688,
+        "prefill_32k_replay_throughput": 36959.462,
+        "prefill_64k_cold_throughput": 2686.065,
+        "prefill_64k_replay_throughput": 40216.423
+      },
+      "started_at": "2026-09-19T17:21:23.388714+00:00",
+      "finished_at": "2026-09-19T17:31:09.563850+00:00",
+      "cache_salt_sha256": "1ac4e0a24ad606c4325297f3fc13eea4735113f44efc25b5c1be1b0bdf300b57"
+    },
+    {
+      "run": "run-3",
+      "receipt_sha256": "b4f174e97bd8334ccff974c085b0407e31696ea0378d600570c92b2cdb468f43",
+      "native_validation_errors": [],
+      "protocol_errors": [],
+      "runtime_error": null,
+      "request_count": 54,
+      "completed_streams": 54,
+      "visible_responses": 54,
+      "finish_reasons": {
+        "stop": 15,
+        "length": 39
+      },
+      "decode_output_gates": {
+        "code": {
+          "passed": 5,
+          "total": 5
+        },
+        "prose": {
+          "passed": 5,
+          "total": 5
+        },
+        "structured": {
+          "passed": 5,
+          "total": 5
+        }
+      },
+      "code_output_budget_stops": 0,
+      "prefill_token_matches": 18,
+      "prefill_requests": 18,
+      "request_groups": {
+        "decode/code": {
+          "requests": 5,
+          "finish_reasons": {
+            "stop": 5
+          },
+          "completed_streams": 5,
+          "visible_responses": 5,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "decode/prose": {
+          "requests": 5,
+          "finish_reasons": {
+            "stop": 5
+          },
+          "completed_streams": 5,
+          "visible_responses": 5,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "decode/structured": {
+          "requests": 5,
+          "finish_reasons": {
+            "stop": 5
+          },
+          "completed_streams": 5,
+          "visible_responses": 5,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/32768/cold": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/32768/warm_replay": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/65536/cold": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/65536/warm_replay": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/8192/cold": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "prefill/8192/warm_replay": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "concurrency/1": {
+          "requests": 3,
+          "finish_reasons": {
+            "length": 3
+          },
+          "completed_streams": 3,
+          "visible_responses": 3,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "concurrency/2": {
+          "requests": 6,
+          "finish_reasons": {
+            "length": 6
+          },
+          "completed_streams": 6,
+          "visible_responses": 6,
+          "native_first_visible_latency_unavailable": 0
+        },
+        "concurrency/4": {
+          "requests": 12,
+          "finish_reasons": {
+            "length": 12
+          },
+          "completed_streams": 12,
+          "visible_responses": 12,
+          "native_first_visible_latency_unavailable": 0
+        }
+      },
+      "metrics": {
+        "code_decode_throughput": 53.735,
+        "code_c1_aggregate_end_to_end_throughput": 38.749,
+        "code_c2_aggregate_end_to_end_throughput": 60.951,
+        "code_c4_aggregate_end_to_end_throughput": 90.572,
+        "prose_decode_throughput": 31.718,
+        "code_ttft": 0.415,
+        "prose_ttft": 0.381,
+        "code_c1_per_stream_ttft": 0.4,
+        "code_c2_per_stream_ttft": 0.549,
+        "code_c4_per_stream_ttft": 0.523,
+        "prefill_8k_cold_throughput": 2407.872,
+        "prefill_8k_replay_throughput": 9637.624,
+        "prefill_32k_cold_throughput": 2674.728,
+        "prefill_32k_replay_throughput": 37189.665,
+        "prefill_64k_cold_throughput": 2593.238,
+        "prefill_64k_replay_throughput": 38964.019
+      },
+      "started_at": "2026-09-19T17:32:22.110080+00:00",
+      "finished_at": "2026-09-19T17:42:51.373906+00:00",
+      "cache_salt_sha256": "155911e417fa0bb44dfabc0020d69036914f4dc29cac4db238908292d6469e08"
+    }
+  ],
+  "accepted_run_count": 3,
+  "full_suite_native_requests": 162,
+  "separate_c4_screen_requests": 12,
+  "functional_gate_requests": 2,
+  "total_benchmark_requests": 174,
+  "total_inference_requests": 176,
+  "excluded_runs": [],
+  "excluded_metric_blocks": [],
+  "aggregation": "Median of 3 complete native per-run values; initial C4 screen excluded. Baseline uses two frozen native values; parent uses three with its documented C1-only replacement. Ranges and sample standard deviations describe observed dispersion, not confidence intervals.",
+  "performance_metrics": [
+    {
+      "key": "code_decode_throughput",
+      "source_path": [
+        "decode",
+        "code",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "unit": "tokens_per_second",
+      "baseline_per_run": [
+        54.015,
+        53.766
+      ],
+      "baseline_median": 53.8905,
+      "baseline_dispersion": {
+        "min": 53.766,
+        "max": 54.015,
+        "sample_stdev": 0.17606958851545199
+      },
+      "parent_replay_per_run": [
+        55.451,
+        53.614,
+        53.305
+      ],
+      "parent_replay_median": 53.614,
+      "parent_replay_dispersion": {
+        "min": 53.305,
+        "max": 55.451,
+        "sample_stdev": 1.1601268608791608
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        54.415,
+        52.844,
+        53.735
+      ],
+      "median": 53.735,
+      "dispersion": {
+        "min": 52.844,
+        "max": 54.415,
+        "sample_stdev": 0.7878580667438341
+      },
+      "change_vs_baseline_pct": -0.2885480743359259,
+      "change_vs_parent_replay_pct": 0.22568732047600903,
+      "lower_is_better": false
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "source_path": [
+        "concurrency",
+        "1",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "unit": "tokens_per_second",
+      "baseline_per_run": [
+        40.05,
+        40.55
+      ],
+      "baseline_median": 40.3,
+      "baseline_dispersion": {
+        "min": 40.05,
+        "max": 40.55,
+        "sample_stdev": 0.3535533905932738
+      },
+      "parent_replay_per_run": [
+        40.468,
+        39.727,
+        39.795
+      ],
+      "parent_replay_median": 39.795,
+      "parent_replay_dispersion": {
+        "min": 39.727,
+        "max": 40.468,
+        "sample_stdev": 0.4096002115884897
+      },
+      "parent_value_sources": [
+        "run-1.json",
+        "run-2.json",
+        "c1-recheck.json"
+      ],
+      "per_run": [
+        39.159,
+        38.762,
+        38.749
+      ],
+      "median": 38.762,
+      "dispersion": {
+        "min": 38.749,
+        "max": 39.159,
+        "sample_stdev": 0.23305149645518117
+      },
+      "change_vs_baseline_pct": -3.816377171215868,
+      "change_vs_parent_replay_pct": -2.5958034929011164,
+      "lower_is_better": false
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "source_path": [
+        "concurrency",
+        "2",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "unit": "tokens_per_second",
+      "baseline_per_run": [
+        57.729,
+        56.775
+      ],
+      "baseline_median": 57.252,
+      "baseline_dispersion": {
+        "min": 56.775,
+        "max": 57.729,
+        "sample_stdev": 0.6745798692519668
+      },
+      "parent_replay_per_run": [
+        60.04,
+        60.211,
+        57.65
+      ],
+      "parent_replay_median": 60.04,
+      "parent_replay_dispersion": {
+        "min": 57.65,
+        "max": 60.211,
+        "sample_stdev": 1.4317857148796163
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        62.094,
+        63.523,
+        60.951
+      ],
+      "median": 62.094,
+      "dispersion": {
+        "min": 60.951,
+        "max": 63.523,
+        "sample_stdev": 1.2886474821817395
+      },
+      "change_vs_baseline_pct": 8.457346468245653,
+      "change_vs_parent_replay_pct": 3.421052631578947,
+      "lower_is_better": false
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "source_path": [
+        "concurrency",
+        "4",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "unit": "tokens_per_second",
+      "baseline_per_run": [
+        87.031,
+        88.023
+      ],
+      "baseline_median": 87.527,
+      "baseline_dispersion": {
+        "min": 87.031,
+        "max": 88.023,
+        "sample_stdev": 0.7014499269370482
+      },
+      "parent_replay_per_run": [
+        86.248,
+        82.994,
+        79.767
+      ],
+      "parent_replay_median": 82.994,
+      "parent_replay_dispersion": {
+        "min": 79.767,
+        "max": 86.248,
+        "sample_stdev": 3.2405093735399113
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        88.783,
+        92.596,
+        90.572
+      ],
+      "median": 90.572,
+      "dispersion": {
+        "min": 88.783,
+        "max": 92.596,
+        "sample_stdev": 1.9077065637391244
+      },
+      "change_vs_baseline_pct": 3.4789265026791805,
+      "change_vs_parent_replay_pct": 9.130780538352168,
+      "lower_is_better": false
+    },
+    {
+      "key": "prose_decode_throughput",
+      "source_path": [
+        "decode",
+        "prose",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "unit": "tokens_per_second",
+      "baseline_per_run": [
+        32.25,
+        31.506
+      ],
+      "baseline_median": 31.878,
+      "baseline_dispersion": {
+        "min": 31.506,
+        "max": 32.25,
+        "sample_stdev": 0.5260874452027912
+      },
+      "parent_replay_per_run": [
+        31.395,
+        31.316,
+        31.167
+      ],
+      "parent_replay_median": 31.316,
+      "parent_replay_dispersion": {
+        "min": 31.167,
+        "max": 31.395,
+        "sample_stdev": 0.11577708466416428
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        31.915,
+        31.327,
+        31.718
+      ],
+      "median": 31.718,
+      "dispersion": {
+        "min": 31.327,
+        "max": 31.915,
+        "sample_stdev": 0.2992863734508014
+      },
+      "change_vs_baseline_pct": -0.5019135453918078,
+      "change_vs_parent_replay_pct": 1.2836888491505993,
+      "lower_is_better": false
+    },
+    {
+      "key": "code_ttft",
+      "source_path": [
+        "decode",
+        "code",
+        "ttft_seconds",
+        "median"
+      ],
+      "unit": "seconds",
+      "baseline_per_run": [
+        0.393,
+        0.41
+      ],
+      "baseline_median": 0.4015,
+      "baseline_dispersion": {
+        "min": 0.393,
+        "max": 0.41,
+        "sample_stdev": 0.01202081528017128
+      },
+      "parent_replay_per_run": [
+        0.408,
+        0.394,
+        0.446
+      ],
+      "parent_replay_median": 0.408,
+      "parent_replay_dispersion": {
+        "min": 0.394,
+        "max": 0.446,
+        "sample_stdev": 0.02690724809414742
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        0.393,
+        0.414,
+        0.415
+      ],
+      "median": 0.414,
+      "dispersion": {
+        "min": 0.393,
+        "max": 0.415,
+        "sample_stdev": 0.012423096769056128
+      },
+      "change_vs_baseline_pct": 3.1133250311332406,
+      "change_vs_parent_replay_pct": 1.4705882352941124,
+      "lower_is_better": true
+    },
+    {
+      "key": "prose_ttft",
+      "source_path": [
+        "decode",
+        "prose",
+        "ttft_seconds",
+        "median"
+      ],
+      "unit": "seconds",
+      "baseline_per_run": [
+        0.381,
+        0.379
+      ],
+      "baseline_median": 0.38,
+      "baseline_dispersion": {
+        "min": 0.379,
+        "max": 0.381,
+        "sample_stdev": 0.0014142135623730963
+      },
+      "parent_replay_per_run": [
+        0.383,
+        0.383,
+        0.383
+      ],
+      "parent_replay_median": 0.383,
+      "parent_replay_dispersion": {
+        "min": 0.383,
+        "max": 0.383,
+        "sample_stdev": 0.0
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        0.38,
+        0.381,
+        0.381
+      ],
+      "median": 0.381,
+      "dispersion": {
+        "min": 0.38,
+        "max": 0.381,
+        "sample_stdev": 0.0005773502691896262
+      },
+      "change_vs_baseline_pct": 0.2631578947368318,
+      "change_vs_parent_replay_pct": -0.5221932114882533,
+      "lower_is_better": true
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "source_path": [
+        "concurrency",
+        "1",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "unit": "seconds",
+      "baseline_per_run": [
+        0.39,
+        0.409
+      ],
+      "baseline_median": 0.3995,
+      "baseline_dispersion": {
+        "min": 0.39,
+        "max": 0.409,
+        "sample_stdev": 0.013435028842544376
+      },
+      "parent_replay_per_run": [
+        0.39,
+        0.397,
+        0.38
+      ],
+      "parent_replay_median": 0.39,
+      "parent_replay_dispersion": {
+        "min": 0.38,
+        "max": 0.397,
+        "sample_stdev": 0.008544003745317538
+      },
+      "parent_value_sources": [
+        "run-1.json",
+        "run-2.json",
+        "c1-recheck.json"
+      ],
+      "per_run": [
+        0.39,
+        0.341,
+        0.4
+      ],
+      "median": 0.39,
+      "dispersion": {
+        "min": 0.341,
+        "max": 0.4,
+        "sample_stdev": 0.03157530680769388
+      },
+      "change_vs_baseline_pct": -2.377972465581979,
+      "change_vs_parent_replay_pct": 0.0,
+      "lower_is_better": true
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "source_path": [
+        "concurrency",
+        "2",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "unit": "seconds",
+      "baseline_per_run": [
+        0.547,
+        0.443
+      ],
+      "baseline_median": 0.495,
+      "baseline_dispersion": {
+        "min": 0.443,
+        "max": 0.547,
+        "sample_stdev": 0.07353910524340097
+      },
+      "parent_replay_per_run": [
+        0.448,
+        0.458,
+        0.457
+      ],
+      "parent_replay_median": 0.457,
+      "parent_replay_dispersion": {
+        "min": 0.448,
+        "max": 0.458,
+        "sample_stdev": 0.005507570547286107
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        0.468,
+        0.45,
+        0.549
+      ],
+      "median": 0.468,
+      "dispersion": {
+        "min": 0.45,
+        "max": 0.549,
+        "sample_stdev": 0.05273518749374085
+      },
+      "change_vs_baseline_pct": -5.454545454545445,
+      "change_vs_parent_replay_pct": 2.4070021881838155,
+      "lower_is_better": true
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "source_path": [
+        "concurrency",
+        "4",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "unit": "seconds",
+      "baseline_per_run": [
+        0.681,
+        0.678
+      ],
+      "baseline_median": 0.6795,
+      "baseline_dispersion": {
+        "min": 0.678,
+        "max": 0.681,
+        "sample_stdev": 0.0021213203435596446
+      },
+      "parent_replay_per_run": [
+        0.536,
+        0.684,
+        0.73
+      ],
+      "parent_replay_median": 0.684,
+      "parent_replay_dispersion": {
+        "min": 0.536,
+        "max": 0.73,
+        "sample_stdev": 0.10137060717979347
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        0.695,
+        0.524,
+        0.523
+      ],
+      "median": 0.524,
+      "dispersion": {
+        "min": 0.523,
+        "max": 0.695,
+        "sample_stdev": 0.09901683358567534
+      },
+      "change_vs_baseline_pct": -22.884473877851352,
+      "change_vs_parent_replay_pct": -23.391812865497073,
+      "lower_is_better": true
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "source_path": [
+        "prefill",
+        "8192",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "unit": "tokens_per_second",
+      "baseline_per_run": [
+        2363.42,
+        2345.911
+      ],
+      "baseline_median": 2354.6655,
+      "baseline_dispersion": {
+        "min": 2345.911,
+        "max": 2363.42,
+        "sample_stdev": 12.38073263179527
+      },
+      "parent_replay_per_run": [
+        2645.972,
+        2556.186,
+        2636.501
+      ],
+      "parent_replay_median": 2636.501,
+      "parent_replay_dispersion": {
+        "min": 2556.186,
+        "max": 2645.972,
+        "sample_stdev": 49.33174242142007
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        2573.133,
+        2571.838,
+        2407.872
+      ],
+      "median": 2571.838,
+      "dispersion": {
+        "min": 2407.872,
+        "max": 2573.133,
+        "sample_stdev": 95.04185420294235
+      },
+      "change_vs_baseline_pct": 9.223072236799679,
+      "change_vs_parent_replay_pct": -2.4526066934926205,
+      "lower_is_better": false
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "source_path": [
+        "prefill",
+        "8192",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "unit": "tokens_per_second",
+      "baseline_per_run": [
+        9535.205,
+        9580.592
+      ],
+      "baseline_median": 9557.8985,
+      "baseline_dispersion": {
+        "min": 9535.205,
+        "max": 9580.592,
+        "sample_stdev": 32.09345547771427
+      },
+      "parent_replay_per_run": [
+        9606.511,
+        9611.233,
+        9659.455
+      ],
+      "parent_replay_median": 9611.233,
+      "parent_replay_dispersion": {
+        "min": 9606.511,
+        "max": 9659.455,
+        "sample_stdev": 29.29939050560586
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        9436.19,
+        7757.561,
+        9637.624
+      ],
+      "median": 9436.19,
+      "dispersion": {
+        "min": 7757.561,
+        "max": 9637.624,
+        "sample_stdev": 1032.231228937748
+      },
+      "change_vs_baseline_pct": -1.2733813819010398,
+      "change_vs_parent_replay_pct": -1.8212335503675736,
+      "lower_is_better": false
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "source_path": [
+        "prefill",
+        "32768",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "unit": "tokens_per_second",
+      "baseline_per_run": [
+        2549.911,
+        2518.25
+      ],
+      "baseline_median": 2534.0805,
+      "baseline_dispersion": {
+        "min": 2518.25,
+        "max": 2549.911,
+        "sample_stdev": 22.38770779914732
+      },
+      "parent_replay_per_run": [
+        2793.872,
+        2633.435,
+        2672.64
+      ],
+      "parent_replay_median": 2672.64,
+      "parent_replay_dispersion": {
+        "min": 2633.435,
+        "max": 2793.872,
+        "sample_stdev": 83.64036188547564
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        2784.779,
+        2611.688,
+        2674.728
+      ],
+      "median": 2674.728,
+      "dispersion": {
+        "min": 2611.688,
+        "max": 2784.779,
+        "sample_stdev": 87.60304264312583
+      },
+      "change_vs_baseline_pct": 5.550238044923983,
+      "change_vs_parent_replay_pct": 0.07812500000001776,
+      "lower_is_better": false
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "source_path": [
+        "prefill",
+        "32768",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "unit": "tokens_per_second",
+      "baseline_per_run": [
+        35621.263,
+        34869.071
+      ],
+      "baseline_median": 35245.167,
+      "baseline_dispersion": {
+        "min": 34869.071,
+        "max": 35621.263,
+        "sample_stdev": 531.8800639542684
+      },
+      "parent_replay_per_run": [
+        36393.765,
+        36019.795,
+        34182.613
+      ],
+      "parent_replay_median": 36019.795,
+      "parent_replay_dispersion": {
+        "min": 34182.613,
+        "max": 36393.765,
+        "sample_stdev": 1183.517668444935
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        38015.773,
+        36959.462,
+        37189.665
+      ],
+      "median": 37189.665,
+      "dispersion": {
+        "min": 36959.462,
+        "max": 38015.773,
+        "sample_stdev": 555.4638868540426
+      },
+      "change_vs_baseline_pct": 5.517062807504924,
+      "change_vs_parent_replay_pct": 3.2478530208181366,
+      "lower_is_better": false
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "source_path": [
+        "prefill",
+        "65536",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "unit": "tokens_per_second",
+      "baseline_per_run": [
+        2453.238,
+        2390.227
+      ],
+      "baseline_median": 2421.7325,
+      "baseline_dispersion": {
+        "min": 2390.227,
+        "max": 2453.238,
+        "sample_stdev": 44.55550538934552
+      },
+      "parent_replay_per_run": [
+        2732.473,
+        2545.215,
+        2356.561
+      ],
+      "parent_replay_median": 2545.215,
+      "parent_replay_dispersion": {
+        "min": 2356.561,
+        "max": 2732.473,
+        "sample_stdev": 187.9564320190541
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        2707.803,
+        2686.065,
+        2593.238
+      ],
+      "median": 2686.065,
+      "dispersion": {
+        "min": 2593.238,
+        "max": 2707.803,
+        "sample_stdev": 60.847530486728395
+      },
+      "change_vs_baseline_pct": 10.915016419030588,
+      "change_vs_parent_replay_pct": 5.533913637944132,
+      "lower_is_better": false
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "source_path": [
+        "prefill",
+        "65536",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "unit": "tokens_per_second",
+      "baseline_per_run": [
+        35474.107,
+        35407.276
+      ],
+      "baseline_median": 35440.6915,
+      "baseline_dispersion": {
+        "min": 35407.276,
+        "max": 35474.107,
+        "sample_stdev": 47.25665329348211
+      },
+      "parent_replay_per_run": [
+        39277.546,
+        40433.081,
+        37209.535
+      ],
+      "parent_replay_median": 39277.546,
+      "parent_replay_dispersion": {
+        "min": 37209.535,
+        "max": 40433.081,
+        "sample_stdev": 1633.1554042436762
+      },
+      "parent_value_sources": [
+        "run-1",
+        "run-2",
+        "run-3"
+      ],
+      "per_run": [
+        39592.667,
+        40216.423,
+        38964.019
+      ],
+      "median": 39592.667,
+      "dispersion": {
+        "min": 38964.019,
+        "max": 40216.423,
+        "sample_stdev": 626.2035923797745
+      },
+      "change_vs_baseline_pct": 11.715277903084932,
+      "change_vs_parent_replay_pct": 0.8022929945776136,
+      "lower_is_better": false
+    }
+  ],
+  "prefill_first_visible_latency": [
+    {
+      "depth": 8192,
+      "phase": "cold",
+      "baseline_per_run_seconds": [
+        3.466,
+        3.492
+      ],
+      "baseline_median_seconds": 3.479,
+      "parent_replay_per_run_seconds": [
+        3.096,
+        3.205,
+        3.107
+      ],
+      "parent_replay_median_seconds": 3.107,
+      "per_run_seconds": [
+        3.184,
+        3.185,
+        3.402
+      ],
+      "median_seconds": 3.185
+    },
+    {
+      "depth": 8192,
+      "phase": "warm_replay",
+      "baseline_per_run_seconds": [
+        0.859,
+        0.855
+      ],
+      "baseline_median_seconds": 0.857,
+      "parent_replay_per_run_seconds": [
+        0.853,
+        0.852,
+        0.848
+      ],
+      "parent_replay_median_seconds": 0.852,
+      "per_run_seconds": [
+        0.868,
+        1.056,
+        0.85
+      ],
+      "median_seconds": 0.868
+    },
+    {
+      "depth": 32768,
+      "phase": "cold",
+      "baseline_per_run_seconds": [
+        12.851,
+        13.012
+      ],
+      "baseline_median_seconds": 12.9315,
+      "parent_replay_per_run_seconds": [
+        11.729,
+        12.443,
+        12.261
+      ],
+      "parent_replay_median_seconds": 12.261,
+      "per_run_seconds": [
+        11.767,
+        12.547,
+        12.251
+      ],
+      "median_seconds": 12.251
+    },
+    {
+      "depth": 32768,
+      "phase": "warm_replay",
+      "baseline_per_run_seconds": [
+        0.92,
+        0.94
+      ],
+      "baseline_median_seconds": 0.9299999999999999,
+      "parent_replay_per_run_seconds": [
+        0.9,
+        0.91,
+        0.959
+      ],
+      "parent_replay_median_seconds": 0.91,
+      "per_run_seconds": [
+        0.862,
+        0.887,
+        0.881
+      ],
+      "median_seconds": 0.881
+    },
+    {
+      "depth": 65536,
+      "phase": "cold",
+      "baseline_per_run_seconds": [
+        26.714,
+        27.418
+      ],
+      "baseline_median_seconds": 27.066,
+      "parent_replay_per_run_seconds": [
+        23.984,
+        25.749,
+        27.81
+      ],
+      "parent_replay_median_seconds": 25.749,
+      "per_run_seconds": [
+        24.203,
+        24.399,
+        25.272
+      ],
+      "median_seconds": 24.399
+    },
+    {
+      "depth": 65536,
+      "phase": "warm_replay",
+      "baseline_per_run_seconds": [
+        1.847,
+        1.851
+      ],
+      "baseline_median_seconds": 1.849,
+      "parent_replay_per_run_seconds": [
+        1.669,
+        1.621,
+        1.761
+      ],
+      "parent_replay_median_seconds": 1.669,
+      "per_run_seconds": [
+        1.655,
+        1.63,
+        1.682
+      ],
+      "median_seconds": 1.655
+    }
+  ],
+  "integrity": {
+    "request_denominator": 162,
+    "completed_streams": 162,
+    "visible_responses": 162,
+    "first_visible_latency_unavailable": 0,
+    "native_validation_errors": 0,
+    "protocol_errors": 0,
+    "runtime_errors": 0,
+    "finish_reasons": {
+      "stop": 45,
+      "length": 117
+    },
+    "decode_output_gates": {
+      "code": {
+        "passed": 15,
+        "total": 15
+      },
+      "prose": {
+        "passed": 15,
+        "total": 15
+      },
+      "structured": {
+        "passed": 15,
+        "total": 15
+      }
+    },
+    "prefill_token_matches": 54,
+    "prefill_request_denominator": 54,
+    "code_output_budget_stops": 0
+  },
+  "configuration": {
+    "adaptive_k": {
+      "alpha": 0.15,
+      "boot_line": "adaptive-k: AdaptiveKScheduler active (... mode=batch-uniform ...) engine_k=5 async=True",
+      "down": 0.42,
+      "k_hi": 5,
+      "k_lo": 3,
+      "mode": "batch-uniform",
+      "scheduler_sha256": "697f99bf1951535dcc3381776fa744ad8204d83d2606f341b617bac7a31949b4",
+      "seed": 1,
+      "signal": "pos",
+      "up": 0.58,
+      "respect_draft_budget": true
+    },
+    "scheduler": "AdaptiveKScheduler batch-uniform with effective SchedulerOutput draft-budget cap; other parent settings preserved",
+    "serving_image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "serving_image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "expected_runtime_identity": {
+      "container_file_sha256": {
+        "/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_connector.py": "5893f8747aa093874c46a0185f93c786265d99b5a4cd8da849a7471132422d66",
+        "/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_hybrid.py": "11a2db855306b816a4f3d377d04207cc2d62112a381bcc54162099248bbf75f6",
+        "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e20_hybrid_scratch.py": "f4368638f1286d67f529f6b6e89cb066e375ac365deb4c8698f07e39e876ab7d",
+        "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e20_kda_w8a16.py": "3c7f1650c1f8d3c0525323a8875ea4f1190a7ccca4232d9b6701525aece22572",
+        "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/model.py": "34d8161d0408b7e786b922e53829d0a45ca6c11c38470a128467fd8dd08f9ab4",
+        "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py": "46aa3a7ea68948cc16c78ebeb3b8aff0de6d9583657d75711e8231ed4209ed9d",
+        "/usr/local/lib/python3.12/dist-packages/vllm/model_executor/layers/fused_moe/runner/moe_runner.py": "7f12a8923a80dab5639e6d1324b9c18509960e0d5bde00e74fc234f3b0e247d5",
+        "/usr/local/lib/python3.12/dist-packages/vllm/model_executor/layers/fused_moe/runner/moe_runner_interface.py": "6e57212e46964a5737e2fcea7c29e9bcf88fa7e22886c7c21208ad661b154feb",
+        "/usr/local/lib/python3.12/dist-packages/vllm/model_executor/layers/linear.py": "bed47ddb286f5e55a7ffcccf4243d92d7d489db858a6c90e91c81342b0b8e1ae",
+        "/usr/local/lib/python3.12/dist-packages/vllm/model_executor/layers/mamba/gdn/kimi_gdn_linear_attn.py": "4f2b1604d02187bc684d88b074f8bd1288c90077d9dd7168d547244cafcd0272",
+        "/usr/local/lib/python3.12/dist-packages/vllm/model_executor/layers/mla.py": "eddc5d57cf39468157300189a12f7a1e440886218444e7a111286c527c9de3bf",
+        "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/attention.py": "c04298d14eedcb6cc329d161c182cfccf092113ee7f12e54d27ad233818df083",
+        "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/kda.py": "73da412cbd8d109c676cb6bcf37f5b5148dc72f4c9a4a09796c0cd4f2f4fbbd4",
+        "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/mhc_prefill_sharding.py": "bc809df101a4350fbe9d44d4b884ce0799d69606e99c108beeacd65bc125cb28",
+        "/opt/tp4/adaptive_k_scheduler.py": "697f99bf1951535dcc3381776fa744ad8204d83d2606f341b617bac7a31949b4"
+      },
+      "environment": {
+        "LD_PRELOAD": "/opt/patched-nccl/libnccl.so.2",
+        "NCCL_IB_GID_INDEX": "-1",
+        "VLLM_ADAPTIVE_K_MODE": "batch-uniform",
+        "VLLM_NCCL_SO_PATH": "/opt/patched-nccl/libnccl.so.2",
+        "SPARK_MHC_PREFILL_SHARD": "1",
+        "VLLM_ADAPTIVE_K_RESPECT_DRAFT_BUDGET": "1"
+      },
+      "kda_boot_receipt": {
+        "group_size": 128,
+        "modules": 34,
+        "original_bytes": 1751384064,
+        "packed_bytes": 905222528,
+        "padded_n": 6400,
+        "prefill_bf16_min_tokens": 2048,
+        "shape_nk": [
+          6288,
+          4096
+        ],
+        "shared_scratch_bytes": 51515392,
+        "variant": "pad6400-bf16-scratch"
+      },
+      "memory_probe": {
+        "phase": "post_warmup_periodic",
+        "schema": "e20-memory-probe-v1"
+      }
+    },
+    "kv_cache_memory_bytes_per_rank": 16106127360,
+    "kv_capacity_tokens": 1344328,
+    "context_limit": 262144,
+    "mhc_prefill": {
+      "enabled": true,
+      "global_rows": 6912,
+      "owner_rows": 1728,
+      "tensor_parallel_size": 4,
+      "decode_context_parallel_size": 1,
+      "upstream_revision": "61f277bd0c97fbff892668e12ea04a330a45fa01",
+      "source_manifest_sha256": "e8c2a8572309e5b6ef7ca56d52b9d29496135d44671d34fd4240a592d4583871",
+      "first_pre": "full-sized",
+      "auxiliary_outputs": "full ordered DFlash2 captures",
+      "reductions": "per-call deferral; native TP PyNccl reduce-scatter/all-gather",
+      "gpu_checks": "Unchanged mHC sources: 4 ranks x 22 checks passed during the original E03 qualification.",
+      "cpu_checks": "11 corrected CPU Torch tests PASS",
+      "prior_e03_live_activation": {
+        "global_rows": 6912,
+        "owner_rows": 1728,
+        "reduce_scatter_per_rank": 90,
+        "all_gather_per_rank": 95,
+        "dflash_auxiliary_all_gather_per_rank": 5,
+        "ranks_verified": 4
+      }
+    },
+    "sparkcache": {
+      "cache_namespace_policy": "Retain measured E03 namespace: same model computation and serialized bytes; baseline namespace remains separate.",
+      "connector": "spark_context_cache_connector.py",
+      "connector_module_path": "sparkcache.spark_context_cache_connector",
+      "connector_sha256": "5893f8747aa093874c46a0185f93c786265d99b5a4cd8da849a7471132422d66",
+      "distribution": "Connector and encoder are operator-supplied pinned payloads; hashes do not grant redistribution rights.",
+      "extra_config": {
+        "spark_cache_cuda_restore": false,
+        "spark_cache_draft_checkpoint_sha256": "5d3e05d24de860b98fa172f480a859d808e3022731d0fda1e1a83ad8d776e1ff",
+        "spark_cache_draft_policy": "separate",
+        "spark_cache_max_span_tokens": 262144,
+        "spark_cache_min_span_tokens": 4096,
+        "spark_cache_model_profile": "glm53-flash-hybrid",
+        "spark_cache_pending_wait_ms": 2000,
+        "spark_cache_restore": true,
+        "spark_cache_scheduler_probe": "none",
+        "spark_cache_store": true,
+        "spark_cache_streaming_snapshots": false,
+        "spark_cache_target_checkpoint_sha256": "c652a5964160ed137dce29253f7d8a6a1477f17c68a82042b65d94b1f97683f4"
+      },
+      "hybrid_encoder": "spark_context_cache_hybrid.py",
+      "hybrid_encoder_sha256": "11a2db855306b816a4f3d377d04207cc2d62112a381bcc54162099248bbf75f6",
+      "kv_load_failure_policy": "recompute",
+      "kv_role": "kv_both",
+      "kv_transfer_config_sha256": "9a0520e0dc71d7e8cf9045065cff78226296305b25f0bc010c7830bb82019ed5",
+      "memory_corrections": [
+        "Release completed saver snapshot and encoded-page references before blocking for the next item",
+        "Encode the page header and payload parts with one join to avoid an extra full-size copy",
+        "View validated snapshot page spans during Python restore; retain mutable per-layer copies and stream synchronization."
+      ],
+      "mode": "on"
+    },
+    "instrumentation": {
+      "comparison_limit": "The reference included external host observers. Disclose any difference; their overhead was not isolated.",
+      "external_host_observer": {
+        "enabled_during_this_run": true,
+        "source_sha256": "7e01cf319e1b1ab1c907edfd4933df00a6e0e6139482b23b4283279433066499",
+        "meminfo_interval_seconds": 0.2,
+        "pressure_interval_seconds": 1,
+        "process_interval_seconds": 5,
+        "smaps_interval_seconds": 30,
+        "status": "Exact baseline sampler active on all four ranks; continuous raw JSONL retained across this series."
+      },
+      "gpu_worker_probe": {
+        "expected_enabled": true,
+        "interval_seconds": 1,
+        "live_verification": "Observed on all four ranks in the completed C4 screen; unchanged 1 Hz source.",
+        "schema": "e20-memory-probe-v1"
+      },
+      "nsight_enabled": false
+    },
+    "baseline_scheduler_sha256": "4cea8f55fa51b0371a52a4dd6eb5511ccb0bccbd81e435e6840f68f4ba641518",
+    "candidate_manifest_sha256": "b817d0a9db59263750378a93c35a55a183c556eec15fa7fe859d580608e33e79"
+  },
+  "rigmark": {
+    "version": "1.1.0",
+    "source": {
+      "revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+      "repository_dirty": false,
+      "repository_source": "git-worktree",
+      "repository_source_sha256": "e0e92cff99f74ffa43d0a82541cf9db6010dd0a4ef3e8e7b84c5e1abd13a867f",
+      "comparison_note": "Source and prompt content match the 2026-09-18 reference. The 2026-09-11 record uses an earlier source hash and remains a historical comparison."
+    },
+    "prompts": {
+      "version": "1.0.0",
+      "sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb"
+    },
+    "cache_salt_policy": "Fresh per run; shared by its cold/replay pairs and forwarded to both chat and prefill requests. Raw salts are omitted; hashes identify the measured values.",
+    "cache_salt_sha256": {
+      "run-1": "ed70ee738f6f6c3fac36437102a8158bb2793f6ea5b7e95c2b8aa1bb5ac76c29",
+      "run-2": "1ac4e0a24ad606c4325297f3fc13eea4735113f44efc25b5c1be1b0bdf300b57",
+      "run-3": "155911e417fa0bb44dfabc0020d69036914f4dc29cac4db238908292d6469e08"
+    },
+    "settings": {
+      "concurrency": [
+        1,
+        2,
+        4
+      ],
+      "concurrency_runs": 3,
+      "concurrency_tokens": 256,
+      "concurrency_workload": "code",
+      "decode_tokens": 8192,
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      },
+      "prefill_depths": [
+        8192,
+        32768,
+        65536
+      ],
+      "prefill_runs": 3,
+      "runs": 5,
+      "seed": 20260905,
+      "temperature": 0,
+      "top_p": 1
+    }
+  },
+  "preparation_validation": {
+    "cpu_integration_and_policy_tests_passed": 50,
+    "cpu_scope": "Pinned R10 AsyncScheduler and SchedulerOutput hook, 1-to-4-to-1 async handouts, flags, C1, uniform batches, prefill/finished filters and unchanged policy tests.",
+    "original_scheduler_hash_preserved": true,
+    "four_rank_dry_run_passed": true,
+    "dry_run_delta": "Scheduler mount source and VLLM_ADAPTIVE_K_RESPECT_DRAFT_BUDGET=1 only.",
+    "offline_check": "PASS before deployment",
+    "image_sources_verified_on_all_ranks": true,
+    "candidate_and_parent_manifests_verified_on_all_ranks": true,
+    "direct_neighbor_jumbo_pings_passed": 8
+  },
+  "runtime_identity": {
+    "ranks_verified": 4,
+    "source_hashes_per_rank": 19,
+    "boot_and_each_completed_run_match": true,
+    "budget_activation": "SchedulerOutput resolver, engine k=5, async enabled, batch-uniform mode; first cap budget=3 observed.",
+    "budget_counter_unit": "Placeholder handouts trimmed, not accepted tokens or measured compute savings."
+  },
+  "functional_gates": {
+    "passed": 2,
+    "total": 2,
+    "elapsed_from_health_seconds": 3.294466
+  },
+  "instrumentation_metadata_erratum": {
+    "scope": [
+      "c4-screen",
+      "run-1"
+    ],
+    "issue": "Native appliance metadata retained preparation placeholders for external_host_observer.enabled_during_this_run/status and gpu_worker_probe.live_verification.",
+    "actual": "External observers were active on all four ranks before C4 began and remained active across the series; GPU probe samples are present in all four rank logs. Per-run sampled evidence records establish actual instrumentation.",
+    "raw_receipts": "Preserved without editing. Future run metadata corrected before run 2.",
+    "measurement_effect": "Metadata description only; no runtime or instrumentation change."
+  },
+  "native_presentation": {
+    "full_suite_cards_saved": 3,
+    "c4_screen_card_saved": false,
+    "c4_screen_warning": "could not render terminal report: 'code'",
+    "scope": "The selector saves the complete native JSON before rendering. Its card renderer expects a decode/code block. This presentation warning does not affect recorded requests or timing; the original log is retained."
+  },
+  "limitations": [
+    "Frozen comparisons are not contemporaneous baseline reloads.",
+    "The initial C4 screen has a different preceding workload from a complete suite and is excluded from all suite aggregates.",
+    "The draft/placeholder mismatch also exists in the baseline; its correction does not establish why the parent lost C4 throughput.",
+    "Native output gates and normal token-budget stops are separate from performance integrity.",
+    "Host memory minima are sampled and CUDA allocator peaks cover worker lifetime without reset."
+  ],
+  "final_loaded_state": {
+    "health_http_status": 200,
+    "ranks": 4,
+    "same_four_container_starts": true,
+    "container_restarts": 0,
+    "source_hashes_per_rank": 19,
+    "all_source_hashes_unchanged_since_boot": true,
+    "inference_requests_since_boot": 176,
+    "functional_gates": 2,
+    "benchmark_requests": 174,
+    "api_post_count": 176,
+    "finished_reasons": {
+      "stop": 47.0,
+      "length": 129.0,
+      "abort": 0.0,
+      "error": 0.0,
+      "repetition": 0.0
+    },
+    "running_waiting_requests": 0,
+    "unaccounted_requests": 0,
+    "runtime_error_log_count": 0,
+    "host_observers_stopped": 4,
+    "task_tunnel_stopped": true,
+    "loaded_recipe": "E03 plus replay views plus effective draft-budget cap; unpromoted",
+    "return_recipe": "Preserved E03 plus replay views overlay; new coordinated authorization required for any later transition.",
+    "production_defaults_changed": false,
+    "committed_or_pushed": false
+  },
+  "final_local_validation": {
+    "command": "./scripts/check.sh",
+    "exit_code": 0,
+    "result": "PASS",
+    "candidate_scheduler_test_count": 50,
+    "four_rank_launcher_manifest_and_mount_checks": "PASS",
+    "git_diff_check": "PASS",
+    "log_sha256": "124ae373cb406fba216fd4e03ff476d92fd4991a80238fcfebef21eda635a349",
+    "scope": "Final code, configuration, report, portable evidence and C4 presentation limitation"
+  }
+}

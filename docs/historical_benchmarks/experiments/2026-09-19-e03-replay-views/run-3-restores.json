@@ -1,0 +1,109 @@
+{
+  "run": 3,
+  "native_receipt_sha256": "9aa6d8077fb66ecb0ad90944e4d443ad47015184cef1000f4773754ae6357267",
+  "memory_summary_sha256": "1a3fa7c7d062a4409fbae1531b39643dc7441942938b827af24c879be489bcbc",
+  "verified_replay_requests": 9,
+  "rank_restores": 36,
+  "depths": [
+    {
+      "prompt_tokens": 8192,
+      "restored_tokens": 6912,
+      "bytes_mib_per_rank_rounded": 88.2,
+      "max_rank_restore_ms_per_pair": [
+        191.1,
+        190.5,
+        181.0
+      ],
+      "max_rank_restore_median_ms": 190.5,
+      "per_rank": [
+        [
+          168.4,
+          158.9,
+          163.6
+        ],
+        [
+          153.2,
+          153.7,
+          160.7
+        ],
+        [
+          184.1,
+          180.0,
+          181.0
+        ],
+        [
+          191.1,
+          190.5,
+          180.7
+        ]
+      ]
+    },
+    {
+      "prompt_tokens": 32768,
+      "restored_tokens": 32256,
+      "bytes_mib_per_rank_rounded": 237.4,
+      "max_rank_restore_ms_per_pair": [
+        445.0,
+        450.8,
+        452.3
+      ],
+      "max_rank_restore_median_ms": 450.8,
+      "per_rank": [
+        [
+          372.0,
+          370.4,
+          376.9
+        ],
+        [
+          362.2,
+          367.7,
+          379.1
+        ],
+        [
+          417.3,
+          441.4,
+          444.8
+        ],
+        [
+          445.0,
+          450.8,
+          452.3
+        ]
+      ]
+    },
+    {
+      "prompt_tokens": 65536,
+      "restored_tokens": 64512,
+      "bytes_mib_per_rank_rounded": 427.2,
+      "max_rank_restore_ms_per_pair": [
+        877.8,
+        870.6,
+        885.1
+      ],
+      "max_rank_restore_median_ms": 877.8,
+      "per_rank": [
+        [
+          731.0,
+          741.9,
+          736.7
+        ],
+        [
+          733.9,
+          733.4,
+          737.8
+        ],
+        [
+          875.1,
+          870.6,
+          885.1
+        ],
+        [
+          877.8,
+          861.4,
+          851.3
+        ]
+      ]
+    }
+  ],
+  "limits": "Logged per-rank restore timings, not CUDA-event kernel measurements. Maximum duration is taken across ranks for each replay, then the median across three pairs. No cross-host timestamp subtraction."
+}

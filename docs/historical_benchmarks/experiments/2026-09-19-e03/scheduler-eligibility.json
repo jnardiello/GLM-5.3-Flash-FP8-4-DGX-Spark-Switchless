@@ -1,0 +1,30 @@
+{
+  "status": "8192_target_rows_unreachable_with_current_budget",
+  "max_num_batched_tokens": 8192,
+  "dflash_reserved_slots_per_request": 5,
+  "target_token_upper_bound": 8187,
+  "mamba_block_size": 2304,
+  "pure_prefill_examples": [
+    {
+      "prompt_tokens": 8192,
+      "budget_after_dflash_reservation": 8187,
+      "first_target_chunk_without_additional_publication_stops": 6912,
+      "rows_per_tp_rank": 1728
+    },
+    {
+      "prompt_tokens": 32768,
+      "budget_after_dflash_reservation": 8187,
+      "first_target_chunk_without_additional_publication_stops": 6912,
+      "rows_per_tp_rank": 1728
+    },
+    {
+      "prompt_tokens": 65536,
+      "budget_after_dflash_reservation": 8187,
+      "first_target_chunk_without_additional_publication_stops": 6912,
+      "rows_per_tp_rank": 1728
+    }
+  ],
+  "scheduler_source_sha256": "122d9722b48f8cec267d2136a18c184b8901a5a0a46187eab7030d6227f1983d",
+  "speculative_config_source_sha256": "fc14efbcf18ad3d67cb869591d2f480b55724d1e663bb433ee5b502976bd52b9",
+  "limitations": "Alignment examples execute the actual scheduler method with no additional publication stops. The 8187 upper bound follows from the request budget before alignment and does not depend on publication stops."
+}

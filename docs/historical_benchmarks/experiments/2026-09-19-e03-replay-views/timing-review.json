@@ -1,0 +1,101 @@
+{
+  "schema": "tp4-timing-review/v1",
+  "scope": "Existing native receipts and server metric snapshots only; no new inference.",
+  "spike_reporting_thresholds": "Decode TTFT >2s; warm replay TTFT >3s. Descriptive markers only, not exclusions.",
+  "excluded_requests": 3,
+  "excluded_runs": 0,
+  "server_requests_per_run": [
+    54,
+    54,
+    54
+  ],
+  "unaccounted_api_requests": 0,
+  "runs": [
+    {
+      "run": 1,
+      "native_receipt_sha256": "606025ed443bdad1673245cc0fe5628d1b867d95866b52cd0f399a6b8ea5d0f2",
+      "native_requests": 54,
+      "server": {
+        "vllm:time_to_first_token_seconds_count": 54.0,
+        "vllm:time_to_first_token_seconds_sum": 143.24135947227478,
+        "vllm:time_to_first_token_seconds_created": 0.0,
+        "vllm:e2e_request_latency_seconds_count": 54.0,
+        "vllm:e2e_request_latency_seconds_sum": 756.3713052272797,
+        "vllm:e2e_request_latency_seconds_created": 0.0,
+        "vllm:request_queue_time_seconds_count": 54.0,
+        "vllm:request_queue_time_seconds_sum": 4.761235088022659,
+        "vllm:request_queue_time_seconds_created": 0.0
+      },
+      "client_ttft_sum_seconds": 144.683904,
+      "client_wall_sum_seconds": 757.009224,
+      "retained_latency_spikes": [],
+      "client_minus_server_ttft_sum_seconds": 1.4425445277252322,
+      "client_minus_server_wall_sum_seconds": 0.6379187727203544
+    },
+    {
+      "run": 2,
+      "native_receipt_sha256": "51be9b445584c7f0a90d89934ee4e2b8506b172ba51b60146a356ef01ad613c7",
+      "native_requests": 54,
+      "server": {
+        "vllm:time_to_first_token_seconds_count": 54.0,
+        "vllm:time_to_first_token_seconds_sum": 150.78832340240479,
+        "vllm:time_to_first_token_seconds_created": 0.0,
+        "vllm:e2e_request_latency_seconds_count": 54.0,
+        "vllm:e2e_request_latency_seconds_sum": 735.1185960769653,
+        "vllm:e2e_request_latency_seconds_created": 0.0,
+        "vllm:request_queue_time_seconds_count": 54.0,
+        "vllm:request_queue_time_seconds_sum": 4.673965006018989,
+        "vllm:request_queue_time_seconds_created": 0.0
+      },
+      "client_ttft_sum_seconds": 152.206086,
+      "client_wall_sum_seconds": 735.751949,
+      "retained_latency_spikes": [],
+      "client_minus_server_ttft_sum_seconds": 1.417762597595214,
+      "client_minus_server_wall_sum_seconds": 0.6333529230346358
+    },
+    {
+      "run": 3,
+      "native_receipt_sha256": "9aa6d8077fb66ecb0ad90944e4d443ad47015184cef1000f4773754ae6357267",
+      "native_requests": 54,
+      "server": {
+        "vllm:time_to_first_token_seconds_count": 54.0,
+        "vllm:time_to_first_token_seconds_sum": 148.13646912574768,
+        "vllm:time_to_first_token_seconds_created": 0.0,
+        "vllm:e2e_request_latency_seconds_count": 54.0,
+        "vllm:e2e_request_latency_seconds_sum": 723.1109721660614,
+        "vllm:e2e_request_latency_seconds_created": 0.0,
+        "vllm:request_queue_time_seconds_count": 54.0,
+        "vllm:request_queue_time_seconds_sum": 4.737926677946234,
+        "vllm:request_queue_time_seconds_created": 0.0
+      },
+      "client_ttft_sum_seconds": 183.102032,
+      "client_wall_sum_seconds": 803.310605,
+      "retained_latency_spikes": [
+        {
+          "group": "decode/code",
+          "sample": 3,
+          "ttft_seconds": 6.622441
+        },
+        {
+          "group": "decode/prose",
+          "sample": 5,
+          "ttft_seconds": 6.585742
+        },
+        {
+          "group": "prefill/32768/warm_replay",
+          "sample": 1,
+          "ttft_seconds": 7.114234
+        }
+      ],
+      "client_minus_server_ttft_sum_seconds": 34.96556287425233,
+      "client_minus_server_wall_sum_seconds": 80.19963283393861
+    }
+  ],
+  "limitations": [
+    "Client and server histograms have different timing boundaries; aggregate differences cannot locate an individual delay or prove its cause.",
+    "All originals retained. Only run 3 C1 is excluded from accepted metric aggregates after an owner-authorized native repeat.",
+    "No extra API request, abort or engine error was observed."
+  ],
+  "exclusion_scope": "Run 3 concurrency/1 block only, replaced at owner request; all other original samples retained.",
+  "targeted_recheck": "c1-recheck.json"
+}

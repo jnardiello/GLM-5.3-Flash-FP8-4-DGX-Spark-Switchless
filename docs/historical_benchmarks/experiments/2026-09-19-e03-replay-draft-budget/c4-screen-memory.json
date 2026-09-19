@@ -1,0 +1,400 @@
+{
+  "schema": "tp4-memory-window/v1",
+  "run": "c4-screen",
+  "native_receipt_sha256": "7a89a1b231a743a50f8be66f47811b3592d8424de7c1b2b25d2e30357c181a7f",
+  "memory_summary_sha256": "a72a61e143959efa016d0d3a472285726f2f4c485ffb4cf398e6241c3b3e2ba8",
+  "duration_seconds": 34.283635,
+  "limits": [
+    "MemAvailable minima are sampled observations, not a guarantee about unsampled transients.",
+    "Host reads are sequential; meminfo target 5Hz, process PSS every5s, smaps every30s.",
+    "CUDA peak counters cover the entire worker lifetime without reset; current maxima are observed within this run.",
+    "PyTorch allocator counters omit driver/NCCL/SIRCL allocations; host PSS is not total unified-memory consumption.",
+    "PSI/vmstat are host-wide counters; they alone cannot establish a performance cause."
+  ],
+  "ranks": [
+    {
+      "rank": 0,
+      "host_min_available_gib": 3.2300758361816406,
+      "meminfo_samples": 170,
+      "meminfo_max_gap_ms": 518.978000007337,
+      "worker_identity_stable": true,
+      "cuda_allocator": {
+        "allocated_bytes.all.current": {
+          "first_mib": 98600.60302734375,
+          "last_mib": 98592.6279296875,
+          "max_observed_mib": 98640.04052734375
+        },
+        "reserved_bytes.all.current": {
+          "first_mib": 99608.0,
+          "last_mib": 99608.0,
+          "max_observed_mib": 99608.0
+        },
+        "allocated_bytes.all.peak": {
+          "first_mib": 98637.13427734375,
+          "last_mib": 98681.75537109375,
+          "max_observed_mib": 98681.75537109375
+        },
+        "reserved_bytes.all.peak": {
+          "first_mib": 99608.0,
+          "last_mib": 99608.0,
+          "max_observed_mib": 99608.0
+        }
+      },
+      "cuda_counters": {
+        "num_ooms": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_oom_rejections": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_alloc_retries": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_sync_all_streams": {
+          "first": 38,
+          "last": 38,
+          "max": 38,
+          "delta": 0
+        }
+      },
+      "pressure": {
+        "first_sample_utc": "2026-09-19T17:08:07.384+00:00",
+        "last_sample_utc": "2026-09-19T17:08:42.384+00:00",
+        "samples": 35,
+        "vmstat_delta": {
+          "allocstall_device": 0,
+          "allocstall_dma": 0,
+          "allocstall_dma32": 0,
+          "allocstall_movable": 0,
+          "allocstall_normal": 0,
+          "compact_stall": 0,
+          "oom_kill": 0,
+          "pgfault": 16986,
+          "pgmajfault": 0,
+          "pgscan_anon": 0,
+          "pgscan_direct": 0,
+          "pgscan_direct_throttle": 0,
+          "pgscan_file": 0,
+          "pgscan_khugepaged": 0,
+          "pgscan_kswapd": 0,
+          "pgscan_proactive": 0,
+          "pgsteal_anon": 0,
+          "pgsteal_direct": 0,
+          "pgsteal_file": 0,
+          "pgsteal_khugepaged": 0,
+          "pgsteal_kswapd": 0,
+          "pgsteal_proactive": 0
+        },
+        "psi": {
+          "some": {
+            "total_stall_us_delta": 0,
+            "max_avg10_pct": 0.0
+          },
+          "full": {
+            "total_stall_us_delta": 0,
+            "max_avg10_pct": 0.0
+          }
+        }
+      },
+      "c4_min_available_mib": 3307.59765625,
+      "native_host_window_sha256": "9c321e338dc180587b530b8a99b0e73503deb687f1ad23a043bd182349fdf38e"
+    },
+    {
+      "rank": 1,
+      "host_min_available_gib": 7.7796173095703125,
+      "meminfo_samples": 171,
+      "meminfo_max_gap_ms": 419.73500000312924,
+      "worker_identity_stable": true,
+      "cuda_allocator": {
+        "allocated_bytes.all.current": {
+          "first_mib": 98633.75927734375,
+          "last_mib": 98592.6591796875,
+          "max_observed_mib": 98633.75927734375
+        },
+        "reserved_bytes.all.current": {
+          "first_mib": 99606.0,
+          "last_mib": 99606.0,
+          "max_observed_mib": 99606.0
+        },
+        "allocated_bytes.all.peak": {
+          "first_mib": 98652.318359375,
+          "last_mib": 98681.75537109375,
+          "max_observed_mib": 98681.75537109375
+        },
+        "reserved_bytes.all.peak": {
+          "first_mib": 99606.0,
+          "last_mib": 99606.0,
+          "max_observed_mib": 99606.0
+        }
+      },
+      "cuda_counters": {
+        "num_ooms": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_oom_rejections": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_alloc_retries": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_sync_all_streams": {
+          "first": 38,
+          "last": 38,
+          "max": 38,
+          "delta": 0
+        }
+      },
+      "pressure": {
+        "first_sample_utc": "2026-09-19T17:08:07.363+00:00",
+        "last_sample_utc": "2026-09-19T17:08:42.363+00:00",
+        "samples": 35,
+        "vmstat_delta": {
+          "allocstall_device": 0,
+          "allocstall_dma": 0,
+          "allocstall_dma32": 0,
+          "allocstall_movable": 0,
+          "allocstall_normal": 0,
+          "compact_stall": 0,
+          "oom_kill": 0,
+          "pgfault": 16864,
+          "pgmajfault": 3,
+          "pgscan_anon": 0,
+          "pgscan_direct": 0,
+          "pgscan_direct_throttle": 0,
+          "pgscan_file": 0,
+          "pgscan_khugepaged": 0,
+          "pgscan_kswapd": 0,
+          "pgscan_proactive": 0,
+          "pgsteal_anon": 0,
+          "pgsteal_direct": 0,
+          "pgsteal_file": 0,
+          "pgsteal_khugepaged": 0,
+          "pgsteal_kswapd": 0,
+          "pgsteal_proactive": 0
+        },
+        "psi": {
+          "some": {
+            "total_stall_us_delta": 0,
+            "max_avg10_pct": 0.0
+          },
+          "full": {
+            "total_stall_us_delta": 0,
+            "max_avg10_pct": 0.0
+          }
+        }
+      },
+      "c4_min_available_mib": 7966.328125,
+      "native_host_window_sha256": "a476d66746a7142156f98a956f4d4449076421a7b5fad9c049434320927bd72c"
+    },
+    {
+      "rank": 2,
+      "host_min_available_gib": 7.781108856201172,
+      "meminfo_samples": 171,
+      "meminfo_max_gap_ms": 409.9299999943469,
+      "worker_identity_stable": true,
+      "cuda_allocator": {
+        "allocated_bytes.all.current": {
+          "first_mib": 98592.5927734375,
+          "last_mib": 98592.6279296875,
+          "max_observed_mib": 98624.31298828125
+        },
+        "reserved_bytes.all.current": {
+          "first_mib": 99608.0,
+          "last_mib": 99608.0,
+          "max_observed_mib": 99608.0
+        },
+        "allocated_bytes.all.peak": {
+          "first_mib": 98637.1328125,
+          "last_mib": 98681.75537109375,
+          "max_observed_mib": 98681.75537109375
+        },
+        "reserved_bytes.all.peak": {
+          "first_mib": 99608.0,
+          "last_mib": 99608.0,
+          "max_observed_mib": 99608.0
+        }
+      },
+      "cuda_counters": {
+        "num_ooms": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_oom_rejections": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_alloc_retries": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_sync_all_streams": {
+          "first": 38,
+          "last": 38,
+          "max": 38,
+          "delta": 0
+        }
+      },
+      "pressure": {
+        "first_sample_utc": "2026-09-19T17:08:07.399+00:00",
+        "last_sample_utc": "2026-09-19T17:08:42.399+00:00",
+        "samples": 35,
+        "vmstat_delta": {
+          "allocstall_device": 0,
+          "allocstall_dma": 0,
+          "allocstall_dma32": 0,
+          "allocstall_movable": 0,
+          "allocstall_normal": 0,
+          "compact_stall": 0,
+          "oom_kill": 0,
+          "pgfault": 16927,
+          "pgmajfault": 1,
+          "pgscan_anon": 0,
+          "pgscan_direct": 0,
+          "pgscan_direct_throttle": 0,
+          "pgscan_file": 0,
+          "pgscan_khugepaged": 0,
+          "pgscan_kswapd": 0,
+          "pgscan_proactive": 0,
+          "pgsteal_anon": 0,
+          "pgsteal_direct": 0,
+          "pgsteal_file": 0,
+          "pgsteal_khugepaged": 0,
+          "pgsteal_kswapd": 0,
+          "pgsteal_proactive": 0
+        },
+        "psi": {
+          "some": {
+            "total_stall_us_delta": 0,
+            "max_avg10_pct": 0.0
+          },
+          "full": {
+            "total_stall_us_delta": 0,
+            "max_avg10_pct": 0.0
+          }
+        }
+      },
+      "c4_min_available_mib": 7967.85546875,
+      "native_host_window_sha256": "6bd223a48cdc0aa8b3726c1f83a35e5a6c12694f3c40f2ea7405bcd2a0dbe4d4"
+    },
+    {
+      "rank": 3,
+      "host_min_available_gib": 7.778480529785156,
+      "meminfo_samples": 171,
+      "meminfo_max_gap_ms": 380.2090000244789,
+      "worker_identity_stable": true,
+      "cuda_allocator": {
+        "allocated_bytes.all.current": {
+          "first_mib": 98592.5927734375,
+          "last_mib": 98592.6591796875,
+          "max_observed_mib": 98633.75927734375
+        },
+        "reserved_bytes.all.current": {
+          "first_mib": 99608.0,
+          "last_mib": 99608.0,
+          "max_observed_mib": 99608.0
+        },
+        "allocated_bytes.all.peak": {
+          "first_mib": 98637.13427734375,
+          "last_mib": 98681.75537109375,
+          "max_observed_mib": 98681.75537109375
+        },
+        "reserved_bytes.all.peak": {
+          "first_mib": 99608.0,
+          "last_mib": 99608.0,
+          "max_observed_mib": 99608.0
+        }
+      },
+      "cuda_counters": {
+        "num_ooms": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_oom_rejections": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_alloc_retries": {
+          "first": 0,
+          "last": 0,
+          "max": 0,
+          "delta": 0
+        },
+        "num_sync_all_streams": {
+          "first": 38,
+          "last": 38,
+          "max": 38,
+          "delta": 0
+        }
+      },
+      "pressure": {
+        "first_sample_utc": "2026-09-19T17:08:07.387+00:00",
+        "last_sample_utc": "2026-09-19T17:08:42.387+00:00",
+        "samples": 35,
+        "vmstat_delta": {
+          "allocstall_device": 0,
+          "allocstall_dma": 0,
+          "allocstall_dma32": 0,
+          "allocstall_movable": 0,
+          "allocstall_normal": 0,
+          "compact_stall": 0,
+          "oom_kill": 0,
+          "pgfault": 16934,
+          "pgmajfault": 2,
+          "pgscan_anon": 0,
+          "pgscan_direct": 0,
+          "pgscan_direct_throttle": 0,
+          "pgscan_file": 0,
+          "pgscan_khugepaged": 0,
+          "pgscan_kswapd": 0,
+          "pgscan_proactive": 0,
+          "pgsteal_anon": 0,
+          "pgsteal_direct": 0,
+          "pgsteal_file": 0,
+          "pgsteal_khugepaged": 0,
+          "pgsteal_kswapd": 0,
+          "pgsteal_proactive": 0
+        },
+        "psi": {
+          "some": {
+            "total_stall_us_delta": 0,
+            "max_avg10_pct": 0.0
+          },
+          "full": {
+            "total_stall_us_delta": 0,
+            "max_avg10_pct": 0.0
+          }
+        }
+      },
+      "c4_min_available_mib": 7965.1640625,
+      "native_host_window_sha256": "32b0cb2c6ad0dc01aab7437cfb141fb339bc47a027383ecff6159c9bb6a477e7"
+    }
+  ]
+}

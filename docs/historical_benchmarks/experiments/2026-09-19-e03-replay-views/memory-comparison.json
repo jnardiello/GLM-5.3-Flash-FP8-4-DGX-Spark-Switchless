@@ -1,0 +1,131 @@
+{
+  "schema": "tp4-memory-comparison/v1",
+  "baseline_runs": 2,
+  "e03_runs": 3,
+  "candidate_runs": 3,
+  "baseline_receipt_sha256": "5ad64d2e24506e175aeaab9b3e9342e5e103b29b4de7b0a75b095acd8df421e4",
+  "observer_source_sha256": "7e01cf319e1b1ab1c907edfd4933df00a6e0e6139482b23b4283279433066499",
+  "same_intervals": true,
+  "kv_bytes_per_rank": 16106127360,
+  "kv_capacity_tokens": 1344328,
+  "candidate_host_oom_kills": 0,
+  "candidate_cuda_ooms": 0,
+  "candidate_alloc_retries": 0,
+  "ranks": [
+    {
+      "rank": 0,
+      "baseline_min_available_gib_per_run": [
+        2.2162513732910156,
+        2.2251434326171875
+      ],
+      "e03_min_available_gib_per_run": [
+        2.1155929565429688,
+        2.9877967834472656,
+        3.0103759765625
+      ],
+      "candidate_min_available_gib_per_run": [
+        2.577007293701172,
+        2.550445556640625,
+        2.8394813537597656
+      ],
+      "candidate_allocated_max_mib_per_run": [
+        99284.2763671875,
+        99338.69775390625,
+        99308.48291015625
+      ],
+      "candidate_reserved_max_mib_per_run": [
+        100782.0,
+        100782.0,
+        100782.0
+      ]
+    },
+    {
+      "rank": 1,
+      "baseline_min_available_gib_per_run": [
+        5.827423095703125,
+        5.97320556640625
+      ],
+      "e03_min_available_gib_per_run": [
+        6.881946563720703,
+        7.005973815917969,
+        6.900043487548828
+      ],
+      "candidate_min_available_gib_per_run": [
+        6.569416046142578,
+        7.195442199707031,
+        7.361492156982422
+      ],
+      "candidate_allocated_max_mib_per_run": [
+        99308.37744140625,
+        99338.27587890625,
+        99297.58251953125
+      ],
+      "candidate_reserved_max_mib_per_run": [
+        100744.0,
+        100744.0,
+        100744.0
+      ]
+    },
+    {
+      "rank": 2,
+      "baseline_min_available_gib_per_run": [
+        5.990264892578125,
+        6.393348693847656
+      ],
+      "e03_min_available_gib_per_run": [
+        6.528770446777344,
+        7.1507568359375,
+        6.953910827636719
+      ],
+      "candidate_min_available_gib_per_run": [
+        6.932361602783203,
+        7.083431243896484,
+        6.806293487548828
+      ],
+      "candidate_allocated_max_mib_per_run": [
+        99338.48681640625,
+        99338.48681640625,
+        99314.58251953125
+      ],
+      "candidate_reserved_max_mib_per_run": [
+        100742.0,
+        100742.0,
+        100742.0
+      ]
+    },
+    {
+      "rank": 3,
+      "baseline_min_available_gib_per_run": [
+        6.409454345703125,
+        6.647453308105469
+      ],
+      "e03_min_available_gib_per_run": [
+        6.545650482177734,
+        6.916553497314453,
+        7.093212127685547
+      ],
+      "candidate_min_available_gib_per_run": [
+        6.416873931884766,
+        6.903038024902344,
+        6.917854309082031
+      ],
+      "candidate_allocated_max_mib_per_run": [
+        99338.27587890625,
+        99284.69775390625,
+        99362.48291015625
+      ],
+      "candidate_reserved_max_mib_per_run": [
+        100742.0,
+        100742.0,
+        100742.0
+      ]
+    }
+  ],
+  "limitations": [
+    "MemAvailable minima are sampled observations, not a guarantee about unsampled transients.",
+    "Host reads are sequential; meminfo target 5Hz, process PSS every5s, smaps every30s.",
+    "CUDA peak counters cover the entire worker lifetime without reset; current maxima are observed within this run.",
+    "PyTorch allocator counters omit driver/NCCL/SIRCL allocations; host PSS is not total unified-memory consumption.",
+    "PSI/vmstat are host-wide counters; they alone cannot establish a performance cause."
+  ]
+}

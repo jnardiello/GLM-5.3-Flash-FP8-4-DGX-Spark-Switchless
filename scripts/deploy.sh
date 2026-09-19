@@ -140,6 +140,15 @@ for f in scripts/node/sparkcache/kv-transfer-config.json scripts/node/sparkcache
 done
 REMOTE_DIRS+=(tp4/sparkcache tp4/sircl)
 
+# Accepted E03 runtime sources retain their measured paths; historical checks and
+# preparation assets travel alongside them. The effective recipe selects each mount.
+if [ -d "$REPO/scripts/node/experiments/e03" ]; then
+  while IFS= read -r f; do
+    FILES+=("$f:tp4/experiments/e03/${f#scripts/node/experiments/e03/}")
+    REMOTE_DIRS+=("tp4/experiments/e03/$(dirname "${f#scripts/node/experiments/e03/}")")
+  done < <(cd "$REPO" && find scripts/node/experiments/e03 -type f \( -name '*.py' -o -name '*.json' -o -name SHA256SUMS \) | sort)
+fi
+
 # The configuration overlay travels next to cluster.env, at the same relative path.
 if [ -n "${TP4_ENV:-}" ]; then
   FILES+=("$TP4_ENV:tp4/$TP4_ENV")
