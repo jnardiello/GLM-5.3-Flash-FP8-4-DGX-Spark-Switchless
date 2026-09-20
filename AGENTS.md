@@ -251,9 +251,8 @@ If only a historic summary survives, label it as summary-only; do not invent rec
 Keep frozen JSON bytes and hashes unchanged when relocating records. Their original
 embedded path strings are provenance; use the index for current paths.
 
-The README shows current accepted values, a historical delta column relative to the
-**initial September 11 baseline**, and a second delta column relative to the **immediately
-previous baseline**, with both dates and links to their reports. Its figures compare
+The README shows current accepted values and a single delta column relative to the
+**immediately previous baseline**, with its date and a link to its report. Its figures compare
 current and previous values side by side, with percentage deltas. These presentation
 references do not replace the current operational baseline used to assess new experiments.
 Calculate percentages from unrounded frozen medians and format decimal labels consistently.

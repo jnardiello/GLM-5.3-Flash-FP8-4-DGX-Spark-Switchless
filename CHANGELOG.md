@@ -123,6 +123,9 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Removed
 
+- Removed the initial-baseline delta column from the README performance table, keeping
+  only the dated previous-baseline comparison and aligning the explanatory text and
+  agent guidance.
 - Removed the unused GPU-clock diagnostic tool and its dedicated documentation. The
   tested GB10 driver did not change effective load clocks; production and rollback
   recipes do not invoke the tool. Host lifecycle tests retain their generic coverage.
