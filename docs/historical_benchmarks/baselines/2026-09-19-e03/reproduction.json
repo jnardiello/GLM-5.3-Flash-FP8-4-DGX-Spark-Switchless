@@ -1,0 +1,884 @@
+{
+  "schema": 1,
+  "record_type": "iac_reproduction",
+  "reproduction_id": "2026-09-20-e03-iac",
+  "measured_on": "2026-09-20",
+  "baseline_reference": {
+    "record": "docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json",
+    "sha256": "7aba7010faaffd23900ef0011df3395ca8d41d64a7257156780e0b93aff4f56f",
+    "included_runs": 3,
+    "measured_requests": 162,
+    "modified_or_extended": false
+  },
+  "status": {
+    "deployment_and_operational_identity": "PASS",
+    "native_receipt_validation": "PASS",
+    "benchmark_evidence": "excluded_by_owner",
+    "performance_reproduction": "not_validated"
+  },
+  "scope": "One executed native full suite after default-IaC deployment on four prepared nodes. The owner excluded this suite from evaluation. Only the September 19 accepted benchmarks remain the performance reference.",
+  "deployment": {
+    "recipe_source": "cluster.env.example",
+    "recipe_source_sha256": "85d919e83f4623f6400bc0dc8915165fb5c8546af9404122a1daaebdce57bfe8",
+    "repository_revision": "1db4e743570a38bf43d950cbdf19ee9187a7a33f",
+    "experiment_overlay": null,
+    "rank_count": 4,
+    "deployments": 1,
+    "coordinated_stops": 1,
+    "coordinated_starts": 1,
+    "offline_preflight": "PASS",
+    "four_rank_exact_command_parity_with_serving_overlay": "PASS",
+    "post_deploy_config_and_payloads": "PASS",
+    "jumbo_directions_passed": 8,
+    "rollback_prepared_and_preserved": true,
+    "autostart_default_recipe_verified": true,
+    "fresh_bare_metal_installation_tested": false,
+    "reused_artifacts": [
+      "prepared hosts",
+      "pinned image",
+      "target and drafter weights",
+      "patched NCCL",
+      "operator SparkCache/SIRCL payloads",
+      "compatible compiled kernels and cache namespaces"
+    ],
+    "functional_gates": {
+      "passed": 2,
+      "total": 2,
+      "requests": 2,
+      "elapsed_seconds": 3.0920693389998632,
+      "within_120_seconds": true,
+      "upper_bound_from_health_seconds": 35.139773,
+      "bound_basis": "Controller health polling every 30 seconds; one second allowance for timer rounding. Gates executed immediately after controller readiness and flusher shutdown."
+    },
+    "operational_identity": {
+      "before_benchmark": "PASS",
+      "after_benchmark": "PASS",
+      "same_four_containers_and_workers": true,
+      "restarts": 0,
+      "final_health_http_status": 200,
+      "final_running_requests": 0,
+      "final_waiting_requests": 0,
+      "task_observers_and_tunnel_closed": true
+    }
+  },
+  "rigmark": {
+    "version": "1.1.0",
+    "source": {
+      "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+      "prompts_version": "1.0.0",
+      "repository_dirty": null,
+      "repository_revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+      "repository_source": "git-archive",
+      "repository_source_sha256": "e0e92cff99f74ffa43d0a82541cf9db6010dd0a4ef3e8e7b84c5e1abd13a867f",
+      "version": "1.1.0"
+    },
+    "prompts": {
+      "version": "1.0.0",
+      "sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb"
+    },
+    "comparison_id": "glm53-nq2-3x-20260911-v1",
+    "settings": {
+      "concurrency": [
+        1,
+        2,
+        4
+      ],
+      "concurrency_runs": 3,
+      "concurrency_tokens": 256,
+      "concurrency_workload": "code",
+      "decode_tokens": 8192,
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      },
+      "prefill_depths": [
+        8192,
+        32768,
+        65536
+      ],
+      "prefill_runs": 3,
+      "runs": 5,
+      "seed": 20260905,
+      "temperature": 0,
+      "top_p": 1
+    },
+    "cache_salt_sha256": "0b2a59ee68c6a06add1c3457339a2c48acc9fa7e5b577cf9cd6ce0de4aa82493",
+    "native_executions": 1,
+    "measurement_requests": 54,
+    "client_environment": {
+      "python": "3.14.7",
+      "baseline_platform": "macOS-15.7.9-x86_64-i386-64bit-Mach-O",
+      "reproduction_platform": "macOS-15.8-x86_64-i386-64bit-Mach-O",
+      "transport": "Same workstation and localhost SSH forward to rank0; fresh tunnel.",
+      "limitation": "macOS updated between the frozen series and this reproduction; client timing effects were not isolated."
+    },
+    "external_host_observer": {
+      "enabled_during_this_run": true,
+      "source_sha256": "7e01cf319e1b1ab1c907edfd4933df00a6e0e6139482b23b4283279433066499",
+      "meminfo_interval_seconds": 0.2,
+      "pressure_interval_seconds": 1,
+      "process_interval_seconds": 5,
+      "smaps_interval_seconds": 30,
+      "status": "Exact baseline sampler active on all four ranks during the single reproduction; original JSONL retained."
+    },
+    "gpu_probe_interval_seconds": 1,
+    "included_executions": 0,
+    "included_measurement_requests": 0
+  },
+  "integrity": {
+    "native_validation_errors": [],
+    "protocol_errors": [],
+    "runtime_error": null,
+    "request_count": 54,
+    "completed_streams": 54,
+    "visible_responses": 54,
+    "finish_reasons": {
+      "stop": 15,
+      "length": 39
+    },
+    "decode_output_gates": {
+      "code": {
+        "passed": 5,
+        "total": 5
+      },
+      "prose": {
+        "passed": 5,
+        "total": 5
+      },
+      "structured": {
+        "passed": 5,
+        "total": 5
+      }
+    },
+    "prefill_token_matches": 18,
+    "prefill_requests": 18,
+    "request_groups": {
+      "decode/code": {
+        "requests": 5,
+        "finish_reasons": {
+          "stop": 5
+        },
+        "completed_streams": 5,
+        "visible_responses": 5,
+        "native_first_visible_latency_unavailable": 0
+      },
+      "decode/prose": {
+        "requests": 5,
+        "finish_reasons": {
+          "stop": 5
+        },
+        "completed_streams": 5,
+        "visible_responses": 5,
+        "native_first_visible_latency_unavailable": 0
+      },
+      "decode/structured": {
+        "requests": 5,
+        "finish_reasons": {
+          "stop": 5
+        },
+        "completed_streams": 5,
+        "visible_responses": 5,
+        "native_first_visible_latency_unavailable": 0
+      },
+      "prefill/32768/cold": {
+        "requests": 3,
+        "finish_reasons": {
+          "length": 3
+        },
+        "completed_streams": 3,
+        "visible_responses": 3,
+        "native_first_visible_latency_unavailable": 0
+      },
+      "prefill/32768/warm_replay": {
+        "requests": 3,
+        "finish_reasons": {
+          "length": 3
+        },
+        "completed_streams": 3,
+        "visible_responses": 3,
+        "native_first_visible_latency_unavailable": 0
+      },
+      "prefill/65536/cold": {
+        "requests": 3,
+        "finish_reasons": {
+          "length": 3
+        },
+        "completed_streams": 3,
+        "visible_responses": 3,
+        "native_first_visible_latency_unavailable": 0
+      },
+      "prefill/65536/warm_replay": {
+        "requests": 3,
+        "finish_reasons": {
+          "length": 3
+        },
+        "completed_streams": 3,
+        "visible_responses": 3,
+        "native_first_visible_latency_unavailable": 0
+      },
+      "prefill/8192/cold": {
+        "requests": 3,
+        "finish_reasons": {
+          "length": 3
+        },
+        "completed_streams": 3,
+        "visible_responses": 3,
+        "native_first_visible_latency_unavailable": 0
+      },
+      "prefill/8192/warm_replay": {
+        "requests": 3,
+        "finish_reasons": {
+          "length": 3
+        },
+        "completed_streams": 3,
+        "visible_responses": 3,
+        "native_first_visible_latency_unavailable": 0
+      },
+      "concurrency/1": {
+        "requests": 3,
+        "finish_reasons": {
+          "length": 3
+        },
+        "completed_streams": 3,
+        "visible_responses": 3,
+        "native_first_visible_latency_unavailable": 0
+      },
+      "concurrency/2": {
+        "requests": 6,
+        "finish_reasons": {
+          "length": 6
+        },
+        "completed_streams": 6,
+        "visible_responses": 6,
+        "native_first_visible_latency_unavailable": 0
+      },
+      "concurrency/4": {
+        "requests": 12,
+        "finish_reasons": {
+          "length": 12
+        },
+        "completed_streams": 12,
+        "visible_responses": 12,
+        "native_first_visible_latency_unavailable": 0
+      }
+    }
+  },
+  "runtime": {
+    "status": "PASS",
+    "request_success_delta": 54,
+    "api_posts": 54,
+    "four_rank_containers_unchanged": true,
+    "four_rank_workers_unchanged": true,
+    "runtime_error_count": 0,
+    "draft_budget_concurrent_cap_observed": 3,
+    "ranks": [
+      {
+        "rank": 0,
+        "runtime_error_count": 0,
+        "mhc_activation": true,
+        "mhc_rows": 6912,
+        "mhc_owner_rows": 1728,
+        "reduce_scatter_calls": 90,
+        "all_gather_calls": 95,
+        "draft_aux_all_gathers": 5,
+        "api_posts": 54
+      },
+      {
+        "rank": 1,
+        "runtime_error_count": 0,
+        "mhc_activation": true,
+        "mhc_rows": 6912,
+        "mhc_owner_rows": 1728,
+        "reduce_scatter_calls": 90,
+        "all_gather_calls": 95,
+        "draft_aux_all_gathers": 5,
+        "api_posts": 0
+      },
+      {
+        "rank": 2,
+        "runtime_error_count": 0,
+        "mhc_activation": true,
+        "mhc_rows": 6912,
+        "mhc_owner_rows": 1728,
+        "reduce_scatter_calls": 90,
+        "all_gather_calls": 95,
+        "draft_aux_all_gathers": 5,
+        "api_posts": 0
+      },
+      {
+        "rank": 3,
+        "runtime_error_count": 0,
+        "mhc_activation": true,
+        "mhc_rows": 6912,
+        "mhc_owner_rows": 1728,
+        "reduce_scatter_calls": 90,
+        "all_gather_calls": 95,
+        "draft_aux_all_gathers": 5,
+        "api_posts": 0
+      }
+    ],
+    "memory_errors": 0,
+    "identity_before": "PASS",
+    "identity_after": "PASS",
+    "final_idle": true
+  },
+  "performance": {
+    "status": "excluded_by_owner",
+    "used_for_comparison": false,
+    "included_runs": 0,
+    "included_requests": 0,
+    "aggregation": "No comparison or accepted aggregate uses this run. Values below are archived native per-run observations only.",
+    "excluded_native_metrics": {
+      "code_decode_throughput": 55.572,
+      "code_c1_aggregate_end_to_end_throughput": 40.955,
+      "code_c2_aggregate_end_to_end_throughput": 61.469,
+      "code_c4_aggregate_end_to_end_throughput": 88.89,
+      "prose_decode_throughput": 31.799,
+      "code_ttft": 0.409,
+      "prose_ttft": 0.383,
+      "code_c1_per_stream_ttft": 0.397,
+      "code_c2_per_stream_ttft": 0.551,
+      "code_c4_per_stream_ttft": 0.521,
+      "prefill_8k_cold_throughput": 2663.525,
+      "prefill_8k_replay_throughput": 9704.459,
+      "prefill_32k_cold_throughput": 2797.766,
+      "prefill_32k_replay_throughput": 37541.861,
+      "prefill_64k_cold_throughput": 2730.348,
+      "prefill_64k_replay_throughput": 39602.118
+    }
+  },
+  "memory": {
+    "ranks": [
+      {
+        "rank": 0,
+        "minimum_available_gib": 2.6467208862304688,
+        "worker_stable": true,
+        "sample_quality": {
+          "meminfo_samples": 3235,
+          "process_samples": 130,
+          "first_meminfo_utc": "2026-09-20T07:33:02.731+00:00",
+          "last_meminfo_utc": "2026-09-20T07:43:52.580+00:00",
+          "first_offset_ms": 38.354,
+          "last_offset_ms": 169.974,
+          "meminfo_gap_median_ms": 200.00200002687052,
+          "meminfo_gap_max_ms": 644.0269999438897,
+          "meminfo_gaps_over300ms": 101,
+          "read_durations_ms": {
+            "meminfo": {
+              "median": 0.286,
+              "max": 0.85
+            },
+            "pressure_vmstat": {
+              "median": 0.4065,
+              "max": 0.885
+            },
+            "processes": {
+              "median": 204.683,
+              "max": 513.455
+            }
+          },
+          "meminfo_errors": 0,
+          "process_sample_errors": 0
+        },
+        "pressure": {
+          "first_sample_utc": "2026-09-20T07:33:02.531+00:00",
+          "last_sample_utc": "2026-09-20T07:43:52.531+00:00",
+          "samples": 650,
+          "vmstat_delta": {
+            "allocstall_device": 0,
+            "allocstall_dma": 0,
+            "allocstall_dma32": 0,
+            "allocstall_movable": 5,
+            "allocstall_normal": 0,
+            "compact_stall": 20,
+            "oom_kill": 0,
+            "pgfault": 3911810,
+            "pgmajfault": 50,
+            "pgscan_anon": 0,
+            "pgscan_direct": 3630,
+            "pgscan_direct_throttle": 0,
+            "pgscan_file": 185646,
+            "pgscan_khugepaged": 0,
+            "pgscan_kswapd": 182016,
+            "pgscan_proactive": 0,
+            "pgsteal_anon": 0,
+            "pgsteal_direct": 3630,
+            "pgsteal_file": 182887,
+            "pgsteal_khugepaged": 0,
+            "pgsteal_kswapd": 179257,
+            "pgsteal_proactive": 0
+          },
+          "psi": {
+            "some": {
+              "total_stall_us_delta": 2239,
+              "max_avg10_pct": 0.0
+            },
+            "full": {
+              "total_stall_us_delta": 2229,
+              "max_avg10_pct": 0.0
+            }
+          }
+        },
+        "gpu_allocator": {
+          "allocated_bytes.all.current": {
+            "first_mib": 98592.6435546875,
+            "last_mib": 98592.6591796875,
+            "max_observed_mib": 99284.2763671875
+          },
+          "reserved_bytes.all.current": {
+            "first_mib": 99610.0,
+            "last_mib": 100784.0,
+            "max_observed_mib": 100784.0
+          },
+          "allocated_bytes.all.peak": {
+            "first_mib": 98637.1328125,
+            "last_mib": 99362.48291015625,
+            "max_observed_mib": 99362.48291015625
+          },
+          "reserved_bytes.all.peak": {
+            "first_mib": 99610.0,
+            "last_mib": 100784.0,
+            "max_observed_mib": 100784.0
+          }
+        },
+        "gpu_counters": {
+          "num_ooms": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_oom_rejections": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_alloc_retries": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_sync_all_streams": {
+            "first": 38,
+            "last": 38,
+            "max": 38,
+            "delta": 0
+          }
+        },
+        "gpu_samples": 649,
+        "host_snapshot_sha256": "f6356759953b97ff5e1e82ea1e35c78121ec5469573555daef02a4b6edde6a32"
+      },
+      {
+        "rank": 1,
+        "minimum_available_gib": 6.6407318115234375,
+        "worker_stable": true,
+        "sample_quality": {
+          "meminfo_samples": 3251,
+          "process_samples": 130,
+          "first_meminfo_utc": "2026-09-20T07:33:02.724+00:00",
+          "last_meminfo_utc": "2026-09-20T07:43:52.724+00:00",
+          "first_offset_ms": 31.354,
+          "last_offset_ms": 25.974,
+          "meminfo_gap_median_ms": 200.00000001164153,
+          "meminfo_gap_max_ms": 398.29899999313056,
+          "meminfo_gaps_over300ms": 20,
+          "read_durations_ms": {
+            "meminfo": {
+              "median": 0.315,
+              "max": 0.77
+            },
+            "pressure_vmstat": {
+              "median": 0.217,
+              "max": 0.4
+            },
+            "processes": {
+              "median": 151.015,
+              "max": 397.223
+            }
+          },
+          "meminfo_errors": 0,
+          "process_sample_errors": 0
+        },
+        "pressure": {
+          "first_sample_utc": "2026-09-20T07:33:02.525+00:00",
+          "last_sample_utc": "2026-09-20T07:43:52.525+00:00",
+          "samples": 650,
+          "vmstat_delta": {
+            "allocstall_device": 0,
+            "allocstall_dma": 0,
+            "allocstall_dma32": 0,
+            "allocstall_movable": 0,
+            "allocstall_normal": 0,
+            "compact_stall": 0,
+            "oom_kill": 0,
+            "pgfault": 3881962,
+            "pgmajfault": 19,
+            "pgscan_anon": 0,
+            "pgscan_direct": 0,
+            "pgscan_direct_throttle": 0,
+            "pgscan_file": 0,
+            "pgscan_khugepaged": 0,
+            "pgscan_kswapd": 0,
+            "pgscan_proactive": 0,
+            "pgsteal_anon": 0,
+            "pgsteal_direct": 0,
+            "pgsteal_file": 0,
+            "pgsteal_khugepaged": 0,
+            "pgsteal_kswapd": 0,
+            "pgsteal_proactive": 0
+          },
+          "psi": {
+            "some": {
+              "total_stall_us_delta": 0,
+              "max_avg10_pct": 0.0
+            },
+            "full": {
+              "total_stall_us_delta": 0,
+              "max_avg10_pct": 0.0
+            }
+          }
+        },
+        "gpu_allocator": {
+          "allocated_bytes.all.current": {
+            "first_mib": 98592.6435546875,
+            "last_mib": 98592.6279296875,
+            "max_observed_mib": 99230.27587890625
+          },
+          "reserved_bytes.all.current": {
+            "first_mib": 99608.0,
+            "last_mib": 100742.0,
+            "max_observed_mib": 100742.0
+          },
+          "allocated_bytes.all.peak": {
+            "first_mib": 98637.13427734375,
+            "last_mib": 99362.48291015625,
+            "max_observed_mib": 99362.48291015625
+          },
+          "reserved_bytes.all.peak": {
+            "first_mib": 99608.0,
+            "last_mib": 100742.0,
+            "max_observed_mib": 100742.0
+          }
+        },
+        "gpu_counters": {
+          "num_ooms": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_oom_rejections": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_alloc_retries": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_sync_all_streams": {
+            "first": 38,
+            "last": 38,
+            "max": 38,
+            "delta": 0
+          }
+        },
+        "gpu_samples": 649,
+        "host_snapshot_sha256": "050b403d5de86d90b5cda379c2fe38caa70399ad55428f7d9c15cdbf9943c323"
+      },
+      {
+        "rank": 2,
+        "minimum_available_gib": 6.5468292236328125,
+        "worker_stable": true,
+        "sample_quality": {
+          "meminfo_samples": 3251,
+          "process_samples": 130,
+          "first_meminfo_utc": "2026-09-20T07:33:02.704+00:00",
+          "last_meminfo_utc": "2026-09-20T07:43:52.704+00:00",
+          "first_offset_ms": 11.354,
+          "last_offset_ms": 45.974000000000004,
+          "meminfo_gap_median_ms": 199.99900000402704,
+          "meminfo_gap_max_ms": 388.84300005156547,
+          "meminfo_gaps_over300ms": 14,
+          "read_durations_ms": {
+            "meminfo": {
+              "median": 0.312,
+              "max": 0.895
+            },
+            "pressure_vmstat": {
+              "median": 0.205,
+              "max": 0.482
+            },
+            "processes": {
+              "median": 144.1415,
+              "max": 387.824
+            }
+          },
+          "meminfo_errors": 0,
+          "process_sample_errors": 0
+        },
+        "pressure": {
+          "first_sample_utc": "2026-09-20T07:33:02.504+00:00",
+          "last_sample_utc": "2026-09-20T07:43:52.504+00:00",
+          "samples": 650,
+          "vmstat_delta": {
+            "allocstall_device": 0,
+            "allocstall_dma": 0,
+            "allocstall_dma32": 0,
+            "allocstall_movable": 0,
+            "allocstall_normal": 0,
+            "compact_stall": 0,
+            "oom_kill": 0,
+            "pgfault": 4141558,
+            "pgmajfault": 154,
+            "pgscan_anon": 0,
+            "pgscan_direct": 0,
+            "pgscan_direct_throttle": 0,
+            "pgscan_file": 0,
+            "pgscan_khugepaged": 0,
+            "pgscan_kswapd": 0,
+            "pgscan_proactive": 0,
+            "pgsteal_anon": 0,
+            "pgsteal_direct": 0,
+            "pgsteal_file": 0,
+            "pgsteal_khugepaged": 0,
+            "pgsteal_kswapd": 0,
+            "pgsteal_proactive": 0
+          },
+          "psi": {
+            "some": {
+              "total_stall_us_delta": 0,
+              "max_avg10_pct": 0.0
+            },
+            "full": {
+              "total_stall_us_delta": 0,
+              "max_avg10_pct": 0.0
+            }
+          }
+        },
+        "gpu_allocator": {
+          "allocated_bytes.all.current": {
+            "first_mib": 98592.6435546875,
+            "last_mib": 98592.6591796875,
+            "max_observed_mib": 99338.48681640625
+          },
+          "reserved_bytes.all.current": {
+            "first_mib": 99614.0,
+            "last_mib": 100748.0,
+            "max_observed_mib": 100748.0
+          },
+          "allocated_bytes.all.peak": {
+            "first_mib": 98637.13427734375,
+            "last_mib": 99362.48291015625,
+            "max_observed_mib": 99362.48291015625
+          },
+          "reserved_bytes.all.peak": {
+            "first_mib": 99614.0,
+            "last_mib": 100748.0,
+            "max_observed_mib": 100748.0
+          }
+        },
+        "gpu_counters": {
+          "num_ooms": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_oom_rejections": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_alloc_retries": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_sync_all_streams": {
+            "first": 38,
+            "last": 38,
+            "max": 38,
+            "delta": 0
+          }
+        },
+        "gpu_samples": 649,
+        "host_snapshot_sha256": "abd1a07c596cb3a62c1b36771c9597751a22840a64ec11f6f6c89e2a8cb5049c"
+      },
+      {
+        "rank": 3,
+        "minimum_available_gib": 6.707275390625,
+        "worker_stable": true,
+        "sample_quality": {
+          "meminfo_samples": 3250,
+          "process_samples": 130,
+          "first_meminfo_utc": "2026-09-20T07:33:02.762+00:00",
+          "last_meminfo_utc": "2026-09-20T07:43:52.562+00:00",
+          "first_offset_ms": 69.354,
+          "last_offset_ms": 187.974,
+          "meminfo_gap_median_ms": 199.99900000402704,
+          "meminfo_gap_max_ms": 397.1509999828413,
+          "meminfo_gaps_over300ms": 18,
+          "read_durations_ms": {
+            "meminfo": {
+              "median": 0.319,
+              "max": 1.018
+            },
+            "pressure_vmstat": {
+              "median": 0.2125,
+              "max": 0.493
+            },
+            "processes": {
+              "median": 143.6805,
+              "max": 396.209
+            }
+          },
+          "meminfo_errors": 0,
+          "process_sample_errors": 0
+        },
+        "pressure": {
+          "first_sample_utc": "2026-09-20T07:33:02.562+00:00",
+          "last_sample_utc": "2026-09-20T07:43:52.562+00:00",
+          "samples": 650,
+          "vmstat_delta": {
+            "allocstall_device": 0,
+            "allocstall_dma": 0,
+            "allocstall_dma32": 0,
+            "allocstall_movable": 22,
+            "allocstall_normal": 0,
+            "compact_stall": 67,
+            "oom_kill": 0,
+            "pgfault": 3988581,
+            "pgmajfault": 230,
+            "pgscan_anon": 0,
+            "pgscan_direct": 16465,
+            "pgscan_direct_throttle": 0,
+            "pgscan_file": 134809,
+            "pgscan_khugepaged": 0,
+            "pgscan_kswapd": 118344,
+            "pgscan_proactive": 0,
+            "pgsteal_anon": 0,
+            "pgsteal_direct": 14004,
+            "pgsteal_file": 116648,
+            "pgsteal_khugepaged": 0,
+            "pgsteal_kswapd": 102644,
+            "pgsteal_proactive": 0
+          },
+          "psi": {
+            "some": {
+              "total_stall_us_delta": 740729,
+              "max_avg10_pct": 6.7
+            },
+            "full": {
+              "total_stall_us_delta": 740705,
+              "max_avg10_pct": 6.7
+            }
+          }
+        },
+        "gpu_allocator": {
+          "allocated_bytes.all.current": {
+            "first_mib": 98592.6435546875,
+            "last_mib": 98592.6591796875,
+            "max_observed_mib": 99256.27587890625
+          },
+          "reserved_bytes.all.current": {
+            "first_mib": 99608.0,
+            "last_mib": 100742.0,
+            "max_observed_mib": 100742.0
+          },
+          "allocated_bytes.all.peak": {
+            "first_mib": 98637.13427734375,
+            "last_mib": 99362.48291015625,
+            "max_observed_mib": 99362.48291015625
+          },
+          "reserved_bytes.all.peak": {
+            "first_mib": 99608.0,
+            "last_mib": 100742.0,
+            "max_observed_mib": 100742.0
+          }
+        },
+        "gpu_counters": {
+          "num_ooms": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_oom_rejections": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_alloc_retries": {
+            "first": 0,
+            "last": 0,
+            "max": 0,
+            "delta": 0
+          },
+          "num_sync_all_streams": {
+            "first": 38,
+            "last": 38,
+            "max": 38,
+            "delta": 0
+          }
+        },
+        "gpu_samples": 649,
+        "host_snapshot_sha256": "c0734d882b19bba997ea10b239aa53dbb5c3762f33270bc7258fe9ba178af14f"
+      }
+    ],
+    "gpu_ooms": 0,
+    "gpu_allocation_retries": 0,
+    "host_oom_kills": 0,
+    "limits": [
+      "MemAvailable minima are sampled observations, not a guarantee about unsampled transients.",
+      "Host reads are sequential; meminfo target 5Hz, process PSS every5s, smaps every30s.",
+      "CUDA peak counters cover the entire worker lifetime without reset; current maxima are observed within this run.",
+      "PyTorch allocator counters omit driver/NCCL/SIRCL allocations; host PSS is not total unified-memory consumption.",
+      "PSI/vmstat are host-wide counters; they alone cannot establish a performance cause."
+    ],
+    "status": "excluded_by_owner; not used for evaluation"
+  },
+  "native_receipt": {
+    "sha256": "0325689ea8d5fdbcb63091d7b42a3049fabf4c83d2afa4914c9e824e1bc3213f",
+    "card_sha256": "3a220728ffeee7963cb7e36eba8ef7bff69cabbf2fc12aaf14a3bb3d8e698577",
+    "started_at": "2026-09-20T07:33:02.692646+00:00",
+    "finished_at": "2026-09-20T07:43:52.749974+00:00",
+    "duration_seconds": 650.057328
+  },
+  "evidence_sha256": {
+    "check-f0-before.json": "4204e2dc589c1b616c48a1053ba2d26d15dac4d482fad61b9221692e0ed7769b",
+    "check-f0-after.json": "3cdf123ed91a3b55475b44f4789f3ca6a2c99cb7049ec2adbc5989c7b00231e4",
+    "functional-gates.json": "25563833d83050c5a25e47b01a51903fd1ab432178e5d53cf17ed795fc213b45",
+    "lifecycle-summary.json": "ffc43c1d18966a20d09166370bce25f9f21e957ff8abc5968e7d7fa2b5fdc73c",
+    "runtime-check.json": "8b45bc3d54fe5e1a876fbfcc5ca3602db22e80ecd9890582069821c3ba5dbb1a",
+    "full-1-summary.json": "b2cd44050aa936a3f75dc74c632bb0823db86463801a6361a54830ad52186bb3",
+    "full-1-memory/memory-summary.json": "40968ea7e626c7fb8923f49b409c2919a90fea6abe158d983d2926448543f903",
+    "observer-cleanup.json": "30747f9ca820883a8535e3d5bee22d68739cb23c12e7d51b82b3b0c5f5043555"
+  },
+  "limitations": [
+    "The owner rejects this run as reliable evidence. It is excluded from all benchmark evaluations and aggregates.",
+    "The accepted September 19 baseline remains exactly three suites / 162 requests with unchanged bytes and medians.",
+    "Deploy, configuration identity and the two functional gates are recorded separately from benchmark acceptance.",
+    "No accepted performance reproduction of the new default deployment is established by this excluded run.",
+    "Original native JSON, card, logs and samples remain unchanged and retained for provenance."
+  ],
+  "exclusion": {
+    "decision": "exclude",
+    "requested_by": "owner",
+    "reason": "Owner explicitly instructed that this run must not be used as reliable evidence or taken into account; retain the September 19 benchmarks.",
+    "executed_runs": 1,
+    "executed_requests": 54,
+    "included_runs": 0,
+    "included_requests": 0,
+    "applies_to": "All benchmark-derived performance and memory observations; original receipts retained solely as excluded evidence."
+  }
+}

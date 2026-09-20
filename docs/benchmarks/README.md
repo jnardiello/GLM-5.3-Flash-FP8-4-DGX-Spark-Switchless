@@ -11,6 +11,7 @@ Readable reports live here; machine-readable frozen records and portable experim
 | 2026-09-19 previous base | 2 / 108 | [Report](baselines/2026-09-19.md) |
 | 2026-09-19 IaC reproduction of previous base | 1 / 54, separate | [Report](reproductions/2026-09-19-iac.md) |
 | 2026-09-19 E03 accepted current reference | 3 / 162 | [Report](baselines/2026-09-19-e03.md); [IaC promotion status](../historical_benchmarks/baselines/2026-09-19-e03/promotion.json) |
+| 2026-09-20 E03 IaC benchmark | 0 included; 1 / 54 excluded | [Excluded report](reproductions/2026-09-20-e03-iac.md); owner rejects this run as reliable evidence; deployment and functional checks recorded separately |
 
 [Historical comparison table and archived charts](comparisons/2026-09-19-vs-2026-09-11.md).
 
@@ -30,7 +31,7 @@ frozen sources. Original current-only figures remain unchanged in
 
 | Experiment | Evidence / recorded outcome |
 | --- | --- |
-| [2026-09-19-e03-draft-budget-c1-review](experiments/2026-09-19-e03-draft-budget-c1-review.md) | 3 C1-only executions / 9 requests + 3 full suites / 162 requests, same loaded candidate; C1 −0.17%, C4 −0.68%, prose −2.17% versus baseline; owner accepts the tradeoffs, outcome promote; IaC defaults encoded, live reproduction pending; original values unchanged |
+| [2026-09-19-e03-draft-budget-c1-review](experiments/2026-09-19-e03-draft-budget-c1-review.md) | 3 C1-only executions / 9 requests + 3 full suites / 162 requests, same loaded candidate; C1 −0.17%, C4 −0.68%, prose −2.17% versus baseline; owner accepts the tradeoffs, outcome promote; subsequent IaC deployment verified, September 20 benchmark excluded; original values unchanged |
 | [2026-09-19-e03-replay-draft-budget](experiments/2026-09-19-e03-replay-draft-budget.md) | 3/3 full suites / 162 requests + separate 12-request C4 screen; effective draft-budget cap; original decision_required assessment preserved, later owner acceptance recorded in the C1 follow-up |
 | [2026-09-19-e03-replay-views](experiments/2026-09-19-e03-replay-views.md) | 3 full runs + C1/C4 repeats / 177 requests; 162 in main comparison, 12 in separate C4 check; only anomalous C1 replaced; C4 repeat -3.97% throughput vs baseline; parent of the draft-budget follow-up, decision_required |
 | [2026-09-19-e03](experiments/2026-09-19-e03.md) | 3 runs / 162 requests; cold prefill +9–10%, C2 +5.1%, replay tradeoff; decision_required; preserved as parent of the separately measured replay follow-up |

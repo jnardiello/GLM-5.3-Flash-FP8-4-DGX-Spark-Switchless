@@ -1,6 +1,6 @@
 # E03 replay with the effective draft budget
 
-**Original measurement assessment: decision_required.** The owner subsequently accepted the candidate after the [separate C1 investigation](2026-09-19-e03-draft-budget-c1-review.md), including its observed tradeoffs even if systematic. The current disposition is **promote**, with the measured combination encoded in the default IaC and subsequent live reproduction pending. This report retains the original measurements and their assessment at completion.
+**Original measurement assessment: decision_required.** The owner subsequently accepted the candidate after the [separate C1 investigation](2026-09-19-e03-draft-budget-c1-review.md), including its observed tradeoffs even if systematic. The current disposition is **promote**, with the measured combination encoded in the default IaC. Its [September 20 deployment checks](../reproductions/2026-09-20-e03-iac.md) passed; the owner excluded that window's benchmark from evaluation. This report retains the original measurements and their assessment at completion.
 
 3/3 full native suites, **162 requests**, plus a separate **12-request initial C4 screen**. C4 exceeds the frozen target in all three suites and C2 improves, while C1 throughput is lower in all three; these conflicting primary outcomes required the owner decision.
 

@@ -13,8 +13,10 @@ these values directly, without an experiment overlay.
 
 The performance reference contains three final native Rigmark suites / 162 requests.
 The [promotion record](historical_benchmarks/baselines/2026-09-19-e03/promotion.json)
-tracks the newly encoded IaC separately: a subsequent coordinated deployment and
-reproduction have not yet been performed. Source parity alone does not establish them.
+records the completed September 20 coordinated deployment, functional gates and
+four-rank identity checks. The owner [excluded the 54-request benchmark](benchmarks/reproductions/2026-09-20-e03-iac.md)
+from evaluation. Performance reproduction of that deployment remains unvalidated;
+the accepted September 19 reference is unchanged.
 
 The [previous September 19 base](historical_benchmarks/baselines/2026-09-19/baseline.json)
 remains frozen at two accepted suites / 108 requests. Its complete return is

@@ -7,6 +7,10 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Recorded the completed E03 default-IaC deployment, two timely functional gates
+  and four-rank identity checks. The separate 54-request benchmark is excluded by
+  owner instruction and retained only for provenance; the accepted September 19
+  performance reference, frozen bytes and medians remain unchanged.
 - Added a dated previous-baseline delta column to the README and PNG/SVG comparisons
   of all 16 current versus previous September 19 metrics, with paired values, exact
   percentage changes and the accepted approximately-unchanged labels. The historical

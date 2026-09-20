@@ -1,6 +1,6 @@
 # C1 investigation on the retained draft-budget candidate
 
-**Outcome: promote — accepted by the owner.** The owner accepts the observed performance tradeoffs even if the remaining decreases are systematic. The [decision record](../../historical_benchmarks/experiments/2026-09-19-e03-draft-budget-c1-review/owner-decision.json) preserves the earlier measurement assessments and source hashes. The measured combination is now encoded in the default IaC; its [subsequent live reproduction](../../historical_benchmarks/baselines/2026-09-19-e03/promotion.json) remains pending.
+**Outcome: promote — accepted by the owner.** The owner accepts the observed performance tradeoffs even if the remaining decreases are systematic. The [decision record](../../historical_benchmarks/experiments/2026-09-19-e03-draft-budget-c1-review/owner-decision.json) preserves the earlier measurement assessments and source hashes. The measured combination is encoded in the default IaC. The [subsequent September 20 deployment](../reproductions/2026-09-20-e03-iac.md) passed its functional and identity checks; the owner excluded that window's benchmark from evaluation.
 
 This follow-up retains the same serving processes, code and configuration as [E03 plus replay views plus the draft-budget cap](2026-09-19-e03-replay-draft-budget.md). It completed **three C1-only executions / nine requests**, followed by **three complete native suites / 162 requests**: **171 requests in total**. These observations are separate from the original three suites; no earlier values or frozen references are replaced. Recovery without a runtime change does not establish a causal fix or prove that every decrease is noise.
 
@@ -76,6 +76,6 @@ These are sampled minima, not guaranteed headroom. The frozen baseline's rank-0 
 
 No serving code, recipe, model load or lifecycle action was changed. Final four-rank identity passes, including 19 source hashes per rank, unchanged process starts and `/health` 200. The service was left loaded and idle; the task's four host observers and SSH tunnel are stopped. All six native JSON receipts and the three complete-suite cards are retained. The C1-only renderer's missing-code-block warnings are presentation limitations, separate from successful request integrity.
 
-The owner has accepted the measured candidate. Recording this decision adds no measurements, runtime changes or lifecycle actions; the subsequent IaC encoding is recorded separately, and live reproduction has not been performed. The frozen reference and both original measurement records remain unchanged.
+The owner has accepted the measured candidate. Recording this decision added no measurements, runtime changes or lifecycle actions. The subsequent IaC deployment verification and exclusion of the September 20 benchmark are recorded in the [promotion record](../../historical_benchmarks/baselines/2026-09-19-e03/promotion.json). The frozen reference and both original measurement records remain unchanged.
 
 [Portable results, counts, source hashes, all 16 metric comparisons and individual extracts](../../historical_benchmarks/experiments/2026-09-19-e03-draft-budget-c1-review/results.json).

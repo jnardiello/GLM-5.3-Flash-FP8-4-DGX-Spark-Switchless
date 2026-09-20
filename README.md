@@ -47,9 +47,11 @@ not complete agent-task timings.
 The owner accepts the remaining small performance tradeoffs. The [current benchmark
 report](docs/benchmarks/baselines/2026-09-19-e03.md) compares all 16 metrics with the
 previous base and records variability, memory, counts and limitations. Earlier suites
-and isolated checks remain separately archived. The default recipe matches the measured
-candidate; [deployment and reproduction of these new defaults](docs/historical_benchmarks/baselines/2026-09-19-e03/promotion.json)
-remain pending.
+and isolated checks remain separately archived. The default recipe was deployed on
+September 20; both functional gates and four-rank identity checks passed. The
+[benchmark executed in that window](docs/benchmarks/reproductions/2026-09-20-e03-iac.md)
+was excluded by the owner and is not used for evaluation. The accepted performance
+reference remains the three September 19 suites / 162 requests shown above.
 
 The graphs compare current and previous September 19 medians side by side, with each
 delta calculated against the previous base. Click an image for its SVG version.
