@@ -135,6 +135,14 @@ or resetting peaks. External host-memory sampling was also active during the
 accepted runs; its overhead was not measured separately. The frozen baseline
 identifies the instrumented recipe.
 
+For a bounded sequence-count functionality window, the guarded
+[`e03-c5/delta.env`](../scripts/node/experiments/e03-c5/delta.env) changes only
+`MAX_NUM_SEQS` from six to five. Its sibling `fallback-max4.env` changes it to four.
+Both require the accepted E03 image, replay connector, 262,144-token context and one
+15 GiB KV argument before applying. They preserve all other engine and container
+arguments. The fallback is the current E03 recipe at four sequences; it does not use
+the older 12 GiB C4 connector variant.
+
 ## Adaptive draft length
 
 DFlash2 produces a fused block of draft tokens. The adaptive scheduler verifies either

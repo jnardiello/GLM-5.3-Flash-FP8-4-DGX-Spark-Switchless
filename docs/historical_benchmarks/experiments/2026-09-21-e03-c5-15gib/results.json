@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-21-e03-c5-15gib",
+  "record_type": "portable_measurement_extract",
+  "title": "E03 C5 15 GiB functional smoke",
+  "outcome": "functional smoke passed; retain the C5 operational configuration; performance outcome unresolved; no performance promotion or new baseline",
+  "coverage": "One native decode-only Rigmark execution with one request for each of code, prose and structured generation (3 requests total). Prefill and concurrency were skipped.",
+  "privacy": "Numeric fields, safe protocol/settings fields and receipt digests only. Raw prompts, responses, cache salt, endpoint, host identities, private paths and generated payloads are omitted.",
+  "reference": {
+    "baseline_id": "2026-09-19-e03",
+    "baseline_sha256": "7aba7010faaffd23900ef0011df3395ca8d41d64a7257156780e0b93aff4f56f",
+    "relationship": "The accepted E03 system identity with MAX_NUM_SEQS changed from 6 to 5 only. The frozen performance baseline is unchanged."
+  },
+  "configuration": {
+    "overlay": "scripts/node/experiments/e03-c5/delta.env",
+    "overlay_sha256": "2bf2d7348efd293cd8354e5aeddd97e92d92b68eecc071ee6774b9ba76d00dba",
+    "max_num_seqs": 5,
+    "max_model_len": 262144,
+    "kv_cache_memory_bytes_per_rank": 16106127360,
+    "kv_cache_dtype": "fp8_e4m3",
+    "reported_kv_capacity_tokens": 1344328,
+    "theoretical_full_context_ratio": 5.13,
+    "installed_vllm_version": "0.1.dev1+gd377796e8",
+    "sparkcache_connector_sha256": "5893f8747aa093874c46a0185f93c786265d99b5a4cd8da849a7471132422d66",
+    "scheduler_sha256": "697f99bf1951535dcc3381776fa744ad8204d83d2606f341b617bac7a31949b4"
+  },
+  "live_verification": {
+    "health_status": 200,
+    "functional_gates_passed": 2,
+    "functional_gates_total": 2,
+    "gate_seconds_after_health": 32.50462579727173,
+    "operational_identity": "PASS",
+    "operational_identity_note": "Private identity derived from the frozen E03 system identity by changing max_num_seqs only; it is not a performance baseline.",
+    "autostart_overlay_selected": true,
+    "transition_summary_sha256": "879269e54ded6268f3d076f712e8753d9d8727d85c352c01903126f507826e97",
+    "operational_identity_receipt_sha256": "151a45ee9391f49f72bafea90b722a3a70da1c07c6fa4abe921ef1bb58b3d2f4",
+    "autostart_receipt_sha256": "b68e10a59db420b687fda8169b61ac83b8d1470da654977677fd0b7a3f47901c"
+  },
+  "native_run": {
+    "receipt_sha256": "979eff1c185b2bd14134b8c417dddd4ad61a48d7a16409f775202173640d6686",
+    "exit_code": 0,
+    "protocol": {
+      "version": "1.1.0",
+      "prompts_version": "1.0.0",
+      "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+      "repository_revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+      "repository_source": "git-archive",
+      "repository_source_sha256": "e0e92cff99f74ffa43d0a82541cf9db6010dd0a4ef3e8e7b84c5e1abd13a867f"
+    },
+    "settings_without_cache_salt": {
+      "comparison_id": "glm53-nq2-3x-20260911-v1",
+      "model": "glm-5.3-flash",
+      "runs": 1,
+      "decode_tokens": 8192,
+      "seed": 20260905,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      },
+      "skip_prefill": true,
+      "skip_concurrency": true
+    },
+    "request_accounting": {
+      "planned": 3,
+      "attempted": 3,
+      "completed": 3,
+      "visible_responses": 3,
+      "done_markers": 3,
+      "completion_gates_passed": 3,
+      "completion_gates_total": 3,
+      "finish_reasons": {
+        "stop": 3
+      },
+      "native_receipt_error_entries": 0
+    },
+    "requests": [
+      {
+        "workload": "code",
+        "prompt_tokens": 132,
+        "completion_tokens": 1885,
+        "finish_reason": "stop",
+        "stream_done_marker": true,
+        "completion_gate_valid": true,
+        "decode_tokens_per_second": 54.22,
+        "ttft_seconds": 0.437863
+      },
+      {
+        "workload": "prose",
+        "prompt_tokens": 124,
+        "completion_tokens": 1001,
+        "finish_reason": "stop",
+        "stream_done_marker": true,
+        "completion_gate_valid": true,
+        "decode_tokens_per_second": 31.831,
+        "ttft_seconds": 0.383717
+      },
+      {
+        "workload": "structured",
+        "prompt_tokens": 110,
+        "completion_tokens": 436,
+        "finish_reason": "stop",
+        "stream_done_marker": true,
+        "completion_gate_valid": true,
+        "decode_tokens_per_second": 69.507,
+        "ttft_seconds": 0.45466
+      }
+    ]
+  },
+  "limitations": [
+    "Each throughput and TTFT value is one sample; no median or variability estimate is available.",
+    "The 0.437863-second code TTFT is above the frozen E03 median of 0.396 seconds and its 0.362744-0.406898-second first-request range; one sample cannot establish parity or a regression.",
+    "No prefill, concurrency, repeated suite, maximum-context occupancy or competing-traffic isolation was measured.",
+    "The reported 5.13-fold KV ratio is an engine allocation calculation, not evidence that five full-context requests can run concurrently.",
+    "This smoke run supports functional operation only and does not update or reproduce the frozen E03 performance reference."
+  ]
+}

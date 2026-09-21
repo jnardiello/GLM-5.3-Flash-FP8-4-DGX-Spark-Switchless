@@ -31,6 +31,7 @@ frozen sources. Original current-only figures remain unchanged in
 
 | Experiment | Evidence / recorded outcome |
 | --- | --- |
+| [2026-09-21-e03-c5-15gib](experiments/2026-09-21-e03-c5-15gib.md) | One decode-only native execution / 3 requests; 3/3 native gates and both post-boot gates passed; owner retains the max-five operational recipe; performance unresolved, with no promotion or new baseline |
 | [2026-09-19-e03-draft-budget-c1-review](experiments/2026-09-19-e03-draft-budget-c1-review.md) | 3 C1-only executions / 9 requests + 3 full suites / 162 requests, same loaded candidate; C1 −0.17%, C4 −0.68%, prose −2.17% versus baseline; owner accepts the tradeoffs, outcome promote; subsequent IaC deployment verified, September 20 benchmark excluded; original values unchanged |
 | [2026-09-19-e03-replay-draft-budget](experiments/2026-09-19-e03-replay-draft-budget.md) | 3/3 full suites / 162 requests + separate 12-request C4 screen; effective draft-budget cap; original decision_required assessment preserved, later owner acceptance recorded in the C1 follow-up |
 | [2026-09-19-e03-replay-views](experiments/2026-09-19-e03-replay-views.md) | 3 full runs + C1/C4 repeats / 177 requests; 162 in main comparison, 12 in separate C4 check; only anomalous C1 replaced; C4 repeat -3.97% throughput vs baseline; parent of the draft-budget follow-up, decision_required |

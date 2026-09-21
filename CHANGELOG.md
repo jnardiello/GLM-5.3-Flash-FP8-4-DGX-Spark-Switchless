@@ -7,6 +7,11 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Added guarded current-E03 max-five-sequence functionality and max-four fallback
+  overlays, with full-cluster procedures that retain the 15 GiB KV pool, context,
+  replay connector and all unrelated accepted runtime settings. Recorded the live C5
+  identity, post-boot gates and three-request decode smoke as functionality-only
+  evidence, leaving the frozen E03 performance reference unchanged.
 - Recorded the completed E03 default-IaC deployment, two timely functional gates
   and four-rank identity checks. The separate 54-request benchmark is excluded by
   owner instruction and retained only for provenance; the accepted September 19

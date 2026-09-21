@@ -414,6 +414,67 @@ The controller and launcher revalidate the merged recipe before remote work: `NO
 Expected: the overlay changes only listed keys and the boot signatures identify the
 intended recipe. Stop on a missing overlay, changed container name, or failed gate.
 
+### Current-E03 C5 functionality window
+
+First stop any currently serving experiment with the exact overlay that launched it.
+Return to the accepted E03 defaults and verify both functional gates plus
+`./scripts/check-f0.py` before beginning this window. Do not carry forward an older
+C4 overlay, its 12 GiB KV pool, or its connector.
+
+```sh
+TP4_ENV=<currently-serving-overlay> ./scripts/tp4ctl down
+unset TP4_ENV
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Complete both functional gates, then run ./scripts/check-f0.py.
+```
+
+Start C5 as one coordinated four-rank transition:
+
+```sh
+./scripts/tp4ctl down
+export TP4_ENV=scripts/node/experiments/e03-c5/delta.env
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Complete both functional gates within two minutes of /health 200.
+```
+
+Inspect all four container commands. Require `--max-num-seqs 5`,
+`--max-model-len 262144`, and exactly one
+`--kv-cache-memory-bytes=16106127360`, together with the normal E03 image, replay
+connector, mHC and draft-budget signatures. If this window calls for a bounded Rigmark
+functionality probe, run one native execution with `--skip-prefill --skip-concurrency
+--runs 1` and a unique absolute `--output`. This is one request for each of the three
+decode workloads. Inspect the saved receipt and stop; do not continue into a complete suite,
+repeat series or promotion decision. The default `check-f0.py` identity intentionally
+pins the frozen max-six performance reference and rejects this delta. Do not weaken it
+or publish a replacement baseline; keep any max-sequence-only operational identity
+receipt private and explicitly separate from performance evidence.
+
+If C5 fails, take the whole stack down with the C5 overlay still selected, then start
+the four-sequence fallback as another coordinated transition:
+
+```sh
+./scripts/tp4ctl down
+export TP4_ENV=scripts/node/experiments/e03-c5/fallback-max4.env
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Repeat both functional gates; require the same signatures with --max-num-seqs 4.
+```
+
+Keep the active overlay selected for status, verification and down. Before leaving C5
+unattended, configure rank-0 autostart with
+`Environment=TP4_ENV=scripts/node/experiments/e03-c5/delta.env` and run
+`systemctl daemon-reload`. When selecting the fallback, replace that drop-in value with
+`fallback-max4.env` during the same coordinated transition; do not leave autostart on
+C5 or the unmodified max-six base. To return to accepted E03 defaults, stop with the
+active overlay, unset `TP4_ENV`, deploy, start once, remove the autostart overlay
+selection, run `systemctl daemon-reload`, and repeat both gates plus
+`./scripts/check-f0.py`. Never repair or restart only one rank.
+
 ## Recovery and rollback
 
 Begin with read-only status and choose the narrowest matching rollback. Every restart
