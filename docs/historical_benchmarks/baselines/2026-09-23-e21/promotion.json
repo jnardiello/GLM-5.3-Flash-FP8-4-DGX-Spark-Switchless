@@ -1,0 +1,72 @@
+{
+  "schema": "tp4-iac-promotion/v1",
+  "baseline_id": "2026-09-23-e21",
+  "owner_decision": "promote",
+  "status": "deployed_without_restart_identity_verified_host_check_pending",
+  "measured_recipe_encoded": true,
+  "runtime_sources_unchanged": true,
+  "promotion_method": "launcher_command_parity",
+  "promotion_method_reason": "Owner decision: the three accepted suites were measured on the loaded candidate under ideal conditions, so neither a reapplication nor a reproduction run is required.",
+  "local_validation": {
+    "offline_check": "PASS",
+    "four_rank_command_parity_with_measured_candidate": "PASS",
+    "mounted_source_hashes": "PASS",
+    "complete_e03_rollback_parity": "PASS",
+    "historical_identity_selection": "PASS",
+    "previous_baseline_unchanged": {
+      "path": "docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json",
+      "sha256": "7aba7010faaffd23900ef0011df3395ca8d41d64a7257156780e0b93aff4f56f"
+    },
+    "figures_visually_reviewed": true,
+    "plotter_matplotlib_version": "3.11.2",
+    "figures_sha256": {
+      "docs/plots/comparisons/2026-09-23-e21-vs-2026-09-19-e03/generation.png": "4edbaf5f990e9f143bfddb0bdb6620633561c7b8cf81fdd24d55e4f535dce7ed",
+      "docs/plots/comparisons/2026-09-23-e21-vs-2026-09-19-e03/generation.svg": "fee7f723b333734b646e5352cd2b311cb5eaec1cddd1a5d06983ce6d796631f3",
+      "docs/plots/comparisons/2026-09-23-e21-vs-2026-09-19-e03/prefill.png": "2aeeb46de7ce2ec29ac0e5ad8090e7a4e8010ea5fe459aa5659281131906b3e6",
+      "docs/plots/comparisons/2026-09-23-e21-vs-2026-09-19-e03/prefill.svg": "17edbe23776c2fc8dd26030fc3b3d43e44948d7e954bd8fefdbd3fc87f560e79"
+    }
+  },
+  "new_deployments": 1,
+  "new_lifecycle_actions": 0,
+  "new_measurement_requests": 0,
+  "live_default_apply": {
+    "date": "2026-09-23",
+    "restart": false,
+    "deploy_check_drift": "cluster.env and launcher only, on each rank; all E21 sources already matched",
+    "deploy": "PASS",
+    "autostart_overlay_selection_removed": true,
+    "autostart_tp4_env_after_reload": "none",
+    "check_f0": {
+      "result": "FAIL",
+      "e21_and_recipe_identity_problems": 0,
+      "problems": [
+        "rank 3: verify-node reports systemd NeedDaemonReload=yes for the fabric iptables unit, whose file changed on 2026-09-19 without a reload; preexisting and unrelated to the promoted recipe",
+        "endpoint not idle: one running request from a non-benchmark client"
+      ]
+    },
+    "health": 200,
+    "per_rank_running_identity": {
+      "ranks_checked": 4,
+      "flag_VLLM_E21_BF16_RESIDUE_W8A16": "1 on 4/4",
+      "e21_and_hook_mounts_from_bf16_residue": "4/4",
+      "sparkcache_namespace": "sparkcache-e21-bf16-residue-20260923 on 4/4",
+      "boot_receipt_E21_BF16_RESIDUE_W8A16_READY_modules_67": "4/4"
+    }
+  },
+  "live_reproduction": {
+    "status": "not_required_by_owner_decision",
+    "executed_runs": 0,
+    "executed_requests": 0
+  },
+  "baseline": {
+    "path": "docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json",
+    "sha256": "3bd710b74229a34a2ef7962f4f074b3af552ce1a968439f1b834cd80c8efcac7"
+  },
+  "rollback": "scripts/node/reference/baseline-20260919-e03.env",
+  "notes": [
+    "The encoded default produces a launcher command byte-identical, on all four ranks, to the measured candidate overlay.",
+    "The serving processes that produced the three accepted suites remained in service; applying the default requires no restart.",
+    "The historical C5 concurrency overlay pins the E03 cache configuration and applies only on the E03 base.",
+    "The live identity check found no E21, recipe or container mismatch; its two problems are a preexisting pending systemd reload on rank 3 and a running client request."
+  ]
+}

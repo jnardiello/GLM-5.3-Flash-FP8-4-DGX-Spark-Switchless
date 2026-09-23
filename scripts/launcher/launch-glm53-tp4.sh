@@ -446,6 +446,14 @@ if [ "${SPARK_MHC_PREFILL_SHARD:-0}" = 1 ] && [ "$DRY_RUN" != 1 ]; then
   (cd "$ENV_DIR/experiments/e03" && sha256sum -c SHA256SUMS) \
     || { echo "[launch] ERROR: E03 source manifest failed" >&2; exit 1; }
 fi
+# The E21 BF16-residue files carry their own manifest; verify it whenever they are mounted.
+case "${EXTRA_DOCKER_ENV:-}" in
+  *e21_bf16_residue.py:*)
+    if [ "$DRY_RUN" != 1 ]; then
+      (cd "$ENV_DIR/experiments/e03/bf16-residue" && sha256sum -c SHA256SUMS) \
+        || { echo "[launch] ERROR: E21 BF16-residue source manifest failed" >&2; exit 1; }
+    fi ;;
+esac
 if [ "$ASYNC_SCHEDULING" = "1" ]; then
   ASYNCFLAG="--async-scheduling"
 fi

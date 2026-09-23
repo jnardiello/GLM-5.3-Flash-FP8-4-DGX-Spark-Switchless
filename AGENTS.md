@@ -19,7 +19,7 @@ for each part of the requested task before substantive work:
 For installation, read both [`docs/install-from-zero.md`](docs/install-from-zero.md)
 and [`docs/operations.md`](docs/operations.md). The default recipe is
 [`cluster.env.example`](cluster.env.example); its measured identity and performance
-record is [`docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json`](docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json). Preserve its
+record is [`docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json`](docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json). Preserve its
 non-site settings unless the owner requests a variant. Use this checklist to navigate
 the existing procedures:
 
@@ -144,22 +144,25 @@ benchmark interface. Do not recreate it with private wrapper scripts, blanket ca
 qualification prerequisites, or a parallel benchmark/admission framework; necessary
 measurement fixes belong in Rigmark.
 
-Run one experiment at a time. Use the owner-accepted **September 19, 2026 E03**
-reference in [`docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json`](docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json)
-for future comparisons. Its fixed medians use exactly three final native Rigmark
-suites (162 requests) from the retained E03/replay/draft-budget candidate. The earlier
-three candidate suites and nine isolated C1 requests remain separate; this is not a
-six-run median. The owner accepts the recorded small tradeoffs even if systematic.
-Do not treat that decision as proof that all decreases are noise or that the initial
-C1 slowdown has a proven fix.
+Run one experiment at a time. Use the owner-accepted **September 23, 2026 E21**
+reference in [`docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json`](docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json)
+for future comparisons. Its fixed medians use exactly three complete native Rigmark
+suites (162 requests) measured on one retained load of the E21 candidate, which adds
+8-bit KDA output and MLA attention projections to the E03 recipe. Its code gate is
+13/15 because two long code requests reached the output budget; that is a measured
+output limit, not a failure.
 
-The IaC defaults in `cluster.env.example` select those measured sources, mHC 6,912-row
-prefill, replay views and the effective draft-budget cap, retaining hybrid KDA and
-15 GiB KV per rank. `scripts/check-f0.py` selects this identity by default without
-inference. Encoding the recipe does not establish live redeployment or reproduction;
-record those separately in the [promotion record](docs/historical_benchmarks/baselines/2026-09-19-e03/promotion.json).
-The immediate rollback is `scripts/node/reference/baseline-20260919.env`.
+The IaC defaults in `cluster.env.example` select those measured sources: the E03 mHC
+6,912-row prefill, replay views and effective draft-budget cap, plus the E21 residual
+projections and its cache namespace, retaining hybrid KDA and 15 GiB KV per rank.
+`scripts/check-f0.py` selects this identity by default without inference. The
+[promotion record](docs/historical_benchmarks/baselines/2026-09-23-e21/promotion.json)
+records how the default was applied. The immediate rollback is
+`scripts/node/reference/baseline-20260919-e03.env`, the complete E03 recipe.
 
+The [previous E03 reference](docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json)
+remains immutable at three suites / 162 requests; its older rollback is
+`scripts/node/reference/baseline-20260919.env`.
 The [earlier September 19 base](docs/historical_benchmarks/baselines/2026-09-19/baseline.json)
 remains immutable at exactly two accepted native runs / 108 requests; its third run
 was excluded for competing traffic. The [September 18](docs/historical_benchmarks/baselines/2026-09-18/baseline.json)
@@ -225,10 +228,15 @@ from the current baseline and remove the previous delta; no intermediate baselin
 reload is required. If work stops, report the loaded state and coordinate any required
 restoration with the owner rather than unloading automatically.
 
-A promotion requires encoding the tested change in existing IaC, updating recipe and
-rollback documentation, reapplying the recipe in an authorized window, and verifying
-actual configuration, functional gates and native Rigmark reproduction. Record that
-reproduction separately. Commit and push only within the owner's authorization.
+A promotion encodes the measured recipe in existing IaC and updates recipe and rollback
+documentation. The accepted suites are already the measurement, so do not reload or
+rerun them. Prove instead that the encoded default produces a launcher command
+identical, on all four ranks, to the measured candidate, and that the running identity
+matches it with `scripts/check-f0.py`. When the measured candidate is still serving,
+deploy the default and retire its overlay without a restart. Record the parity and
+live identity in the promotion record. A separate reproduction run is made only on
+explicit owner request and stays separate from the frozen baseline. Commit and push
+only within the owner's authorization.
 
 ### Archive and publish
 

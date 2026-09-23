@@ -401,17 +401,20 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
             kda["receipts"] = [{"padded_n": padded_n} for _ in range(kda["modules"])]
         c["runtime_receipts"] = {"scheduler_boot_signature": True, "kda": kda, "memory_probe": {
             **identity.get("memory_probe", {}), "rank": rank}}
+        if identity.get("e21_boot_receipt"):
+            c["runtime_receipts"]["e21"] = deepcopy(identity["e21_boot_receipt"])
     return rec, exp, ranks
 
 
-assert check.BASELINE == BASELINES / "2026-09-19-e03/baseline.json"
-for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03"):
+assert check.BASELINE == BASELINES / "2026-09-23-e21/baseline.json"
+for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21"):
     baseline_path = BASELINES / name / "baseline.json"
     baseline_recipe, baseline_expected, baseline_ranks = baseline_fixture(baseline_path)
     assert check.evaluate(baseline_recipe, baseline_expected, baseline_ranks, endpoint()) == [], name
 
 current_recipe, current_expected, current_ranks = baseline_fixture(check.BASELINE)
-assert current_expected["baseline_id"] == "2026-09-19-e03"
+assert current_expected["baseline_id"] == "2026-09-23-e21"
+assert current_expected["runtime_identity"]["e21_boot_receipt"]["modules"] == 67
 assert current_expected["kv_cache_memory_bytes"] == "16106127360"
 assert current_expected["runtime_identity"]["kda_boot_receipt"]["prefill_bf16_min_tokens"] == 2048
 
@@ -436,6 +439,21 @@ for field, value in (("modules", 33), ("prefill_bf16_min_tokens", 1024),
     wrong_kda[0]["remote"]["container"]["runtime_receipts"]["kda"][field] = value
     assert f"rank 0: KDA boot receipt {field}" in check.evaluate(
         current_recipe, current_expected, wrong_kda, endpoint())
+
+for field, value in (("modules", 34), ("added_scratch_bytes", 0), ("mla_layout", "no_q_lora"),
+                     ("families", ["kda_o_proj"])):
+    wrong_e21 = deepcopy(current_ranks)
+    wrong_e21[0]["remote"]["container"]["runtime_receipts"]["e21"][field] = value
+    assert f"rank 0: E21 boot receipt {field}" in check.evaluate(
+        current_recipe, current_expected, wrong_e21, endpoint())
+missing_e21 = deepcopy(current_ranks)
+missing_e21[3]["remote"]["container"]["runtime_receipts"].pop("e21")
+assert "rank 3: E21 boot receipt modules" in check.evaluate(
+    current_recipe, current_expected, missing_e21, endpoint())
+no_flag = deepcopy(current_ranks)
+no_flag[1]["remote"]["container"]["environment"].pop("VLLM_E21_BF16_RESIDUE_W8A16")
+assert "rank 1: runtime environment VLLM_E21_BF16_RESIDUE_W8A16" in check.evaluate(
+    current_recipe, current_expected, no_flag, endpoint())
 
 wrong_padding = deepcopy(current_ranks)
 wrong_padding[0]["remote"]["container"]["runtime_receipts"]["kda"]["receipts"][5]["padded_n"] = 6288
@@ -465,7 +483,7 @@ assert "rank 0: running image content ID" in check.evaluate(
 original_load = check.load_recipe
 try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-selection.") as temp:
-        for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03"):
+        for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21"):
             path = BASELINES / name / "baseline.json"
             rec, exp, ranks = baseline_fixture(path)
             check.load_recipe = lambda timeout: (deepcopy(rec), {"returncode": 0})
@@ -489,6 +507,7 @@ try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-overlay.") as temp:
         isolated = Path(temp)
         for relative in ("scripts/lib/common.sh", "scripts/node/bootstrap/versions.env",
+                         "scripts/node/reference/baseline-20260919-e03.env",
                          "scripts/node/reference/baseline-20260919.env",
                          "scripts/node/reference/baseline-20260918.env",
                          "scripts/node/reference/f0-20260912.env", "cluster.env.example"):
@@ -503,7 +522,8 @@ RELAY_DEST=operator@192.0.2.23
 '''
         check.REPO = isolated
         for overlay, baseline in (
-            (None, "2026-09-19-e03"),
+            (None, "2026-09-23-e21"),
+            ("scripts/node/reference/baseline-20260919-e03.env", "2026-09-19-e03"),
             ("scripts/node/reference/baseline-20260919.env", "2026-09-19"),
             ("scripts/node/reference/baseline-20260918.env", "2026-09-18"),
             ("scripts/node/reference/f0-20260912.env", "2026-09-11"),
@@ -523,7 +543,12 @@ RELAY_DEST=operator@192.0.2.23
             assert problems == [], (baseline, problems)
             if overlay:
                 assert effective["extra_docker_env"] != effective["base_extra_docker_env"]
-                if baseline == "2026-09-19":
+                if baseline == "2026-09-19-e03":
+                    # Same KV and mHC as E21; the E21 cache namespace pin is what differs.
+                    assert effective["extra_vllm_args"] == effective["base_extra_vllm_args"]
+                    assert "baseline payload pin: sparkcache_config_sha256" in check.recipe_problems(
+                        effective, current_expected)
+                elif baseline == "2026-09-19":
                     assert "baseline mHC prefill flag" in check.recipe_problems(effective, current_expected)
                 else:
                     assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]

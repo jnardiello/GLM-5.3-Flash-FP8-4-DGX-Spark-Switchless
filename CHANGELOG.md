@@ -7,6 +7,20 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Added the prepared E21 candidate, which extends the accepted E20 INT8 group-128 Marlin
+  mechanism to the KDA output projection and the MLA output, fused QKV-A and Q-B
+  projections behind a flag that is off by default. Its guarded overlay applies only on
+  the default E03 recipe at six sequences, selects a separate SparkCache namespace, and
+  refuses any other base. An offline test covers pins, the gated hook, family selection
+  and shape validation, the prefill dispatch threshold, four-rank launcher parity and
+  overlay refusals. The candidate was later measured and promoted; see Changed.
+- Added the September 23 E21 frozen reference: three complete native Rigmark suites /
+  162 requests on one retained candidate load, with C4 +9.88%, C2 +4.68% and prose
+  +4.02% against E03, zero errors and a 43/45 native gate count from two code requests
+  that reached the output budget. Added its report, experiment extract, owner decision,
+  promotion record and E21-versus-E03 comparison figures.
+- Added `scripts/node/reference/baseline-20260919-e03.env`, the complete E03 recipe, as
+  the one-step rollback from the E21 default.
 - Added guarded current-E03 max-five-sequence functionality and max-four fallback
   overlays, with full-cluster procedures that retain the 15 GiB KV pool, context,
   replay connector and all unrelated accepted runtime settings. Recorded the live C5
@@ -84,6 +98,19 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- Made E21 the default IaC recipe: the KDA hook mounts from `experiments/e03/bf16-residue/`,
+  the default adds the E21 module and `VLLM_E21_BF16_RESIDUE_W8A16=1`, and SparkCache uses
+  the E21 namespace. The launcher verifies that directory's `SHA256SUMS` before starting,
+  and `check-f0.py` validates the new reference by default, including the
+  `E21_BF16_RESIDUE_W8A16_READY` boot receipt. The encoded default produces a launcher
+  command identical on all four ranks to the measured candidate. The README, recipe,
+  operations, installation and node guides describe E21, with E03 as the previous
+  reference; the C5 overlays are documented as E03-only history.
+- Changed the promotion rule in `AGENTS.md`: the accepted suites are the measurement, so a
+  promotion proves four-rank launcher parity and live identity instead of reloading and
+  rerunning the benchmark. A reproduction run happens only on explicit owner request, and
+  `docs/operations.md` describes applying a default without restart while the measured
+  candidate is still serving.
 - Made the accepted E03 mHC 6,912-row path, replay views and effective draft-budget
   scheduler the default IaC recipe, preserving measured runtime hashes, FP8/DFlash2,
   hybrid KDA, graph budgets, 15 GiB KV and context. Updated installation, boot signatures,
@@ -126,6 +153,10 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Fixed
 
+- Fixed a dead `IMAGE` assignment in the configuration template: the historical F0 rollback
+  line had lost its comment marker, so it read as an active setting that the real
+  digest-pinned `IMAGE` below silently overrode. Editing it had no effect. It is now marked
+  as reference only, leaving one active image pin and its content ID.
 - Resolve the baseline path for rollback from the sealed archive's own manifest,
   supporting both historical and reorganized source layouts without rewriting archives.
 - Aligned chart medians and numeric labels with the frozen README baseline values.

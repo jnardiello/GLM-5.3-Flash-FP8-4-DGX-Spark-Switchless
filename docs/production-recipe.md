@@ -5,20 +5,24 @@ one-step rollback comments live in [`cluster.env.example`](../cluster.env.exampl
 host/software pins live in `scripts/node/bootstrap/versions.env`, model file manifests
 in `scripts/node/model-manifests/`, and NCCL pins in `scripts/node/nccl/`.
 
-The **Current** recipe is the [accepted September 19 E03 reference](historical_benchmarks/baselines/2026-09-19-e03/baseline.json):
-R10, SIRCL, hybrid KDA, E03 mHC prefill sharding, SparkCache replay views and
-batch-uniform adaptive verification capped by the effective draft budget. It retains
-15 GiB KV per rank and the 262,144-token context limit. `cluster.env.example` encodes
-these values directly, without an experiment overlay.
+The **Current** recipe is the [accepted September 23 E21 reference](historical_benchmarks/baselines/2026-09-23-e21/baseline.json):
+R10, SIRCL, hybrid KDA, E03 mHC prefill sharding, SparkCache replay views,
+batch-uniform adaptive verification capped by the effective draft budget, and E21
+8-bit residual attention projections. It retains 15 GiB KV per rank and the
+262,144-token context limit. `cluster.env.example` encodes these values directly,
+without an experiment overlay.
 
-The performance reference contains three final native Rigmark suites / 162 requests.
-The [promotion record](historical_benchmarks/baselines/2026-09-19-e03/promotion.json)
-records the completed September 20 coordinated deployment, functional gates and
-four-rank identity checks. The owner [excluded the 54-request benchmark](benchmarks/reproductions/2026-09-20-e03-iac.md)
-from evaluation. Performance reproduction of that deployment remains unvalidated;
-the accepted September 19 reference is unchanged.
+The performance reference contains three complete native Rigmark suites / 162 requests
+measured on one retained candidate load. By owner decision the promotion used
+four-rank launcher-command parity with that measured candidate instead of a separate
+reproduction run; the [promotion record](historical_benchmarks/baselines/2026-09-23-e21/promotion.json)
+records the parity and live identity checks.
 
-The [previous September 19 base](historical_benchmarks/baselines/2026-09-19/baseline.json)
+The [previous E03 reference](historical_benchmarks/baselines/2026-09-19-e03/baseline.json)
+remains frozen at three suites / 162 requests. Its complete return is
+[`baseline-20260919-e03.env`](../scripts/node/reference/baseline-20260919-e03.env), the
+immediate rollback.
+The [earlier September 19 base](historical_benchmarks/baselines/2026-09-19/baseline.json)
 remains frozen at two accepted suites / 108 requests. Its complete return is
 [`baseline-20260919.env`](../scripts/node/reference/baseline-20260919.env).
 [September 18](historical_benchmarks/baselines/2026-09-18/baseline.json) and
@@ -33,9 +37,9 @@ September 12 filenames identify the later capture of the September 11 recipe.
 | Hardware | four NVIDIA GB10 nodes, verified on ASUS Ascent GX10 | one GPU per TP rank; platform overrides belong in `cluster.env` |
 | Network | two-port ConnectX-7 switchless RoCE ring | four direct edges, MTU 9000; see [`fabric.md`](fabric.md) |
 | Serving engine | SparkRing/SparkCache R10 SM121 vLLM container pinned by registry digest (`IMAGE`) and content ID (`IMAGE_ID`) | rank 0 exposes the OpenAI-compatible API; ranks 1–3 are headless; the September 18 rollback uses the same image |
-| Prefix cache | SparkCache replay connector selected by `scripts/node/experiments/e03/kv-transfer-config.json` (`SPARKCACHE_MODE=on`) | persistent cache in the dedicated E03 namespace; replay views connector and corrected encoder are operator payload pinned by SHA-256 |
+| Prefix cache | SparkCache replay connector selected by `scripts/node/experiments/e03/bf16-residue/kv-transfer-config.json` (`SPARKCACHE_MODE=on`) | persistent cache in the dedicated E21 namespace; replay views connector and corrected encoder are operator payload pinned by SHA-256 |
 | Transport | SIRCL single-rail sync-prefill bundle and runtime under `SIRCL_DIR`, started through its entrypoint | operator payload pinned by `scripts/node/sircl/SHA256SUMS`; the container runs with `--no-healthcheck` because that entrypoint never writes the image's readiness marker |
-| Engine overrides | 17 vLLM modules under `scripts/node/overrides/` and `scripts/node/experiments/e03/overrides/` | cache allocation, worker instrumentation, GLM model/indexer, hybrid KDA scratch and per-call mHC sharding |
+| Engine overrides | 18 vLLM modules under `scripts/node/overrides/`, `scripts/node/experiments/e03/overrides/` and `scripts/node/experiments/e03/bf16-residue/` | cache allocation, worker instrumentation, GLM model/indexer, hybrid KDA scratch, per-call mHC sharding and E21 residual projections |
 | Target model | pinned `zai-org/GLM-5.3-Flash` FP8 snapshot | immutable file list and hashes under `scripts/node/model-manifests/` |
 | Drafter | pinned `incoai/GLM-5.3-Flash-DFlash2` | fused speculative draft; non-commercial upstream terms apply |
 | Expert kernels | vLLM Triton FP8 MoE with the GB10-specific JSON in `scripts/node/moe-configs/` | loads the selected platform configuration for the Triton backend |
@@ -122,6 +126,19 @@ switch back to the original checkpoint weights. CPU integration tests are in
 `scripts/tests/test-kda-hybrid.py`; CUDA numerics and graph execution require the
 pinned engine and GPU environment.
 
+E21 extends the same mechanism to 67 more modules per rank, loaded from
+[`experiments/e03/bf16-residue/`](../scripts/node/experiments/e03/bf16-residue/README.md)
+and enabled by `VLLM_E21_BF16_RESIDUE_W8A16=1`: the 34 KDA output projections
+`[4096, 2048]`, and the 11 MLA output `[4096, 4096]`, fused QKV-A `[2048, 4096]` and
+Q-B `[4096, 1536]` projections. The MLA projections are block FP8 in the checkpoint;
+the vendor model code dequantizes them to BF16 on load, so the 8-bit step is a second
+quantization, checked before the window at 0.65–0.71% relative weight error. The KDA
+f/g gates, MLA `kv_b_proj`, the sparse-attention indexer, `lm_head` and the drafter
+are unchanged. Large prefills reuse the shared BF16 scratch, which grows by 79,691,776
+bytes per rank. Each rank logs `E21_BF16_RESIDUE_W8A16_READY` with the converted
+module count. Converting about 1.18 GiB of BF16 weights per rank raised the sampled
+minimum available memory on every rank.
+
 The KV pool is **15 GiB per rank**, compared with 16 GiB in the September 18 and
 September 11 references. The configured per-request context limit remains
 262,144 tokens. The measured boot reported **1,344,328 tokens** of pooled KV
@@ -135,13 +152,14 @@ or resetting peaks. External host-memory sampling was also active during the
 accepted runs; its overhead was not measured separately. The frozen baseline
 identifies the instrumented recipe.
 
-For a bounded sequence-count functionality window, the guarded
+For a bounded sequence-count functionality window on the **E03 base only**, the guarded
 [`e03-c5/delta.env`](../scripts/node/experiments/e03-c5/delta.env) changes only
 `MAX_NUM_SEQS` from six to five. Its sibling `fallback-max4.env` changes it to four.
 Both require the accepted E03 image, replay connector, 262,144-token context and one
 15 GiB KV argument before applying. They preserve all other engine and container
-arguments. The fallback is the current E03 recipe at four sequences; it does not use
-the older 12 GiB C4 connector variant.
+arguments. The fallback is the E03 recipe at four sequences; it does not use
+the older 12 GiB C4 connector variant. Both pin the E03 cache configuration and refuse
+the E21 default; combine them only with the E03 rollback.
 
 ## Adaptive draft length
 
@@ -193,8 +211,8 @@ to base scheduling rather than taking down the endpoint.
 ## SparkCache prefix cache and SIRCL transport
 
 `SPARKCACHE_MODE=on` selects the Current configuration. The launcher builds `--kv-transfer-config`
-from the tracked `scripts/node/experiments/e03/kv-transfer-config.json` (deployed to
-`~/tp4/experiments/e03/`), which names the `SparkContextCacheConnector`, the target and
+from the tracked `scripts/node/experiments/e03/bf16-residue/kv-transfer-config.json` (deployed to
+`~/tp4/experiments/e03/bf16-residue/`), which names the `SparkContextCacheConnector`, the target and
 drafter checkpoint hashes it accepts, a 4,096–262,144-token span, store and restore
 enabled with `recompute` on a failed load, and the cache root under the runtime cache
 volume. The connector, encoder, and SIRCL bundle/runtime are untracked operator
@@ -227,7 +245,7 @@ Keep all three connector versions for the current, September 19 and September 18
 `SPARKCACHE_ENCODER` and `SPARKCACHE_ENCODER_SHA256` select and pin the encoder;
 the connector has corresponding variables. `scripts/node/sparkcache/SHA256SUMS`
 and the configuration pins must agree with the prepared files. The tracked JSON
-is the exact measured configuration, including its dedicated E03 cache namespace;
+is the exact measured configuration, including its dedicated E21 cache namespace;
 its digest is recorded in the current accepted reference. Preserve that namespace when
 reproducing this recipe. Changing its spelling changes both the configuration hash
 and the cache selected by the engine.
@@ -242,9 +260,12 @@ must use its own `spark_cache_root`. Unchanged checkpoint hashes do not establis
 compatibility when weights are converted in memory. Keep the original cache for rollback;
 update the variant's config hash and manifest together with its separate cache path.
 
-The immediate rollback, [`baseline-20260919.env`](../scripts/node/reference/baseline-20260919.env),
-restores the previous model, scheduler, connector and cache namespace, disables mHC,
-and retains hybrid KDA and 15 GiB KV. Stop with the serving recipe before selecting it.
+The immediate rollback, [`baseline-20260919-e03.env`](../scripts/node/reference/baseline-20260919-e03.env),
+restores the complete E03 recipe: the E03 hook source and cache namespace, without the
+E21 module or flag. The older [`baseline-20260919.env`](../scripts/node/reference/baseline-20260919.env)
+restores the earlier September 19 model, scheduler, connector and cache namespace,
+disables mHC, and retains hybrid KDA and 15 GiB KV. Stop with the serving recipe before
+selecting either.
 
 The older rollback to September 18 uses the complete
 [`baseline-20260918.env`](../scripts/node/reference/baseline-20260918.env) overlay,
@@ -289,7 +310,7 @@ Generated-code quality audits remain separate from performance acceptance.
 - Adaptive verification selects the low or high length per step from the batched
   requests' history; one length per step keeps decode on full CUDA graphs under
   concurrency.
-- Hybrid KDA execution uses compact weights for decode and the same weights through
+- Hybrid 8-bit attention projections (KDA input/output and MLA) use compact weights for decode and the same weights through
   BF16 linear execution for large prefills, with one shared scratch allocation.
 - SparkCache restores long shared prefixes from a persistent cache; its saver and
   encoder corrections reduce avoidable copies and retained payloads.
@@ -301,25 +322,26 @@ Generated-code quality audits remain separate from performance acceptance.
 
 ## Qualification and reproduction
 
-The [current reference](historical_benchmarks/baselines/2026-09-19-e03/baseline.json)
-uses exactly three final complete native Rigmark suites / 162 requests on the retained
-candidate. All streams completed visibly, with zero measurement/protocol/runtime errors,
-45/45 native output gates and 54/54 prefill token counts passing. Both functional gates
-passed after the original candidate boot. Runtime sources, graph settings, cache,
-memory instrumentation and the four serving processes were retained across the suites.
+The [current reference](historical_benchmarks/baselines/2026-09-23-e21/baseline.json)
+uses exactly three complete native Rigmark suites / 162 requests on one retained
+candidate load. All streams completed visibly, with zero measurement/protocol/runtime
+errors and 54/54 prefill token counts passing. Native output gates pass 43/45: two long
+code requests reached the 8,192-token output budget, a measured output limit. Both
+functional gates passed after the candidate boot. Runtime sources, graph settings,
+cache, memory instrumentation and the four serving processes were retained across the
+suites.
 
-The owner accepts the measured tradeoffs: the final C1/C4 medians are near the previous
-baseline, C2 and long replay improve, and prose/replay 8K decrease modestly. The cause
-of the original C1 slowdown remains unisolated. Earlier candidate suites and isolated
-C1/C4 checks stay separate. See the [dated report](benchmarks/baselines/2026-09-19-e03.md)
-for all 16 metrics, exact deltas, variability, memory, counts and limits.
+Against E03, C4 rises 9.88% and C2 4.68% with every suite outside the E03 range, prose
+rises 4.02%, and no primary metric worsens beyond measured noise. See the
+[dated report](benchmarks/baselines/2026-09-23-e21.md) for all 16 metrics, exact deltas,
+variability, memory, counts and limits.
 
-The [promotion record](historical_benchmarks/baselines/2026-09-19-e03/promotion.json)
-distinguishes accepted measurements and locally encoded IaC from a subsequent live
-reproduction. Follow the [coordinated migration](operations.md#migrate-the-accepted-overlay-to-defaults)
-when authorized; record the new identity, gates and native Rigmark results separately.
-The previous base's [one-run IaC reproduction](historical_benchmarks/baselines/2026-09-19/reproduction.json)
-is historical evidence for that earlier configuration, not for this promotion.
+The [promotion record](historical_benchmarks/baselines/2026-09-23-e21/promotion.json)
+records the owner's decision to promote without a separate reproduction run, the
+four-rank launcher-command parity between the encoded default and the measured
+candidate, and the live identity check. Follow the
+[coordinated migration](operations.md#migrate-the-accepted-overlay-to-defaults) when a
+default must be applied to a stack loaded from an overlay.
 
 The performance figures describe inference, not complete agent tasks. Concurrency
 requests have 256-token outputs; long code decode excludes TTFT. The context limit is

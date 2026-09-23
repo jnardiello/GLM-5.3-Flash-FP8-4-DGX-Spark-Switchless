@@ -1,0 +1,585 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "experiment_id": "2026-09-23-e21-bf16-residue",
+  "title": "E21: 8-bit weights for the residual BF16 attention projections",
+  "outcome": "promote",
+  "coverage": "Three complete native Rigmark suites, 162 requests, on one retained candidate load after one coordinated transition.",
+  "privacy": "Numeric fields, safe protocol/settings fields and receipt digests only. Raw prompts, responses, cache salt, host names, addresses and private paths are omitted.",
+  "reference": {
+    "baseline_id": "2026-09-19-e03",
+    "baseline_sha256": "7aba7010faaffd23900ef0011df3395ca8d41d64a7257156780e0b93aff4f56f",
+    "relationship": "The accepted E03 recipe plus the E21 BF16-residue conversion; six sequences, 15 GiB KV per rank."
+  },
+  "configuration": {
+    "families": [
+      {
+        "name": "kda_o_proj",
+        "modules": 34,
+        "shape_nk_per_rank": [
+          4096,
+          2048
+        ]
+      },
+      {
+        "name": "mla_o_proj",
+        "modules": 11,
+        "shape_nk_per_rank": [
+          4096,
+          4096
+        ]
+      },
+      {
+        "name": "mla_fused_qkv_a_proj",
+        "modules": 11,
+        "shape_nk_per_rank": [
+          2048,
+          4096
+        ]
+      },
+      {
+        "name": "mla_q_b_proj",
+        "modules": 11,
+        "shape_nk_per_rank": [
+          4096,
+          1536
+        ]
+      }
+    ],
+    "flag": "VLLM_E21_BF16_RESIDUE_W8A16=1",
+    "candidate_manifest_sha256": "a4688817f1f9352c864b986769eefe2616ee9717158efc5a5486e8bf61e50cc9",
+    "overlay_sha256": "403ffc965149f0ea79fc6ebf2d49413d99d839d94ee7cf63fcf4a79468e223b6",
+    "hook_sha256": "aa7dbe1d1e427e56a8c375fba1cf70d41a194fb68fa712a779ddae3f9deb657a",
+    "residue_module_sha256": "d5c2ec827bdacb07112cea3e2d00c87d81c41ed5226aab84b721bfb2011ac59d",
+    "kv_transfer_config_sha256": "548fe62a6676370261a3ddff27e81ac2cfd0d68b1cad4ee8bc99e1c832181e8c",
+    "boot_receipt": {
+      "modules": 67,
+      "families": [
+        "kda_o_proj",
+        "mla_fused_qkv_a_proj",
+        "mla_o_proj",
+        "mla_q_b_proj"
+      ],
+      "mla_layout": "q_lora",
+      "added_scratch_bytes": 79691776,
+      "original_bytes": 1262485504,
+      "packed_bytes": 641118784,
+      "prefill_bf16_min_tokens": 2048,
+      "group_size": 128
+    },
+    "observed_kv_capacity_tokens": 1344328
+  },
+  "lifecycle": {
+    "coordinated_transitions": 1,
+    "downtime_to_health_seconds": 724,
+    "post_boot_gates": {
+      "coherent_response": true,
+      "tool_call": true,
+      "elapsed_from_health_seconds": 3.111
+    },
+    "process_continuity": "No container restart during the series; all four started before run 1.",
+    "restart_counts": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "runs": [
+    {
+      "run": "run-1",
+      "receipt_sha256": "78272d85b1ded4a700ed7eb780e06c4e83613a57c48cb39b130a11a5ec2a9629",
+      "portable_extract_sha256": "134567a8fb1a0e3b77437924a9f529c2da3e0d7c71ada642f7f03f79da133ec3"
+    },
+    {
+      "run": "run-2",
+      "receipt_sha256": "b7fc5e934ada8cbac3f582777fb482f0cb133787d9d46708c4b8f81e64db7777",
+      "portable_extract_sha256": "b07c0e3572abc09096cc57ac9107445d20fd929d73d639d01dd3f5259bf8fba3"
+    },
+    {
+      "run": "run-3",
+      "receipt_sha256": "852a163a058a210215f36e602d5f21ad5ddd33faada86324b0d6cc21bf10b7b1",
+      "portable_extract_sha256": "0545ca4933866378c97dfb51d654ac47bcc163dffef56f345790149305244345"
+    }
+  ],
+  "performance_metrics": [
+    {
+      "key": "code_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "code",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "lower_is_better": false,
+      "per_run": [
+        55.318,
+        54.945,
+        53.819
+      ],
+      "median": 54.945,
+      "dispersion": {
+        "minimum": 53.819,
+        "maximum": 55.318,
+        "sample_stdev": 0.7803851613145886
+      },
+      "previous_baseline_median": 53.809,
+      "change_vs_previous_baseline_pct": 2.111170993699944,
+      "all_runs_outside_previous_range": false
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "1",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "lower_is_better": false,
+      "per_run": [
+        38.76,
+        40.718,
+        40.944
+      ],
+      "median": 40.718,
+      "dispersion": {
+        "minimum": 38.76,
+        "maximum": 40.944,
+        "sample_stdev": 1.2010201219518932
+      },
+      "previous_baseline_median": 40.233,
+      "change_vs_previous_baseline_pct": 1.2054780901250381,
+      "all_runs_outside_previous_range": false
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "2",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "lower_is_better": false,
+      "per_run": [
+        64.269,
+        64.726,
+        66.066
+      ],
+      "median": 64.726,
+      "dispersion": {
+        "minimum": 64.269,
+        "maximum": 66.066,
+        "sample_stdev": 0.9339573509177665
+      },
+      "previous_baseline_median": 61.834,
+      "change_vs_previous_baseline_pct": 4.677038522495707,
+      "all_runs_outside_previous_range": true
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "4",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "lower_is_better": false,
+      "per_run": [
+        96.785,
+        92.501,
+        95.524
+      ],
+      "median": 95.524,
+      "dispersion": {
+        "minimum": 92.501,
+        "maximum": 96.785,
+        "sample_stdev": 2.201564065234831
+      },
+      "previous_baseline_median": 86.932,
+      "change_vs_previous_baseline_pct": 9.883587171582384,
+      "all_runs_outside_previous_range": true
+    },
+    {
+      "key": "prose_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "prose",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "lower_is_better": false,
+      "per_run": [
+        32.647,
+        32.441,
+        31.799
+      ],
+      "median": 32.441,
+      "dispersion": {
+        "minimum": 31.799,
+        "maximum": 32.647,
+        "sample_stdev": 0.4422864833265125
+      },
+      "previous_baseline_median": 31.186,
+      "change_vs_previous_baseline_pct": 4.024241646892845,
+      "all_runs_outside_previous_range": true
+    },
+    {
+      "key": "code_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "code",
+        "ttft_seconds",
+        "median"
+      ],
+      "lower_is_better": true,
+      "per_run": [
+        0.387,
+        0.407,
+        0.387
+      ],
+      "median": 0.387,
+      "dispersion": {
+        "minimum": 0.387,
+        "maximum": 0.407,
+        "sample_stdev": 0.011547005383792493
+      },
+      "previous_baseline_median": 0.396,
+      "change_vs_previous_baseline_pct": -2.2727272727272747,
+      "all_runs_outside_previous_range": false
+    },
+    {
+      "key": "prose_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "prose",
+        "ttft_seconds",
+        "median"
+      ],
+      "lower_is_better": true,
+      "per_run": [
+        0.379,
+        0.38,
+        0.377
+      ],
+      "median": 0.379,
+      "dispersion": {
+        "minimum": 0.377,
+        "maximum": 0.38,
+        "sample_stdev": 0.0015275252316519481
+      },
+      "previous_baseline_median": 0.381,
+      "change_vs_previous_baseline_pct": -0.5249343832021002,
+      "all_runs_outside_previous_range": true
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "1",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "lower_is_better": true,
+      "per_run": [
+        0.35,
+        0.392,
+        0.338
+      ],
+      "median": 0.35,
+      "dispersion": {
+        "minimum": 0.338,
+        "maximum": 0.392,
+        "sample_stdev": 0.028354893757515653
+      },
+      "previous_baseline_median": 0.343,
+      "change_vs_previous_baseline_pct": 2.0408163265305976,
+      "all_runs_outside_previous_range": false
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "2",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "lower_is_better": true,
+      "per_run": [
+        0.46,
+        0.443,
+        0.461
+      ],
+      "median": 0.46,
+      "dispersion": {
+        "minimum": 0.443,
+        "maximum": 0.461,
+        "sample_stdev": 0.010115993936995688
+      },
+      "previous_baseline_median": 0.449,
+      "change_vs_previous_baseline_pct": 2.449888641425392,
+      "all_runs_outside_previous_range": false
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "4",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "lower_is_better": true,
+      "per_run": [
+        0.655,
+        0.543,
+        0.524
+      ],
+      "median": 0.543,
+      "dispersion": {
+        "minimum": 0.524,
+        "maximum": 0.655,
+        "sample_stdev": 0.07078841713161836
+      },
+      "previous_baseline_median": 0.572,
+      "change_vs_previous_baseline_pct": -5.069930069930056,
+      "all_runs_outside_previous_range": false
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "lower_is_better": false,
+      "per_run": [
+        2653.208,
+        2587.697,
+        2644.825
+      ],
+      "median": 2644.825,
+      "dispersion": {
+        "minimum": 2587.697,
+        "maximum": 2653.208,
+        "sample_stdev": 35.650091617460504
+      },
+      "previous_baseline_median": 2558.401,
+      "change_vs_previous_baseline_pct": 3.3780474601127803,
+      "all_runs_outside_previous_range": false
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "lower_is_better": false,
+      "per_run": [
+        9527.941,
+        9692.828,
+        9668.86
+      ],
+      "median": 9668.86,
+      "dispersion": {
+        "minimum": 9527.941,
+        "maximum": 9692.828,
+        "sample_stdev": 89.08830109690751
+      },
+      "previous_baseline_median": 9417.164,
+      "change_vs_previous_baseline_pct": 2.6727367177634362,
+      "all_runs_outside_previous_range": false
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "lower_is_better": false,
+      "per_run": [
+        2733.042,
+        2736.966,
+        2716.192
+      ],
+      "median": 2733.042,
+      "dispersion": {
+        "minimum": 2716.192,
+        "maximum": 2736.966,
+        "sample_stdev": 11.036902886830708
+      },
+      "previous_baseline_median": 2661.974,
+      "change_vs_previous_baseline_pct": 2.66974808919996,
+      "all_runs_outside_previous_range": true
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "lower_is_better": false,
+      "per_run": [
+        37824.884,
+        34351.789,
+        37929.218
+      ],
+      "median": 37824.884,
+      "dispersion": {
+        "minimum": 34351.789,
+        "maximum": 37929.218,
+        "sample_stdev": 2035.9794003796646
+      },
+      "previous_baseline_median": 37177.429,
+      "change_vs_previous_baseline_pct": 1.7415270969921075,
+      "all_runs_outside_previous_range": false
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "lower_is_better": false,
+      "per_run": [
+        2662.712,
+        2649.955,
+        2615.638
+      ],
+      "median": 2649.955,
+      "dispersion": {
+        "minimum": 2615.638,
+        "maximum": 2662.712,
+        "sample_stdev": 24.345975074605963
+      },
+      "previous_baseline_median": 2616.073,
+      "change_vs_previous_baseline_pct": 1.29514734489443,
+      "all_runs_outside_previous_range": false
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "lower_is_better": false,
+      "per_run": [
+        40106.337,
+        40007.301,
+        40178.996
+      ],
+      "median": 40106.337,
+      "dispersion": {
+        "minimum": 40007.301,
+        "maximum": 40178.996,
+        "sample_stdev": 86.18452355459947
+      },
+      "previous_baseline_median": 40078.253,
+      "change_vs_previous_baseline_pct": 0.07007291460534111,
+      "all_runs_outside_previous_range": false
+    }
+  ],
+  "integrity": {
+    "requests": 162,
+    "completed_streams": 162,
+    "visible_responses": 162,
+    "stream_done_markers": {
+      "passed": 162,
+      "total": 162
+    },
+    "native_validation_errors": 0,
+    "protocol_errors": 0,
+    "runtime_errors": 0,
+    "finish_reasons": {
+      "stop": 43,
+      "length": 119
+    },
+    "completion_gates": {
+      "code": {
+        "passed": 13,
+        "total": 15
+      },
+      "prose": {
+        "passed": 15,
+        "total": 15
+      },
+      "structured": {
+        "passed": 15,
+        "total": 15
+      }
+    },
+    "generation_posts_per_run": [
+      54,
+      54,
+      54
+    ],
+    "competing_traffic": "none observed"
+  },
+  "memory": {
+    "minimum_available_gib_by_rank": {
+      "0": [
+        3.2187957763671875,
+        3.5807037353515625,
+        3.3587265014648438
+      ],
+      "1": [
+        7.510833740234375,
+        7.536830902099609,
+        7.860195159912109
+      ],
+      "2": [
+        7.621433258056641,
+        7.716575622558594,
+        7.738887786865234
+      ],
+      "3": [
+        7.434276580810547,
+        7.759716033935547,
+        7.902591705322266
+      ]
+    },
+    "gpu_ooms": 0,
+    "gpu_allocation_retries": 0,
+    "host_oom_kills": 0
+  },
+  "limitations": [
+    "Three complete suites on one retained candidate load, compared with the three-suite E03 reference measured on 2026-09-19; dispersion, not statistical significance.",
+    "Generated text differs from the reference because the converted weights change the arithmetic, so per-request comparisons are confounded; suite medians are the unit of comparison.",
+    "C1 was 38.760 tok/s in run 1, below the E03 range, and 40.718 and 40.944 tok/s in runs 2 and 3. This matches the known unisolated C1 variability on this machine.",
+    "Two of fifteen long code requests reached the 8,192-token output budget, so the native code completion gate is 13/15. That is a measured output limit, not a transport or runtime failure; E03 recorded 15/15.",
+    "C1 and C2 per-stream TTFT medians are 2.04% and 2.45% higher than E03, within or at the edge of the reference dispersion.",
+    "Server timing sum deltas were not captured for this series.",
+    "Promotion was accepted by the owner without a separate reapplication or reproduction run: the encoded default recipe produces a launcher command identical, on all four ranks, to the measured candidate, and the measured processes remained loaded."
+  ]
+}

@@ -332,7 +332,9 @@ only when those actions are outside its scope:
 Expected: static verification passes; fabric-check sees two addressed MTU-9000 ports
 per node and eight successful jumbo pings; `/health` reaches 200; all runtime
 signatures in [`operations.md`](operations.md) are present, including the mHC flag,
-replay connector pin and draft-budget scheduler startup marker. Run the
+replay connector pin, draft-budget scheduler startup marker and the
+`E21_BF16_RESIDUE_W8A16_READY` line with 67 modules on every rank. All E21 sources are
+tracked in the checkout and need no extra operator payload. Run the
 [post-boot functional gates](operations.md#post-boot-functional-gates) within two
 minutes of readiness, then verify the accepted identity with `./scripts/check-f0.py`.
 Save installation evidence separately from the frozen performance reference.

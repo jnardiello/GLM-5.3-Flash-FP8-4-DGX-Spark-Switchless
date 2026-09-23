@@ -10,32 +10,32 @@ contains the infrastructure as code, runtime patches, and guides to
 
 ## Measured performance
 
-Current accepted baseline: **19/09/2026 · E03 + replay views + draft budget**, measured
-with native [Rigmark](https://github.com/alexellis/rigmark). Frozen medians of
-**three complete runs: 162/162 requests**, zero measurement/runtime errors and
-45/45 native output gates passing.
+Current accepted baseline: **23/09/2026 · E21, 8-bit weights for the residual BF16
+attention projections**, measured with native [Rigmark](https://github.com/alexellis/rigmark).
+Frozen medians of **three complete runs: 162/162 requests**, zero measurement/runtime
+errors and 43/45 native output gates passing; the two remaining code requests reached
+the 8,192-token output budget.
 
-| Workload | Current · 19/09/2026 E03 | Change vs previous [📊 19/09/2026](docs/benchmarks/baselines/2026-09-19.md) |
+| Workload | Current · 23/09/2026 E21 | Change vs previous [📊 19/09/2026](docs/benchmarks/baselines/2026-09-19-e03.md) |
 | --- | ---: | ---: |
-| Code decode, one request | 53.81 tok/s | ≈ unchanged (-0.15%) |
-| Code C1, end-to-end | 40.23 tok/s | ≈ unchanged (-0.17%) |
-| Code C2, aggregate end-to-end | 61.83 tok/s | +8.00% |
-| Code C4, aggregate end-to-end | 86.93 tok/s | ≈ unchanged (-0.68%) |
-| Prose decode | 31.19 tok/s | ≈ unchanged (-2.17%) |
-| Code TTFT | 0.396 s | ≈ unchanged (-1.37%) |
-| Prose TTFT | 0.381 s | ≈ unchanged (+0.26%) |
-| C1 per-stream TTFT | 0.343 s | -14.14% |
-| C2 per-stream TTFT | 0.449 s | -9.29% |
-| C4 per-stream TTFT | 0.572 s | -15.82% |
-| Prefill 8K, cold | 2,558.4 tok/s | +8.65% |
-| Prefill 8K, replay | 9,417.2 tok/s | ≈ unchanged (-1.47%) |
-| Prefill 32K, cold | 2,662.0 tok/s | +5.05% |
-| Prefill 32K, replay | 37,177.4 tok/s | +5.48% |
-| Prefill 64K, cold | 2,616.1 tok/s | +8.02% |
-| Prefill 64K, replay | 40,078.3 tok/s | +13.09% |
+| Code decode, one request | 54.94 tok/s | ≈ unchanged (+2.11%) |
+| Code C1, end-to-end | 40.72 tok/s | ≈ unchanged (+1.21%) |
+| Code C2, aggregate end-to-end | 64.73 tok/s | +4.68% |
+| Code C4, aggregate end-to-end | 95.52 tok/s | +9.88% |
+| Prose decode | 32.44 tok/s | +4.02% |
+| Code TTFT | 0.387 s | -2.27% |
+| Prose TTFT | 0.379 s | ≈ unchanged (-0.52%) |
+| C1 per-stream TTFT | 0.350 s | ≈ unchanged (+2.04%) |
+| C2 per-stream TTFT | 0.460 s | +2.45% |
+| C4 per-stream TTFT | 0.543 s | -5.07% |
+| Prefill 8K, cold | 2,644.8 tok/s | +3.38% |
+| Prefill 8K, replay | 9,668.9 tok/s | +2.67% |
+| Prefill 32K, cold | 2,733.0 tok/s | +2.67% |
+| Prefill 32K, replay | 37,824.9 tok/s | ≈ unchanged (+1.74%) |
+| Prefill 64K, cold | 2,650.0 tok/s | ≈ unchanged (+1.30%) |
+| Prefill 64K, replay | 40,106.3 tok/s | ≈ unchanged (+0.07%) |
 
-Percentages use unrounded medians relative to the previous September 19 base, before
-E03, replay views and the draft-budget cap.
+Percentages use unrounded medians relative to the previous September 19 E03 baseline.
 “≈ unchanged” marks owner-accepted changes of roughly 1–2%, with the exact delta
 retained; it does not establish statistical equivalence.
 Higher throughput and lower TTFT are better. C1/C2/C4 mean one, two or four concurrent
@@ -44,21 +44,21 @@ to first token. Concurrency outputs cap at 256 tokens; long decode allows 8,192.
 Cold prefill uses a fresh cache salt per run. These are inference measurements,
 not complete agent-task timings.
 
-The owner accepts the remaining small performance tradeoffs. The [current benchmark
-report](docs/benchmarks/baselines/2026-09-19-e03.md) compares all 16 metrics with the
-previous base and records variability, memory, counts and limitations. Earlier suites
-and isolated checks remain separately archived. The default recipe was deployed on
-September 20; both functional gates and four-rank identity checks passed. The
-[benchmark executed in that window](docs/benchmarks/reproductions/2026-09-20-e03-iac.md)
-was excluded by the owner and is not used for evaluation. The accepted performance
-reference remains the three September 19 suites / 162 requests shown above.
+The main gain is under concurrency, the primary workload for parallel agents: C2 and
+C4 improved in every run beyond the previous baseline's range. Converting the weights
+also raised the minimum available memory on the tightest rank by about 1 GiB. The owner
+accepts the small per-stream TTFT increase at C1 and C2. The [current benchmark
+report](docs/benchmarks/baselines/2026-09-23-e21.md) compares all 16 metrics with the
+previous baseline and records variability, memory, counts and limitations. The measured
+processes remain in service: the encoded default produces the same launcher command on
+all four ranks, so no separate reproduction run was needed.
 
-The graphs compare current and previous September 19 medians side by side, with each
-delta calculated against the previous base. Click an image for its SVG version.
+The graphs compare current and previous medians side by side, with each delta calculated
+against the previous September 19 E03 baseline. Click an image for its SVG version.
 
-[![Current versus previous September 19 baseline: generation throughput, time to first token and percentage changes.](docs/plots/comparisons/2026-09-19-e03-vs-2026-09-19/generation.png)](docs/plots/comparisons/2026-09-19-e03-vs-2026-09-19/generation.svg)
+[![Current E21 versus previous September 19 E03 baseline: generation throughput, time to first token and percentage changes.](docs/plots/comparisons/2026-09-23-e21-vs-2026-09-19-e03/generation.png)](docs/plots/comparisons/2026-09-23-e21-vs-2026-09-19-e03/generation.svg)
 
-[![Current versus previous September 19 baseline: cold prefill, immediate replay and percentage changes at 8K, 32K and 64K.](docs/plots/comparisons/2026-09-19-e03-vs-2026-09-19/prefill.png)](docs/plots/comparisons/2026-09-19-e03-vs-2026-09-19/prefill.svg)
+[![Current E21 versus previous September 19 E03 baseline: cold prefill, immediate replay and percentage changes at 8K, 32K and 64K.](docs/plots/comparisons/2026-09-23-e21-vs-2026-09-19-e03/prefill.png)](docs/plots/comparisons/2026-09-23-e21-vs-2026-09-19-e03/prefill.svg)
 
 The [benchmark archive](docs/benchmarks/README.md) retains earlier baselines, experiments
 and separate reproduction results. See [local Rigmark reports](docs/rigmark_reports/README.md)
@@ -67,7 +67,8 @@ for saving and viewing native receipts.
 The [current recipe](docs/production-recipe.md), encoded in
 [`cluster.env.example`](cluster.env.example), combines the digest-pinned SparkRing image,
 DFlash2 with adaptive verification capped by its effective draft budget, E03 mHC prefill
-sharding, hybrid INT8/BF16 KDA projections, SparkCache replay views and SIRCL/patched NCCL.
+sharding, hybrid INT8/BF16 KDA input projections, E21 8-bit weights for the KDA output
+and MLA attention projections, SparkCache replay views and SIRCL/patched NCCL.
 The **15 GiB KV pool per rank** and **262,144-token context limit** are retained.
 
 ## Install with an agent
@@ -93,9 +94,9 @@ proxy.
 Replace the placeholders below, then give this prompt to the agent in the checkout:
 
 ```text
-Install this repository's accepted September 19, 2026 E03 recipe on my four nodes.
+Install this repository's accepted September 23, 2026 E21 recipe on my four nodes.
 Read AGENTS.md, docs/install-from-zero.md, and docs/operations.md first.
-Use docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json and cluster.env.example as the reference.
+Use docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json and cluster.env.example as the reference.
 
 SSH targets in rank order:
 0: <user@rank0-host>

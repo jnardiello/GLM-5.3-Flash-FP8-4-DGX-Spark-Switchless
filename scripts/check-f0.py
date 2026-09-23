@@ -23,7 +23,7 @@ from typing import Any, Callable
 
 
 REPO = Path(__file__).resolve().parents[1]
-BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json"
+BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json"
 ADAPTIVE_DEFAULTS = {
     "VLLM_ADAPTIVE_K_ENABLE": "1", "VLLM_ADAPTIVE_K_LO": "3",
     "VLLM_ADAPTIVE_K_HI": "5", "VLLM_ADAPTIVE_K_MODE": "per-request",
@@ -252,6 +252,9 @@ if container and identity.get("kda_boot_receipt"):
                 runtime_receipts["scheduler_boot_signature"] = True
             if "E20_KDA_INPUT_W8A16_READY " in line:
                 try: runtime_receipts["kda"] = json.loads(line.split("E20_KDA_INPUT_W8A16_READY ", 1)[1])
+                except json.JSONDecodeError: pass
+            if "E21_BF16_RESIDUE_W8A16_READY " in line:
+                try: runtime_receipts["e21"] = json.loads(line.split("E21_BF16_RESIDUE_W8A16_READY ", 1)[1])
                 except json.JSONDecodeError: pass
     except ValueError:
         errors.append({"check": "container start time", "error": "invalid timestamp"})
@@ -645,6 +648,10 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
                     problems.append(f"rank {rank}: KDA padding receipt")
             elif kda.get(key) != value:
                 problems.append(f"rank {rank}: KDA boot receipt {key}")
+        e21 = receipts.get("e21") or {}
+        for key, value in identity.get("e21_boot_receipt", {}).items():
+            if e21.get(key) != value:
+                problems.append(f"rank {rank}: E21 boot receipt {key}")
         memory_probe = receipts.get("memory_probe") or {}
         if identity.get("memory_probe"):
             if (any(memory_probe.get(key) != value for key, value in identity["memory_probe"].items())

@@ -5,8 +5,8 @@ artifacts for the four cluster hosts. Nothing in this directory runs merely beca
 it exists in the repository; deploy, bootstrap, launcher, and configuration choices
 select the files explicitly.
 
-The base configuration is the [accepted September 19 E03 recipe](../../docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json).
-The previous September 19 base, September 18 and September 11 remain historical references with their own
+The base configuration is the [accepted September 23 E21 recipe](../../docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json).
+The previous E03 reference, the earlier September 19 base, September 18 and September 11 remain historical references with their own
 rollback assets; the September 12 filenames below belong to the September 11
 reference's later capture.
 
@@ -44,6 +44,7 @@ reference's later capture.
 | shared `scripts/node/etc/common/` files | `/etc/sysctl.d/`, `/etc/sudoers.d/`, `/usr/local/sbin/`, `/etc/systemd/system/` | bootstrap/deploy-host |
 | GRUB drop-in | `/etc/default/grub.d/zz-tp4-perf.cfg` | bootstrap/deploy-host and `tp4-iommu.sh` |
 | built NCCL library | `$NCCL_DIR/libnccl.so.2` | `scripts/node/nccl/install-nccl.sh` |
+| E03 reference overlay selected through `TP4_ENV` (immediate rollback) | `~/tp4/scripts/node/reference/baseline-20260919-e03.env` | `scripts/deploy.sh` |
 | September 19 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260919.env` | `scripts/deploy.sh` |
 | September 18 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260918.env` | `scripts/deploy.sh` |
 | `reference/model-20260918.py` and `reference/sparkcache-20260918.json` | `~/tp4/reference/` | `scripts/deploy.sh` |
@@ -63,8 +64,13 @@ script activates `/etc` state only under `--apply`; it never reboots a node.
 
 ## Current engine and cache payload
 
-The current recipe mounts 17 vLLM modules: retained cache allocation, worker/probe,
-indexer and hybrid-KDA sources, plus the E03 model and mHC per-call sharding modules.
+The current recipe mounts 18 vLLM modules: retained cache allocation, worker/probe,
+indexer and hybrid-KDA sources, the E03 model and mHC per-call sharding modules, and the
+E21 residual-projection module. The KDA hook is mounted from
+[`experiments/e03/bf16-residue/`](experiments/e03/bf16-residue/README.md), which also
+converts 67 KDA output and MLA attention projections per rank to the same INT8 format
+when `VLLM_E21_BF16_RESIDUE_W8A16=1`; the launcher verifies that directory's
+`SHA256SUMS` before starting.
 E03 applies only to 6,912-row pure eager prefills under TP4/DCP1, leaving decode and
 CUDA graph paths ordinary. All measured source bytes and paths are retained. The hybrid path converts 34 KDA input projections to
 group-128 INT8 storage, pads their TP-local `[6288, 4096]` shape to `[6400, 4096]`,
@@ -104,10 +110,14 @@ not distribute unlicensed operator payload automatically.
 `SPARKCACHE_CONNECTOR_SHA256` and `SPARKCACHE_ENCODER_SHA256` pin the selected
 modules, and `SPARKCACHE_CONFIG_SHA256` pins the tracked JSON. Keep those values
 consistent with `sparkcache/SHA256SUMS`. Preserve the JSON's measured cache namespace
-when reproducing the Current recipe: its E03 JSON lives under `experiments/e03/`,
-separate from both earlier cache computations, and its spelling is part of the hash.
+when reproducing the Current recipe: its E21 JSON lives under `experiments/e03/bf16-residue/`,
+separate from the E03 and earlier cache computations, and its spelling is part of the hash.
 
-For the immediate previous-base return, use
+For the immediate return to E03, use
+[`reference/baseline-20260919-e03.env`](reference/baseline-20260919-e03.env). It restores
+the E03 hook source and cache namespace and removes the E21 module and flag.
+
+For the earlier September 19 base, use
 [`reference/baseline-20260919.env`](reference/baseline-20260919.env). It restores the
 original model, scheduler, corrected connector and cache namespace, disables mHC,
 and retains hybrid KDA and 15 GiB KV. See the coordinated procedure in operations.
@@ -166,4 +176,4 @@ The first three inspect deployed nodes and require site configuration. The final
 command is fully offline and validates source syntax, manifests, templates, links,
 fixtures, the adaptive-k policy, hybrid dispatch contracts, and payload preparation
 without SSH, Docker, a GPU, or `cluster.env`. Offline checks do not constitute a new
-live deployment or benchmark reproduction of the accepted E03 defaults.
+live deployment of the accepted E21 defaults.

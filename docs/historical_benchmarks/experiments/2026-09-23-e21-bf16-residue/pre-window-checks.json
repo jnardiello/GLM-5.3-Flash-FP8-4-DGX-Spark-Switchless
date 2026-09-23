@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "kind": "e21_pre_window_checks",
+  "numeric_check": {
+    "outcome": "pass",
+    "summary_pct": {
+      "kda_o_proj": {
+        "weight": 0.6607,
+        "output_range": [
+          0.5873,
+          0.8142
+        ]
+      },
+      "mla_o_proj": {
+        "weight": 0.6519,
+        "output_range": [
+          0.5414,
+          0.7666
+        ]
+      },
+      "mla_q_b_proj": {
+        "weight": 0.7142,
+        "output_range": [
+          0.6009,
+          0.9116
+        ]
+      },
+      "mla_fused_qkv_a_proj_q_a": {
+        "weight": 0.6455,
+        "output_range": [
+          0.5438,
+          0.7598
+        ]
+      },
+      "mla_fused_qkv_a_proj_kv_a": {
+        "weight": 0.6511,
+        "output_range": [
+          0.5997,
+          0.8044
+        ]
+      }
+    },
+    "e20_reference_pct": {
+      "weight": 0.7023,
+      "output": [
+        0.7026,
+        0.726
+      ]
+    },
+    "criterion": "same order as E20; no family materially larger",
+    "limits": "Sampled row blocks of the rank-0 partition of one layer per family; CPU emulation of the quantization, not the GPU kernel."
+  },
+  "installed_fused_qkv_a_class": {
+    "sha256_of_image_source_file": "c356fc0b98e1960d99512f9ea7a0055613a868f2dce7b4b1eb3bd4269e7ad550",
+    "finding": "DeepSeekV2FusedQkvAProjLinear decides _use_min_latency_gemm once in __init__: weight shape exactly 2112 x 7168, BF16, CUDA capability 9.0 or family 10.x. The candidate shape is 2048 x 4096 on SM121, so the flag is False and forward always calls the standard MergedColumnParallelLinear path through quant_method.apply.",
+    "outcome": "pass"
+  }
+}

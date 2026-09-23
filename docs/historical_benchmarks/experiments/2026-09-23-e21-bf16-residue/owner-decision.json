@@ -1,0 +1,31 @@
+{
+  "schema": "tp4-experiment-owner-decision/v1",
+  "experiment": "2026-09-23-e21-bf16-residue",
+  "candidate": "E21 BF16-residue W8A16",
+  "outcome": "promote",
+  "decision": "The owner accepted the candidate and asked to promote it as the new baseline, with no reapplication or reproduction run because the accepted suites were measured under ideal conditions on the loaded candidate.",
+  "acceptance_status": "accepted_by_owner",
+  "iac_promotion_status": "encoded_as_default",
+  "post_promotion_reproduction_status": "not_required_by_owner_decision",
+  "baseline": {
+    "path": "docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json"
+  },
+  "previous_baseline": {
+    "path": "docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json",
+    "sha256": "7aba7010faaffd23900ef0011df3395ca8d41d64a7257156780e0b93aff4f56f",
+    "unchanged": true
+  },
+  "measurements": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-23-e21-bf16-residue/results.json",
+    "sha256": "3bee57b13674227a2d0b4e65afe3662948a59f89e0719ae3960ee80d110fabd6"
+  },
+  "limits": [
+    "Three complete suites on one retained candidate load, compared with the three-suite E03 reference measured on 2026-09-19; dispersion, not statistical significance.",
+    "Generated text differs from the reference because the converted weights change the arithmetic, so per-request comparisons are confounded; suite medians are the unit of comparison.",
+    "C1 was 38.760 tok/s in run 1, below the E03 range, and 40.718 and 40.944 tok/s in runs 2 and 3. This matches the known unisolated C1 variability on this machine.",
+    "Two of fifteen long code requests reached the 8,192-token output budget, so the native code completion gate is 13/15. That is a measured output limit, not a transport or runtime failure; E03 recorded 15/15.",
+    "C1 and C2 per-stream TTFT medians are 2.04% and 2.45% higher than E03, within or at the edge of the reference dispersion.",
+    "Server timing sum deltas were not captured for this series.",
+    "Promotion was accepted by the owner without a separate reapplication or reproduction run: the encoded default recipe produces a launcher command identical, on all four ranks, to the measured candidate, and the measured processes remained loaded."
+  ]
+}

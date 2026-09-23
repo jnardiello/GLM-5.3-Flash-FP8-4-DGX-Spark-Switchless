@@ -10,27 +10,28 @@ Readable reports live here; machine-readable frozen records and portable experim
 | 2026-09-18 baseline | 3 / 162 | [Report](baselines/2026-09-18.md) |
 | 2026-09-19 previous base | 2 / 108 | [Report](baselines/2026-09-19.md) |
 | 2026-09-19 IaC reproduction of previous base | 1 / 54, separate | [Report](reproductions/2026-09-19-iac.md) |
-| 2026-09-19 E03 accepted current reference | 3 / 162 | [Report](baselines/2026-09-19-e03.md); [IaC promotion status](../historical_benchmarks/baselines/2026-09-19-e03/promotion.json) |
+| 2026-09-19 E03 previous reference | 3 / 162 | [Report](baselines/2026-09-19-e03.md); [IaC promotion status](../historical_benchmarks/baselines/2026-09-19-e03/promotion.json) |
 | 2026-09-20 E03 IaC benchmark | 0 included; 1 / 54 excluded | [Excluded report](reproductions/2026-09-20-e03-iac.md); owner rejects this run as reliable evidence; deployment and functional checks recorded separately |
+| 2026-09-23 E21 accepted current reference | 3 / 162 | [Report](baselines/2026-09-23-e21.md); [promotion record](../historical_benchmarks/baselines/2026-09-23-e21/promotion.json) |
 
 [Historical comparison table and archived charts](comparisons/2026-09-19-vs-2026-09-11.md).
 
-The README's comparison figures show all 16 saved medians for the current E03 reference
-and the previous September 19 base, with percentage changes from unrounded values.
-The legends distinguish the same-date records: three accepted runs / 162 requests for
-current E03 and two / 108 for the previous base. Small changes retain exact deltas
+The README's comparison figures show all 16 saved medians for the current E21 reference
+and the previous E03 reference, with percentage changes from unrounded values. Both
+records have three accepted runs / 162 requests. Small changes retain exact deltas
 alongside the owner's “≈ unchanged” display convention.
 From the repository root, run `python3 scripts/plot-baseline-comparison.py` in an
 environment with `matplotlib==3.11.2`. It writes PNG/SVG files under
-`docs/plots/comparisons/2026-09-19-e03-vs-2026-09-19/` without running inference.
-The [dated current report](baselines/2026-09-19-e03.md) links the figures and both
-frozen sources. Original current-only figures remain unchanged in
-`docs/plots/baselines/2026-09-19-e03/`; older comparisons remain archived separately.
+`docs/plots/comparisons/2026-09-23-e21-vs-2026-09-19-e03/` without running inference.
+The [dated current report](baselines/2026-09-23-e21.md) links the figures and both
+frozen sources. The E03-versus-previous-base comparison and the E03 current-only figures
+remain archived unchanged under `docs/plots/`.
 
 ## Experiment outcomes
 
 | Experiment | Evidence / recorded outcome |
 | --- | --- |
+| [2026-09-23-e21-bf16-residue](experiments/2026-09-23-e21-bf16-residue.md) | 3 full suites / 162 requests on one retained load; C4 +9.88% and C2 +4.68% with every suite outside the E03 range, prose +4.02%, C1 +1.21%; code gate 13/15 from two output-budget stops; zero errors; owner accepts, outcome promote; became the September 23 E21 reference without a separate reproduction run |
 | [2026-09-21-e03-c5-15gib](experiments/2026-09-21-e03-c5-15gib.md) | One decode-only native execution / 3 requests; 3/3 native gates and both post-boot gates passed; owner retains the max-five operational recipe; performance unresolved, with no promotion or new baseline |
 | [2026-09-21-c4-no-admission-3x](experiments/2026-09-21-c4-no-admission-3x.md) | 4 suites / 216 measured requests: runs 1, 3 and 4 form the accepted three-suite / 162-request aggregate; run 2 is excluded for a verified competing non-benchmark client. Mixed primary results include code -1.67%, C1 -2.28%, C2 +0.61% and C4 +1.85%; outcome `unresolved`, no promotion |
 | [2026-09-21-c4-native-admission-28](experiments/2026-09-21-c4-native-admission-28.md) | Performance `unresolved`; integration `owner_withdrawn`, with verified coordinated return to the complete original C4 recipe. Archived R10 backport evidence covers the final four-active/24-waiting cap, HTTP 503, cancellation recovery and bounded replay; one full native suite / 54 requests observed C4 throughput +5.78% and C1/C4 TTFT +15.74%/+6.99% versus fixed E03, with no vLLM release upgrade or permanent promotion |

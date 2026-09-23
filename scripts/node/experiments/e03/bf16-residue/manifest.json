@@ -1,0 +1,106 @@
+{
+  "schema": "tp4-experiment-candidate/v1",
+  "experiment": "E21",
+  "candidate": "bf16-residue-w8a16",
+  "status": "prepared_not_measured",
+  "summary": "Extends the accepted E20 INT8 group-128 W8A16 mechanism from the KDA input projection to four further attention projection families that run as BF16 GEMMs on the accepted E03 recipe.",
+  "parent": {
+    "recipe": "cluster.env.example defaults (accepted E03, max-num-seqs 6)",
+    "baseline_id": "2026-09-19-e03",
+    "baseline_sha256": "7aba7010faaffd23900ef0011df3395ca8d41d64a7257156780e0b93aff4f56f"
+  },
+  "files": {
+    "e20_kda_w8a16.py": {
+      "base": "scripts/node/overrides/vllm/models/glm5next/nvidia/e20_kda_w8a16.py",
+      "base_sha256": "3c7f1650c1f8d3c0525323a8875ea4f1190a7ccca4232d9b6701525aece22572",
+      "candidate_sha256": "aa7dbe1d1e427e56a8c375fba1cf70d41a194fb68fa712a779ddae3f9deb657a",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e20_kda_w8a16.py",
+      "change": "Accepted source plus one flag-gated call at the end of finalize_kda_input_w8a16. With the flag unset or 0 it performs exactly the accepted conversion."
+    },
+    "e21_bf16_residue.py": {
+      "base": null,
+      "base_sha256": null,
+      "candidate_sha256": "d5c2ec827bdacb07112cea3e2d00c87d81c41ed5226aab84b721bfb2011ac59d",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e21_bf16_residue.py",
+      "change": "New module. Reuses the accepted _dequant_nk_kernel from e20_hybrid_scratch.py."
+    },
+    "kv-transfer-config.json": {
+      "base": "scripts/node/experiments/e03/kv-transfer-config.json",
+      "base_sha256": "9a0520e0dc71d7e8cf9045065cff78226296305b25f0bc010c7830bb82019ed5",
+      "candidate_sha256": "548fe62a6676370261a3ddff27e81ac2cfd0d68b1cad4ee8bc99e1c832181e8c",
+      "change": "Only spark_cache_root differs, so the candidate never reads or writes the accepted E03 cache."
+    }
+  },
+  "activation": {
+    "flag": "VLLM_E21_BF16_RESIDUE_W8A16",
+    "default": "unset (off)",
+    "overlay": "scripts/node/experiments/e03/bf16-residue/delta.env",
+    "boot_signature": "E21_BF16_RESIDUE_W8A16_READY",
+    "expected_signature_fields": {
+      "modules": 67,
+      "families": ["kda_o_proj", "mla_fused_qkv_a_proj", "mla_o_proj", "mla_q_b_proj"],
+      "mla_layout": "q_lora",
+      "added_scratch_bytes": 79691776
+    }
+  },
+  "families": [
+    {"name": "kda_o_proj", "layers": 34, "shape_nk_per_rank": [4096, 2048], "on_disk": "bf16"},
+    {"name": "mla_o_proj", "layers": 11, "shape_nk_per_rank": [4096, 4096], "on_disk": "fp8_block_128 dequantized to bf16 on load"},
+    {"name": "mla_fused_qkv_a_proj", "layers": 11, "shape_nk_per_rank": [2048, 4096], "on_disk": "fp8_block_128 dequantized to bf16 on load"},
+    {"name": "mla_q_b_proj", "layers": 11, "shape_nk_per_rank": [4096, 1536], "on_disk": "fp8_block_128 dequantized to bf16 on load"}
+  ],
+  "excluded": {
+    "kda_f_g_gates": "They drive a recurrent decay state, so a small relative error accumulates along the sequence.",
+    "mla_kv_b_proj": "Absorbed by the MLA attention backend and on the FP8 KV and SparkCache path.",
+    "mla_indexer_projections": "They select which tokens sparse attention reads.",
+    "lm_head": "Feeds the logits directly.",
+    "dflash2_drafter": "Its acceptance rate already limits prose throughput.",
+    "mla_no_q_lora_families": "Declared for completeness; they cannot fire because the checkpoint uses q_lora_rank 1536."
+  },
+  "source_identity": {
+    "checkpoint": "zai-org/GLM-5.3-Flash",
+    "revision": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "config_json_sha256": "bb8f01c42cb92a52ca72e65afb4d5bd8d11aef083cd210e8de25dfb904f23e9f",
+    "safetensors_index_sha256": "3c3f40366a53c3fd7974b4eab7881a365a98c2a4329150befebab99fe7c18b05",
+    "config_values": {
+      "hidden_size": 4096,
+      "num_hidden_layers": 45,
+      "num_attention_heads": 64,
+      "q_lora_rank": 1536,
+      "kv_lora_rank": 512,
+      "qk_nope_head_dim": 256,
+      "qk_rope_head_dim": 0,
+      "v_head_dim": 256,
+      "quant_method": "fp8",
+      "kda_layers": 34,
+      "mla_layers": 11
+    },
+    "reviewed_runtime_sources_sha256": {
+      "scripts/node/experiments/e03/overrides/vllm/models/glm5next/nvidia/model.py": "34d8161d0408b7e786b922e53829d0a45ca6c11c38470a128467fd8dd08f9ab4",
+      "scripts/node/experiments/e03/overrides/vllm/models/glm5next/nvidia/attention.py": "c04298d14eedcb6cc329d161c182cfccf092113ee7f12e54d27ad233818df083",
+      "scripts/node/experiments/e03/overrides/vllm/model_executor/layers/mla.py": "eddc5d57cf39468157300189a12f7a1e440886218444e7a111286c527c9de3bf",
+      "scripts/node/experiments/e03/overrides/vllm/model_executor/layers/linear.py": "bed47ddb286f5e55a7ffcccf4243d92d7d489db858a6c90e91c81342b0b8e1ae",
+      "scripts/node/overrides/vllm/models/glm5next/nvidia/e20_hybrid_scratch.py": "f4368638f1286d67f529f6b6e89cb066e375ac365deb4c8698f07e39e876ab7d"
+    }
+  },
+  "memory_per_rank": {
+    "converted_bf16_bytes": 1262485504,
+    "approx_packed_bytes": 641105920,
+    "added_scratch_bytes": 79691776,
+    "approx_net_freed_bytes": 541687808,
+    "note": "Freed memory raises MemAvailable; the KV pool stays fixed at 16106127360 bytes."
+  },
+  "expected_effect": {
+    "decode_kernel_share_pct": 6.58,
+    "end_to_end_pct_range": [3.0, 3.6],
+    "basis": "Validated weight-traffic cost model and the E20 conversion ratio 0.45-0.54, recorded in the private attribution receipt. The ratio comes from two accepted E20 runs with decision_required and a concurrent KV change, so it is an estimate, not a measurement."
+  },
+  "rollback": "Down with this overlay, then deploy/up with the overlay the owner selected before the window. The accepted E20 hook and scratch files are never modified.",
+  "limits": [
+    "The offline tests exercise configuration, selection, validation and dispatch with stubbed dependencies. They do not execute Marlin, Triton or CUDA.",
+    "GPU kernel correctness, CUDA graph capture and torch.compile behaviour are unproven until the first authorized boot and its functional gates.",
+    "The forward of the installed DeepSeekV2FusedQkvAProjLinear is not in the checkout. Upstream vLLM has a low-latency path that reads self.weight directly; it must be confirmed absent or inactive in the R10 image before the window.",
+    "For the three MLA families the INT8 step is a second quantization of weights already dequantized from FP8, so numeric error must be measured against the FP8-dequantized reference.",
+    "No throughput, latency or prefill effect is established by this preparation."
+  ]
+}

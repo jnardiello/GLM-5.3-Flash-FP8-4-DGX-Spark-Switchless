@@ -15,8 +15,11 @@ the actual R10 modules. The [license and notice](../../../../third_party/sparkri
 are retained. FP8 checkpoint mapping, E20 projections, cache fixes, DFlash2,
 scheduler, CUDA graphs, 15 GiB KV and maximum context remain unchanged.
 
-The defaults set `SPARK_MHC_PREFILL_SHARD=1`, select the nine E03 module mounts and
-retain the measured E03 cache namespace. Do not reuse entries from the previous base.
+The E21 defaults keep `SPARK_MHC_PREFILL_SHARD=1` and the nine E03 module mounts. The
+promoted [E21 layer](bf16-residue/README.md) mounts the KDA hook from `bf16-residue/`, adds
+its residual-projection module and selects its own cache namespace; the complete E03
+recipe, with the measured E03 cache namespace, is
+`scripts/node/reference/baseline-20260919-e03.env`. Do not reuse entries from the previous base.
 The source manifest and historical `candidate.env` remain unchanged. To reconstruct
 the original E03-only experiment on the new defaults, prepend the complete
 `scripts/node/reference/baseline-20260919.env` to `candidate.env` in one private
@@ -65,8 +68,8 @@ Ordinary long prefills must log `SPARK_MHC_PREFILL` on all four ranks with
 `rows=6912 owner_rows=1728 rs=90 ag=95 aux=5`; `aux` counts DFlash2 auxiliary
 all-gathers. Logging is limited to the first eight eligible forwards per process.
 For the historical E03-only experiment, the current identity checker rejects the
-missing replay/budget components. Keep the old records unchanged; current defaults
-are checked against the separate accepted E03/replay/draft-budget reference.
+missing replay/budget components. Keep the old records unchanged; the E03 rollback is
+checked against the E03/replay/draft-budget reference and the current defaults against E21.
 
 Use the [native benchmark procedure](../../../../AGENTS.md#run-the-benchmark) with
 the September 19 settings and fresh salts. Keep the three complete 54-request
