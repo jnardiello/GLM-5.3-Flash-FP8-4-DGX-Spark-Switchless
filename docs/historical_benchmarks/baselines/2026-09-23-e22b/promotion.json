@@ -1,0 +1,66 @@
+{
+  "schema": "tp4-iac-promotion/v1",
+  "baseline_id": "2026-09-23-e22b",
+  "owner_decision": "promote",
+  "status": "deployed_without_restart_identity_verified",
+  "measured_recipe_encoded": true,
+  "runtime_sources_unchanged": true,
+  "promotion_method": "launcher_command_parity",
+  "promotion_method_reason": "Owner decision under the repository promotion rule: the accepted suites were measured on the loaded E22b candidate, so no reapplication or reproduction run.",
+  "local_validation": {
+    "offline_check": "PASS",
+    "four_rank_command_parity_with_measured_candidate": "PASS",
+    "mounted_source_hashes": "PASS",
+    "complete_e21_rollback_parity": "PASS",
+    "historical_identity_selection": "PASS",
+    "previous_baseline_unchanged": {
+      "path": "docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json",
+      "sha256": "3bd710b74229a34a2ef7962f4f074b3af552ce1a968439f1b834cd80c8efcac7"
+    },
+    "figures_visually_reviewed": true,
+    "plotter_matplotlib_version": "3.11.2",
+    "figures_sha256": {
+      "docs/plots/comparisons/2026-09-23-e22b-vs-2026-09-23-e21/generation.png": "4c7d81b14fc4d5297a69f6f6328d3cd9542851066ed5ff1e15976d5d6ccbcde7",
+      "docs/plots/comparisons/2026-09-23-e22b-vs-2026-09-23-e21/generation.svg": "8754c3f98e15bba036e5e004f5e8e05978eaf0a3a2f523d6e5bdc19c6f274654",
+      "docs/plots/comparisons/2026-09-23-e22b-vs-2026-09-23-e21/prefill.png": "92e8704a761403abbaa9f2b48e0e32140d3baa1b93e358d827e15f17b81fdb2d",
+      "docs/plots/comparisons/2026-09-23-e22b-vs-2026-09-23-e21/prefill.svg": "2c7cd3abd2e61a0774f3859c777d3745b39b1d67d1af27cb79d6c049a77a5106"
+    }
+  },
+  "new_deployments": 1,
+  "new_lifecycle_actions": 0,
+  "new_measurement_requests": 0,
+  "live_default_apply": {
+    "date": "2026-09-23",
+    "restart": false,
+    "deploy_check_drift": "cluster.env only, on each rank; all E22b sources already matched",
+    "deploy": "PASS",
+    "autostart_tp4_env": "none; the next boot selects the E22b default",
+    "check_f0": {
+      "result": "PASS",
+      "problems": [],
+      "note": "A first run failed only on a preexisting pending systemd reload on rank 3 (fabric iptables unit changed on 2026-09-19); after an owner-approved systemctl daemon-reload, which restarts no service, the check passed."
+    },
+    "per_rank_running_identity": {
+      "ranks_checked": 4,
+      "e22_boot_receipt_modules_30": "4/4",
+      "e21_boot_receipt": "4/4",
+      "flags": "VLLM_E21_BF16_RESIDUE_W8A16=1, VLLM_E22_DRAFTER_W8A16=1, VLLM_E22_CONTEXT_KV_W8A16=0 on 4/4"
+    },
+    "health": 200
+  },
+  "live_reproduction": {
+    "status": "not_required_by_owner_decision",
+    "executed_runs": 0,
+    "executed_requests": 0
+  },
+  "baseline": {
+    "path": "docs/historical_benchmarks/baselines/2026-09-23-e22b/baseline.json",
+    "sha256": "7454e85cb1b1ac6ad4a04f4f88bca19b98955d238f0c4b315bf28aace31866bd"
+  },
+  "rollback": "scripts/node/reference/baseline-20260923-e21.env",
+  "notes": [
+    "The encoded default produces a launcher command byte-identical, on all four ranks, to the measured E22b load.",
+    "The serving processes that produced the three accepted suites remained in service; applying the default requires no restart.",
+    "Live identity check PASS against 2026-09-23-e22b after the rank-3 systemd reload."
+  ]
+}

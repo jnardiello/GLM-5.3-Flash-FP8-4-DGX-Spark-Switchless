@@ -73,9 +73,11 @@ cost a coordinated restart:
 
 ## Coordinated transition
 
-**Promoted on September 23, 2026.** The default `cluster.env.example` now encodes this
-candidate, measured as the [E21 reference](../../../../../docs/benchmarks/baselines/2026-09-23-e21.md);
-the immediate return is `TP4_ENV=scripts/node/reference/baseline-20260919-e03.env`. The
+**Promoted on September 23, 2026.** The default `cluster.env.example` encodes this
+candidate, measured as the [E21 reference](../../../../../docs/benchmarks/baselines/2026-09-23-e21.md),
+under the later E22b drafter conversion; the complete E21 recipe is
+`TP4_ENV=scripts/node/reference/baseline-20260923-e21.env`, and the return to E03 is
+`TP4_ENV=scripts/node/reference/baseline-20260919-e03.env`. The
 transition below is the record of the measurement window and applies only to a site
 configuration that still holds the E03 recipe.
 

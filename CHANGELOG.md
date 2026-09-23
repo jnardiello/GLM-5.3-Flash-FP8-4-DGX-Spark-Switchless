@@ -7,6 +7,22 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Added the E22b drafter component under `scripts/node/experiments/e03/drafter-w8a16/`: it
+  converts 30 BF16 linears of the DFlash2 drafter to the accepted E20/E21 INT8 group-128
+  Marlin format and keeps the drafter's context K/V projection in BF16. Its drafter
+  override is the serving image's file byte for byte plus one appended, flag-gated load
+  hook. The launcher verifies the directory's `SHA256SUMS` whenever its files are
+  mounted, and an offline test covers pins and vendor provenance, the hook, family
+  selection and refusals, and four-rank launcher parity.
+- Added the September 23 E22b frozen reference: three complete native Rigmark suites /
+  162 requests on one retained load, with code decode +3.03%, C1 +2.23% and prose +2.97%
+  against E21, C4 unchanged, zero errors and 45/45 native gates. Added its report, the E22b
+  experiment report and extracts, the matched first-token and prefill probes against E21,
+  the owner decision, the promotion record and E22b-versus-E21 figures. The first candidate,
+  E22, which also converted the context K/V projection, is archived as a superseded
+  benchmark record only; its overlay and cache configuration are not kept.
+- Added `scripts/node/reference/baseline-20260923-e21.env`, the complete E21 recipe, as the
+  one-step rollback from the E22b default.
 - Added the prepared E21 candidate, which extends the accepted E20 INT8 group-128 Marlin
   mechanism to the KDA output projection and the MLA output, fused QKV-A and Q-B
   projections behind a flag that is off by default. Its guarded overlay applies only on
@@ -98,6 +114,15 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- Made E22b the default IaC recipe: the drafter override `qwen3_dflash2.py` and
+  `e22_drafter_w8a16.py` are mounted from `experiments/e03/drafter-w8a16/`, the default sets
+  `VLLM_E22_DRAFTER_W8A16=1` and `VLLM_E22_CONTEXT_KV_W8A16=0`, and SparkCache uses the E22b
+  namespace. 30 DFlash2 drafter linears use 8-bit weights; the context K/V projection stays
+  BF16. `check-f0.py` validates the new September 23 E22b reference by default, including the
+  `E22_DRAFTER_W8A16_READY` boot receipt. The encoded default produces a launcher command
+  identical on all four ranks to the measured candidate. The README, figures, recipe,
+  operations, installation and node guides describe E22b, with E21 as the previous
+  reference and the immediate rollback.
 - Made E21 the default IaC recipe: the KDA hook mounts from `experiments/e03/bf16-residue/`,
   the default adds the E21 module and `VLLM_E21_BF16_RESIDUE_W8A16=1`, and SparkCache uses
   the E21 namespace. The launcher verifies that directory's `SHA256SUMS` before starting,

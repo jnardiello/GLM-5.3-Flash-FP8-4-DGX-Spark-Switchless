@@ -86,14 +86,17 @@ Then verify these signatures that `docker ps` does not prove:
 | SparkCache lane | `docker inspect`, `./scripts/verify-node.sh` | `--kv-transfer-config` naming `SparkContextCacheConnector` in the command, entrypoint `/opt/sircl-serving/entrypoint.sh`, the connector, encoder, engine override and SIRCL mounts present, `sparkcache payload` and `sircl payload` rows PASS; `docker ps` shows no health state because the lane runs with `--no-healthcheck` |
 | Hybrid KDA and KV pool | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E20_KDA_INPUT_W8A16_READY` on every rank: 34 modules, group 128, padded N=6400, threshold 2048, shared scratch 51,515,392 bytes; `--kv-cache-memory-bytes=16106127360`; matching source hashes and `E20_MEMORY_PROBE` records |
 | E21 residual projections | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E21_BF16_RESIDUE_W8A16_READY` on every rank: 67 modules in the `kda_o_proj`, `mla_fused_qkv_a_proj`, `mla_o_proj` and `mla_q_b_proj` families, `mla_layout=q_lora`, group 128, threshold 2048, added scratch 79,691,776 bytes; `VLLM_E21_BF16_RESIDUE_W8A16=1` and matching `experiments/e03/bf16-residue/` source hashes |
+| E22b drafter conversion | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E22_DRAFTER_W8A16_READY` on every rank: 30 modules in the `down_proj`, `gate_up_proj`, `kernel_projection`, `o_proj` and `qkv_proj` families, `context_kv_w8a16` false, 0 added scratch bytes; `VLLM_E22_DRAFTER_W8A16=1`, `VLLM_E22_CONTEXT_KV_W8A16=0` and matching `experiments/e03/drafter-w8a16/` source hashes; the drafter CUDA graphs are captured fresh at every boot |
 
-The default [accepted E21 recipe](benchmarks/baselines/2026-09-23-e21.md) retains those
+The default [accepted E22b recipe](benchmarks/baselines/2026-09-23-e22b.md) retains those
 signatures, including the E03 `SPARK_MHC_PREFILL_SHARD=1` and its measured source
-mounts, and adds the E21 residual projections with their own cache namespace. Eligible eager long prefills log
+mounts and the E21 residual projections, and adds the E22b drafter conversion with its
+own cache namespace. Eligible eager long prefills log
 `SPARK_MHC_PREFILL rows=6912 owner_rows=1728 rs=90 ag=95 aux=5` on all four ranks;
 this is a workload activation receipt, not a requirement to run extra inference during
 an identity-only check. Runtime sources keep their `experiments/e03/` paths to preserve
-measured hashes; the E21 hook and module live under `experiments/e03/bf16-residue/`.
+measured hashes; the E21 hook and module live under `experiments/e03/bf16-residue/` and
+the E22b drafter override and module under `experiments/e03/drafter-w8a16/`.
 Do not append the historical experiment overlays to the new defaults.
 
 The selected replay connector SHA-256 is
@@ -107,9 +110,10 @@ limit, expect `draft-budget first-cap budget=3` and aggregate `limited_requests`
 `trimmed_tokens`. These count placeholder handouts, not accepted tokens or saved compute.
 An adaptive-policy fallback invalidates activation.
 
-The complete immediate return is `TP4_ENV=scripts/node/reference/baseline-20260919-e03.env`:
-the E03 recipe without the E21 module or flag, with the E03 hook source and cache
-namespace. The older `baseline-20260919.env` restores the earlier September 19 base.
+The complete immediate return is `TP4_ENV=scripts/node/reference/baseline-20260923-e21.env`:
+the E21 recipe with the vendor drafter, no E22 module or flags and the E21 cache
+namespace. `baseline-20260919-e03.env` restores the E03 recipe, and the older
+`baseline-20260919.env` restores the earlier September 19 base.
 Use the same effective recipe for all commands in a coordinated service window.
 
 For a boot caused by rank-0 autostart, inspect the units too:
@@ -132,6 +136,7 @@ verdict is needed:
 ```sh
 ./scripts/check-f0.py
 ./scripts/check-f0.py --base-url http://127.0.0.1:8000
+TP4_ENV=scripts/node/reference/baseline-20260923-e21.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json
 TP4_ENV=scripts/node/reference/baseline-20260919-e03.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json
 TP4_ENV=scripts/node/reference/baseline-20260919.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-19/baseline.json
 TP4_ENV=scripts/node/reference/baseline-20260918.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-18/baseline.json
@@ -140,9 +145,9 @@ TP4_ENV=scripts/node/reference/baseline-20260918.env ./scripts/check-f0.py --bas
 
 The second form uses an already-established localhost SSH tunnel when the management LAN
 is not directly reachable. The checker reads the local `cluster.env` and honors `TP4_ENV`
-as the effective delta. By default it validates the **September 23 E21** identity from
-[the current reference](historical_benchmarks/baselines/2026-09-23-e21/baseline.json), including
-the E21 sources/flag/boot signature, the mHC sources/flag, replay connector, draft-budget scheduler/activation, hybrid KDA,
+as the effective delta. By default it validates the **September 23 E22b** identity from
+[the current reference](historical_benchmarks/baselines/2026-09-23-e22b/baseline.json), including
+the E22b drafter sources/flags/boot signature, the E21 sources/flag/boot signature, the mHC sources/flag, replay connector, draft-budget scheduler/activation, hybrid KDA,
 KV byte budget and image content ID. Historical `--baseline` selection also requires
 the matching complete runtime recipe. A baseline-changing delta fails the check.
 
@@ -298,14 +303,14 @@ content or touching a running container. It does replace `~/tp4/cluster.env`, wh
 what rank-0 autostart uses next. `restart` is disruptive and always cycles all ranks.
 
 `EXTRA_DOCKER_ENV` is one word-split string carrying the tuned MoE JSON, the adaptive
-scheduler mount, `PYTHONPATH`, policy variables, the retained base, E03 and E21 vLLM override mounts, the
+scheduler mount, `PYTHONPATH`, policy variables, the retained base, E03, E21 and E22b vLLM override mounts, the
 SIRCL bundle/runtime mounts with their entrypoint, and the connector and encoder mounts. An overlay
 replaces the complete value. Preserve every unrelated entry, avoid spaces/globs in
 values, and never clear the string while `--scheduler-cls
 adaptive_k_scheduler.AdaptiveKScheduler` remains in `EXTRA_VLLM_ARGS`.
 
 The accepted configuration includes `scripts/node/overrides/`, the measured sources and
-config under `scripts/node/experiments/e03/` (including `bf16-residue/`), `scripts/node/sparkcache/kv-transfer-config.json`
+config under `scripts/node/experiments/e03/` (including `bf16-residue/` and `drafter-w8a16/`), `scripts/node/sparkcache/kv-transfer-config.json`
 and payload `SHA256SUMS` manifests in the deploy set. It also stages the frozen
 September 18 model and cache config for rollback. The SparkCache connector/encoder and
 SIRCL bundle/runtime are operator payload: prepare and place the pinned versions on
@@ -433,9 +438,9 @@ intended recipe. Stop on a missing overlay, changed container name, or failed ga
 ### Historical E03 C5 functionality window
 
 This procedure was defined while E03 was the default recipe. The C5 overlays check the
-E03 cache configuration and refuse the E21 default, and `TP4_ENV` names a single file,
+E03 cache configuration and refuse the current default, and `TP4_ENV` names a single file,
 so they cannot be stacked on the E03 rollback. They remain as the record of that window;
-a sequence-count window on the current base needs a new delta derived from E21.
+a sequence-count window on the current base needs a new delta derived from E22b.
 
 As recorded, it first stopped any currently serving experiment with the exact overlay
 that launched it, returned to the E03 defaults and verified both functional gates plus
@@ -505,7 +510,8 @@ below is full-cluster and must fall within an authorized service window.
 | --- | --- | --- |
 | Overlay result is bad | `./scripts/tp4ctl restart` with no `TP4_ENV` | base `cluster.env` signatures and gates return |
 | Production engine knob is bad | restore the rollback documented beside the value in `cluster.env.example`, update local `cluster.env`, deploy, restart | all runtime signatures plus task gate |
-| Restore the previous E03 reference | use the [complete E03 rollback](#restore-the-previous-e03-reference) | E03 hook source and cache namespace, no E21 mount, flag or boot signature; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json` with the same overlay, both gates |
+| Restore the previous E21 reference | use the [complete E21 rollback](#restore-the-previous-e21-reference) | vendor drafter, no E22 mount, flags or boot signature, E21 cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json` with the same overlay, both gates |
+| Restore the E03 reference | use the [complete E03 rollback](#restore-the-previous-e03-reference) | E03 hook source and cache namespace, no E21 mount, flag or boot signature; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json` with the same overlay, both gates |
 | Restore the earlier September 19 base | use the [complete September 19 rollback](#restore-the-previous-september-19-base) | original scheduler/model/connector/cache, mHC disabled, 15 GiB KV; historical identity check and both gates |
 | Restore the September 18 baseline | use the complete [September 18 overlay](#restore-the-september-18-baseline) for deploy and the coordinated transition | 16 GiB KV, original KDA model and connector, original cache namespace, no hybrid helper/encoder/probe mounts; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-18/baseline.json` with the same overlay, both gates |
 | Restore the September 11 baseline | use the [frozen archive restore](#restore-from-the-frozen-previous-archive): verify the archive and run its prepared restore plan, including the original base and overlay | `PATCH_FILE` mount present, no `--kv-transfer-config`, `mode=per-request`, automatic GID selection, generated identity-check command using the archived baseline path PASS, both gates |
@@ -520,6 +526,30 @@ below is full-cluster and must fall within an authorized service window.
 An IOMMU revert exit code 4 means GRUB was not safely regenerated: do not reboot.
 Never use `EXTRA_DOCKER_ENV=""` as a generic rollback. Never purge a model to recover
 space without a fresh disk census and explicit owner decision.
+
+### Restore the previous E21 reference
+
+The immediate complete return is
+[`baseline-20260923-e21.env`](../scripts/node/reference/baseline-20260923-e21.env). It
+restores the vendor DFlash2 drafter and the E21 cache namespace and removes the E22
+override, module and flags; every other engine and container argument is unchanged. Keep
+both cache directories available; neither recipe reuses the other's cache.
+
+In the authorized window, first stop using the currently serving recipe. Then:
+
+```sh
+export TP4_ENV=scripts/node/reference/baseline-20260923-e21.env
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Complete both functional gates within two minutes of /health 200.
+./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json
+```
+
+Keep this overlay for subsequent lifecycle commands and configure autostart to use
+it before an unattended reboot. Returning to current defaults requires a coordinated
+stop with the rollback overlay, then deploy/start without it and removal of that
+autostart selection.
 
 ### Restore the previous E03 reference
 
@@ -595,7 +625,7 @@ export TP4_ENV=scripts/node/reference/baseline-20260918.env
 
 Keep this overlay for later lifecycle commands. For unattended autostart, install a
 systemd drop-in that sets this same `TP4_ENV` and run `systemctl daemon-reload`; otherwise
-a later reboot would select the accepted E21 default recipe. Returning to the current defaults
+a later reboot would select the accepted E22b default recipe. Returning to the current defaults
 requires a coordinated transition with no overlay and removal of that drop-in. Preserve
 both persistent-cache directories; do not reuse their contents across quantization
 recipes. The frozen baseline medians are not remeasured as part of rollback.

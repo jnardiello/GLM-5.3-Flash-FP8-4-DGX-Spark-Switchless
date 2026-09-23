@@ -344,10 +344,12 @@ MGMT_IPS="192.0.2.21 192.0.2.22 192.0.2.23 192.0.2.24"
 MASTER_IP=192.0.2.21
 RELAY_DEST=operator@192.0.2.23
 ''')
-            # E21 is the default recipe. The candidate overlay applies only on the complete
-            # E03 recipe, which the immediate rollback restores.
+            # E21 is now a complete rollback overlay; the candidate overlay applies only on
+            # the complete E03 recipe.
             e03 = (REPO / "scripts/node/reference/baseline-20260919-e03.env").read_text() + "\n"
+            e21 = (REPO / "scripts/node/reference/baseline-20260923-e21.env").read_text() + "\n"
             (root / "empty.env").write_text("")
+            (root / "e21.env").write_text(e21)
             (root / "e03.env").write_text(e03)
             (root / "candidate.env").write_text(e03 + delta)
             env = dict(os.environ, TP4_DRY_RUN="1")
@@ -381,8 +383,8 @@ RELAY_DEST=operator@192.0.2.23
             new_cfg = f"<canonical JSON of {home}/tp4/experiments/e03/bf16-residue/kv-transfer-config.json>"
             flag = f"{MANIFEST['activation']['flag']}=1"
             for rank in range(4):
-                before, after = argv(launch("e03.env", rank)), argv(launch("empty.env", rank))
-                # The promoted default is exactly the measured candidate command.
+                before, after = argv(launch("e03.env", rank)), argv(launch("e21.env", rank))
+                # The E21 rollback is exactly the measured candidate command.
                 self.assertEqual(after, argv(launch("candidate.env", rank)))
                 self.assertEqual(Counter(before) - Counter(after), Counter([old_hook, old_cfg]))
                 self.assertEqual(Counter(after) - Counter(before),
@@ -404,10 +406,11 @@ RELAY_DEST=operator@192.0.2.23
                 "residue-present": e03 + "EXTRA_DOCKER_ENV+=' -v $HOME/x/e21_bf16_residue.py:/tmp/e21_bf16_residue.py:ro'\n" + delta,
                 "kv-changed": e03 + 'EXTRA_VLLM_ARGS="${EXTRA_VLLM_ARGS/--kv-cache-memory-bytes=16106127360/--kv-cache-memory-bytes=12884901888}"\n' + delta,
                 "applied-twice": e03 + delta + "\n" + delta,
-                # On the promoted E21 default, neither the candidate delta nor the
-                # historical E03-only C5 overlay may apply.
-                "delta-on-e21-default": delta,
-                "c5-on-e21-default": c5,
+                # Neither the candidate delta nor the historical E03-only C5 overlay may apply
+                # on the E21 recipe or on the current default.
+                "delta-on-e21": e21 + delta,
+                "delta-on-default": delta,
+                "c5-on-default": c5,
             }
             for name, text in bad.items():
                 (root / "bad.env").write_text(text)

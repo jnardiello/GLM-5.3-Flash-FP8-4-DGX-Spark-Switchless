@@ -454,6 +454,14 @@ case "${EXTRA_DOCKER_ENV:-}" in
         || { echo "[launch] ERROR: E21 BF16-residue source manifest failed" >&2; exit 1; }
     fi ;;
 esac
+# Likewise for the E22 drafter candidate, when its files are mounted.
+case "${EXTRA_DOCKER_ENV:-}" in
+  *e22_drafter_w8a16.py:*)
+    if [ "$DRY_RUN" != 1 ]; then
+      (cd "$ENV_DIR/experiments/e03/drafter-w8a16" && sha256sum -c SHA256SUMS) \
+        || { echo "[launch] ERROR: E22 drafter W8A16 source manifest failed" >&2; exit 1; }
+    fi ;;
+esac
 if [ "$ASYNC_SCHEDULING" = "1" ]; then
   ASYNCFLAG="--async-scheduling"
 fi

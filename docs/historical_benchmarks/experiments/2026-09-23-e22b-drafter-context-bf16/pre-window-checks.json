@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "e22_pre_window_checks",
+  "numeric_check": {
+    "method": "rank-0 partition, sampled row blocks, vLLM symmetric uint8b128 group-128 with BF16 scales; reference is the BF16 checkpoint weight",
+    "m_values": [
+      16,
+      24,
+      36
+    ],
+    "weight_rel_l2_pct_range": [
+      0.6494,
+      0.7314
+    ],
+    "output_rel_l2_pct_range": [
+      0.5085,
+      0.9774
+    ],
+    "e21_reference_pct": {
+      "weight": [
+        0.65,
+        0.71
+      ],
+      "output": [
+        0.54,
+        0.91
+      ]
+    },
+    "checkpoint_has_lm_head": false,
+    "checkpoint_has_embed_tokens": false
+  },
+  "vendor_sources_reviewed_sha256": {
+    "vllm/model_executor/models/qwen3_dflash.py": "88621764210615a5992275eb940a8aaae5ee08bee7d5585dbd581722b945997b",
+    "vllm/model_executor/models/qwen3_dflash2.py": "7a0d368f41f81a823c75661770451a49b4b248f944a67a1bb14ec5da318fb21e"
+  }
+}

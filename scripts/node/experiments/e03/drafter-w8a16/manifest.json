@@ -1,0 +1,167 @@
+{
+  "schema": "tp4-experiment-candidate/v1",
+  "experiment": "E22b",
+  "candidate": "drafter-w8a16-context-bf16",
+  "status": "promoted",
+  "summary": "Applies the accepted E20/E21 INT8 group-128 W8A16 mechanism to 30 BF16 linears of the DFlash2 drafter on the accepted E21 recipe, keeping the drafter context K/V projection in BF16.",
+  "parent": {
+    "recipe": "cluster.env.example defaults (accepted E21, max-num-seqs 6)",
+    "baseline_id": "2026-09-23-e21",
+    "baseline_sha256": "3bd710b74229a34a2ef7962f4f074b3af552ce1a968439f1b834cd80c8efcac7"
+  },
+  "files": {
+    "qwen3_dflash2.py": {
+      "base": null,
+      "vendor_path": "/usr/local/lib/python3.12/dist-packages/vllm/model_executor/models/qwen3_dflash2.py",
+      "vendor_sha256": "7a0d368f41f81a823c75661770451a49b4b248f944a67a1bb14ec5da318fb21e",
+      "vendor_prefix_marker": "\n\n# --- E22 candidate addition.",
+      "candidate_sha256": "57f00c64d18a41b5898df0e1acba2fde6929a70ba31c0107c2a4d7c066f3b1f2",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/model_executor/models/qwen3_dflash2.py",
+      "change": "The serving image's file byte for byte, followed by one appended block that assigns a flag-gated load_weights to DFlash2Qwen3ForCausalLM. With the flag unset or 0 it loads exactly as the vendor file."
+    },
+    "e22_drafter_w8a16.py": {
+      "base": null,
+      "candidate_sha256": "8334d0c3a1c024196fdc016131b2449c1432d387d4120e804da20e8b77dc2c67",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e22_drafter_w8a16.py",
+      "change": "New module. Reuses E21's _pack_projection, ResidueW8A16Method and ShapedBF16Scratch unchanged. VLLM_E22_CONTEXT_KV_W8A16=0 leaves the fused context K/V projection in BF16; E22b sets it."
+    },
+    "kv-transfer-config-e22b.json": {
+      "base": "scripts/node/experiments/e03/bf16-residue/kv-transfer-config.json",
+      "base_sha256": "548fe62a6676370261a3ddff27e81ac2cfd0d68b1cad4ee8bc99e1c832181e8c",
+      "candidate_sha256": "f7d8989486907766c8df7ceaf67731fd2ec95e3bf474a6f63bb4303e41fbe4bc",
+      "change": "Only spark_cache_root differs, so the candidate never reads or writes the E21 cache."
+    }
+  },
+  "activation": {
+    "flags": {
+      "VLLM_E22_DRAFTER_W8A16": "1",
+      "VLLM_E22_CONTEXT_KV_W8A16": "0"
+    },
+    "default": "unset (off) in the module; set by the E22b default recipe",
+    "overlay": "scripts/node/experiments/e03/drafter-w8a16/delta-context-bf16.env",
+    "boot_signature": "E22_DRAFTER_W8A16_READY",
+    "expected_signature_fields": {
+      "modules": 30,
+      "families": [
+        "down_proj",
+        "gate_up_proj",
+        "kernel_projection",
+        "o_proj",
+        "qkv_proj"
+      ],
+      "context_kv_w8a16": false,
+      "scratch_shape_nk": null,
+      "added_scratch_bytes": 0
+    }
+  },
+  "families": [
+    {
+      "name": "qkv_proj",
+      "modules": 5,
+      "shape_nk_per_rank": [
+        1536,
+        4096
+      ],
+      "scratch": false
+    },
+    {
+      "name": "o_proj",
+      "modules": 5,
+      "shape_nk_per_rank": [
+        4096,
+        1024
+      ],
+      "scratch": false
+    },
+    {
+      "name": "gate_up_proj",
+      "modules": 5,
+      "shape_nk_per_rank": [
+        6144,
+        4096
+      ],
+      "scratch": false
+    },
+    {
+      "name": "down_proj",
+      "modules": 5,
+      "shape_nk_per_rank": [
+        4096,
+        3072
+      ],
+      "scratch": false
+    },
+    {
+      "name": "kernel_projection",
+      "modules": 10,
+      "shape_nk_per_rank": [
+        1024,
+        4096
+      ],
+      "scratch": false
+    }
+  ],
+  "excluded": {
+    "context_kv": "Kept BF16: converting it (the superseded E22 candidate) cost about 3% of 8K cold prefill in matched probes.",
+    "fc": "Replicated [4096, 20480]; its prefill scratch alone would be 160 MiB. A possible later variant, measured on its own.",
+    "lm_head": "Shared with the target and absent from the drafter checkpoint; feeds the candidate logits.",
+    "embed_tokens": "Shared with the target and absent from the drafter checkpoint; a lookup, not a GEMM.",
+    "candidate_selector_hidden_projection": "[256, 4096], negligible traffic."
+  },
+  "source_identity": {
+    "checkpoint": "incoai/GLM-5.3-Flash-DFlash2",
+    "revision": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "config_json_sha256": "c4aeac0101196a6e26705b34c45230bcd0c7c68ee2d2d1efdb242087f3712573",
+    "config_values": {
+      "hidden_size": 4096,
+      "intermediate_size": 12288,
+      "num_hidden_layers": 5,
+      "num_attention_heads": 32,
+      "num_key_value_heads": 8,
+      "head_dim": 128,
+      "attention_bias": false,
+      "conv_kernel_size": 2,
+      "conv_group_size": 16
+    },
+    "reviewed_vendor_sources_sha256": {
+      "vllm/model_executor/models/qwen3_dflash.py": "88621764210615a5992275eb940a8aaae5ee08bee7d5585dbd581722b945997b",
+      "vllm/model_executor/models/qwen3_dflash2.py": "7a0d368f41f81a823c75661770451a49b4b248f944a67a1bb14ec5da318fb21e"
+    },
+    "reviewed_runtime_sources_sha256": {
+      "scripts/node/experiments/e03/bf16-residue/e21_bf16_residue.py": "d5c2ec827bdacb07112cea3e2d00c87d81c41ed5226aab84b721bfb2011ac59d",
+      "scripts/node/overrides/vllm/models/glm5next/nvidia/e20_hybrid_scratch.py": "f4368638f1286d67f529f6b6e89cb066e375ac365deb4c8698f07e39e876ab7d"
+    }
+  },
+  "memory_per_rank": {
+    "original_bf16_bytes": 566231040,
+    "packed_bytes": 287544960,
+    "added_scratch_bytes": 0
+  },
+  "numeric_check": {
+    "method": "Rank-0 TP4 partitions of layers 0 and 4, sampled row blocks, vLLM symmetric uint8b128 group-128 with BF16 scales against the BF16 checkpoint, random inputs at M = 16, 24, 36.",
+    "weight_rel_l2_pct": [
+      0.6494,
+      0.7314
+    ],
+    "output_rel_l2_pct": [
+      0.5085,
+      0.9774
+    ],
+    "e21_reference_pct": {
+      "weight": [
+        0.65,
+        0.71
+      ],
+      "output": [
+        0.54,
+        0.91
+      ]
+    }
+  },
+  "expected_effect": "Measured: code decode +3.03%, C1 +2.23%, prose +2.97%, C4 unchanged against E21 (three suites).",
+  "rollback": "TP4_ENV=scripts/node/reference/baseline-20260923-e21.env, the complete E21 recipe. The E21 cache namespace is never written by the candidate.",
+  "limits": [
+    "Target verification should keep generated tokens those of the target at temperature 0; the verifier code was not reviewed, so the claim is an expectation. Acceptance is measured.",
+    "CPU checks do not validate SM121 Marlin numerics, graph capture or throughput."
+  ]
+}

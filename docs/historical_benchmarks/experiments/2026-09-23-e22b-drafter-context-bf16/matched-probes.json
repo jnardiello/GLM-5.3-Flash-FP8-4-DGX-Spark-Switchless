@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "kind": "e22b_matched_diagnostic_probes",
+  "protocol": "Native Rigmark from the frozen source, identical for every variant: P1 = --runs 1 --skip-prefill --concurrency 1 --concurrency-runs 30; P2 = --runs 1 --skip-concurrency --prefill-depths 8192 --prefill-runs 10. Order: E22 (loaded), E21 control after one transition, E22b after a second. Server means come from vLLM _sum/_count deltas around each probe, over all probe requests.",
+  "variants": {
+    "e22": {
+      "c1_ttft_seconds": {
+        "n": 30,
+        "median": 0.3937,
+        "mean": 0.3923,
+        "slow_share_ge_0_36": "25/30",
+        "max": 0.493
+      },
+      "p1_server_mean_ms": {
+        "request_queue_time": 0.0,
+        "time_to_first_token": 385.4,
+        "request_prefill_time": 333.1,
+        "e2e_request_latency": 7656.4
+      },
+      "prefill_8k_cold": {
+        "n": 10,
+        "median_eff": 2571.5,
+        "mean_eff": 2559.7,
+        "median_ttft": 3.186,
+        "slow_share_ttft_ge_3_12": "7/10"
+      },
+      "p2_server_mean_ms": {
+        "request_queue_time": 92.1,
+        "time_to_first_token": 1803.3,
+        "request_prefill_time": 1699.8,
+        "e2e_request_latency": 5846.3
+      },
+      "native_receipt_sha256": {
+        "P1": "198da0bb5e69bc3a8ef700720a040056eafc9c913793deaf17f7dcde5a1b40be",
+        "P2": "ccbc35246260b094562085eea0e7dbb9793dc43398ed017857c04b8fa7335c4d"
+      }
+    },
+    "e21": {
+      "c1_ttft_seconds": {
+        "n": 30,
+        "median": 0.4042,
+        "mean": 0.3951,
+        "slow_share_ge_0_36": "26/30",
+        "max": 0.418
+      },
+      "p1_server_mean_ms": {
+        "request_queue_time": 0.0,
+        "time_to_first_token": 387.8,
+        "request_prefill_time": 329.5,
+        "e2e_request_latency": 7822.9
+      },
+      "prefill_8k_cold": {
+        "n": 10,
+        "median_eff": 2650.4,
+        "mean_eff": 2626.9,
+        "median_ttft": 3.091,
+        "slow_share_ttft_ge_3_12": "2/10"
+      },
+      "p2_server_mean_ms": {
+        "request_queue_time": 89.9,
+        "time_to_first_token": 1775.9,
+        "request_prefill_time": 1674.3,
+        "e2e_request_latency": 6070.7
+      },
+      "native_receipt_sha256": {
+        "P1": "ec7efaab7bfa20bfde7217a61094b7fba05b233ea9538347b15862fb28c5b72f",
+        "P2": "a95f78fa2d14e8eeae743ba3913fa00f462ec856d870e9ee942f27d0a8694222"
+      }
+    },
+    "e22b": {
+      "c1_ttft_seconds": {
+        "n": 30,
+        "median": 0.3874,
+        "mean": 0.3766,
+        "slow_share_ge_0_36": "21/30",
+        "max": 0.411
+      },
+      "p1_server_mean_ms": {
+        "request_queue_time": 0.0,
+        "time_to_first_token": 371.0,
+        "request_prefill_time": 326.0,
+        "e2e_request_latency": 7646.6
+      },
+      "prefill_8k_cold": {
+        "n": 10,
+        "median_eff": 2639.5,
+        "mean_eff": 2548.2,
+        "median_ttft": 3.104,
+        "slow_share_ttft_ge_3_12": "5/10"
+      },
+      "p2_server_mean_ms": {
+        "request_queue_time": 90.6,
+        "time_to_first_token": 1838.6,
+        "request_prefill_time": 1738.6,
+        "e2e_request_latency": 5141.1
+      },
+      "native_receipt_sha256": {
+        "P1": "d6b46d30639430bcf66e82e19c2724174125f0e799c3c09bc9f543e7545f2322",
+        "P2": "713c9f2361e737a2b917c197ba788664eb8eda597d3abee273c7616081d524f5"
+      }
+    }
+  },
+  "finding": "C1 time to first token is quantized in engine-step units in every variant and was not an E22 drawback: the matched E21 control was no faster. E22's 8K cold prefill loss was real (-3.0% median, 7/10 slow versus 2/10); keeping the drafter context K/V projection in BF16 (E22b) removed most of it.",
+  "status": "diagnostic; separate from the accepted suites"
+}

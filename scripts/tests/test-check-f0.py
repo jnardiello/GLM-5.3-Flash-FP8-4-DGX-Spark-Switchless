@@ -403,18 +403,22 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
             **identity.get("memory_probe", {}), "rank": rank}}
         if identity.get("e21_boot_receipt"):
             c["runtime_receipts"]["e21"] = deepcopy(identity["e21_boot_receipt"])
+        if identity.get("e22_boot_receipt"):
+            c["runtime_receipts"]["e22"] = deepcopy(identity["e22_boot_receipt"])
     return rec, exp, ranks
 
 
-assert check.BASELINE == BASELINES / "2026-09-23-e21/baseline.json"
-for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21"):
+assert check.BASELINE == BASELINES / "2026-09-23-e22b/baseline.json"
+for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21", "2026-09-23-e22b"):
     baseline_path = BASELINES / name / "baseline.json"
     baseline_recipe, baseline_expected, baseline_ranks = baseline_fixture(baseline_path)
     assert check.evaluate(baseline_recipe, baseline_expected, baseline_ranks, endpoint()) == [], name
 
 current_recipe, current_expected, current_ranks = baseline_fixture(check.BASELINE)
-assert current_expected["baseline_id"] == "2026-09-23-e21"
+assert current_expected["baseline_id"] == "2026-09-23-e22b"
 assert current_expected["runtime_identity"]["e21_boot_receipt"]["modules"] == 67
+assert current_expected["runtime_identity"]["e22_boot_receipt"]["modules"] == 30
+assert current_expected["runtime_identity"]["e22_boot_receipt"]["context_kv_w8a16"] is False
 assert current_expected["kv_cache_memory_bytes"] == "16106127360"
 assert current_expected["runtime_identity"]["kda_boot_receipt"]["prefill_bf16_min_tokens"] == 2048
 
@@ -455,6 +459,22 @@ no_flag[1]["remote"]["container"]["environment"].pop("VLLM_E21_BF16_RESIDUE_W8A1
 assert "rank 1: runtime environment VLLM_E21_BF16_RESIDUE_W8A16" in check.evaluate(
     current_recipe, current_expected, no_flag, endpoint())
 
+for field, value in (("modules", 31), ("context_kv_w8a16", True), ("added_scratch_bytes", 20971520),
+                     ("families", ["qkv_proj"])):
+    wrong_e22 = deepcopy(current_ranks)
+    wrong_e22[0]["remote"]["container"]["runtime_receipts"]["e22"][field] = value
+    assert f"rank 0: E22 boot receipt {field}" in check.evaluate(
+        current_recipe, current_expected, wrong_e22, endpoint())
+missing_e22 = deepcopy(current_ranks)
+missing_e22[2]["remote"]["container"]["runtime_receipts"].pop("e22")
+assert "rank 2: E22 boot receipt modules" in check.evaluate(
+    current_recipe, current_expected, missing_e22, endpoint())
+for flag in ("VLLM_E22_DRAFTER_W8A16", "VLLM_E22_CONTEXT_KV_W8A16"):
+    no_e22_flag = deepcopy(current_ranks)
+    no_e22_flag[3]["remote"]["container"]["environment"].pop(flag)
+    assert f"rank 3: runtime environment {flag}" in check.evaluate(
+        current_recipe, current_expected, no_e22_flag, endpoint())
+
 wrong_padding = deepcopy(current_ranks)
 wrong_padding[0]["remote"]["container"]["runtime_receipts"]["kda"]["receipts"][5]["padded_n"] = 6288
 assert "rank 0: KDA padding receipt" in check.evaluate(
@@ -483,7 +503,7 @@ assert "rank 0: running image content ID" in check.evaluate(
 original_load = check.load_recipe
 try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-selection.") as temp:
-        for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21"):
+        for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21", "2026-09-23-e22b"):
             path = BASELINES / name / "baseline.json"
             rec, exp, ranks = baseline_fixture(path)
             check.load_recipe = lambda timeout: (deepcopy(rec), {"returncode": 0})
@@ -507,6 +527,7 @@ try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-overlay.") as temp:
         isolated = Path(temp)
         for relative in ("scripts/lib/common.sh", "scripts/node/bootstrap/versions.env",
+                         "scripts/node/reference/baseline-20260923-e21.env",
                          "scripts/node/reference/baseline-20260919-e03.env",
                          "scripts/node/reference/baseline-20260919.env",
                          "scripts/node/reference/baseline-20260918.env",
@@ -522,7 +543,8 @@ RELAY_DEST=operator@192.0.2.23
 '''
         check.REPO = isolated
         for overlay, baseline in (
-            (None, "2026-09-23-e21"),
+            (None, "2026-09-23-e22b"),
+            ("scripts/node/reference/baseline-20260923-e21.env", "2026-09-23-e21"),
             ("scripts/node/reference/baseline-20260919-e03.env", "2026-09-19-e03"),
             ("scripts/node/reference/baseline-20260919.env", "2026-09-19"),
             ("scripts/node/reference/baseline-20260918.env", "2026-09-18"),
@@ -543,8 +565,8 @@ RELAY_DEST=operator@192.0.2.23
             assert problems == [], (baseline, problems)
             if overlay:
                 assert effective["extra_docker_env"] != effective["base_extra_docker_env"]
-                if baseline == "2026-09-19-e03":
-                    # Same KV and mHC as E21; the E21 cache namespace pin is what differs.
+                if baseline in ("2026-09-23-e21", "2026-09-19-e03"):
+                    # Same KV and mHC as E22b; the cache namespace pin is what differs.
                     assert effective["extra_vllm_args"] == effective["base_extra_vllm_args"]
                     assert "baseline payload pin: sparkcache_config_sha256" in check.recipe_problems(
                         effective, current_expected)

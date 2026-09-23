@@ -12,25 +12,28 @@ Readable reports live here; machine-readable frozen records and portable experim
 | 2026-09-19 IaC reproduction of previous base | 1 / 54, separate | [Report](reproductions/2026-09-19-iac.md) |
 | 2026-09-19 E03 previous reference | 3 / 162 | [Report](baselines/2026-09-19-e03.md); [IaC promotion status](../historical_benchmarks/baselines/2026-09-19-e03/promotion.json) |
 | 2026-09-20 E03 IaC benchmark | 0 included; 1 / 54 excluded | [Excluded report](reproductions/2026-09-20-e03-iac.md); owner rejects this run as reliable evidence; deployment and functional checks recorded separately |
-| 2026-09-23 E21 accepted current reference | 3 / 162 | [Report](baselines/2026-09-23-e21.md); [promotion record](../historical_benchmarks/baselines/2026-09-23-e21/promotion.json) |
+| 2026-09-23 E21 previous reference | 3 / 162 | [Report](baselines/2026-09-23-e21.md); [promotion record](../historical_benchmarks/baselines/2026-09-23-e21/promotion.json) |
+| 2026-09-23 E22b accepted current reference | 3 / 162 | [Report](baselines/2026-09-23-e22b.md); [promotion record](../historical_benchmarks/baselines/2026-09-23-e22b/promotion.json) |
 
 [Historical comparison table and archived charts](comparisons/2026-09-19-vs-2026-09-11.md).
 
-The README's comparison figures show all 16 saved medians for the current E21 reference
-and the previous E03 reference, with percentage changes from unrounded values. Both
+The README's comparison figures show all 16 saved medians for the current E22b reference
+and the previous E21 reference, with percentage changes from unrounded values. Both
 records have three accepted runs / 162 requests. Small changes retain exact deltas
 alongside the owner's “≈ unchanged” display convention.
 From the repository root, run `python3 scripts/plot-baseline-comparison.py` in an
 environment with `matplotlib==3.11.2`. It writes PNG/SVG files under
-`docs/plots/comparisons/2026-09-23-e21-vs-2026-09-19-e03/` without running inference.
-The [dated current report](baselines/2026-09-23-e21.md) links the figures and both
-frozen sources. The E03-versus-previous-base comparison and the E03 current-only figures
-remain archived unchanged under `docs/plots/`.
+`docs/plots/comparisons/2026-09-23-e22b-vs-2026-09-23-e21/` without running inference.
+The [dated current report](baselines/2026-09-23-e22b.md) links the figures and both
+frozen sources. Earlier comparisons, including E21 versus E03, remain archived unchanged
+under `docs/plots/`.
 
 ## Experiment outcomes
 
 | Experiment | Evidence / recorded outcome |
 | --- | --- |
+| [2026-09-23-e22b-drafter-context-bf16](experiments/2026-09-23-e22b-drafter-context-bf16.md) | 3 full suites / 162 requests on one retained load plus matched diagnostic probes; code decode +3.03%, C1 +2.23%, prose +2.97% against E21, C4 unchanged, zero errors, gates 45/45; owner accepts, outcome promote; became the September 23 E22b reference |
+| [2026-09-23-e22-drafter-w8a16](experiments/2026-09-23-e22-drafter-w8a16.md) | 3 full suites / 162 requests plus one supplementary suite and matched probes; code, C1 and prose gains, C4 unchanged, a real 8K cold prefill loss (-3.0% in matched probes) from the converted context K/V projection; outcome superseded by E22b |
 | [2026-09-23-e21-bf16-residue](experiments/2026-09-23-e21-bf16-residue.md) | 3 full suites / 162 requests on one retained load; C4 +9.88% and C2 +4.68% with every suite outside the E03 range, prose +4.02%, C1 +1.21%; code gate 13/15 from two output-budget stops; zero errors; owner accepts, outcome promote; became the September 23 E21 reference without a separate reproduction run |
 | [2026-09-21-e03-c5-15gib](experiments/2026-09-21-e03-c5-15gib.md) | One decode-only native execution / 3 requests; 3/3 native gates and both post-boot gates passed; owner retains the max-five operational recipe; performance unresolved, with no promotion or new baseline |
 | [2026-09-21-c4-no-admission-3x](experiments/2026-09-21-c4-no-admission-3x.md) | 4 suites / 216 measured requests: runs 1, 3 and 4 form the accepted three-suite / 162-request aggregate; run 2 is excluded for a verified competing non-benchmark client. Mixed primary results include code -1.67%, C1 -2.28%, C2 +0.61% and C4 +1.85%; outcome `unresolved`, no promotion |

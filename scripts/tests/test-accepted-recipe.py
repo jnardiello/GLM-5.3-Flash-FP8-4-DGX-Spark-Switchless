@@ -11,7 +11,7 @@ import subprocess
 import tempfile
 
 REPO = Path(__file__).resolve().parents[2]
-REFERENCE = REPO / "docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json"
+REFERENCE = REPO / "docs/historical_benchmarks/baselines/2026-09-23-e22b/baseline.json"
 record = json.loads(REFERENCE.read_text())
 sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
 for item in record["provenance"].values():
@@ -32,12 +32,15 @@ for row in record["performance"]["metrics"]:
 e03 = REPO / "scripts/node/experiments/e03"
 previous = (REPO / "scripts/node/reference/baseline-20260919.env").read_text()
 e03_rollback = (REPO / "scripts/node/reference/baseline-20260919-e03.env").read_text()
+e21_rollback = (REPO / "scripts/node/reference/baseline-20260923-e21.env").read_text()
 # The historical E03 measurement: previous base plus the three E03 deltas.
 historical_e03 = "\n".join([previous, (e03 / "candidate.env").read_text(),
                             (e03 / "replay-views/delta.env").read_text(),
                             (e03 / "draft-budget/delta.env").read_text()])
-# The measured E21 candidate: the complete E03 recipe plus the BF16-residue delta.
-historical_candidate = "\n".join([e03_rollback, (e03 / "bf16-residue/delta.env").read_text()])
+# The historical E21 measurement: the complete E03 recipe plus the BF16-residue delta.
+historical_e21 = "\n".join([e03_rollback, (e03 / "bf16-residue/delta.env").read_text()])
+# The measured E22b candidate: the complete E21 recipe plus the drafter context-BF16 delta.
+historical_candidate = "\n".join([e21_rollback, (e03 / "drafter-w8a16/delta-context-bf16.env").read_text()])
 with tempfile.TemporaryDirectory(prefix="tp4-accepted-recipe-") as temp:
     root = Path(temp)
     shutil.copyfile(REPO / "scripts/launcher/launch-glm53-tp4.sh", root / "launch.sh")
@@ -51,6 +54,8 @@ RELAY_DEST=operator@192.0.2.23
     (root / "measured.env").write_text(historical_candidate)
     (root / "rollback.env").write_text(previous)
     (root / "rollback-e03.env").write_text(e03_rollback)
+    (root / "rollback-e21.env").write_text(e21_rollback)
+    (root / "historical-e21.env").write_text(historical_e21)
     (root / "historical-e03.env").write_text(historical_e03)
     env = dict(os.environ, TP4_DRY_RUN="1")
     env.pop("TP4_ENV", None)
@@ -87,7 +92,14 @@ RELAY_DEST=operator@192.0.2.23
             assert source.startswith(str(Path.home()) + "/tp4/")
             local = REPO / "scripts/node" / source.split("/tp4/", 1)[1]
             assert sha(local) == digest, local
-        # Immediate rollback: exactly the measured E03 command, without any E21 element.
+        # Immediate rollback: exactly the measured E21 command, without any E22 element.
+        e21_restored = launch(rank, "rollback-e21.env")
+        assert e21_restored == launch(rank, "historical-e21.env"), f"rank {rank}: E21 rollback drifted"
+        assert not any("drafter-w8a16" in item or "qwen3_dflash2" in item for item in e21_restored)
+        assert not any(item.startswith("VLLM_E22_") for item in e21_restored)
+        assert "VLLM_E21_BF16_RESIDUE_W8A16=1" in e21_restored
+        assert "VLLM_E22_DRAFTER_W8A16=1" in current and "VLLM_E22_CONTEXT_KV_W8A16=0" in current
+        # Older E03 return: exactly the measured E03 command, without any E21 element.
         e03_restored = launch(rank, "rollback-e03.env")
         assert e03_restored == launch(rank, "historical-e03.env"), f"rank {rank}: E03 rollback drifted"
         assert not any("e21_bf16_residue" in item for item in e03_restored)
@@ -104,4 +116,4 @@ RELAY_DEST=operator@192.0.2.23
         assert not any("connector-e03-replay-views" in item for item in restored)
         assert "--kv-cache-memory-bytes=16106127360" in restored
 
-print("test-accepted-recipe: PASS (four-rank command parity, mounted hashes, E03 and pre-E03 rollbacks, 3-run provenance)")
+print("test-accepted-recipe: PASS (four-rank command parity, mounted hashes, E21, E03 and pre-E03 rollbacks, 3-run provenance)")

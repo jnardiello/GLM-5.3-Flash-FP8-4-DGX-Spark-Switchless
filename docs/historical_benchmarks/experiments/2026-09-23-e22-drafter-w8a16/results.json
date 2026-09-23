@@ -1,0 +1,279 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "experiment_id": "2026-09-23-e22-drafter-w8a16",
+  "title": "E22: 8-bit weights for 31 DFlash2 drafter linears, including the context K/V projection",
+  "outcome": "superseded",
+  "outcome_detail": "Throughput gains on code, C1 and prose, C4 unchanged; external review recommended unresolved. A matched probe showed a real 8K cold prefill loss (-3.0%); the E22b variant, which keeps the context K/V projection in BF16, removed it and was promoted instead.",
+  "reference": {
+    "baseline_id": "2026-09-23-e21",
+    "baseline_sha256": "3bd710b74229a34a2ef7962f4f074b3af552ce1a968439f1b834cd80c8efcac7"
+  },
+  "coverage": "Three complete native suites (162 requests) on one retained load, plus one supplementary suite and diagnostic probes kept separate.",
+  "runs": [
+    {
+      "run": "run-1",
+      "receipt_sha256": "71a01c3c9b683f2e146324b53e72ab2fea31b461b314f69b3af232a2796af517"
+    },
+    {
+      "run": "run-2",
+      "receipt_sha256": "2fd04c0811a7883b2c252606d5eee7bf04d72982dbe3fb110f2385d86067bfbc"
+    },
+    {
+      "run": "run-3",
+      "receipt_sha256": "5971a1d6d844ad3cbc19c0a2f133df698763c8892019557850f62610bc410f82"
+    }
+  ],
+  "supplementary_run": {
+    "receipt_sha256": "540bf217d6a35e5df37d63bf35eb4bb21173defbda378e4bc9e05e49c1975e1d",
+    "metrics": {
+      "code_decode_throughput": 56.884,
+      "code_c1_aggregate_end_to_end_throughput": 44.923,
+      "code_c2_aggregate_end_to_end_throughput": 66.315,
+      "code_c4_aggregate_end_to_end_throughput": 96.081,
+      "prose_decode_throughput": 33.456,
+      "code_ttft": 0.401,
+      "prose_ttft": 0.376,
+      "code_c1_per_stream_ttft": 0.404,
+      "code_c2_per_stream_ttft": 0.46,
+      "code_c4_per_stream_ttft": 0.522,
+      "prefill_8k_cold_throughput": 2595.022,
+      "prefill_8k_replay_throughput": 9585.547,
+      "prefill_32k_cold_throughput": 2606.594,
+      "prefill_32k_replay_throughput": 38181.486,
+      "prefill_64k_cold_throughput": 2688.633,
+      "prefill_64k_replay_throughput": 39527.308
+    }
+  },
+  "performance_metrics": [
+    {
+      "key": "code_decode_throughput",
+      "unit": "tokens_per_second",
+      "per_run": [
+        56.504,
+        55.974,
+        57.02
+      ],
+      "median": 56.504,
+      "previous_baseline_median": 54.945,
+      "change_vs_previous_baseline_pct": 2.837382837382833
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "per_run": [
+        41.694,
+        41.212,
+        42.703
+      ],
+      "median": 41.694,
+      "previous_baseline_median": 40.718,
+      "change_vs_previous_baseline_pct": 2.396974311115475
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "per_run": [
+        69.394,
+        61.883,
+        67.24
+      ],
+      "median": 67.24,
+      "previous_baseline_median": 64.726,
+      "change_vs_previous_baseline_pct": 3.8840651361122207
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "per_run": [
+        95.001,
+        93.528,
+        94.69
+      ],
+      "median": 94.69,
+      "previous_baseline_median": 95.524,
+      "change_vs_previous_baseline_pct": -0.8730790167915949
+    },
+    {
+      "key": "prose_decode_throughput",
+      "unit": "tokens_per_second",
+      "per_run": [
+        33.742,
+        32.927,
+        33.01
+      ],
+      "median": 33.01,
+      "previous_baseline_median": 32.441,
+      "change_vs_previous_baseline_pct": 1.753953330661803
+    },
+    {
+      "key": "code_ttft",
+      "unit": "seconds",
+      "per_run": [
+        0.386,
+        0.388,
+        0.388
+      ],
+      "median": 0.388,
+      "previous_baseline_median": 0.387,
+      "change_vs_previous_baseline_pct": 0.25839793281653767
+    },
+    {
+      "key": "prose_ttft",
+      "unit": "seconds",
+      "per_run": [
+        0.375,
+        0.375,
+        0.376
+      ],
+      "median": 0.375,
+      "previous_baseline_median": 0.379,
+      "change_vs_previous_baseline_pct": -1.0554089709762544
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "unit": "seconds",
+      "per_run": [
+        0.339,
+        0.405,
+        0.391
+      ],
+      "median": 0.391,
+      "previous_baseline_median": 0.35,
+      "change_vs_previous_baseline_pct": 11.714285714285726
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "unit": "seconds",
+      "per_run": [
+        0.444,
+        0.459,
+        0.459
+      ],
+      "median": 0.459,
+      "previous_baseline_median": 0.46,
+      "change_vs_previous_baseline_pct": -0.21739130434782628
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "unit": "seconds",
+      "per_run": [
+        0.651,
+        0.526,
+        0.536
+      ],
+      "median": 0.536,
+      "previous_baseline_median": 0.543,
+      "change_vs_previous_baseline_pct": -1.2891344383057102
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "unit": "tokens_per_second",
+      "per_run": [
+        2648.249,
+        2548.698,
+        2542.454
+      ],
+      "median": 2548.698,
+      "previous_baseline_median": 2644.825,
+      "change_vs_previous_baseline_pct": -3.6345315852655644
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "unit": "tokens_per_second",
+      "per_run": [
+        9562.72,
+        9529.382,
+        9586.085
+      ],
+      "median": 9562.72,
+      "previous_baseline_median": 9668.86,
+      "change_vs_previous_baseline_pct": -1.0977509241006824
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "unit": "tokens_per_second",
+      "per_run": [
+        2785.68,
+        2774.39,
+        2749.086
+      ],
+      "median": 2774.39,
+      "previous_baseline_median": 2733.042,
+      "change_vs_previous_baseline_pct": 1.5128929595666645
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "unit": "tokens_per_second",
+      "per_run": [
+        38631.259,
+        37248.977,
+        37270.712
+      ],
+      "median": 37270.712,
+      "previous_baseline_median": 37824.884,
+      "change_vs_previous_baseline_pct": -1.4650990073095762
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "unit": "tokens_per_second",
+      "per_run": [
+        2700.276,
+        2660.691,
+        2647.616
+      ],
+      "median": 2660.691,
+      "previous_baseline_median": 2649.955,
+      "change_vs_previous_baseline_pct": 0.4051389551898005
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "unit": "tokens_per_second",
+      "per_run": [
+        39745.429,
+        40093.529,
+        39873.618
+      ],
+      "median": 39873.618,
+      "previous_baseline_median": 40106.337,
+      "change_vs_previous_baseline_pct": -0.5802549357723626
+    }
+  ],
+  "integrity": {
+    "requests": 162,
+    "completed_streams": 162,
+    "native_validation_errors": 0,
+    "protocol_errors": 0,
+    "runtime_errors": 0
+  },
+  "drafter_acceptance_ratio_by_suite": {
+    "E21": [
+      0.6338,
+      0.6379,
+      0.6156
+    ],
+    "E22": [
+      0.5906,
+      0.5832,
+      0.6078
+    ]
+  },
+  "boot_receipt": {
+    "added_scratch_bytes": 20971520,
+    "families": [
+      "context_kv",
+      "down_proj",
+      "gate_up_proj",
+      "kernel_projection",
+      "o_proj",
+      "qkv_proj"
+    ],
+    "modules": 31,
+    "original_bytes": 587202560,
+    "packed_bytes": 298194752
+  },
+  "matched_probes": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-23-e22b-drafter-context-bf16/matched-probes.json",
+    "sha256": "b77647078ee7569bf243291e4a429e09abede5b587eede54848bf16e626f295a"
+  }
+}
