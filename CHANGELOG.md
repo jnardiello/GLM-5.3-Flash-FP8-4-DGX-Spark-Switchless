@@ -12,6 +12,26 @@ Versions and releases are created only at the owner's explicit request.
   replay connector and all unrelated accepted runtime settings. Recorded the live C5
   identity, post-boot gates and three-request decode smoke as functionality-only
   evidence, leaving the frozen E03 performance reference unchanged.
+- Archived the three-suite native Rigmark record for the restored original C4 recipe
+  without the withdrawn admission cap. Four suites / 216 measured requests are preserved:
+  runs 1, 3 and 4 form the accepted three-suite / 162-request aggregate, while run 2 is
+  retained diagnostically but excluded after verified competing non-benchmark traffic.
+  Primary medians are mixed, so the outcome is unresolved with no promotion, and the
+  frozen E03 reference, its bytes and medians remain unchanged.
+- Archived the owner-withdrawn native vLLM admission experiment for the pinned R10 C4
+  recipe, covering its four-active and 24-waiting cap, HTTP 503 at saturation,
+  cancellation recovery and bounded full-context replay. One 54-request native suite
+  observed mixed throughput and latency changes that a single run cannot establish as
+  repeatable, so the performance outcome is unresolved and no release upgrade is implied.
+  The source-derived overrides stay out of the public configuration, default payload and
+  offline test set, and the verified coordinated return to the complete original C4
+  recipe is recorded.
+- Archived the September 20 C4 262,144-token capacity activation as a lifecycle and
+  capacity record: a coordinated four-rank transition, two timely post-boot gates, four
+  full-context request bodies submitted in a cold and a replay phase with verified per-rank
+  commits and loads, and a one-request smoke. No native Rigmark suite ran, so the record
+  supports no throughput, latency or prefill claim, its separately pinned connector is not
+  tracked here, and the accepted E03 recipe and frozen performance records remain unchanged.
 - Recorded the completed E03 default-IaC deployment, two timely functional gates
   and four-rank identity checks. The separate 54-request benchmark is excluded by
   owner instruction and retained only for provenance; the accepted September 19

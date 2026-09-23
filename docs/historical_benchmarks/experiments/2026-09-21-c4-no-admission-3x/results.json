@@ -1,0 +1,1618 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-21-c4-no-admission-3x",
+  "record_type": "portable_measurement_extract",
+  "title": "Original C4 without native admission: three-suite comparison",
+  "status": "complete",
+  "outcome": "unresolved",
+  "scope": "Three accepted complete native Rigmark suites on the restored original C4 recipe with the retained weight load and no intervening lifecycle or recipe change. Four suites were measured because run 2 was excluded for a verified competing non-benchmark client.",
+  "recipe": {
+    "selected_overlay": "scripts/node/reference/c4-262k.env",
+    "selected_overlay_is_provenance_only": "The overlay path names the recipe selected at measurement time. That overlay is not published in this repository, because the C4 candidate was superseded and its configuration was not retained in the tree.",
+    "base_image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "base_image_content_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "serving_engine": "pinned R10",
+    "vllm_release_upgraded": false,
+    "context_limit_tokens": 262144,
+    "kv_cache_memory_bytes_per_rank": 12884901888,
+    "max_batched_tokens": 8192,
+    "max_active_sequences": 4,
+    "native_admission_queue_cap": null,
+    "native_admission_overrides_selected": false,
+    "retained_features": [
+      "FP8",
+      "DFlash2",
+      "SparkCache",
+      "SIRCL",
+      "hybrid KDA",
+      "E03 mHC",
+      "draft-budget scheduler"
+    ]
+  },
+  "fixed_reference": {
+    "baseline_id": "2026-09-19-e03",
+    "path": "docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json",
+    "sha256": "7aba7010faaffd23900ef0011df3395ca8d41d64a7257156780e0b93aff4f56f",
+    "accepted_native_suites": 3,
+    "included_requests": 162
+  },
+  "protocol": {
+    "version": "1.1.0",
+    "repository_revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+    "repository_source_sha256": "e0e92cff99f74ffa43d0a82541cf9db6010dd0a4ef3e8e7b84c5e1abd13a867f",
+    "prompts_version": "1.0.0",
+    "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+    "comparison_id": "glm53-nq2-3x-20260911-v1",
+    "served_model": "glm-5.3-flash"
+  },
+  "settings": {
+    "seed": 20260905,
+    "temperature": 0,
+    "top_p": 1,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "decode_workloads": [
+      "code",
+      "prose",
+      "structured"
+    ],
+    "decode_runs_per_workload": 5,
+    "decode_output_tokens": 8192,
+    "prefill_depths": [
+      8192,
+      32768,
+      65536
+    ],
+    "prefill_runs_per_phase": 3,
+    "prefill_phases": [
+      "cold",
+      "warm_replay"
+    ],
+    "prefill_output_tokens": 8,
+    "concurrency_levels": [
+      1,
+      2,
+      4
+    ],
+    "concurrency_rounds": 3,
+    "concurrency_output_tokens": 256,
+    "concurrency_workload": "code",
+    "cache_salt_policy": "Fresh value per complete execution, shared within that run's cold/replay pairs and forwarded to chat and prefill requests; raw values omitted."
+  },
+  "run_accounting": {
+    "target_accepted_native_suites": 3,
+    "target_accepted_requests": 162,
+    "completed_native_suites": 4,
+    "completed_native_requests": 216,
+    "included_native_suites": 3,
+    "included_requests": 162,
+    "excluded_native_suites": 1,
+    "excluded_requests": 54,
+    "additional_accepted_suites_required": 0,
+    "additional_accepted_requests_required": 0,
+    "status": "complete: runs 1, 3 and 4 accepted; run 2 excluded and retained diagnostically"
+  },
+  "native_receipts": [
+    {
+      "run": 1,
+      "path": "docs/rigmark_reports/2026-09-21-c4-no-admission-3x/run-1.json",
+      "status": "accepted",
+      "sha256": "f42ac11d180285553febf29cdf95d3a40d6f9aa9e91b66e12546d30a64c378a7"
+    },
+    {
+      "run": 2,
+      "path": "docs/rigmark_reports/2026-09-21-c4-no-admission-3x/run-2.json",
+      "status": "excluded_competing_traffic",
+      "sha256": "f6d28b9f07d8bf8cfb2d35d9c5b2edd66f56cdc96bea747b4a1040ebff2e6566"
+    },
+    {
+      "run": 3,
+      "path": "docs/rigmark_reports/2026-09-21-c4-no-admission-3x/run-3.json",
+      "status": "accepted",
+      "sha256": "ddccaf7cbf412b1c5ecd6d75fe6f1636ab4815ef8f834608dfc012da34d9975b"
+    },
+    {
+      "run": 4,
+      "path": "docs/rigmark_reports/2026-09-21-c4-no-admission-3x/run-4.json",
+      "status": "accepted",
+      "sha256": "ea1e6580e0fc7f1a241568fb68ef339e95cd061127d5c9a544edd6ca2494d4e2"
+    }
+  ],
+  "preparation": {
+    "local_metadata_validation_rejections": 1,
+    "exit_code": 2,
+    "inference_started": false,
+    "model_requests": 0,
+    "native_receipt_created": false,
+    "counted_as_excluded_suite": false,
+    "reason": "Four native Rigmark metadata fields were nested rather than present at the required top level.",
+    "correction_check": "Corrected metadata passed the native Rigmark load_metadata function before accepted run 1.",
+    "rejected_metadata_sha256": "0bf1064f771167f748ef4a1b3bc010a7b5ddc734e742eea9758234e7e5a94546",
+    "failure_receipt_sha256": "1c68bdf19962ba32f670dce80d6220caf48b8ccc7ec1316d4866c259810b2d42"
+  },
+  "accepted_runs": [
+    {
+      "run": 1,
+      "request_integrity": {
+        "requests": 54,
+        "completed_streams": 54,
+        "visible_responses": 54,
+        "missing_visible_responses": 0,
+        "first_visible_latency_unavailable": 0,
+        "native_validation_errors": 0,
+        "protocol_errors": 0,
+        "runtime_error": null,
+        "runtime_error_count": 0,
+        "validation_denominators": {
+          "native_receipts": 1,
+          "protocol_receipts": 1,
+          "runtime_receipts": 1
+        },
+        "decode_output_gates": {
+          "passed": 15,
+          "total": 15
+        },
+        "prefill_token_matches": {
+          "passed": 18,
+          "total": 18
+        },
+        "finish_reasons": {
+          "stop": 15,
+          "length": 39
+        }
+      },
+      "service_integrity": {
+        "health_before": 200,
+        "health_after": 200,
+        "idle_before": true,
+        "idle_after": true,
+        "request_success_delta": 54,
+        "http_200": {
+          "chat_completions": 36,
+          "completions": 18,
+          "tokenize": 18
+        },
+        "fatal_log_candidates": 0,
+        "host_oom_delta": 0,
+        "gpu_oom_delta": 0,
+        "gpu_oom_rejections": 0,
+        "allocator_retries": 0
+      },
+      "observer": {
+        "ranks": 4,
+        "stable_worker_identity_ranks": 4,
+        "minimum_memavailable_gib_by_rank": [
+          6.104946136474609,
+          10.611068725585938,
+          10.63772964477539,
+          10.692306518554688
+        ],
+        "maximum_meminfo_gap_ms_by_rank": [
+          659.2839999939315,
+          363.88100002659485,
+          366.86700000427663,
+          386.72999996924773
+        ],
+        "meminfo_errors": 0,
+        "limitation": "Sampled minima and gaps do not guarantee unsampled transients and do not establish a performance cause."
+      },
+      "metrics": [
+        {
+          "key": "code_decode_throughput",
+          "value": 54.904,
+          "fixed_e03_median": 53.809,
+          "change_vs_fixed_e03_pct": 2.034975561709019
+        },
+        {
+          "key": "code_c1_aggregate_end_to_end_throughput",
+          "value": 39.315,
+          "fixed_e03_median": 40.233,
+          "change_vs_fixed_e03_pct": -2.2817090448139568
+        },
+        {
+          "key": "code_c2_aggregate_end_to_end_throughput",
+          "value": 64.694,
+          "fixed_e03_median": 61.834,
+          "change_vs_fixed_e03_pct": 4.625287058899633
+        },
+        {
+          "key": "code_c4_aggregate_end_to_end_throughput",
+          "value": 85.523,
+          "fixed_e03_median": 86.932,
+          "change_vs_fixed_e03_pct": -1.6208070675930681
+        },
+        {
+          "key": "prose_decode_throughput",
+          "value": 32.035,
+          "fixed_e03_median": 31.186,
+          "change_vs_fixed_e03_pct": 2.722375424870123
+        },
+        {
+          "key": "code_ttft",
+          "value": 0.396,
+          "fixed_e03_median": 0.396,
+          "change_vs_fixed_e03_pct": 0
+        },
+        {
+          "key": "prose_ttft",
+          "value": 0.384,
+          "fixed_e03_median": 0.381,
+          "change_vs_fixed_e03_pct": 0.7874015748031503
+        },
+        {
+          "key": "code_c1_per_stream_ttft",
+          "value": 0.344,
+          "fixed_e03_median": 0.343,
+          "change_vs_fixed_e03_pct": 0.2915451895043572
+        },
+        {
+          "key": "code_c2_per_stream_ttft",
+          "value": 0.447,
+          "fixed_e03_median": 0.449,
+          "change_vs_fixed_e03_pct": -0.44543429844098037
+        },
+        {
+          "key": "code_c4_per_stream_ttft",
+          "value": 0.538,
+          "fixed_e03_median": 0.572,
+          "change_vs_fixed_e03_pct": -5.94405594405593
+        },
+        {
+          "key": "prefill_8k_cold_throughput",
+          "value": 2591.766,
+          "fixed_e03_median": 2558.401,
+          "change_vs_fixed_e03_pct": 1.3041348873769296
+        },
+        {
+          "key": "prefill_8k_replay_throughput",
+          "value": 9740.634,
+          "fixed_e03_median": 9417.164,
+          "change_vs_fixed_e03_pct": 3.4348982347551695
+        },
+        {
+          "key": "prefill_32k_cold_throughput",
+          "value": 2796.617,
+          "fixed_e03_median": 2661.974,
+          "change_vs_fixed_e03_pct": 5.058013338973259
+        },
+        {
+          "key": "prefill_32k_replay_throughput",
+          "value": 38427.98,
+          "fixed_e03_median": 37177.429,
+          "change_vs_fixed_e03_pct": 3.3637371750478144
+        },
+        {
+          "key": "prefill_64k_cold_throughput",
+          "value": 2718.159,
+          "fixed_e03_median": 2616.073,
+          "change_vs_fixed_e03_pct": 3.9022611372083365
+        },
+        {
+          "key": "prefill_64k_replay_throughput",
+          "value": 39507.435,
+          "fixed_e03_median": 40078.253,
+          "change_vs_fixed_e03_pct": -1.4242586871239107
+        }
+      ],
+      "supporting_receipts": {
+        "portable_run_extract_sha256": "dc4567687118c3517d762940be2fd152d90e589377ef3fe9904ab800aa1b3691",
+        "acceptance_sha256": "ec415bb2441f15e0c9e181e4218730948e7b4f332f4c81d466f92685c709f36a",
+        "memory_summary_sha256": "1692703ccfa303c35a614634e76a412d73965765f775de9b443f7597e03a6ed7"
+      }
+    },
+    {
+      "run": 3,
+      "request_integrity": {
+        "requests": 54,
+        "completed_streams": 54,
+        "visible_responses": 54,
+        "missing_visible_responses": 0,
+        "first_visible_latency_unavailable": 0,
+        "native_validation_errors": 0,
+        "protocol_errors": 0,
+        "runtime_error": null,
+        "runtime_error_count": 0,
+        "validation_denominators": {
+          "native_receipts": 1,
+          "protocol_receipts": 1,
+          "runtime_receipts": 1
+        },
+        "decode_output_gates": {
+          "passed": 15,
+          "total": 15
+        },
+        "prefill_token_matches": {
+          "passed": 18,
+          "total": 18
+        },
+        "finish_reasons": {
+          "stop": 15,
+          "length": 39
+        }
+      },
+      "service_integrity": {
+        "health_before": 200,
+        "health_after": 200,
+        "idle_before": true,
+        "idle_after": true,
+        "request_success_delta": 54,
+        "http_200": {
+          "chat_completions": 36,
+          "completions": 18,
+          "tokenize": 18
+        },
+        "all_generation_clients_loopback": true,
+        "fatal_log_candidates": 0,
+        "host_oom_delta": 0,
+        "gpu_oom_delta": 0,
+        "gpu_oom_rejections": 0,
+        "allocator_retries": 0
+      },
+      "observer": {
+        "ranks": 4,
+        "stable_worker_identity_ranks": 4,
+        "minimum_memavailable_gib_by_rank": [
+          6.82061767578125,
+          11.025970458984375,
+          11.17181396484375,
+          11.149120330810547
+        ],
+        "maximum_meminfo_gap_ms_by_rank": [
+          609.1989999986254,
+          535.5600000475533,
+          362.4749999726191,
+          405.3319999948144
+        ],
+        "meminfo_errors": 0,
+        "limitation": "Sampled minima and gaps do not guarantee unsampled transients and do not establish a performance cause."
+      },
+      "metrics": [
+        {
+          "key": "code_decode_throughput",
+          "value": 52.46,
+          "fixed_e03_median": 53.809,
+          "change_vs_fixed_e03_pct": -2.507015555018671
+        },
+        {
+          "key": "code_c1_aggregate_end_to_end_throughput",
+          "value": 39.943,
+          "fixed_e03_median": 40.233,
+          "change_vs_fixed_e03_pct": -0.7208013322397017
+        },
+        {
+          "key": "code_c2_aggregate_end_to_end_throughput",
+          "value": 62.214,
+          "fixed_e03_median": 61.834,
+          "change_vs_fixed_e03_pct": 0.6145486302034405
+        },
+        {
+          "key": "code_c4_aggregate_end_to_end_throughput",
+          "value": 89.197,
+          "fixed_e03_median": 86.932,
+          "change_vs_fixed_e03_pct": 2.6054847466985698
+        },
+        {
+          "key": "prose_decode_throughput",
+          "value": 31.282,
+          "fixed_e03_median": 31.186,
+          "change_vs_fixed_e03_pct": 0.3078304367344324
+        },
+        {
+          "key": "code_ttft",
+          "value": 0.395,
+          "fixed_e03_median": 0.396,
+          "change_vs_fixed_e03_pct": -0.2525252525252527
+        },
+        {
+          "key": "prose_ttft",
+          "value": 0.382,
+          "fixed_e03_median": 0.381,
+          "change_vs_fixed_e03_pct": 0.2624671916010501
+        },
+        {
+          "key": "code_c1_per_stream_ttft",
+          "value": 0.413,
+          "fixed_e03_median": 0.343,
+          "change_vs_fixed_e03_pct": 20.408163265306108
+        },
+        {
+          "key": "code_c2_per_stream_ttft",
+          "value": 0.467,
+          "fixed_e03_median": 0.449,
+          "change_vs_fixed_e03_pct": 4.008908685968823
+        },
+        {
+          "key": "code_c4_per_stream_ttft",
+          "value": 0.625,
+          "fixed_e03_median": 0.572,
+          "change_vs_fixed_e03_pct": 9.265734265734276
+        },
+        {
+          "key": "prefill_8k_cold_throughput",
+          "value": 2606.937,
+          "fixed_e03_median": 2558.401,
+          "change_vs_fixed_e03_pct": 1.897122460474338
+        },
+        {
+          "key": "prefill_8k_replay_throughput",
+          "value": 9289.077,
+          "fixed_e03_median": 9417.164,
+          "change_vs_fixed_e03_pct": -1.3601440943366956
+        },
+        {
+          "key": "prefill_32k_cold_throughput",
+          "value": 2669.21,
+          "fixed_e03_median": 2661.974,
+          "change_vs_fixed_e03_pct": 0.2718283499388002
+        },
+        {
+          "key": "prefill_32k_replay_throughput",
+          "value": 37925.224,
+          "fixed_e03_median": 37177.429,
+          "change_vs_fixed_e03_pct": 2.011422037817638
+        },
+        {
+          "key": "prefill_64k_cold_throughput",
+          "value": 2606.453,
+          "fixed_e03_median": 2616.073,
+          "change_vs_fixed_e03_pct": -0.3677267415702808
+        },
+        {
+          "key": "prefill_64k_replay_throughput",
+          "value": 37839.998,
+          "fixed_e03_median": 40078.253,
+          "change_vs_fixed_e03_pct": -5.5847119883194445
+        }
+      ],
+      "supporting_receipts": {
+        "portable_run_extract_sha256": "0bc4dd447b8adf4d6f8a3a99b7b61a4e147931f5c7790eb232b1107921593c04",
+        "acceptance_sha256": "18e3780d5ea0c2dad4fbc25b07f3db04e73a129ffc7d11e999ca3f49b61673be",
+        "memory_summary_sha256": "eba4a35991ad151066cd746e9f87f370c07db2caee1468697245ad352cf8133c"
+      }
+    },
+    {
+      "run": 4,
+      "request_integrity": {
+        "requests": 54,
+        "completed_streams": 54,
+        "visible_responses": 54,
+        "missing_visible_responses": 0,
+        "first_visible_latency_unavailable": 0,
+        "native_validation_errors": 0,
+        "protocol_errors": 0,
+        "runtime_error": null,
+        "runtime_error_count": 0,
+        "validation_denominators": {
+          "native_receipts": 1,
+          "protocol_receipts": 1,
+          "runtime_receipts": 1
+        },
+        "decode_output_gates": {
+          "passed": 15,
+          "total": 15
+        },
+        "prefill_token_matches": {
+          "passed": 18,
+          "total": 18
+        },
+        "finish_reasons": {
+          "stop": 15,
+          "length": 39
+        }
+      },
+      "service_integrity": {
+        "health_before": 200,
+        "health_after": 200,
+        "idle_before": true,
+        "idle_after": true,
+        "request_success_delta": 54,
+        "http_200": {
+          "chat_completions": 36,
+          "completions": 18,
+          "tokenize": 18
+        },
+        "all_generation_clients_loopback": true,
+        "fatal_log_candidates": 0,
+        "host_oom_delta": 0,
+        "gpu_oom_delta": 0,
+        "gpu_oom_rejections": 0,
+        "allocator_retries": 0
+      },
+      "observer": {
+        "ranks": 4,
+        "stable_worker_identity_ranks": 4,
+        "minimum_memavailable_gib_by_rank": [
+          6.5088043212890625,
+          10.88177490234375,
+          10.986717224121094,
+          11.083721160888672
+        ],
+        "maximum_meminfo_gap_ms_by_rank": [
+          707.9280000180006,
+          580.5190000100993,
+          337.5920000253245,
+          424.6830000192858
+        ],
+        "meminfo_errors": 0,
+        "limitation": "Sampled minima and gaps do not guarantee unsampled transients and do not establish a performance cause."
+      },
+      "metrics": [
+        {
+          "key": "code_decode_throughput",
+          "value": 52.912,
+          "fixed_e03_median": 53.809,
+          "change_vs_fixed_e03_pct": -1.6670073779479242
+        },
+        {
+          "key": "code_c1_aggregate_end_to_end_throughput",
+          "value": 39.09,
+          "fixed_e03_median": 40.233,
+          "change_vs_fixed_e03_pct": -2.840951457758541
+        },
+        {
+          "key": "code_c2_aggregate_end_to_end_throughput",
+          "value": 61.053,
+          "fixed_e03_median": 61.834,
+          "change_vs_fixed_e03_pct": -1.2630591583918327
+        },
+        {
+          "key": "code_c4_aggregate_end_to_end_throughput",
+          "value": 88.543,
+          "fixed_e03_median": 86.932,
+          "change_vs_fixed_e03_pct": 1.8531725946717024
+        },
+        {
+          "key": "prose_decode_throughput",
+          "value": 30.753,
+          "fixed_e03_median": 31.186,
+          "change_vs_fixed_e03_pct": -1.388443532354261
+        },
+        {
+          "key": "code_ttft",
+          "value": 0.413,
+          "fixed_e03_median": 0.396,
+          "change_vs_fixed_e03_pct": 4.292929292929283
+        },
+        {
+          "key": "prose_ttft",
+          "value": 0.393,
+          "fixed_e03_median": 0.381,
+          "change_vs_fixed_e03_pct": 3.1496062992126013
+        },
+        {
+          "key": "code_c1_per_stream_ttft",
+          "value": 0.396,
+          "fixed_e03_median": 0.343,
+          "change_vs_fixed_e03_pct": 15.451895043731776
+        },
+        {
+          "key": "code_c2_per_stream_ttft",
+          "value": 0.451,
+          "fixed_e03_median": 0.449,
+          "change_vs_fixed_e03_pct": 0.44543429844098037
+        },
+        {
+          "key": "code_c4_per_stream_ttft",
+          "value": 0.54,
+          "fixed_e03_median": 0.572,
+          "change_vs_fixed_e03_pct": -5.594405594405581
+        },
+        {
+          "key": "prefill_8k_cold_throughput",
+          "value": 2636.464,
+          "fixed_e03_median": 2558.401,
+          "change_vs_fixed_e03_pct": 3.0512417717160094
+        },
+        {
+          "key": "prefill_8k_replay_throughput",
+          "value": 9487.884,
+          "fixed_e03_median": 9417.164,
+          "change_vs_fixed_e03_pct": 0.7509691877512098
+        },
+        {
+          "key": "prefill_32k_cold_throughput",
+          "value": 2743.571,
+          "fixed_e03_median": 2661.974,
+          "change_vs_fixed_e03_pct": 3.0652816293472345
+        },
+        {
+          "key": "prefill_32k_replay_throughput",
+          "value": 37278.429,
+          "fixed_e03_median": 37177.429,
+          "change_vs_fixed_e03_pct": 0.2716702115146263
+        },
+        {
+          "key": "prefill_64k_cold_throughput",
+          "value": 2688.449,
+          "fixed_e03_median": 2616.073,
+          "change_vs_fixed_e03_pct": 2.7665894644377356
+        },
+        {
+          "key": "prefill_64k_replay_throughput",
+          "value": 36432.449,
+          "fixed_e03_median": 40078.253,
+          "change_vs_fixed_e03_pct": -9.096713871235847
+        }
+      ],
+      "supporting_receipts": {
+        "portable_run_extract_sha256": "6d82b83f7fe93d1368d4c1baeeb47f6511859d9097485357ed6c46ab7b23f379",
+        "acceptance_sha256": "baf1a956fed03a85a21e91e7f45e4aa3b853eef39293eef3b90d97671dc01905",
+        "memory_summary_sha256": "1d5bcbcee347c022fe60c5d511829566a3ab4ac15cf9edec3fa19526a0774009"
+      }
+    }
+  ],
+  "excluded_runs": [
+    {
+      "run": 2,
+      "status": "excluded_competing_traffic",
+      "included_in_candidate_aggregate": false,
+      "request_integrity": {
+        "requests": 54,
+        "completed_streams": 54,
+        "visible_responses": 54,
+        "missing_visible_responses": 0,
+        "first_visible_latency_unavailable": 0,
+        "native_validation_errors": 0,
+        "protocol_errors": 0,
+        "runtime_error": null,
+        "runtime_error_count": 0,
+        "validation_denominators": {
+          "native_receipts": 1,
+          "protocol_receipts": 1,
+          "runtime_receipts": 1
+        },
+        "decode_output_gates": {
+          "passed": 15,
+          "total": 15
+        },
+        "prefill_token_matches": {
+          "passed": 18,
+          "total": 18
+        },
+        "finish_reasons": {
+          "stop": 15,
+          "length": 39
+        }
+      },
+      "exclusion": {
+        "reason": "Additional accepted generation requests were confirmed by HTTP 200 response headers in the exact native run window; private connection ownership verified a separate non-benchmark client.",
+        "expected_native_generation_requests": 54,
+        "observed_exact_window_accepted_generation_requests": 59,
+        "additional_accepted_generation_requests": 5,
+        "exact_window_http_200": {
+          "chat_completions": 41,
+          "completions": 18,
+          "tokenize": 18
+        },
+        "fatal_log_candidates_all_four_ranks": 0,
+        "series_effect": "Complete native rows remain diagnostic; none of this run's metrics enter the accepted aggregate."
+      },
+      "observer": {
+        "ranks": 4,
+        "minimum_memavailable_gib_by_rank": [
+          6.2800140380859375,
+          10.968814849853516,
+          10.663227081298828,
+          11.23284912109375
+        ],
+        "meminfo_errors": 0,
+        "host_oom_delta": 0,
+        "gpu_oom_delta": 0,
+        "gpu_oom_rejections": 0,
+        "allocator_retries": 0,
+        "limitation": "Diagnostics cover the contaminated full native window, sampled minima do not guarantee unsampled transients, and no C4-only attribution is made."
+      },
+      "diagnostic_metrics": [
+        {
+          "key": "code_decode_throughput",
+          "value": 53.905,
+          "fixed_e03_median": 53.809,
+          "change_vs_fixed_e03_pct": 0.17840881636901568
+        },
+        {
+          "key": "code_c1_aggregate_end_to_end_throughput",
+          "value": 37.911,
+          "fixed_e03_median": 40.233,
+          "change_vs_fixed_e03_pct": -5.771381701588238
+        },
+        {
+          "key": "code_c2_aggregate_end_to_end_throughput",
+          "value": 31.272,
+          "fixed_e03_median": 61.834,
+          "change_vs_fixed_e03_pct": -49.425882200730996
+        },
+        {
+          "key": "code_c4_aggregate_end_to_end_throughput",
+          "value": 47.958,
+          "fixed_e03_median": 86.932,
+          "change_vs_fixed_e03_pct": -44.832742833479045
+        },
+        {
+          "key": "prose_decode_throughput",
+          "value": 31.088,
+          "fixed_e03_median": 31.186,
+          "change_vs_fixed_e03_pct": -0.3142435708330628
+        },
+        {
+          "key": "code_ttft",
+          "value": 0.396,
+          "fixed_e03_median": 0.396,
+          "change_vs_fixed_e03_pct": 0
+        },
+        {
+          "key": "prose_ttft",
+          "value": 0.382,
+          "fixed_e03_median": 0.381,
+          "change_vs_fixed_e03_pct": 0.2624671916010501
+        },
+        {
+          "key": "code_c1_per_stream_ttft",
+          "value": 0.481,
+          "fixed_e03_median": 0.343,
+          "change_vs_fixed_e03_pct": 40.233236151603485
+        },
+        {
+          "key": "code_c2_per_stream_ttft",
+          "value": 0.527,
+          "fixed_e03_median": 0.449,
+          "change_vs_fixed_e03_pct": 17.371937639198222
+        },
+        {
+          "key": "code_c4_per_stream_ttft",
+          "value": 0.557,
+          "fixed_e03_median": 0.572,
+          "change_vs_fixed_e03_pct": -2.622377622377605
+        },
+        {
+          "key": "prefill_8k_cold_throughput",
+          "value": 2615.232,
+          "fixed_e03_median": 2558.401,
+          "change_vs_fixed_e03_pct": 2.2213484125436214
+        },
+        {
+          "key": "prefill_8k_replay_throughput",
+          "value": 9538.214,
+          "fixed_e03_median": 9417.164,
+          "change_vs_fixed_e03_pct": 1.2854188373484763
+        },
+        {
+          "key": "prefill_32k_cold_throughput",
+          "value": 2776.888,
+          "fixed_e03_median": 2661.974,
+          "change_vs_fixed_e03_pct": 4.316871614824177
+        },
+        {
+          "key": "prefill_32k_replay_throughput",
+          "value": 37747.151,
+          "fixed_e03_median": 37177.429,
+          "change_vs_fixed_e03_pct": 1.5324405568765975
+        },
+        {
+          "key": "prefill_64k_cold_throughput",
+          "value": 2615.515,
+          "fixed_e03_median": 2616.073,
+          "change_vs_fixed_e03_pct": -0.02132968002039671
+        },
+        {
+          "key": "prefill_64k_replay_throughput",
+          "value": 40145.67,
+          "fixed_e03_median": 40078.253,
+          "change_vs_fixed_e03_pct": 0.16821341988135383
+        }
+      ],
+      "supporting_receipts": {
+        "portable_run_extract_sha256": "558b6385fe7ee6ca1d1d9de534530109e40516392fbeddd5edb9278e993cfd4c",
+        "exclusion_sha256": "8815d031017e89bfd3b5f116c14ced1b9e48138b1582fc04686d0c80598142bd",
+        "traffic_origin_rank0_sha256": "c2922d46b4a475479130a02573106e51c15e3d7031e31f4ce9d3e9cbe5c659cd",
+        "traffic_origin_local_sockets_sha256": "42139746498036d20203c26ddddef3233efe8b6b4a0986f9d02db13bd3bcf2b0"
+      }
+    }
+  ],
+  "metric_extraction": [
+    {
+      "key": "code_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "code",
+        "decode_tokens_per_second",
+        "median"
+      ]
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "1",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ]
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "2",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ]
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "4",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ]
+    },
+    {
+      "key": "prose_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "prose",
+        "decode_tokens_per_second",
+        "median"
+      ]
+    },
+    {
+      "key": "code_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "code",
+        "ttft_seconds",
+        "median"
+      ]
+    },
+    {
+      "key": "prose_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "prose",
+        "ttft_seconds",
+        "median"
+      ]
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "1",
+        "per_stream_ttft_seconds",
+        "median"
+      ]
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "2",
+        "per_stream_ttft_seconds",
+        "median"
+      ]
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "4",
+        "per_stream_ttft_seconds",
+        "median"
+      ]
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ]
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ]
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ]
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ]
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ]
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ]
+    }
+  ],
+  "comparison_method": "The accepted aggregate retains native per-run values from runs 1, 3 and 4 and reports their median, observed range and sample standard deviation for every predeclared metric. Deltas compare the unrounded candidate median with the fixed E03 median. Integrity and errors use explicit totals and denominators. Excluded run 2 never enters the aggregate.",
+  "diagnostic_cross_comparison": {
+    "record": "docs/historical_benchmarks/experiments/2026-09-21-c4-native-admission-28/results.json",
+    "use": "diagnostic only",
+    "native_admission_single_run_c4_tokens_per_second": 91.96,
+    "native_admission_change_vs_fixed_e03_pct": 5.78383104035337,
+    "original_c4_three_run_median_tokens_per_second": 88.543,
+    "original_c4_change_vs_fixed_e03_pct": 1.8531725946717037,
+    "same_pinned_r10_release_and_image": true,
+    "vllm_release_upgrade_occurred": false,
+    "causal_claim_supported": false,
+    "reason": "The admission record has one suite and a different runtime. The image and pinned R10 release did not change, so its +5.78% C4 result cannot be attributed to a vLLM release upgrade, and the cross-comparison cannot isolate the admission cap as a cause."
+  },
+  "limitations": [
+    "Three accepted historical comparisons describe observed variation but do not establish formal statistical significance.",
+    "C1 throughput is below the fixed E03 median in all accepted runs and its median is below the frozen E03 run range; this caution signal is not dismissed as noise.",
+    "C4 has two accepted runs above and one below the fixed reference median; its median lies inside the frozen E03 run range, so no repeatable gain is established.",
+    "Run 2 is preserved as a complete diagnostic suite but excluded from the candidate aggregate because exact-window HTTP 200 response headers prove five additional accepted generation requests from a privately verified separate non-benchmark client; the headers do not establish completion of those extra streams.",
+    "Observed ranges and sample standard deviations are descriptive, not confidence intervals.",
+    "The accepted E03 baseline remains frozen and is not extended by these measurements."
+  ],
+  "disposition": {
+    "status": "unresolved",
+    "promotion": false,
+    "automatic_discard": false,
+    "reason": "Mixed primary results provide neither a robust qualification gain nor a proven disqualifying regression. C1 throughput and latency are caution signals, while the C4 increase remains within frozen variation. Owner review would be required before accepting these tradeoffs and promoting the performance result."
+  },
+  "accepted_aggregate": {
+    "accepted_runs": [
+      1,
+      3,
+      4
+    ],
+    "native_suites": 3,
+    "requests": 162,
+    "integrity": {
+      "native_validation_errors": {
+        "count": 0,
+        "denominator_receipts": 3
+      },
+      "protocol_errors": {
+        "count": 0,
+        "denominator_receipts": 3
+      },
+      "runtime_errors": {
+        "count": 0,
+        "denominator_receipts": 3
+      },
+      "completed_streams": {
+        "passed": 162,
+        "total": 162
+      },
+      "visible_responses": {
+        "passed": 162,
+        "total": 162
+      },
+      "decode_output_gates": {
+        "passed": 45,
+        "total": 45
+      },
+      "prefill_token_matches": {
+        "passed": 54,
+        "total": 54
+      },
+      "finish_reasons": {
+        "stop": 45,
+        "length": 117
+      },
+      "http_200": {
+        "chat_completions": 108,
+        "completions": 54,
+        "tokenize": 54
+      },
+      "successful_request_delta": 162,
+      "healthy_idle_before_after_checks": {
+        "passed": 6,
+        "total": 6
+      },
+      "rank_windows": 12,
+      "fatal_log_candidates": 0,
+      "host_oom_delta": 0,
+      "gpu_oom_delta": 0,
+      "gpu_oom_rejections": 0,
+      "allocator_retries": 0,
+      "stable_worker_identity_rank_windows": {
+        "passed": 12,
+        "total": 12
+      }
+    },
+    "observer": {
+      "minimum_memavailable_gib_by_rank_across_accepted_series": [
+        6.104946136474609,
+        10.611068725585938,
+        10.63772964477539,
+        10.692306518554688
+      ],
+      "limitation": "Minima are sampled observations. Sample standard deviations are descriptive and are not confidence intervals."
+    },
+    "metrics": [
+      {
+        "key": "code_decode_throughput",
+        "unit": "tokens_per_second",
+        "source_path": [
+          "decode",
+          "code",
+          "decode_tokens_per_second",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 54.904
+          },
+          {
+            "run": 3,
+            "value": 52.46
+          },
+          {
+            "run": 4,
+            "value": 52.912
+          }
+        ],
+        "median": 52.912,
+        "observed_range": {
+          "minimum": 52.46,
+          "maximum": 54.904
+        },
+        "sample_stdev": 1.3003527726479989,
+        "fixed_e03_median": 53.809,
+        "change_vs_fixed_e03_pct": -1.6670073779479266
+      },
+      {
+        "key": "code_c1_aggregate_end_to_end_throughput",
+        "unit": "tokens_per_second",
+        "source_path": [
+          "concurrency",
+          "1",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 39.315
+          },
+          {
+            "run": 3,
+            "value": 39.943
+          },
+          {
+            "run": 4,
+            "value": 39.09
+          }
+        ],
+        "median": 39.315,
+        "observed_range": {
+          "minimum": 39.09,
+          "maximum": 39.943
+        },
+        "sample_stdev": 0.44208181746519654,
+        "fixed_e03_median": 40.233,
+        "change_vs_fixed_e03_pct": -2.281709044813962
+      },
+      {
+        "key": "code_c2_aggregate_end_to_end_throughput",
+        "unit": "tokens_per_second",
+        "source_path": [
+          "concurrency",
+          "2",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 64.694
+          },
+          {
+            "run": 3,
+            "value": 62.214
+          },
+          {
+            "run": 4,
+            "value": 61.053
+          }
+        ],
+        "median": 62.214,
+        "observed_range": {
+          "minimum": 61.053,
+          "maximum": 64.694
+        },
+        "sample_stdev": 1.8598925596209432,
+        "fixed_e03_median": 61.834,
+        "change_vs_fixed_e03_pct": 0.6145486302034486
+      },
+      {
+        "key": "code_c4_aggregate_end_to_end_throughput",
+        "unit": "tokens_per_second",
+        "source_path": [
+          "concurrency",
+          "4",
+          "aggregate_end_to_end_tokens_per_second",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 85.523
+          },
+          {
+            "run": 3,
+            "value": 89.197
+          },
+          {
+            "run": 4,
+            "value": 88.543
+          }
+        ],
+        "median": 88.543,
+        "observed_range": {
+          "minimum": 85.523,
+          "maximum": 89.197
+        },
+        "sample_stdev": 1.9598636006960666,
+        "fixed_e03_median": 86.932,
+        "change_vs_fixed_e03_pct": 1.8531725946717037
+      },
+      {
+        "key": "prose_decode_throughput",
+        "unit": "tokens_per_second",
+        "source_path": [
+          "decode",
+          "prose",
+          "decode_tokens_per_second",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 32.035
+          },
+          {
+            "run": 3,
+            "value": 31.282
+          },
+          {
+            "run": 4,
+            "value": 30.753
+          }
+        ],
+        "median": 31.282,
+        "observed_range": {
+          "minimum": 30.753,
+          "maximum": 32.035
+        },
+        "sample_stdev": 0.6442533145691459,
+        "fixed_e03_median": 31.186,
+        "change_vs_fixed_e03_pct": 0.30783043673443533
+      },
+      {
+        "key": "code_ttft",
+        "unit": "seconds",
+        "source_path": [
+          "decode",
+          "code",
+          "ttft_seconds",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 0.396
+          },
+          {
+            "run": 3,
+            "value": 0.395
+          },
+          {
+            "run": 4,
+            "value": 0.413
+          }
+        ],
+        "median": 0.396,
+        "observed_range": {
+          "minimum": 0.395,
+          "maximum": 0.413
+        },
+        "sample_stdev": 0.010115993936995657,
+        "fixed_e03_median": 0.396,
+        "change_vs_fixed_e03_pct": 0
+      },
+      {
+        "key": "prose_ttft",
+        "unit": "seconds",
+        "source_path": [
+          "decode",
+          "prose",
+          "ttft_seconds",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 0.384
+          },
+          {
+            "run": 3,
+            "value": 0.382
+          },
+          {
+            "run": 4,
+            "value": 0.393
+          }
+        ],
+        "median": 0.384,
+        "observed_range": {
+          "minimum": 0.382,
+          "maximum": 0.393
+        },
+        "sample_stdev": 0.00585946527708232,
+        "fixed_e03_median": 0.381,
+        "change_vs_fixed_e03_pct": 0.7874015748031482
+      },
+      {
+        "key": "code_c1_per_stream_ttft",
+        "unit": "seconds",
+        "source_path": [
+          "concurrency",
+          "1",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 0.344
+          },
+          {
+            "run": 3,
+            "value": 0.413
+          },
+          {
+            "run": 4,
+            "value": 0.396
+          }
+        ],
+        "median": 0.396,
+        "observed_range": {
+          "minimum": 0.344,
+          "maximum": 0.413
+        },
+        "sample_stdev": 0.035949038002891454,
+        "fixed_e03_median": 0.343,
+        "change_vs_fixed_e03_pct": 15.451895043731767
+      },
+      {
+        "key": "code_c2_per_stream_ttft",
+        "unit": "seconds",
+        "source_path": [
+          "concurrency",
+          "2",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 0.447
+          },
+          {
+            "run": 3,
+            "value": 0.467
+          },
+          {
+            "run": 4,
+            "value": 0.451
+          }
+        ],
+        "median": 0.451,
+        "observed_range": {
+          "minimum": 0.447,
+          "maximum": 0.467
+        },
+        "sample_stdev": 0.010583005244258372,
+        "fixed_e03_median": 0.449,
+        "change_vs_fixed_e03_pct": 0.44543429844097204
+      },
+      {
+        "key": "code_c4_per_stream_ttft",
+        "unit": "seconds",
+        "source_path": [
+          "concurrency",
+          "4",
+          "per_stream_ttft_seconds",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 0.538
+          },
+          {
+            "run": 3,
+            "value": 0.625
+          },
+          {
+            "run": 4,
+            "value": 0.54
+          }
+        ],
+        "median": 0.54,
+        "observed_range": {
+          "minimum": 0.538,
+          "maximum": 0.625
+        },
+        "sample_stdev": 0.04966219219218309,
+        "fixed_e03_median": 0.572,
+        "change_vs_fixed_e03_pct": -5.594405594405583
+      },
+      {
+        "key": "prefill_8k_cold_throughput",
+        "unit": "tokens_per_second",
+        "source_path": [
+          "prefill",
+          "8192",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 2591.766
+          },
+          {
+            "run": 3,
+            "value": 2606.937
+          },
+          {
+            "run": 4,
+            "value": 2636.464
+          }
+        ],
+        "median": 2606.937,
+        "observed_range": {
+          "minimum": 2591.766,
+          "maximum": 2636.464
+        },
+        "sample_stdev": 22.729988172749472,
+        "fixed_e03_median": 2558.401,
+        "change_vs_fixed_e03_pct": 1.897122460474332
+      },
+      {
+        "key": "prefill_8k_replay_throughput",
+        "unit": "tokens_per_second",
+        "source_path": [
+          "prefill",
+          "8192",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 9740.634
+          },
+          {
+            "run": 3,
+            "value": 9289.077
+          },
+          {
+            "run": 4,
+            "value": 9487.884
+          }
+        ],
+        "median": 9487.884,
+        "observed_range": {
+          "minimum": 9289.077,
+          "maximum": 9740.634
+        },
+        "sample_stdev": 226.31486547065384,
+        "fixed_e03_median": 9417.164,
+        "change_vs_fixed_e03_pct": 0.7509691877512159
+      },
+      {
+        "key": "prefill_32k_cold_throughput",
+        "unit": "tokens_per_second",
+        "source_path": [
+          "prefill",
+          "32768",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 2796.617
+          },
+          {
+            "run": 3,
+            "value": 2669.21
+          },
+          {
+            "run": 4,
+            "value": 2743.571
+          }
+        ],
+        "median": 2743.571,
+        "observed_range": {
+          "minimum": 2669.21,
+          "maximum": 2796.617
+        },
+        "sample_stdev": 63.99997407030731,
+        "fixed_e03_median": 2661.974,
+        "change_vs_fixed_e03_pct": 3.0652816293472274
+      },
+      {
+        "key": "prefill_32k_replay_throughput",
+        "unit": "tokens_per_second",
+        "source_path": [
+          "prefill",
+          "32768",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 38427.98
+          },
+          {
+            "run": 3,
+            "value": 37925.224
+          },
+          {
+            "run": 4,
+            "value": 37278.429
+          }
+        ],
+        "median": 37925.224,
+        "observed_range": {
+          "minimum": 37278.429,
+          "maximum": 38427.98
+        },
+        "sample_stdev": 576.2775473042516,
+        "fixed_e03_median": 37177.429,
+        "change_vs_fixed_e03_pct": 2.011422037817634
+      },
+      {
+        "key": "prefill_64k_cold_throughput",
+        "unit": "tokens_per_second",
+        "source_path": [
+          "prefill",
+          "65536",
+          "cold",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 2718.159
+          },
+          {
+            "run": 3,
+            "value": 2606.453
+          },
+          {
+            "run": 4,
+            "value": 2688.449
+          }
+        ],
+        "median": 2688.449,
+        "observed_range": {
+          "minimum": 2606.453,
+          "maximum": 2718.159
+        },
+        "sample_stdev": 57.856515841634824,
+        "fixed_e03_median": 2616.073,
+        "change_vs_fixed_e03_pct": 2.76658946443773
+      },
+      {
+        "key": "prefill_64k_replay_throughput",
+        "unit": "tokens_per_second",
+        "source_path": [
+          "prefill",
+          "65536",
+          "warm_replay",
+          "effective_prefill_tokens_per_second",
+          "median"
+        ],
+        "per_run": [
+          {
+            "run": 1,
+            "value": 39507.435
+          },
+          {
+            "run": 3,
+            "value": 37839.998
+          },
+          {
+            "run": 4,
+            "value": 36432.449
+          }
+        ],
+        "median": 37839.998,
+        "observed_range": {
+          "minimum": 36432.449,
+          "maximum": 39507.435
+        },
+        "sample_stdev": 1539.3223204041215,
+        "fixed_e03_median": 40078.253,
+        "change_vs_fixed_e03_pct": -5.584711988319446
+      }
+    ]
+  },
+  "final_identity": {
+    "ranks_passed": 4,
+    "ranks_total": 4,
+    "original_r10_modules_verified": true,
+    "native_admission_absent": true,
+    "health_idle": true,
+    "autostart_base_unchanged": true,
+    "service_selected": "original C4",
+    "receipt_sha256": "1297cc567923e34ba9cccf3744719b41a60976edc2e9d9761844bd04a355bc76"
+  },
+  "series_verification": {
+    "receipt_sha256": "268be8b505decfeb764fe5e95557d3e0c5215e6e2f53253aa4b5f8711c91b50c",
+    "final_assessment_sha256": "d38f000f696ca3cf87c780afa9db0dd606049b7c1b926ee888ee091b76cbc4af",
+    "all_acceptance_checks_passed": true,
+    "observers_cleaned_up": true,
+    "paused_competing_client_resumed": true,
+    "owned_tunnel_closed": true,
+    "private_files_mode": "0600"
+  }
+}

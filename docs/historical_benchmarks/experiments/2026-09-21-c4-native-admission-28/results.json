@@ -1,0 +1,655 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-21-c4-native-admission-28",
+  "record_type": "portable_functional_and_measurement_extract",
+  "title": "C4 native admission with four active and 24 waiting sequences",
+  "outcome": "unresolved",
+  "coverage": "Two coordinated functional stages: initial eight-slot admission qualification, followed by the final 28-slot cap-only configuration. One complete 54-request native suite is included as a single-run observation against the fixed E03 reference.",
+  "privacy": "Numeric fields, safe recipe fields and receipt SHA-256 digests only. Raw prompts, responses, cache salts, endpoints, host identities, private paths and operator payloads are omitted.",
+  "recipe": {
+    "status": "archived owner-withdrawn experiment; exact R10 source artifacts retained; not selected in active integration",
+    "base_image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "base_image_content_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "serving_engine": "pinned R10 with 13 native-admission source overrides",
+    "image_rebuilt": false,
+    "vllm_release_upgraded": false,
+    "driver_updated": false,
+    "retained_features": [
+      "FP8",
+      "DFlash2",
+      "SparkCache",
+      "SIRCL",
+      "hybrid KDA",
+      "E03 memory guards"
+    ],
+    "context_limit_tokens": 262144,
+    "kv_cache_memory_bytes_per_rank": 12884901888,
+    "max_batched_tokens": 8192,
+    "max_active_sequences": 4,
+    "max_active_plus_waiting_sequences": 28,
+    "waiting_sequences_with_four_active": 24,
+    "saturation_sequence": 29,
+    "saturation_http_status": 503,
+    "admission_policy": "Native vLLM admission counts active plus waiting sequences and admits newly available slots continuously."
+  },
+  "source_identity": {
+    "runtime_override_count": 13,
+    "source_manifest_sha256": "bdbdf542a5154be1ddbc51d25c73655e5ebf01617c38ef6c4ea35874ff37d1d3",
+    "provenance_sha256": "954cf4bc7aa48215fff1bc15eb09750ad4828a52db745c06efd8b5f23ec3bd56",
+    "final_overlay_sha256": "f41f44b418b365f656c378b537f52a805b5f128304582e74147e150817e1aa6a",
+    "kv_transfer_config_sha256": "4ae61ddc4312db631f24d55bc42341d55bfc01b3b66b5a7063e4596ff5d24cd7"
+  },
+  "functional_counts": {
+    "coordinated_transitions": 2,
+    "generation_attempts": 58,
+    "completed_generations": 52,
+    "cancelled_generations": 4,
+    "intentional_http_503_rejections": 2
+  },
+  "functional_stages": [
+    {
+      "stage": "initial-eight-slot-qualification",
+      "configuration": {
+        "active_limit": 4,
+        "total_limit": 8,
+        "waiting_with_four_active": 4
+      },
+      "transition": {
+        "passed": true,
+        "functional_gates": 2,
+        "gate_seconds_after_health": 23.53686285018921
+      },
+      "runtime_identity": {
+        "ranks_passed": 4,
+        "ranks_total": 4
+      },
+      "admission": {
+        "accepted_attempts": 10,
+        "completed": 8,
+        "cancelled": 2,
+        "overload_probe_status": 503,
+        "max_running": 4,
+        "max_admitted": 8,
+        "active_cancellation_recovered_slot": true,
+        "waiting_cancellation_recovered_slot": true
+      },
+      "capacity": {
+        "cold_responses": 4,
+        "replay_responses": 4,
+        "prompt_tokens_per_response": 261632,
+        "completion_tokens_per_response": 512,
+        "cold_metrics_samples": 903,
+        "replay_metrics_samples": 60,
+        "metrics_failures": 0,
+        "cold_minimum_memavailable_gib_by_rank": [
+          4.698116302490234,
+          9.216644287109375,
+          9.42022705078125,
+          9.211437225341797
+        ],
+        "replay_minimum_memavailable_gib_by_rank": [
+          5.176002502441406,
+          9.781471252441406,
+          9.586437225341797,
+          9.574756622314453
+        ],
+        "cold_commits_observed_per_rank": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "replay_restore_completions_observed_per_rank": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "new_oom_or_fatal_transport_errors": 0
+      }
+    },
+    {
+      "stage": "final-28-slot-configuration",
+      "configuration_change_from_prior_stage": "Only the active-plus-waiting cap changed from 8 to 28; the 13 runtime override files and the remaining recipe were unchanged.",
+      "configuration": {
+        "active_limit": 4,
+        "total_limit": 28,
+        "waiting_with_four_active": 24
+      },
+      "transition": {
+        "passed": true,
+        "functional_gates": 2,
+        "gate_seconds_after_health": 11.931380987167358
+      },
+      "runtime_identity": {
+        "ranks_passed": 4,
+        "ranks_total": 4
+      },
+      "admission": {
+        "accepted_attempts": 30,
+        "completed": 28,
+        "cancelled": 2,
+        "overload_probe_status": 503,
+        "observed_four_running_twenty_four_waiting": true,
+        "max_running": 4,
+        "max_admitted": 28,
+        "active_cancellation_recovered_slot": true,
+        "waiting_cancellation_recovered_slot": true,
+        "elapsed_seconds": 154.25163316726685,
+        "final_health_status": 200
+      },
+      "capacity": {
+        "phase": "replay only; cold was not repeated after the cap-only change",
+        "responses": 4,
+        "prompt_tokens_per_response": 261632,
+        "completion_tokens_per_response": 512,
+        "metrics_samples": 62,
+        "metrics_failures": 0,
+        "minimum_memavailable_gib_by_rank": [
+          5.3889007568359375,
+          8.92459487915039,
+          10.108833312988281,
+          10.034954071044922
+        ],
+        "maximum_memory_sample_gap_seconds_by_rank": [
+          0.5009324550628662,
+          0.5009036064147949,
+          0.501248836517334,
+          0.5012369155883789
+        ],
+        "restore_completions_observed_per_rank": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "new_oom_or_fatal_errors": 0,
+        "final_running": 0,
+        "final_waiting": 0
+      }
+    }
+  ],
+  "native_kv_capacity": {
+    "native_capacity_tokens": 1075462,
+    "raw_gpu_blocks_per_rank": 640,
+    "native_max_concurrency": 4.102564102564102,
+    "recomputed_blocks_per_max_request": 156,
+    "four_max_requests_plus_reserved_null_block": 625,
+    "physical_four_request_check": "4 * 156 + 1 = 625 <= 640",
+    "historical_threshold_imposed": false,
+    "per_group_page_size_decomposition": null,
+    "decomposition_note": "The runtime did not expose individual group page sizes; aggregate native metrics and bounded full-context responses provide the available cross-check."
+  },
+  "autostart": {
+    "validated_after_benchmark": true,
+    "default_e03_enabled": true,
+    "native_overlay_selected": false,
+    "base_recipe_unchanged_on_all_ranks": true,
+    "dropins_present": false
+  },
+  "functional_limits": [
+    "Aggregate metrics do not independently establish active residency on each rank.",
+    "Restore completion logs do not expose a one-to-one restore-to-request mapping.",
+    "The 28-slot stage repeated replay capacity only because its sole recipe change was the admission cap; initial-stage cold and replay results remain separate evidence.",
+    "Sampled MemAvailable minima do not exclude unsampled transients."
+  ],
+  "benchmark": {
+    "status": "complete",
+    "authorized_native_suites": 1,
+    "completed_native_suites": 1,
+    "included_native_suites": 1,
+    "excluded_native_suites": 0,
+    "included_requests": 54,
+    "duration_seconds": 585.936052,
+    "performance_outcome": "unresolved",
+    "performance_interpretation": "The single suite contains throughput and latency tradeoffs. It does not establish a repeatable gain or regression and does not replace the three-run frozen reference.",
+    "protocol": {
+      "version": "1.1.0",
+      "repository_source": "git-archive",
+      "repository_revision": "ca0b5c11c0bf0cef7271cc0fc21192c7cbe8f087",
+      "repository_source_sha256": "e0e92cff99f74ffa43d0a82541cf9db6010dd0a4ef3e8e7b84c5e1abd13a867f",
+      "prompts_version": "1.0.0",
+      "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+      "comparison_id": "glm53-nq2-3x-20260911-v1",
+      "served_model": "glm-5.3-flash"
+    },
+    "settings": {
+      "seed": 20260905,
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "chat_template_kwargs": {
+        "enable_thinking": false
+      },
+      "decode_workloads": [
+        "code",
+        "prose",
+        "structured"
+      ],
+      "decode_runs_per_workload": 5,
+      "decode_output_tokens": 8192,
+      "prefill_depths": [
+        8192,
+        32768,
+        65536
+      ],
+      "prefill_runs_per_phase": 3,
+      "prefill_phases": [
+        "cold",
+        "warm_replay"
+      ],
+      "prefill_output_tokens_observed": 8,
+      "concurrency_levels": [
+        1,
+        2,
+        4
+      ],
+      "concurrency_rounds": 3,
+      "concurrency_output_tokens": 256,
+      "concurrency_workload": "code",
+      "cache_salt_policy": "One fresh value for this suite, shared within its cold/replay pairs and sent to chat and prefill requests; raw value omitted."
+    },
+    "rigmark_source_sha256": "e0e92cff99f74ffa43d0a82541cf9db6010dd0a4ef3e8e7b84c5e1abd13a867f",
+    "native_receipt_sha256": "de652b8d26d70c0ad33781e4eb5f5f331ccac2736196ed77ce26e6ed97527bed",
+    "cache_salt_sha256": "9c4f36460e02b739ea4e1175c1d33c7e0e18c09759eba4e91cef4a7faef88300",
+    "fixed_reference": {
+      "baseline_id": "2026-09-19-e03",
+      "sha256": "7aba7010faaffd23900ef0011df3395ca8d41d64a7257156780e0b93aff4f56f",
+      "accepted_runs": 3,
+      "accepted_requests": 162,
+      "metric_count": 16
+    },
+    "integrity": {
+      "native_validation_errors": 0,
+      "protocol_errors": 0,
+      "runtime_errors": 0,
+      "completed_streams": 54,
+      "visible_responses": 54,
+      "finish_reasons": {
+        "stop": 15,
+        "length": 39
+      },
+      "decode_output_gates_passed": 15,
+      "decode_output_gates_total": 15,
+      "prefill_token_matches": 18,
+      "prefill_requests": 18,
+      "generation_api_posts": 54,
+      "chat_completion_api_posts": 36,
+      "completion_api_posts": 18,
+      "tokenizer_api_posts": 18,
+      "total_api_posts": 72,
+      "api_non_200": 0,
+      "success_counter_delta": 54,
+      "competing_generation_requests_observed": 0,
+      "post_run_health": 200,
+      "post_run_running": 0,
+      "post_run_waiting": 0
+    },
+    "memory": {
+      "minimum_memavailable_gib_by_rank": [
+        7.048919677734375,
+        10.554313659667969,
+        10.682342529296875,
+        10.877986907958984
+      ],
+      "maximum_meminfo_gap_ms_by_rank": [
+        641.3420000462793,
+        399.1859999950975,
+        386.97699998738244,
+        391.31000003544614
+      ],
+      "meminfo_samples_by_rank": [
+        2913,
+        2930,
+        2930,
+        2930
+      ],
+      "meminfo_errors_by_rank": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "process_sample_errors_by_rank": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "worker_identity_stable_by_rank": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "host_oom_kill_delta_by_rank": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cuda_oom_delta_by_rank": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cuda_allocation_retry_delta_by_rank": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "cache_commits_observed_per_rank": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "cache_restores_observed_per_rank": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "observer_source_sha256": "7e01cf319e1b1ab1c907edfd4933df00a6e0e6139482b23b4283279433066499",
+      "observers_stopped": true
+    },
+    "measurement_limits": [
+      "The client OS differs from the frozen E03 series; timing effects were not isolated.",
+      "The host observer used the same source and target intervals as E03, but its overhead was not isolated and actual spacing is reported.",
+      "Sampled MemAvailable minima do not guarantee headroom between samples.",
+      "CUDA lifetime peaks extend beyond this run, and PyTorch allocator counters omit driver, NCCL and SIRCL allocations.",
+      "Host pressure counters are system-wide and do not by themselves establish a performance cause.",
+      "Cache commit and restore counts do not expose a one-to-one mapping to benchmark requests."
+    ],
+    "metrics": [
+      {
+        "key": "code_decode_throughput",
+        "unit": "tokens_per_second",
+        "source_path": ["decode", "code", "decode_tokens_per_second", "median"],
+        "candidate": 54.057,
+        "fixed_e03_median": 53.809,
+        "change_vs_fixed_e03_pct": 0.460889442286615
+      },
+      {
+        "key": "code_c1_aggregate_end_to_end_throughput",
+        "unit": "tokens_per_second",
+        "source_path": ["concurrency", "1", "aggregate_end_to_end_tokens_per_second", "median"],
+        "candidate": 40.52,
+        "fixed_e03_median": 40.233,
+        "change_vs_fixed_e03_pct": 0.7133447667337911
+      },
+      {
+        "key": "code_c2_aggregate_end_to_end_throughput",
+        "unit": "tokens_per_second",
+        "source_path": ["concurrency", "2", "aggregate_end_to_end_tokens_per_second", "median"],
+        "candidate": 61.367,
+        "fixed_e03_median": 61.834,
+        "change_vs_fixed_e03_pct": -0.7552479218552994
+      },
+      {
+        "key": "code_c4_aggregate_end_to_end_throughput",
+        "unit": "tokens_per_second",
+        "source_path": ["concurrency", "4", "aggregate_end_to_end_tokens_per_second", "median"],
+        "candidate": 91.96,
+        "fixed_e03_median": 86.932,
+        "change_vs_fixed_e03_pct": 5.78383104035337
+      },
+      {
+        "key": "prose_decode_throughput",
+        "unit": "tokens_per_second",
+        "source_path": ["decode", "prose", "decode_tokens_per_second", "median"],
+        "candidate": 31.391,
+        "fixed_e03_median": 31.186,
+        "change_vs_fixed_e03_pct": 0.6573462451099797
+      },
+      {
+        "key": "code_ttft",
+        "unit": "seconds",
+        "source_path": ["decode", "code", "ttft_seconds", "median"],
+        "candidate": 0.393,
+        "fixed_e03_median": 0.396,
+        "change_vs_fixed_e03_pct": -0.7575757575757582
+      },
+      {
+        "key": "prose_ttft",
+        "unit": "seconds",
+        "source_path": ["decode", "prose", "ttft_seconds", "median"],
+        "candidate": 0.383,
+        "fixed_e03_median": 0.381,
+        "change_vs_fixed_e03_pct": 0.5249343832021002
+      },
+      {
+        "key": "code_c1_per_stream_ttft",
+        "unit": "seconds",
+        "source_path": ["concurrency", "1", "per_stream_ttft_seconds", "median"],
+        "candidate": 0.397,
+        "fixed_e03_median": 0.343,
+        "change_vs_fixed_e03_pct": 15.743440233236146
+      },
+      {
+        "key": "code_c2_per_stream_ttft",
+        "unit": "seconds",
+        "source_path": ["concurrency", "2", "per_stream_ttft_seconds", "median"],
+        "candidate": 0.448,
+        "fixed_e03_median": 0.449,
+        "change_vs_fixed_e03_pct": -0.22271714922049018
+      },
+      {
+        "key": "code_c4_per_stream_ttft",
+        "unit": "seconds",
+        "source_path": ["concurrency", "4", "per_stream_ttft_seconds", "median"],
+        "candidate": 0.612,
+        "fixed_e03_median": 0.572,
+        "change_vs_fixed_e03_pct": 6.9930069930070005
+      },
+      {
+        "key": "prefill_8k_cold_throughput",
+        "unit": "tokens_per_second",
+        "source_path": ["prefill", "8192", "cold", "effective_prefill_tokens_per_second", "median"],
+        "candidate": 2534.79,
+        "fixed_e03_median": 2558.401,
+        "change_vs_fixed_e03_pct": -0.9228811277043699
+      },
+      {
+        "key": "prefill_8k_replay_throughput",
+        "unit": "tokens_per_second",
+        "source_path": ["prefill", "8192", "warm_replay", "effective_prefill_tokens_per_second", "median"],
+        "candidate": 9552.829,
+        "fixed_e03_median": 9417.164,
+        "change_vs_fixed_e03_pct": 1.4406141806598998
+      },
+      {
+        "key": "prefill_32k_cold_throughput",
+        "unit": "tokens_per_second",
+        "source_path": ["prefill", "32768", "cold", "effective_prefill_tokens_per_second", "median"],
+        "candidate": 2764.744,
+        "fixed_e03_median": 2661.974,
+        "change_vs_fixed_e03_pct": 3.8606688119418133
+      },
+      {
+        "key": "prefill_32k_replay_throughput",
+        "unit": "tokens_per_second",
+        "source_path": ["prefill", "32768", "warm_replay", "effective_prefill_tokens_per_second", "median"],
+        "candidate": 37014.236,
+        "fixed_e03_median": 37177.429,
+        "change_vs_fixed_e03_pct": -0.4389571963139229
+      },
+      {
+        "key": "prefill_64k_cold_throughput",
+        "unit": "tokens_per_second",
+        "source_path": ["prefill", "65536", "cold", "effective_prefill_tokens_per_second", "median"],
+        "candidate": 2709.212,
+        "fixed_e03_median": 2616.073,
+        "change_vs_fixed_e03_pct": 3.5602599774547627
+      },
+      {
+        "key": "prefill_64k_replay_throughput",
+        "unit": "tokens_per_second",
+        "source_path": ["prefill", "65536", "warm_replay", "effective_prefill_tokens_per_second", "median"],
+        "candidate": 39651.692,
+        "fixed_e03_median": 40078.253,
+        "change_vs_fixed_e03_pct": -1.0643203435039803
+      }
+    ]
+  },
+  "restoration": {
+    "status": "completed",
+    "selected_recipe": "scripts/node/reference/c4-262k.env",
+    "transition": {
+      "coordinated_four_rank_transition": true,
+      "down_exit": 0,
+      "deploy_exit": 0,
+      "up_exit": 0
+    },
+    "functional_gates": {
+      "passed": 2,
+      "total": 2,
+      "seconds_after_first_health_200": 28.486119747161865,
+      "separate_from_experiment_functional_counts": true
+    },
+    "focused_identity": {
+      "ranks_passed": 4,
+      "ranks_total": 4,
+      "checks_by_rank": [21, 19, 19, 19],
+      "max_active_sequences": 4,
+      "context_limit_tokens": 262144,
+      "kv_cache_memory_bytes_per_rank": 12884901888,
+      "max_batched_tokens": 8192,
+      "native_capacity_tokens": 1075462,
+      "native_max_concurrency": 4.102564102564102,
+      "queue_cap_absent": true,
+      "native_admission_mounts_absent": true,
+      "native_compiler_cache_absent": true,
+      "original_r10_modules_matched": 13,
+      "tracked_standard_e03_mounts_matched": 18,
+      "c4_connector_hash_matched": true,
+      "image_and_base_config_matched": true,
+      "dflash_sparkcache_sircl_mhc_and_draft_guards_matched": true,
+      "one_stack_owned_all_gpu_processes": true,
+      "health_200_and_idle": true,
+      "flusher_stopped": true,
+      "autostart_enabled_without_overlay_or_dropin": true,
+      "boot_log_error_candidates": 0
+    },
+    "standard_live_verifier": {
+      "exit_code": 0,
+      "pass": 166,
+      "fail": 0,
+      "warn": 2,
+      "skip": 7
+    },
+    "receipt_sha256": {
+      "coordinated_transition_summary": "7705c0c7b327fc901cd1d8d22f2cbedcf57fcbd9f7588ab107166b8cb4c863ec",
+      "focused_identity_summary": "1297cc567923e34ba9cccf3744719b41a60976edc2e9d9761844bd04a355bc76",
+      "standard_live_verifier_summary": "a98a8822937823c1cb0c1e2f1d2ea8db429849a1d2de2d5d9ebb99026ec0ef55",
+      "standard_live_verifier_log": "66fc5b81668af679dac9346eaaf273039526d2e9832841de49496e8b5e5f61bc"
+    },
+    "counting_note": "The two post-restoration gates are separate from the archived experiment's 58 functional generation attempts and the benchmark's 54 requests."
+  },
+  "disposition": {
+    "status": "owner_withdrawn",
+    "reason": "The owner withdrew the native active-plus-waiting admission cap after reviewing the completed evidence.",
+    "permanent_promotion": false,
+    "frozen_e03_reference_changed": false,
+    "archived_artifacts_retained": true,
+    "active_integration_selected": false,
+    "live_state_at_evidence_capture": "active and idle",
+    "live_restoration": "completed",
+    "live_recipe_after_restoration": "complete original C4 recipe",
+    "default_e03_autostart_unchanged": true,
+    "complete_c4_return_recipe": "scripts/node/reference/c4-262k.env",
+    "recipe_path_is_provenance_only": "The overlay path names the recipe selected at measurement time. Because the candidate was withdrawn, that overlay, the 13 source-derived overrides and their local tests are not published in this repository; this extract and its report are the published evidence.",
+    "archived_artifacts_retained_privately": true
+  },
+  "source_receipts": [
+    {
+      "logical_role": "initial eight-slot transition and gates",
+      "sha256": "6d811f77d1b277acca2305892ea98f6367c1463d98f803a4393cb9225d601b16"
+    },
+    {
+      "logical_role": "initial eight-slot admission probe",
+      "sha256": "6cd891f813c7b0fbf8ea0a0c1c9b80a7a7cdc693d9abc83d71b03bcc3854deee"
+    },
+    {
+      "logical_role": "initial cold capacity summary",
+      "sha256": "b9e448eac4a3d277e18aa180bb66d7f970439a6d4d22e23fe5720bc3c58fec86"
+    },
+    {
+      "logical_role": "initial cold acceptance review",
+      "sha256": "61c0a4be8d79a1bdcf4947f14d881f6715783f1b654e1aecbbdae128f803127b"
+    },
+    {
+      "logical_role": "initial replay capacity summary",
+      "sha256": "331a27823bae5206cf6e4d2744f0a8786b5e2aef4887f4d673e8a946a58dc575"
+    },
+    {
+      "logical_role": "initial replay acceptance review",
+      "sha256": "d36aa2bbf280a4d7b9c840217f0c1ca52c7469c66dcc3747984fb9266d37097c"
+    },
+    {
+      "logical_role": "final 28-slot transition and gates",
+      "sha256": "d30b6d55aacadd5eeff958de72d65edb89d73905dd7169479d1a13cc5afb5b55"
+    },
+    {
+      "logical_role": "final 28-slot four-rank identity",
+      "sha256": "fe3937187f2a37a55df7ac130f82ffaef5460bcd2c0c776333139026f7a0edc5"
+    },
+    {
+      "logical_role": "final 28-slot admission probe",
+      "sha256": "bb30328fb82558bd31a9381d38c423dd68dd7040891b58251d5c38884b4ad96b"
+    },
+    {
+      "logical_role": "final 28-slot replay capacity summary",
+      "sha256": "e055fd8ea58590ae45fa44c740d687307f74ef739d2d2e7d6683258183144b7b"
+    },
+    {
+      "logical_role": "final 28-slot replay acceptance review",
+      "sha256": "d8664a1dc4be94178bba248d2637c38898ef74a6dd031788a074311a3e24620e"
+    },
+    {
+      "logical_role": "native benchmark receipt",
+      "sha256": "de652b8d26d70c0ad33781e4eb5f5f331ccac2736196ed77ce26e6ed97527bed"
+    },
+    {
+      "logical_role": "native benchmark portable summary",
+      "sha256": "af9c0e1ca639677ea8e68fc47fd59a4a5c32c32314ef5536649f3e0f0a0c7143"
+    },
+    {
+      "logical_role": "native benchmark memory summary",
+      "sha256": "a2c8e8523987fc15b262e93722fbcc811dc242d3092372e6f5265f33dd8de151"
+    },
+    {
+      "logical_role": "native benchmark metadata",
+      "sha256": "3de84cd0a27c017677173b1b6ea93be409d923d6426f3b8454d0e0c5e020e417"
+    },
+    {
+      "logical_role": "native benchmark invocation",
+      "sha256": "905e264c99b6ed9e0b259177c985c177800827293ccf176a9fe85ce0fed41d54"
+    },
+    {
+      "logical_role": "native benchmark post-run state",
+      "sha256": "d06004feef273d03bf6bb745c0c7ac26ac86952dc046a7d0d1badaa112384942"
+    },
+    {
+      "logical_role": "native benchmark observer cleanup",
+      "sha256": "5b584f7b3a7ebf7fffe5d1fb5fdd8e0b02db15d5f4591af2f6dd6d6d2220be44"
+    },
+    {
+      "logical_role": "native benchmark traffic reconciliation",
+      "sha256": "ea08ebc1e97074df41da5ac28992365c04b1f019f44bd5242e6b84bb2d0d4557"
+    },
+    {
+      "logical_role": "native benchmark acceptance reconciliation",
+      "sha256": "4cdfcf900108b5d84f53fb92732eefe19ee91b64c8913f40139f44df4c4ab7da"
+    },
+    {
+      "logical_role": "post-benchmark four-rank identity",
+      "sha256": "fe3937187f2a37a55df7ac130f82ffaef5460bcd2c0c776333139026f7a0edc5"
+    },
+    {
+      "logical_role": "validated default E03 autostart selection",
+      "sha256": "355b2acd2b230c6ed2bfdfc19baff57a14b0caf068f98dcce75e464e7a6423e7"
+    }
+  ]
+}
