@@ -15,26 +15,30 @@ prefills**, measured with native [Rigmark](https://github.com/alexellis/rigmark)
 Frozen medians of **three complete runs: 162/162 requests**, zero measurement/runtime
 errors and 45/45 native output gates passing.
 
-| Workload | Current · 24/09/2026 E27 | Change vs previous [📊 23/09/2026 E22b](docs/benchmarks/baselines/2026-09-23-e22b.md) |
-| --- | ---: | ---: |
-| Code decode, one request | 55.11 tok/s | -2.65% |
-| Code C1, end-to-end | 44.38 tok/s | +6.61% |
-| Code C2, aggregate end-to-end | 64.95 tok/s | ≈ unchanged (-1.26%) |
-| Code C4, aggregate end-to-end | 95.51 tok/s | ≈ unchanged (-0.41%) |
-| Prose decode | 32.62 tok/s | -2.34% |
-| Code TTFT | 0.403 s | ≈ unchanged (+0.75%) |
-| Prose TTFT | 0.376 s | ≈ unchanged (+0.27%) |
-| C1 per-stream TTFT | 0.376 s | +6.82% |
-| C2 per-stream TTFT | 0.456 s | -5.39% |
-| C4 per-stream TTFT | 0.720 s | +38.20% |
-| Prefill 8K, cold | 2,609.3 tok/s | ≈ unchanged (-0.05%) |
-| Prefill 8K, replay | 9,589.5 tok/s | ≈ unchanged (-0.11%) |
-| Prefill 32K, cold | 2,779.9 tok/s | ≈ unchanged (+1.69%) |
-| Prefill 32K, replay | 37,652.9 tok/s | ≈ unchanged (-0.20%) |
-| Prefill 64K, cold | 2,690.4 tok/s | +2.95% |
-| Prefill 64K, replay | 40,046.3 tok/s | ≈ unchanged (-0.42%) |
+| Workload | Current · 24/09/2026 E27 | vs previous [📊 23/09/2026 E22b](docs/benchmarks/baselines/2026-09-23-e22b.md) frozen medians | vs same-day E22b control (LAN) |
+| --- | ---: | ---: | ---: |
+| Code decode, one request | 55.11 tok/s | 56.61 tok/s · -2.65% | 56.15 tok/s · ≈ unchanged (-1.85%) |
+| Code C1, end-to-end | 44.38 tok/s | 41.62 tok/s · +6.61% | 42.94 tok/s · +3.34% |
+| Code C2, aggregate end-to-end | 64.95 tok/s | 65.78 tok/s · ≈ unchanged (-1.26%) | 63.95 tok/s · ≈ unchanged (+1.57%) |
+| Code C4, aggregate end-to-end | 95.51 tok/s | 95.90 tok/s · ≈ unchanged (-0.41%) | 98.73 tok/s · -3.27% |
+| Prose decode | 32.62 tok/s | 33.40 tok/s · -2.34% | 33.37 tok/s · -2.25% |
+| Code TTFT | 0.403 s | 0.400 s · ≈ unchanged (+0.75%) | 0.390 s · +3.47% |
+| Prose TTFT | 0.376 s | 0.375 s · ≈ unchanged (+0.27%) | 0.373 s · ≈ unchanged (+0.67%) |
+| C1 per-stream TTFT | 0.376 s | 0.352 s · +6.82% | 0.365 s · +3.01% |
+| C2 per-stream TTFT | 0.456 s | 0.482 s · -5.39% | 0.463 s · ≈ unchanged (-1.41%) |
+| C4 per-stream TTFT | 0.720 s | 0.521 s · +38.20% | 0.533 s · +35.08% |
+| Prefill 8K, cold | 2,609.3 tok/s | 2,610.6 tok/s · ≈ unchanged (-0.05%) | 2,648.3 tok/s · ≈ unchanged (-1.47%) |
+| Prefill 8K, replay | 9,589.5 tok/s | 9,600.4 tok/s · ≈ unchanged (-0.11%) | 9,533.6 tok/s · ≈ unchanged (+0.59%) |
+| Prefill 32K, cold | 2,779.9 tok/s | 2,733.6 tok/s · ≈ unchanged (+1.69%) | 2,728.6 tok/s · ≈ unchanged (+1.88%) |
+| Prefill 32K, replay | 37,652.9 tok/s | 37,728.2 tok/s · ≈ unchanged (-0.20%) | 36,830.8 tok/s · +2.23% |
+| Prefill 64K, cold | 2,690.4 tok/s | 2,613.3 tok/s · +2.95% | 2,645.7 tok/s · ≈ unchanged (+1.69%) |
+| Prefill 64K, replay | 40,046.3 tok/s | 40,214.0 tok/s · ≈ unchanged (-0.42%) | 39,884.6 tok/s · ≈ unchanged (+0.41%) |
 
-Percentages use unrounded medians relative to the previous September 23 E22b baseline.
+The first comparison uses the frozen medians of the previous September 23 E22b baseline,
+measured through an SSH tunnel. The second uses the mean of two E22b control suites
+measured on the same day as E27, over the same direct LAN client path. It is the fairer
+reference for differences of a few percent: for example C4 is −3.3% against it, and the
+frozen comparison hides that. Percentages use unrounded values.
 “≈ unchanged” marks owner-accepted changes of roughly 1–2%, with the exact delta
 retained; it does not establish statistical equivalence.
 Higher throughput and lower TTFT are better. C1/C2/C4 mean one, two or four concurrent
@@ -58,13 +62,11 @@ for the whole prefill. A new Rigmark phase measures exactly that case:
 The owner accepted the cost: requests that arrive while others generate wait longer for
 their first token.
 
-- **C4 per-stream TTFT:** +35% against two same-day control runs of E22b.
-- **C4 throughput:** -3.3% against the same control.
-- **Client path:** this baseline was measured over direct LAN HTTP, the previous one
-  through an SSH tunnel. C1 and the smaller decode differences are closer to the same-day
-  control, which the
-  [current benchmark report](docs/benchmarks/baselines/2026-09-24-e27.md) lists next to
-  all 16 metrics, together with the interference phase, counts and limitations.
+- **C4 per-stream TTFT:** +35% against the same-day control.
+- **C4 throughput:** −3.3% against the same control.
+- **Details:** the [current benchmark report](docs/benchmarks/baselines/2026-09-24-e27.md)
+  lists both comparisons with per-run values, the interference phase, counts and
+  limitations.
 
 The graphs compare current and previous medians side by side, with each delta calculated
 against the previous September 23 E22b baseline. Click an image for its SVG version.

@@ -131,6 +131,10 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- The README performance table now shows two comparisons for every metric: against the
+  frozen E22b medians, as before, and against the same-day E22b control over the same
+  LAN client path. The frozen comparison alone hid the C4 cost (−3.3%) and overstated
+  C1 (+6.6% frozen against +3.3% same-day).
 - Made E27 the default IaC recipe: `cluster.env.example` adds the image's native
   `--prefill-schedule-interval 8`.
   - While requests are in decode, prefill runs on one engine step in eight, with
