@@ -5,7 +5,7 @@ artifacts for the four cluster hosts. Nothing in this directory runs merely beca
 it exists in the repository; deploy, bootstrap, launcher, and configuration choices
 select the files explicitly.
 
-The base configuration is the [accepted September 23 E22b recipe](../../docs/historical_benchmarks/baselines/2026-09-23-e22b/baseline.json).
+The base configuration is the [accepted September 24 E27 recipe](../../docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json).
 The previous E03 reference, the earlier September 19 base, September 18 and September 11 remain historical references with their own
 rollback assets; the September 12 filenames below belong to the September 11
 reference's later capture.
@@ -44,7 +44,8 @@ reference's later capture.
 | shared `scripts/node/etc/common/` files | `/etc/sysctl.d/`, `/etc/sudoers.d/`, `/usr/local/sbin/`, `/etc/systemd/system/` | bootstrap/deploy-host |
 | GRUB drop-in | `/etc/default/grub.d/zz-tp4-perf.cfg` | bootstrap/deploy-host and `tp4-iommu.sh` |
 | built NCCL library | `$NCCL_DIR/libnccl.so.2` | `scripts/node/nccl/install-nccl.sh` |
-| E21 reference overlay selected through `TP4_ENV` (immediate rollback) | `~/tp4/scripts/node/reference/baseline-20260923-e21.env` | `scripts/deploy.sh` |
+| E22b reference overlay selected through `TP4_ENV` (immediate rollback) | `~/tp4/scripts/node/reference/baseline-20260924-e22b.env` | `scripts/deploy.sh` |
+| E21 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260923-e21.env` | `scripts/deploy.sh` |
 | E03 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260919-e03.env` | `scripts/deploy.sh` |
 | September 19 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260919.env` | `scripts/deploy.sh` |
 | September 18 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260918.env` | `scripts/deploy.sh` |
@@ -116,11 +117,15 @@ not distribute unlicensed operator payload automatically.
 `SPARKCACHE_CONNECTOR_SHA256` and `SPARKCACHE_ENCODER_SHA256` pin the selected
 modules, and `SPARKCACHE_CONFIG_SHA256` pins the tracked JSON. Keep those values
 consistent with `sparkcache/SHA256SUMS`. Preserve the JSON's measured cache namespace
-when reproducing the Current recipe: its E22b JSON is
+when reproducing the Current recipe: its E22b JSON, which E27 keeps unchanged, is
 `experiments/e03/drafter-w8a16/kv-transfer-config-e22b.json`, separate from the E21, E03
 and earlier cache computations, and its spelling is part of the hash.
 
-For the immediate return to E21, use
+For the immediate return to E22b, use
+[`reference/baseline-20260924-e22b.env`](reference/baseline-20260924-e22b.env). It removes
+only the E27 `--prefill-schedule-interval 8` engine argument.
+
+For the return to E21, use
 [`reference/baseline-20260923-e21.env`](reference/baseline-20260923-e21.env). It restores
 the vendor drafter and the E21 cache namespace and removes the E22 override, module and
 flags.
@@ -188,4 +193,4 @@ The first three inspect deployed nodes and require site configuration. The final
 command is fully offline and validates source syntax, manifests, templates, links,
 fixtures, the adaptive-k policy, hybrid dispatch contracts, and payload preparation
 without SSH, Docker, a GPU, or `cluster.env`. Offline checks do not constitute a new
-live deployment of the accepted E22b defaults.
+live deployment of the accepted E27 defaults.

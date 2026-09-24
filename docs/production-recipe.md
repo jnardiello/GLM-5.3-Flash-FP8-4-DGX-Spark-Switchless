@@ -5,23 +5,26 @@ one-step rollback comments live in [`cluster.env.example`](../cluster.env.exampl
 host/software pins live in `scripts/node/bootstrap/versions.env`, model file manifests
 in `scripts/node/model-manifests/`, and NCCL pins in `scripts/node/nccl/`.
 
-The **Current** recipe is the [accepted September 23 E22b reference](historical_benchmarks/baselines/2026-09-23-e22b/baseline.json):
+The **Current** recipe is the [accepted September 24 E27 reference](historical_benchmarks/baselines/2026-09-24-e27/baseline.json):
 R10, SIRCL, hybrid KDA, E03 mHC prefill sharding, SparkCache replay views,
 batch-uniform adaptive verification capped by the effective draft budget, E21
-8-bit residual attention projections and E22b 8-bit DFlash2 drafter linears. It retains 15 GiB KV per rank and the
+8-bit residual attention projections, E22b 8-bit DFlash2 drafter linears and the E27
+prefill cadence (`--prefill-schedule-interval 8`). It retains 15 GiB KV per rank and the
 262,144-token context limit. `cluster.env.example` encodes these values directly,
 without an experiment overlay.
 
 The performance reference contains three complete native Rigmark suites / 162 requests
 measured on one retained candidate load. By owner decision the promotion used
 four-rank launcher-command parity with that measured candidate instead of a separate
-reproduction run; the [promotion record](historical_benchmarks/baselines/2026-09-23-e22b/promotion.json)
+reproduction run; the [promotion record](historical_benchmarks/baselines/2026-09-24-e27/promotion.json)
 records the parity and live identity checks.
 
-The [previous E21 reference](historical_benchmarks/baselines/2026-09-23-e21/baseline.json)
+The [previous E22b reference](historical_benchmarks/baselines/2026-09-23-e22b/baseline.json)
 remains frozen at three suites / 162 requests. Its complete return is
-[`baseline-20260923-e21.env`](../scripts/node/reference/baseline-20260923-e21.env), the
-immediate rollback. The [E03 reference](historical_benchmarks/baselines/2026-09-19-e03/baseline.json)
+[`baseline-20260924-e22b.env`](../scripts/node/reference/baseline-20260924-e22b.env), the
+immediate rollback. The [E21 reference](historical_benchmarks/baselines/2026-09-23-e21/baseline.json)
+and its complete return [`baseline-20260923-e21.env`](../scripts/node/reference/baseline-20260923-e21.env),
+the [E03 reference](historical_benchmarks/baselines/2026-09-19-e03/baseline.json)
 and its complete return [`baseline-20260919-e03.env`](../scripts/node/reference/baseline-20260919-e03.env)
 also remain available.
 The [earlier September 19 base](historical_benchmarks/baselines/2026-09-19/baseline.json)
@@ -46,6 +49,7 @@ September 12 filenames identify the later capture of the September 11 recipe.
 | Drafter | pinned `incoai/GLM-5.3-Flash-DFlash2` | fused speculative draft; non-commercial upstream terms apply |
 | Expert kernels | vLLM Triton FP8 MoE with the GB10-specific JSON in `scripts/node/moe-configs/` | loads the selected platform configuration for the Triton backend |
 | Speculation policy | `scripts/node/experiments/e03/draft-budget/adaptive_k_scheduler.py` in `batch-uniform` mode | adaptive length capped by the same `SchedulerOutput` draft budget used by the worker |
+| Prefill cadence | native engine argument `--prefill-schedule-interval 8` (E27) | while requests decode, prefill runs on one step in eight so running requests keep generating during another request's long prefill |
 | Sparse attention | `scripts/node/sparse_attn_indexer_kpool_sm121.py` (September 11 recipe only) | SM121 K-pool compatibility patch bind-mounted over the image module when `SPARKCACHE_MODE=off`; the R10 image ships its own |
 | Host tier | pinned kernel/packages and `iommu.passthrough=1` | verified host baseline; owned by `scripts/node/bootstrap/` and `scripts/node/host/` |
 | Collectives | host-preloaded patched NCCL | prevents uncabled tree connections and uses the physical ring |
@@ -155,6 +159,22 @@ plus one appended, flag-gated load hook. Each rank logs `E22_DRAFTER_W8A16_READY
 modules; drafter weights drop from 540 MiB to 274 MiB per rank. The target model verifies
 every drafted token, so the drafter's precision affects acceptance, which stayed close to
 E21, rather than the generated tokens.
+
+E27 adds the image's native `--prefill-schedule-interval 8` and changes scheduling only.
+
+- **How it works.** While requests are in decode, the engine admits prefill work on one
+  step in eight and runs decode-only steps, on full decode CUDA graphs, in between.
+- **Why.** Without it, a step that carries a long prompt's prefill chunk (up to 8,192
+  tokens, about 2.5 s) is the only step in which running requests advance. Another
+  client's 32K cold prompt then holds them at about 1.5 tokens per second for 14 s.
+- **Effect.** With the cadence, running requests keep 6–11 tokens per second during that
+  prefill. The arriving request's first token comes 15–37% later.
+- **What is unaffected.**
+  - A prefill with no running decode is unchanged.
+  - The engine stops deferring while requests wait in the queue, so several long prompts
+    that arrive together behave as before.
+- **Cost in the standard suite.** C4, whose streams start together, pays +35% per-stream
+  TTFT and -3% throughput against a same-day control. The owner accepted that trade-off.
 
 The KV pool is **15 GiB per rank**, compared with 16 GiB in the September 18 and
 September 11 references. The configured per-request context limit remains
@@ -277,7 +297,10 @@ must use its own `spark_cache_root`. Unchanged checkpoint hashes do not establis
 compatibility when weights are converted in memory. Keep the original cache for rollback;
 update the variant's config hash and manifest together with its separate cache path.
 
-The immediate rollback, [`baseline-20260923-e21.env`](../scripts/node/reference/baseline-20260923-e21.env),
+The immediate rollback, [`baseline-20260924-e22b.env`](../scripts/node/reference/baseline-20260924-e22b.env),
+restores the complete E22b recipe: everything above without the prefill cadence. E27 keeps
+the E22b cache namespace because it changes no cached state.
+[`baseline-20260923-e21.env`](../scripts/node/reference/baseline-20260923-e21.env)
 restores the complete E21 recipe: the vendor drafter, no E22 module or flags and the E21
 cache namespace. [`baseline-20260919-e03.env`](../scripts/node/reference/baseline-20260919-e03.env)
 restores the complete E03 recipe: the E03 hook source and cache namespace, without the
@@ -326,6 +349,8 @@ Generated-code quality audits remain separate from performance acceptance.
   four-node target.
 - DFlash2 drafts a block in one pass, avoiding sequential MTP draft steps on this engine.
 - Triton FP8 MoE uses the versioned GB10 configuration without changing model weights.
+- The prefill cadence keeps running requests generating while another request
+  prefills a long prompt, at the cost of that request's first token.
 - Adaptive verification selects the low or high length per step from the batched
   requests' history; one length per step keeps decode on full CUDA graphs under
   concurrency.
@@ -342,31 +367,38 @@ Generated-code quality audits remain separate from performance acceptance.
 
 ## Qualification and reproduction
 
-The [current reference](historical_benchmarks/baselines/2026-09-23-e22b/baseline.json)
+The [current reference](historical_benchmarks/baselines/2026-09-24-e27/baseline.json)
 uses exactly three complete native Rigmark suites / 162 requests on one retained
-candidate load. All streams completed visibly, with zero measurement/protocol/runtime
-errors, 45/45 native output gates and 54/54 prefill token counts passing. Both
-functional gates passed after the candidate boot. Runtime sources, graph settings,
-cache, memory instrumentation and the four serving processes were retained across the
-suites.
+candidate load, measured over direct LAN HTTP. All streams completed visibly, with zero
+measurement/protocol/runtime errors, 45/45 native output gates and 54/54 prefill token
+counts passing. Both functional gates passed after the candidate boot. Runtime sources,
+graph settings, cache and the four serving processes were retained across the Rigmark
+interference phase and the suites.
 
-Against E21, code decode rises 3.03%, C1 2.23% and prose 2.97% with no primary
-throughput regression; C4 is unchanged. Matched probes found no C1 first-token or 8K
-cold prefill drawback. See the [dated report](benchmarks/baselines/2026-09-23-e22b.md)
-for all 16 metrics, exact deltas, variability, the matched probes, memory, counts and
-limits.
+Against two same-day E22b control suites over the same client path:
+- C4 per-stream TTFT +35% and C4 -3.3%;
+- code and prose decode about -2%, not separable from run variation;
+- prefill, replay, C1 and C2 unchanged.
 
-The [promotion record](historical_benchmarks/baselines/2026-09-23-e22b/promotion.json)
-records the owner's decision to promote without a separate reproduction run, the
-four-rank launcher-command parity between the encoded default and the measured
-candidate, and the live identity check. Follow the
+In the interference phase, running requests decode 3–5× faster while another request
+cold-prefills 8K or 32K tokens. See the [dated report](benchmarks/baselines/2026-09-24-e27.md)
+for all 16 metrics, both comparisons, the interference table, counts and limits.
+
+The [promotion record](historical_benchmarks/baselines/2026-09-24-e27/promotion.json)
+records:
+- the owner's decision to promote without a separate reproduction run;
+- the four-rank launcher-command parity between the encoded default and the measured
+  candidate;
+- the coordinated restart that applied the default, since the measured load had been
+  replaced by the same-day control;
+- the live identity check. Follow the
 [coordinated migration](operations.md#migrate-the-accepted-overlay-to-defaults) when a
 default must be applied to a stack loaded from an overlay.
 
 The performance figures describe inference, not complete agent tasks. Concurrency
 requests have 256-token outputs; long code decode excludes TTFT. The context limit is
 262,144 tokens with 15 GiB KV per rank. Sampled free memory is not guaranteed headroom,
-and observer overhead was not isolated. No answer-quality audit is a performance gate.
+and observer overhead was not isolated; E27's window did not sample host memory. No answer-quality audit is a performance gate.
 
 ## Security and licensing boundary
 

@@ -334,7 +334,8 @@ per node and eight successful jumbo pings; `/health` reaches 200; all runtime
 signatures in [`operations.md`](operations.md) are present, including the mHC flag,
 replay connector pin, draft-budget scheduler startup marker and the
 `E21_BF16_RESIDUE_W8A16_READY` line with 67 modules and the `E22_DRAFTER_W8A16_READY`
-line with 30 modules on every rank. All E21 and E22b sources are tracked in the checkout
+line with 30 modules on every rank, and `--prefill-schedule-interval 8` in every rank's
+command (E27). All E21, E22b and E27 sources are tracked in the checkout
 and need no extra operator payload. Run the
 [post-boot functional gates](operations.md#post-boot-functional-gates) within two
 minutes of readiness, then verify the accepted identity with `./scripts/check-f0.py`.

@@ -1,0 +1,451 @@
+{
+  "schema": 1,
+  "record_type": "diagnostic_not_benchmark",
+  "tool": "private diagnostic reusing the frozen Rigmark client and prefill prompt construction",
+  "note": "Cold prompts built from the repetitive prefill unit; drafter acceptance was about 97%, so absolute decode rates exceed real workloads. Only comparisons between depths and variants are meaningful.",
+  "e22b_all_depths": {
+    "summary": {
+      "c1@128": {
+        "requests": 3,
+        "decode_tps_median_per_stream": 75.42,
+        "ttft_median_s": 0.346
+      },
+      "c1@8192": {
+        "requests": 3,
+        "decode_tps_median_per_stream": 77.75,
+        "ttft_median_s": 3.094
+      },
+      "c1@32768": {
+        "requests": 3,
+        "decode_tps_median_per_stream": 80.55,
+        "ttft_median_s": 11.708
+      },
+      "c1@65536": {
+        "requests": 3,
+        "decode_tps_median_per_stream": 79.55,
+        "ttft_median_s": 24.069
+      },
+      "c4@128": {
+        "requests": 8,
+        "decode_tps_median_per_stream": 36.05,
+        "ttft_median_s": 0.566
+      },
+      "c4@32768": {
+        "requests": 8,
+        "decode_tps_median_per_stream": 12.61,
+        "ttft_median_s": 35.881
+      }
+    },
+    "rows": [
+      {
+        "label": "c1",
+        "depth": 128,
+        "streams": 1,
+        "rep": 1,
+        "ttft_seconds": 0.307167,
+        "decode_tokens_per_second": 74.112,
+        "completion_tokens": 256,
+        "prompt_tokens": 128,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c1",
+        "depth": 128,
+        "streams": 1,
+        "rep": 2,
+        "ttft_seconds": 0.34571,
+        "decode_tokens_per_second": 75.417,
+        "completion_tokens": 256,
+        "prompt_tokens": 128,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c1",
+        "depth": 128,
+        "streams": 1,
+        "rep": 3,
+        "ttft_seconds": 0.348515,
+        "decode_tokens_per_second": 76.047,
+        "completion_tokens": 256,
+        "prompt_tokens": 128,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c1",
+        "depth": 8192,
+        "streams": 1,
+        "rep": 1,
+        "ttft_seconds": 3.540231,
+        "decode_tokens_per_second": 77.75,
+        "completion_tokens": 256,
+        "prompt_tokens": 8192,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c1",
+        "depth": 8192,
+        "streams": 1,
+        "rep": 2,
+        "ttft_seconds": 3.081214,
+        "decode_tokens_per_second": 78.958,
+        "completion_tokens": 256,
+        "prompt_tokens": 8192,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c1",
+        "depth": 8192,
+        "streams": 1,
+        "rep": 3,
+        "ttft_seconds": 3.09354,
+        "decode_tokens_per_second": 75.479,
+        "completion_tokens": 256,
+        "prompt_tokens": 8192,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c1",
+        "depth": 32768,
+        "streams": 1,
+        "rep": 1,
+        "ttft_seconds": 12.242639,
+        "decode_tokens_per_second": 79.289,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c1",
+        "depth": 32768,
+        "streams": 1,
+        "rep": 2,
+        "ttft_seconds": 11.707814,
+        "decode_tokens_per_second": 80.604,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c1",
+        "depth": 32768,
+        "streams": 1,
+        "rep": 3,
+        "ttft_seconds": 11.66584,
+        "decode_tokens_per_second": 80.546,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c1",
+        "depth": 65536,
+        "streams": 1,
+        "rep": 1,
+        "ttft_seconds": 24.06871,
+        "decode_tokens_per_second": 82.397,
+        "completion_tokens": 256,
+        "prompt_tokens": 65536,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c1",
+        "depth": 65536,
+        "streams": 1,
+        "rep": 2,
+        "ttft_seconds": 23.710423,
+        "decode_tokens_per_second": 79.549,
+        "completion_tokens": 256,
+        "prompt_tokens": 65536,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c1",
+        "depth": 65536,
+        "streams": 1,
+        "rep": 3,
+        "ttft_seconds": 24.260526,
+        "decode_tokens_per_second": 75.592,
+        "completion_tokens": 256,
+        "prompt_tokens": 65536,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 128,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 0.659987,
+        "decode_tokens_per_second": 36.251,
+        "completion_tokens": 256,
+        "prompt_tokens": 128,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 128,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 0.660485,
+        "decode_tokens_per_second": 36.249,
+        "completion_tokens": 256,
+        "prompt_tokens": 128,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 128,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 0.659912,
+        "decode_tokens_per_second": 36.25,
+        "completion_tokens": 256,
+        "prompt_tokens": 128,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 128,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 0.659396,
+        "decode_tokens_per_second": 35.702,
+        "completion_tokens": 256,
+        "prompt_tokens": 128,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 128,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 0.471476,
+        "decode_tokens_per_second": 35.849,
+        "completion_tokens": 256,
+        "prompt_tokens": 128,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 128,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 0.472285,
+        "decode_tokens_per_second": 36.401,
+        "completion_tokens": 256,
+        "prompt_tokens": 128,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 128,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 0.471536,
+        "decode_tokens_per_second": 35.85,
+        "completion_tokens": 256,
+        "prompt_tokens": 128,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 128,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 0.471017,
+        "decode_tokens_per_second": 35.851,
+        "completion_tokens": 256,
+        "prompt_tokens": 128,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 30.78049,
+        "decode_tokens_per_second": 9.35,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 42.287362,
+        "decode_tokens_per_second": 15.834,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 52.861711,
+        "decode_tokens_per_second": 44.574,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 16.474714,
+        "decode_tokens_per_second": 6.186,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 40.981565,
+        "decode_tokens_per_second": 16.016,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 15.025786,
+        "decode_tokens_per_second": 6.187,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 51.410624,
+        "decode_tokens_per_second": 43.857,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 29.590215,
+        "decode_tokens_per_second": 9.393,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      }
+    ]
+  },
+  "e27_four_simultaneous_32k": {
+    "summary": {
+      "c4@32768": {
+        "requests": 8,
+        "decode_tps_median_per_stream": 12.04,
+        "ttft_median_s": 35.149,
+        "ms_per_step_median": 657.75,
+        "acceptance_median": 0.9824
+      }
+    },
+    "rows": [
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 16.014714,
+        "decode_tokens_per_second": 6.228,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 29.782024,
+        "decode_tokens_per_second": 9.112,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 55.098837,
+        "decode_tokens_per_second": 56.492,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 1,
+        "ttft_seconds": 40.938857,
+        "decode_tokens_per_second": 14.962,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 15.2381,
+        "decode_tokens_per_second": 6.178,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 28.938906,
+        "decode_tokens_per_second": 9.06,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 54.470873,
+        "decode_tokens_per_second": 57.158,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      },
+      {
+        "label": "c4",
+        "depth": 32768,
+        "streams": 4,
+        "rep": 2,
+        "ttft_seconds": 40.515307,
+        "decode_tokens_per_second": 15.259,
+        "completion_tokens": 256,
+        "prompt_tokens": 32768,
+        "finish_reason": "length"
+      }
+    ]
+  }
+}

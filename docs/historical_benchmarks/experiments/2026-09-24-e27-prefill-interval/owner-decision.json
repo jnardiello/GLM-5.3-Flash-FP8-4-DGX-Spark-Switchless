@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-24-e27-prefill-interval",
+  "date": "2026-09-24",
+  "decision": "promote",
+  "statement": "The owner accepted E27 as the new baseline after reviewing the standard suites, the same-day LAN control, the interference phase and the four-simultaneous-32K diagnostic.",
+  "accepted_trade_off": "Requests that arrive while others decode wait longer for their first token (C4 per-stream TTFT +35% against the same-day control; a long context arriving next to decoding agents +15-37%), in exchange for running agents decoding 3-5x faster during another request's long cold prefill.",
+  "follow_up": "E27b: apply the cadence only to prefills with at least 2,048 remaining tokens."
+}

@@ -7,6 +7,16 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Published the September 24 E27 frozen baseline, its promotion record and the E27
+  experiment records.
+  - Frozen baseline: three native suites, 162 requests.
+  - Experiment records: per-suite extracts; two same-day E22b control suites over the same
+    LAN client path; the Rigmark interference extract; the long-context diagnostic; and
+    the owner decision.
+  - Reports, the benchmark index, README figures comparing E27 with E22b, and the updated
+    recipe, operations, installation and node guides.
+- Added `scripts/node/reference/baseline-20260924-e22b.env`, the complete E22b recipe, as the
+  one-step rollback from E27.
 - Archived the discarded E23 experiment. It gave the DFlash2 drafter an INT8 copy of the
   shared `lm_head` and a hybrid INT8/BF16 `fc` projection. The archive holds its report and
   portable numeric extract, and the benchmark index has a new row for it.
@@ -121,6 +131,18 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- Made E27 the default IaC recipe: `cluster.env.example` adds the image's native
+  `--prefill-schedule-interval 8`.
+  - While requests are in decode, prefill runs on one engine step in eight, with
+    decode-only steps in between.
+  - In Rigmark's interference phase, running requests decode 3–5× faster while another
+    request cold-prefills 8–32K tokens: 1.4–2.2 → 6.1–11.5 tok/s. That request's first
+    token comes 15–37% later.
+  - Against a same-day E22b control, C4 per-stream TTFT is +35% and C4 throughput -3.3%;
+    the owner accepted that trade-off.
+  - `scripts/check-f0.py` now selects the E27 reference and checks the argument in the
+    effective recipe and in every rank's command. Records before E27 require its absence.
+  - The candidate overlay is retired from the tree; its hash is in the promotion record.
 - Made E22b the default IaC recipe: the drafter override `qwen3_dflash2.py` and
   `e22_drafter_w8a16.py` are mounted from `experiments/e03/drafter-w8a16/`, the default sets
   `VLLM_E22_DRAFTER_W8A16=1` and `VLLM_E22_CONTEXT_KV_W8A16=0`, and SparkCache uses the E22b

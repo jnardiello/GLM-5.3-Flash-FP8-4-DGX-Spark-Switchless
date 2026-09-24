@@ -146,7 +146,7 @@ def probe(rank: int) -> dict:
         "--master-addr", "--master-port",
         "--max-model-len", "--max-num-seqs", "--max-num-batched-tokens",
         "--kv-cache-dtype", "--scheduler-cls", "--moe-backend",
-        "--kv-cache-memory-bytes",
+        "--kv-cache-memory-bytes", "--prefill-schedule-interval",
     )
     remote = {
         "errors": [],
@@ -385,6 +385,8 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
         rec[name] = " ".join(f"-e {key}={value}" for key, value in exp["adaptive_env"].items())
     for name in ("extra_vllm_args", "base_extra_vllm_args"):
         rec[name] = rec[name].replace("17179869184", exp["kv_cache_memory_bytes"])
+        if exp["prefill_schedule_interval"] != "1":
+            rec[name] += " --prefill-schedule-interval " + exp["prefill_schedule_interval"]
     ranks = [probe(rank) for rank in range(4)]
     identity = exp["runtime_identity"]
     for rank, item in enumerate(ranks):
@@ -392,6 +394,7 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
         c.update(image_reference=rec["image"], image_digests=[exp["image_digest"]],
                  image_id=exp["image_id"], runtime_files=deepcopy(identity.get("container_file_sha256", {})))
         c["options"]["--kv-cache-memory-bytes"] = [exp["kv_cache_memory_bytes"]]
+        c["options"]["--prefill-schedule-interval"] = check.interval_flag(exp)
         c["environment"].update(exp["adaptive_env"])
         c["environment"].update(identity.get("environment", {}))
         c["runtime_workers"] = [{"pid": 100 + rank, "patched_nccl_loaded": True}]
@@ -408,14 +411,29 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
     return rec, exp, ranks
 
 
-assert check.BASELINE == BASELINES / "2026-09-23-e22b/baseline.json"
-for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21", "2026-09-23-e22b"):
+assert check.BASELINE == BASELINES / "2026-09-24-e27/baseline.json"
+HISTORICAL = ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21",
+              "2026-09-23-e22b", "2026-09-24-e27")
+for name in HISTORICAL:
     baseline_path = BASELINES / name / "baseline.json"
     baseline_recipe, baseline_expected, baseline_ranks = baseline_fixture(baseline_path)
     assert check.evaluate(baseline_recipe, baseline_expected, baseline_ranks, endpoint()) == [], name
+    # Records before E27 ran without the cadence and must refuse it; E27 requires it.
+    assert baseline_expected["prefill_schedule_interval"] == ("8" if name == "2026-09-24-e27" else "1"), name
 
 current_recipe, current_expected, current_ranks = baseline_fixture(check.BASELINE)
-assert current_expected["baseline_id"] == "2026-09-23-e22b"
+assert current_expected["baseline_id"] == "2026-09-24-e27"
+assert current_expected["prefill_schedule_interval"] == "8"
+for bad in ("", " --prefill-schedule-interval 4"):
+    wrong_interval = deepcopy(current_recipe)
+    wrong_interval["extra_vllm_args"] = wrong_interval["extra_vllm_args"].replace(
+        " --prefill-schedule-interval 8", bad)
+    assert "baseline prefill schedule interval" in check.recipe_problems(wrong_interval, current_expected), bad
+for bad in ([], ["4"], ["8", "8"]):
+    wrong_live_interval = deepcopy(current_ranks)
+    wrong_live_interval[1]["remote"]["container"]["options"]["--prefill-schedule-interval"] = bad
+    assert "rank 1: command --prefill-schedule-interval" in check.evaluate(
+        current_recipe, current_expected, wrong_live_interval, endpoint()), bad
 assert current_expected["runtime_identity"]["e21_boot_receipt"]["modules"] == 67
 assert current_expected["runtime_identity"]["e22_boot_receipt"]["modules"] == 30
 assert current_expected["runtime_identity"]["e22_boot_receipt"]["context_kv_w8a16"] is False
@@ -503,7 +521,7 @@ assert "rank 0: running image content ID" in check.evaluate(
 original_load = check.load_recipe
 try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-selection.") as temp:
-        for name in ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21", "2026-09-23-e22b"):
+        for name in HISTORICAL:
             path = BASELINES / name / "baseline.json"
             rec, exp, ranks = baseline_fixture(path)
             check.load_recipe = lambda timeout: (deepcopy(rec), {"returncode": 0})
@@ -527,6 +545,7 @@ try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-overlay.") as temp:
         isolated = Path(temp)
         for relative in ("scripts/lib/common.sh", "scripts/node/bootstrap/versions.env",
+                         "scripts/node/reference/baseline-20260924-e22b.env",
                          "scripts/node/reference/baseline-20260923-e21.env",
                          "scripts/node/reference/baseline-20260919-e03.env",
                          "scripts/node/reference/baseline-20260919.env",
@@ -543,7 +562,8 @@ RELAY_DEST=operator@192.0.2.23
 '''
         check.REPO = isolated
         for overlay, baseline in (
-            (None, "2026-09-23-e22b"),
+            (None, "2026-09-24-e27"),
+            ("scripts/node/reference/baseline-20260924-e22b.env", "2026-09-23-e22b"),
             ("scripts/node/reference/baseline-20260923-e21.env", "2026-09-23-e21"),
             ("scripts/node/reference/baseline-20260919-e03.env", "2026-09-19-e03"),
             ("scripts/node/reference/baseline-20260919.env", "2026-09-19"),
@@ -564,10 +584,20 @@ RELAY_DEST=operator@192.0.2.23
             problems = check.recipe_problems(effective, selected)
             assert problems == [], (baseline, problems)
             if overlay:
-                assert effective["extra_docker_env"] != effective["base_extra_docker_env"]
-                if baseline in ("2026-09-23-e21", "2026-09-19-e03"):
-                    # Same KV and mHC as E22b; the cache namespace pin is what differs.
-                    assert effective["extra_vllm_args"] == effective["base_extra_vllm_args"]
+                # Every historical return drops the E27 cadence from the current base.
+                assert "baseline prefill schedule interval" in check.recipe_problems(
+                    effective, current_expected), baseline
+                if baseline == "2026-09-23-e22b":
+                    # E27 only adds the cadence: same mounts, same cache namespace.
+                    assert effective["extra_docker_env"] == effective["base_extra_docker_env"]
+                    assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]
+                else:
+                    assert effective["extra_docker_env"] != effective["base_extra_docker_env"]
+                if baseline == "2026-09-23-e22b":
+                    pass
+                elif baseline in ("2026-09-23-e21", "2026-09-19-e03"):
+                    # Same KV and mHC as E22b; the cache namespace pin also differs.
+                    assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]
                     assert "baseline payload pin: sparkcache_config_sha256" in check.recipe_problems(
                         effective, current_expected)
                 elif baseline == "2026-09-19":

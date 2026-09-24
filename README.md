@@ -10,31 +10,31 @@ contains the infrastructure as code, runtime patches, and guides to
 
 ## Measured performance
 
-Current accepted baseline: **23/09/2026 · E22b, 8-bit weights for the DFlash2
-drafter**, measured with native [Rigmark](https://github.com/alexellis/rigmark).
+Current accepted baseline: **24/09/2026 · E27, decode-only steps while another request
+prefills**, measured with native [Rigmark](https://github.com/alexellis/rigmark).
 Frozen medians of **three complete runs: 162/162 requests**, zero measurement/runtime
 errors and 45/45 native output gates passing.
 
-| Workload | Current · 23/09/2026 E22b | Change vs previous [📊 23/09/2026 E21](docs/benchmarks/baselines/2026-09-23-e21.md) |
+| Workload | Current · 24/09/2026 E27 | Change vs previous [📊 23/09/2026 E22b](docs/benchmarks/baselines/2026-09-23-e22b.md) |
 | --- | ---: | ---: |
-| Code decode, one request | 56.61 tok/s | +3.03% |
-| Code C1, end-to-end | 41.62 tok/s | +2.23% |
-| Code C2, aggregate end-to-end | 65.78 tok/s | ≈ unchanged (+1.63%) |
-| Code C4, aggregate end-to-end | 95.90 tok/s | ≈ unchanged (+0.39%) |
-| Prose decode | 33.40 tok/s | +2.97% |
-| Code TTFT | 0.400 s | +3.36% |
-| Prose TTFT | 0.375 s | ≈ unchanged (-1.06%) |
-| C1 per-stream TTFT | 0.352 s | ≈ unchanged (+0.57%) |
-| C2 per-stream TTFT | 0.482 s | +4.78% |
-| C4 per-stream TTFT | 0.521 s | -4.05% |
-| Prefill 8K, cold | 2,610.6 tok/s | ≈ unchanged (-1.29%) |
-| Prefill 8K, replay | 9,600.4 tok/s | ≈ unchanged (-0.71%) |
-| Prefill 32K, cold | 2,733.6 tok/s | ≈ unchanged (+0.02%) |
-| Prefill 32K, replay | 37,728.2 tok/s | ≈ unchanged (-0.26%) |
-| Prefill 64K, cold | 2,613.3 tok/s | ≈ unchanged (-1.38%) |
-| Prefill 64K, replay | 40,214.0 tok/s | ≈ unchanged (+0.27%) |
+| Code decode, one request | 55.11 tok/s | -2.65% |
+| Code C1, end-to-end | 44.38 tok/s | +6.61% |
+| Code C2, aggregate end-to-end | 64.95 tok/s | ≈ unchanged (-1.26%) |
+| Code C4, aggregate end-to-end | 95.51 tok/s | ≈ unchanged (-0.41%) |
+| Prose decode | 32.62 tok/s | -2.34% |
+| Code TTFT | 0.403 s | ≈ unchanged (+0.75%) |
+| Prose TTFT | 0.376 s | ≈ unchanged (+0.27%) |
+| C1 per-stream TTFT | 0.376 s | +6.82% |
+| C2 per-stream TTFT | 0.456 s | -5.39% |
+| C4 per-stream TTFT | 0.720 s | +38.20% |
+| Prefill 8K, cold | 2,609.3 tok/s | ≈ unchanged (-0.05%) |
+| Prefill 8K, replay | 9,589.5 tok/s | ≈ unchanged (-0.11%) |
+| Prefill 32K, cold | 2,779.9 tok/s | ≈ unchanged (+1.69%) |
+| Prefill 32K, replay | 37,652.9 tok/s | ≈ unchanged (-0.20%) |
+| Prefill 64K, cold | 2,690.4 tok/s | +2.95% |
+| Prefill 64K, replay | 40,046.3 tok/s | ≈ unchanged (-0.42%) |
 
-Percentages use unrounded medians relative to the previous September 23 E21 baseline.
+Percentages use unrounded medians relative to the previous September 23 E22b baseline.
 “≈ unchanged” marks owner-accepted changes of roughly 1–2%, with the exact delta
 retained; it does not establish statistical equivalence.
 Higher throughput and lower TTFT are better. C1/C2/C4 mean one, two or four concurrent
@@ -43,22 +43,35 @@ to first token. Concurrency outputs cap at 256 tokens; long decode allows 8,192.
 Cold prefill uses a fresh cache salt per run. These are inference measurements,
 not complete agent-task timings.
 
-E22b converts 30 linears of the speculative drafter to 8-bit weights and keeps its
-context K/V projection in BF16. Code decode, C1 and prose improve in every run beyond
-the previous baseline's range, with no primary throughput regression. Concurrent
-first-token times move in engine-step units in both baselines; matched 30-request and
-10-request probes found no C1 first-token or 8K cold prefill drawback against E21.
-The [current benchmark report](docs/benchmarks/baselines/2026-09-23-e22b.md) compares
-all 16 metrics with the previous baseline and records variability, memory, counts,
-the matched probes and limitations. The measured processes remain in service: the
-encoded default produces the same launcher command on all four ranks.
+E27 adds the engine's native `--prefill-schedule-interval 8`. While requests are
+generating, a newly arrived prompt is prefilled on one engine step in eight, with
+decode-only steps in between. Before E27, a long cold prompt stalled every running request
+for the whole prefill. A new Rigmark phase measures exactly that case:
+
+| Another request cold-prefills | Running agents | Their decode, E22b → E27 | Its first token, E22b → E27 |
+| --- | ---: | ---: | ---: |
+| 8K tokens | 1 | 2.2 → **11.5** tok/s | 3.6 → 4.7 s |
+| 8K tokens | 3 | 2.1 → **6.1** tok/s | 3.8 → 5.0 s |
+| 32K tokens | 1 | 1.6 → **8.7** tok/s | 14.2 → 16.3 s |
+| 32K tokens | 3 | 1.4 → **7.0** tok/s | 13.9 → 19.1 s |
+
+The owner accepted the cost: requests that arrive while others generate wait longer for
+their first token.
+
+- **C4 per-stream TTFT:** +35% against two same-day control runs of E22b.
+- **C4 throughput:** -3.3% against the same control.
+- **Client path:** this baseline was measured over direct LAN HTTP, the previous one
+  through an SSH tunnel. C1 and the smaller decode differences are closer to the same-day
+  control, which the
+  [current benchmark report](docs/benchmarks/baselines/2026-09-24-e27.md) lists next to
+  all 16 metrics, together with the interference phase, counts and limitations.
 
 The graphs compare current and previous medians side by side, with each delta calculated
-against the previous September 23 E21 baseline. Click an image for its SVG version.
+against the previous September 23 E22b baseline. Click an image for its SVG version.
 
-[![Current E22b versus previous September 23 E21 baseline: generation throughput, time to first token and percentage changes.](docs/plots/comparisons/2026-09-23-e22b-vs-2026-09-23-e21/generation.png)](docs/plots/comparisons/2026-09-23-e22b-vs-2026-09-23-e21/generation.svg)
+[![Current E27 versus previous September 23 E22b baseline: generation throughput, time to first token and percentage changes.](docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/generation.png)](docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/generation.svg)
 
-[![Current E22b versus previous September 23 E21 baseline: cold prefill, immediate replay and percentage changes at 8K, 32K and 64K.](docs/plots/comparisons/2026-09-23-e22b-vs-2026-09-23-e21/prefill.png)](docs/plots/comparisons/2026-09-23-e22b-vs-2026-09-23-e21/prefill.svg)
+[![Current E27 versus previous September 23 E22b baseline: cold prefill, immediate replay and percentage changes at 8K, 32K and 64K.](docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/prefill.png)](docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/prefill.svg)
 
 The [benchmark archive](docs/benchmarks/README.md) retains earlier baselines, experiments
 and separate reproduction results. See [local Rigmark reports](docs/rigmark_reports/README.md)
@@ -68,8 +81,8 @@ The [current recipe](docs/production-recipe.md), encoded in
 [`cluster.env.example`](cluster.env.example), combines the digest-pinned SparkRing image,
 DFlash2 with adaptive verification capped by its effective draft budget, E03 mHC prefill
 sharding, hybrid INT8/BF16 KDA input projections, E21 8-bit weights for the KDA output
-and MLA attention projections, E22b 8-bit weights for the DFlash2 drafter, SparkCache
-replay views and SIRCL/patched NCCL.
+and MLA attention projections, E22b 8-bit weights for the DFlash2 drafter, the E27 prefill
+cadence, SparkCache replay views and SIRCL/patched NCCL.
 The **15 GiB KV pool per rank** and **262,144-token context limit** are retained.
 
 ## Install with an agent
@@ -95,9 +108,9 @@ proxy.
 Replace the placeholders below, then give this prompt to the agent in the checkout:
 
 ```text
-Install this repository's accepted September 23, 2026 E22b recipe on my four nodes.
+Install this repository's accepted September 24, 2026 E27 recipe on my four nodes.
 Read AGENTS.md, docs/install-from-zero.md, and docs/operations.md first.
-Use docs/historical_benchmarks/baselines/2026-09-23-e22b/baseline.json and cluster.env.example as the reference.
+Use docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json and cluster.env.example as the reference.
 
 SSH targets in rank order:
 0: <user@rank0-host>

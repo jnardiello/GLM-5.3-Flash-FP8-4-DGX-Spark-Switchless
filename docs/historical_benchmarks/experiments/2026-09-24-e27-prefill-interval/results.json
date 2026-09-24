@@ -1,0 +1,486 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "experiment_id": "2026-09-24-e27-prefill-interval",
+  "title": "E27: native prefill cadence (--prefill-schedule-interval 8) on the E22b recipe",
+  "outcome": "promote",
+  "outcome_detail": "Owner accepted. Running agents decode 3-5x faster while another request cold-prefills 8-32K tokens; C4 per-stream TTFT +35% and C4 throughput -3.3% against the same-day control; other standard metrics within about 2%.",
+  "reference": {
+    "baseline_id": "2026-09-23-e22b",
+    "baseline_sha256": "7454e85cb1b1ac6ad4a04f4f88bca19b98955d238f0c4b315bf28aace31866bd"
+  },
+  "coverage": "Three complete native suites (162 requests) on one retained load, the interference phase on the same load, then two same-day E22b control suites (108 requests) after one transition back.",
+  "client_transport": "Direct LAN HTTP to the rank-0 API for the candidate and the same-day control; the frozen E22b reference used an SSH tunnel over a direct Tailscale path. Compare against the same-day control for effects smaller than a few percent.",
+  "runs": [
+    {
+      "run": "run-1",
+      "receipt_sha256": "648fc81e647a4f9691b62f5798d1991cf528b4f1e7ecf9249df5c5f6e26f936a",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/run-1.json",
+        "sha256": "0e5e40faac9f9102e65a129e339b9f8f86f16c367f7d0c3b51b2f9ae06b41600"
+      }
+    },
+    {
+      "run": "run-2",
+      "receipt_sha256": "0575186056b9fefa9d2c6ff42f957961f1b6816222946fa68b3d53ad958189f5",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/run-2.json",
+        "sha256": "027c8e6f93598e25c51f8a383039713edc8cdadd13456c427d1843d2672000b1"
+      }
+    },
+    {
+      "run": "run-3",
+      "receipt_sha256": "6ad522364122c68042e658eee04c609b3b77133098d8125994fd312369e82fb8",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/run-3.json",
+        "sha256": "201c4e5d118ee87288370c2974cc2250ec897e12351014d54c2b61fd3b0ba803"
+      }
+    }
+  ],
+  "same_day_control_runs": [
+    {
+      "run": "run-1",
+      "receipt_sha256": "a74f78be0d3164357c678e3798c4732982a261c3e6f8ce306832d418df33c41e",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/same-day-e22b-control-run-1.json",
+        "sha256": "d01fb7ec1d7125891d2b2179dbba3477f652fb6be08b2cc45a0c8613ef5b6f50"
+      }
+    },
+    {
+      "run": "run-2",
+      "receipt_sha256": "bc26f1ab9a310931ad9ffb01a1e028feef795718d870716468466d97e0b4d572",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/same-day-e22b-control-run-2.json",
+        "sha256": "ef982eaf029bd7889d892463a34f88955fa0066cb548965f6275a07e2e288039"
+      }
+    }
+  ],
+  "performance_metrics": [
+    {
+      "key": "code_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "code",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        54.678,
+        55.665,
+        55.108
+      ],
+      "median": 55.108,
+      "previous_baseline_median": 56.611,
+      "change_vs_previous_baseline_pct": -2.654961049972615,
+      "same_day_lan_control_per_run": [
+        55.67,
+        56.628
+      ],
+      "same_day_lan_control_mean": 56.149,
+      "change_vs_same_day_control_pct": -1.8539956187999862
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "1",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        43.168,
+        45.251,
+        44.377
+      ],
+      "median": 44.377,
+      "previous_baseline_median": 41.625,
+      "change_vs_previous_baseline_pct": 6.611411411411416,
+      "same_day_lan_control_per_run": [
+        44.49,
+        41.394
+      ],
+      "same_day_lan_control_mean": 42.942,
+      "change_vs_same_day_control_pct": 3.341716734199629
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "2",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        62.055,
+        66.588,
+        64.954
+      ],
+      "median": 64.954,
+      "previous_baseline_median": 65.78,
+      "change_vs_previous_baseline_pct": -1.2557008209182263,
+      "same_day_lan_control_per_run": [
+        65.069,
+        62.825
+      ],
+      "same_day_lan_control_mean": 63.947,
+      "change_vs_same_day_control_pct": 1.5747415828732958
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "4",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        96.073,
+        89.909,
+        95.507
+      ],
+      "median": 95.507,
+      "previous_baseline_median": 95.901,
+      "change_vs_previous_baseline_pct": -0.4108403457732335,
+      "same_day_lan_control_per_run": [
+        97.83,
+        99.64
+      ],
+      "same_day_lan_control_mean": 98.735,
+      "change_vs_same_day_control_pct": -3.269357370739856
+    },
+    {
+      "key": "prose_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "prose",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        33.277,
+        32.486,
+        32.623
+      ],
+      "median": 32.623,
+      "previous_baseline_median": 33.403,
+      "change_vs_previous_baseline_pct": -2.3351196000359287,
+      "same_day_lan_control_per_run": [
+        33.611,
+        33.134
+      ],
+      "same_day_lan_control_mean": 33.3725,
+      "change_vs_same_day_control_pct": -2.245861113192016
+    },
+    {
+      "key": "code_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "code",
+        "ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.386,
+        0.406,
+        0.403
+      ],
+      "median": 0.403,
+      "previous_baseline_median": 0.4,
+      "change_vs_previous_baseline_pct": 0.7500000000000062,
+      "same_day_lan_control_per_run": [
+        0.39,
+        0.389
+      ],
+      "same_day_lan_control_mean": 0.3895,
+      "change_vs_same_day_control_pct": 3.4659820282413323
+    },
+    {
+      "key": "prose_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "prose",
+        "ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.375,
+        0.376,
+        0.376
+      ],
+      "median": 0.376,
+      "previous_baseline_median": 0.375,
+      "change_vs_previous_baseline_pct": 0.2666666666666595,
+      "same_day_lan_control_per_run": [
+        0.374,
+        0.373
+      ],
+      "same_day_lan_control_mean": 0.3735,
+      "change_vs_same_day_control_pct": 0.6693440428380271
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "1",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.389,
+        0.376,
+        0.337
+      ],
+      "median": 0.376,
+      "previous_baseline_median": 0.352,
+      "change_vs_previous_baseline_pct": 6.818181818181834,
+      "same_day_lan_control_per_run": [
+        0.336,
+        0.394
+      ],
+      "same_day_lan_control_mean": 0.365,
+      "change_vs_same_day_control_pct": 3.013698630136985
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "2",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.456,
+        0.451,
+        0.468
+      ],
+      "median": 0.456,
+      "previous_baseline_median": 0.482,
+      "change_vs_previous_baseline_pct": -5.394190871369286,
+      "same_day_lan_control_per_run": [
+        0.442,
+        0.483
+      ],
+      "same_day_lan_control_mean": 0.4625,
+      "change_vs_same_day_control_pct": -1.4054054054054022
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "4",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.544,
+        0.751,
+        0.72
+      ],
+      "median": 0.72,
+      "previous_baseline_median": 0.521,
+      "change_vs_previous_baseline_pct": 38.19577735124759,
+      "same_day_lan_control_per_run": [
+        0.523,
+        0.543
+      ],
+      "same_day_lan_control_mean": 0.533,
+      "change_vs_same_day_control_pct": 35.08442776735458
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2609.345,
+        2616.943,
+        2479.402
+      ],
+      "median": 2609.345,
+      "previous_baseline_median": 2610.637,
+      "change_vs_previous_baseline_pct": -0.049489837154703675,
+      "same_day_lan_control_per_run": [
+        2646.379,
+        2650.149
+      ],
+      "same_day_lan_control_mean": 2648.264,
+      "change_vs_same_day_control_pct": -1.469604238852329
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        9538.703,
+        9589.485,
+        9589.553
+      ],
+      "median": 9589.485,
+      "previous_baseline_median": 9600.375,
+      "change_vs_previous_baseline_pct": -0.1134330690207408,
+      "same_day_lan_control_per_run": [
+        9503.679,
+        9563.424
+      ],
+      "same_day_lan_control_mean": 9533.551500000001,
+      "change_vs_same_day_control_pct": 0.5867016085243648
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2779.897,
+        2719.255,
+        2782.534
+      ],
+      "median": 2779.897,
+      "previous_baseline_median": 2733.601,
+      "change_vs_previous_baseline_pct": 1.693590249637733,
+      "same_day_lan_control_per_run": [
+        2786.004,
+        2671.239
+      ],
+      "same_day_lan_control_mean": 2728.6215,
+      "change_vs_same_day_control_pct": 1.8791723219948153
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        37652.856,
+        36479.984,
+        38073.062
+      ],
+      "median": 37652.856,
+      "previous_baseline_median": 37728.202,
+      "change_vs_previous_baseline_pct": -0.1997073700994223,
+      "same_day_lan_control_per_run": [
+        37547.023,
+        36114.675
+      ],
+      "same_day_lan_control_mean": 36830.849,
+      "change_vs_same_day_control_pct": 2.231843745985862
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2690.397,
+        2644.246,
+        2701.644
+      ],
+      "median": 2690.397,
+      "previous_baseline_median": 2613.315,
+      "change_vs_previous_baseline_pct": 2.9495870187864703,
+      "same_day_lan_control_per_run": [
+        2668.87,
+        2622.568
+      ],
+      "same_day_lan_control_mean": 2645.719,
+      "change_vs_same_day_control_pct": 1.6886902955302485
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        40625.626,
+        40046.294,
+        39886.723
+      ],
+      "median": 40046.294,
+      "previous_baseline_median": 40214.03,
+      "change_vs_previous_baseline_pct": -0.41710815852078476,
+      "same_day_lan_control_per_run": [
+        40150.663,
+        39618.565
+      ],
+      "same_day_lan_control_mean": 39884.614,
+      "change_vs_same_day_control_pct": 0.4053693486917087
+    }
+  ],
+  "integrity": {
+    "requests": 162,
+    "completed_streams": 162,
+    "visible_responses": 162,
+    "native_validation_errors": 0,
+    "protocol_errors": 0,
+    "runtime_errors": 0,
+    "prefill_token_matches": "54/54",
+    "decode_output_gates": {
+      "code": "15/15",
+      "prose": "15/15",
+      "structured": "15/15"
+    },
+    "client_probe_timeouts": 0
+  },
+  "interference": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/interference.json",
+    "sha256": "1dce8b964b0fc6793db47b71a9f61795fd017b82d3c9021bbd39721bb22ceae1"
+  },
+  "long_context_diagnostic": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/long-context-diagnostic.json",
+    "sha256": "8e11ca6f39b3156079719855fe06a34499e56078816f1e8d41f2f9bf0c312af8"
+  },
+  "owner_decision": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/owner-decision.json",
+    "sha256": "38355eb1630b878ff9eee61b8d28ac371d31a3bd2de98aadc45d021eec405599"
+  },
+  "post_boot_gates": {
+    "coherent_response": "PASS",
+    "tool_call": "PASS",
+    "elapsed_from_health_seconds": 3.17
+  },
+  "notes": [
+    "check-f0 first failed on a pending systemd reload on rank 1 (not caused by E27); after systemctl daemon-reload, which restarts no service, it passed.",
+    "Host memory observers were not run in this window; no OOM or allocation-retry event was observed in engine logs."
+  ]
+}

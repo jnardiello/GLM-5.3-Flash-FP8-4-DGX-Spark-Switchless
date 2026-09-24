@@ -1,0 +1,78 @@
+{
+  "schema": "tp4-iac-promotion/v1",
+  "baseline_id": "2026-09-24-e27",
+  "owner_decision": "promote",
+  "status": "deployed_with_coordinated_restart_identity_verified",
+  "measured_recipe_encoded": true,
+  "runtime_sources_unchanged": true,
+  "promotion_method": "launcher_command_parity",
+  "promotion_method_reason": "Owner decision under the repository promotion rule: the accepted suites were measured on the loaded E27 candidate, so no reproduction run. The measured load had been replaced by the same-day E22b control, so applying the default needed one coordinated four-rank restart.",
+  "candidate_overlay": {
+    "path": "scripts/node/experiments/e03/prefill-interval/delta.env",
+    "sha256": "dfa25f08a6d071631efb765a8c05376ab9c4653a1fa74d9d87cc1d4c80d2889c",
+    "status": "retired from the tree; the default now carries its only change"
+  },
+  "local_validation": {
+    "offline_check": "PASS",
+    "four_rank_command_parity_with_measured_candidate": "PASS",
+    "four_rank_command_parity_of_e22b_rollback_with_previous_default": "PASS",
+    "mounted_source_hashes": "PASS",
+    "historical_identity_selection": "PASS",
+    "previous_baseline_unchanged": {
+      "path": "docs/historical_benchmarks/baselines/2026-09-23-e22b/baseline.json",
+      "sha256": "7454e85cb1b1ac6ad4a04f4f88bca19b98955d238f0c4b315bf28aace31866bd"
+    },
+    "figures_visually_reviewed": true,
+    "plotter_matplotlib_version": "3.11.2",
+    "figures_sha256": {
+      "docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/generation.png": "e0b3b22caaef6aa8ee1250fc3374a17b11707a1378a943a61da1c308e03ede5c",
+      "docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/generation.svg": "bcba173c77cafd799c82b1312ade6363fe8576e3f12a216a68144ad01bb3bbaf",
+      "docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/prefill.png": "42894aefa5484c8dd465addb3909dd25bf92895ff7bd9059615123c3104dbea1",
+      "docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/prefill.svg": "9fc208c11953684424ec45613ed74d5fb086a213bf042e7c1667d05ef752d37d"
+    }
+  },
+  "new_deployments": 1,
+  "new_lifecycle_actions": 1,
+  "new_measurement_requests": 0,
+  "live_default_apply": {
+    "date": "2026-09-24",
+    "restart": true,
+    "restart_reason": "The same-day E22b control suites had replaced the measured E27 load.",
+    "deploy": "PASS",
+    "autostart_tp4_env": "none; the next boot selects the E27 default",
+    "deployed_cluster_env_matches_local": "4/4",
+    "post_boot_gates": {
+      "coherent_response": "PASS",
+      "tool_call": "PASS",
+      "elapsed_from_health_seconds": 3.07
+    },
+    "check_f0": {
+      "result": "PASS",
+      "problems": []
+    },
+    "per_rank_running_identity": {
+      "ranks_checked": 4,
+      "prefill_schedule_interval_8": "4/4",
+      "e21_boot_receipt": "4/4",
+      "e22_boot_receipt_modules_30": "4/4"
+    },
+    "health": 200,
+    "real_completion": "HTTP 200"
+  },
+  "live_reproduction": {
+    "status": "not_required_by_owner_decision",
+    "executed_runs": 0,
+    "executed_requests": 0
+  },
+  "baseline": {
+    "path": "docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json",
+    "sha256": "9af7e2326f3267715b1e5cc98207d7ddfd9983c44607b3f8ddaebb89a420600d"
+  },
+  "rollback": "scripts/node/reference/baseline-20260924-e22b.env",
+  "notes": [
+    "The encoded default produces a launcher command byte-identical, on all four ranks, to the measured E27 candidate (E22b default plus the candidate overlay).",
+    "The E22b rollback produces a launcher command byte-identical, on all four ranks, to the previous E22b default.",
+    "During the measurement window check-f0 first failed on a pending systemd reload on rank 1, unrelated to E27; after systemctl daemon-reload, which restarts no service, it passed.",
+    "Live identity check PASS against 2026-09-24-e27 after the coordinated restart."
+  ]
+}

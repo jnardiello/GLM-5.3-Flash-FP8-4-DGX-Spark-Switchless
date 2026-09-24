@@ -311,8 +311,11 @@ RELAY_DEST=operator@192.0.2.23
             # E22b is the default; its measured overlay applies on the complete E21 recipe,
             # which the immediate rollback restores.
             e21 = (REPO / "scripts/node/reference/baseline-20260923-e21.env").read_text() + "\n"
+            # E27 is now the default; its complete E22b return must equal the measured E22b load.
+            e22b = (REPO / "scripts/node/reference/baseline-20260924-e22b.env").read_text() + "\n"
             (root / "empty.env").write_text("")
             (root / "e21.env").write_text(e21)
+            (root / "e22b.env").write_text(e22b)
             (root / "candidate.env").write_text(e21 + delta)
             env = dict(os.environ, TP4_DRY_RUN="1")
             env.pop("TP4_ENV", None)
@@ -348,8 +351,11 @@ RELAY_DEST=operator@192.0.2.23
                 self.assertEqual(Counter(before) - Counter(after), Counter([old_cfg]))
                 self.assertEqual(Counter(after) - Counter(before),
                                  Counter([new_cfg, "-v", override, "-v", module, "-e", flags[0], "-e", flags[1]]))
-                # The promoted default is exactly the measured E22b command.
-                self.assertEqual(argv(launch("empty.env", rank)), after)
+                # The E22b return is exactly the measured E22b command; the E27 default
+                # differs only by the prefill cadence.
+                self.assertEqual(argv(launch("e22b.env", rank)), after)
+                self.assertEqual(argv(launch("empty.env", rank)),
+                                 after + ["--prefill-schedule-interval", "8"])
                 mounts = [after[i + 1] for i, item in enumerate(after[:-1]) if item == "-v"]
                 targets = [item.split(":")[1] for item in mounts]
                 self.assertEqual(len(targets), len(set(targets)), "Duplicate container mount")

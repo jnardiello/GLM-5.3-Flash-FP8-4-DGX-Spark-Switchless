@@ -13,25 +13,28 @@ Readable reports live here; machine-readable frozen records and portable experim
 | 2026-09-19 E03 previous reference | 3 / 162 | [Report](baselines/2026-09-19-e03.md); [IaC promotion status](../historical_benchmarks/baselines/2026-09-19-e03/promotion.json) |
 | 2026-09-20 E03 IaC benchmark | 0 included; 1 / 54 excluded | [Excluded report](reproductions/2026-09-20-e03-iac.md); owner rejects this run as reliable evidence; deployment and functional checks recorded separately |
 | 2026-09-23 E21 previous reference | 3 / 162 | [Report](baselines/2026-09-23-e21.md); [promotion record](../historical_benchmarks/baselines/2026-09-23-e21/promotion.json) |
-| 2026-09-23 E22b accepted current reference | 3 / 162 | [Report](baselines/2026-09-23-e22b.md); [promotion record](../historical_benchmarks/baselines/2026-09-23-e22b/promotion.json) |
+| 2026-09-23 E22b previous reference | 3 / 162 | [Report](baselines/2026-09-23-e22b.md); [promotion record](../historical_benchmarks/baselines/2026-09-23-e22b/promotion.json) |
+| 2026-09-24 E27 accepted current reference | 3 / 162 | [Report](baselines/2026-09-24-e27.md); [promotion record](../historical_benchmarks/baselines/2026-09-24-e27/promotion.json) |
 
 [Historical comparison table and archived charts](comparisons/2026-09-19-vs-2026-09-11.md).
 
-The README's comparison figures show all 16 saved medians for the current E22b reference
-and the previous E21 reference, with percentage changes from unrounded values. Both
+The README's comparison figures show all 16 saved medians for the current E27 reference
+and the previous E22b reference, with percentage changes from unrounded values. Both
 records have three accepted runs / 162 requests. Small changes retain exact deltas
-alongside the owner's “≈ unchanged” display convention.
+alongside the owner's “≈ unchanged” display convention. E27 was measured over direct LAN
+HTTP and E22b through an SSH tunnel; the E27 report also lists a same-day LAN control.
 From the repository root, run `python3 scripts/plot-baseline-comparison.py` in an
 environment with `matplotlib==3.11.2`. It writes PNG/SVG files under
-`docs/plots/comparisons/2026-09-23-e22b-vs-2026-09-23-e21/` without running inference.
-The [dated current report](baselines/2026-09-23-e22b.md) links the figures and both
-frozen sources. Earlier comparisons, including E21 versus E03, remain archived unchanged
+`docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/` without running inference.
+The [dated current report](baselines/2026-09-24-e27.md) links the figures and both
+frozen sources. Earlier comparisons, including E22b versus E21, remain archived unchanged
 under `docs/plots/`.
 
 ## Experiment outcomes
 
 | Experiment | Evidence / recorded outcome |
 | --- | --- |
+| [2026-09-24-e27-prefill-interval](experiments/2026-09-24-e27-prefill-interval.md) | 3 full suites / 162 requests on one retained load, the new Rigmark interference phase, a four-simultaneous-32K diagnostic and 2 same-day E22b LAN control suites / 108 requests; running agents decode 3–5× faster during another request's 8–32K cold prefill; C4 per-stream TTFT +35% and C4 -3.3% against the control; zero errors; owner accepts, outcome promote; became the September 24 E27 reference |
 | [2026-09-23-e23-drafter-head](experiments/2026-09-23-e23-drafter-head.md) | 3 full suites / 162 requests on one retained load plus matched probes; against E22b: C1 +3.50%, code decode +0.97%; C2 -1.96%, C4 -1.89%; 32K cold prefill -2.47% below the E22b range in every suite. Zero errors; relayed-client series excluded; outcome discard, owner closed it |
 | [2026-09-23-e22b-drafter-context-bf16](experiments/2026-09-23-e22b-drafter-context-bf16.md) | 3 full suites / 162 requests on one retained load plus matched diagnostic probes; code decode +3.03%, C1 +2.23%, prose +2.97% against E21, C4 unchanged, zero errors, gates 45/45; owner accepts, outcome promote; became the September 23 E22b reference |
 | [2026-09-23-e22-drafter-w8a16](experiments/2026-09-23-e22-drafter-w8a16.md) | 3 full suites / 162 requests plus one supplementary suite and matched probes; code, C1 and prose gains, C4 unchanged, a real 8K cold prefill loss (-3.0% in matched probes) from the converted context K/V projection; outcome superseded by E22b |
