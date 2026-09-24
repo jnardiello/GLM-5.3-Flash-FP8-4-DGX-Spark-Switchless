@@ -1,0 +1,415 @@
+{
+ "schema": 1,
+ "record_type": "portable_measurement_extract",
+ "experiment_id": "2026-09-23-e23-drafter-head",
+ "title": "E23: drafter-only INT8 copy of the shared lm_head and a hybrid INT8/BF16 drafter fc projection, on E22b",
+ "outcome": "discard",
+ "outcome_detail": "Repeatable but small gains on code decode (+1.0%) and C1 (+3.5% in suites, +1.7% in the matched 30-round probe) against small, same-direction losses on cold prefill (32K -2.5%, every suite below the E22b range), C2 (-2.0%) and C4 (-1.9%). An external review found no realistic variant with a clear win; the estimated ceiling after all proposed ablations was about +3% on code/C1. The owner closed the experiment; the service returned to E22b.",
+ "reference": {
+  "baseline_id": "2026-09-23-e22b",
+  "baseline_sha256": "7454e85cb1b1ac6ad4a04f4f88bca19b98955d238f0c4b315bf28aace31866bd"
+ },
+ "coverage": "Three complete native suites (162 requests) on one retained load. Earlier series on the same load were excluded (see excluded_series).",
+ "client_transport": {
+  "accepted_suites": "direct LAN HTTP to the rank-0 API, zero ICMP loss during every suite (about 1,700 one-second probes)",
+  "reference": "the E22b reference used an SSH tunnel over a direct Tailscale path, about 1 ms higher round-trip time",
+  "effect": "about 1 ms per request, if anything favouring the candidate; it does not explain the losses"
+ },
+ "excluded_series": [
+  {
+   "label": "first suite series, suite 1",
+   "requests": 54,
+   "reason": "owner requested deletion and a fresh re-run; values not retained"
+  },
+  {
+   "label": "first suite series, suite 2",
+   "requests": "partial (decode only)",
+   "reason": "owner stopped the series"
+  },
+  {
+   "label": "second series, suite 2",
+   "requests": 54,
+   "reason": "client path over Tailscale fell back to DERP relays with 20-83% ICMP loss; C2 -28.9%, C4 -23.0% while engine-side generation matched E22b"
+  },
+  {
+   "label": "second series, suite 3",
+   "requests": "partial",
+   "reason": "stopped on the same relayed client path"
+  },
+  {
+   "label": "third series, suite 1",
+   "requests": "partial (decode/code)",
+   "reason": "stopped when the Tailscale path fell back to a relay again (10 lost probes)"
+  }
+ ],
+ "runs": [
+  {
+   "run": "run-1",
+   "receipt_sha256": "1d13bf1f7f062e899c198f87ee2e7d38d813b3d81f034264c0fed4bcc58dc95e",
+   "cache_salt": "fresh per suite (hash only in private receipts)"
+  },
+  {
+   "run": "run-2",
+   "receipt_sha256": "43b0529d22ec300cb0a822701e833b0e88670873b4ed2bc0abdc9232ba5cc3ad",
+   "cache_salt": "fresh per suite (hash only in private receipts)"
+  },
+  {
+   "run": "run-3",
+   "receipt_sha256": "a8a8a3cb082303f3d744b99e44e39e72f00aa9603d580aa9fad4eae7867c4f94",
+   "cache_salt": "fresh per suite (hash only in private receipts)"
+  }
+ ],
+ "performance_metrics": [
+  {
+   "key": "code_decode_throughput",
+   "unit": "tokens_per_second",
+   "per_run": [
+    57.161,
+    57.609,
+    56.96
+   ],
+   "median": 57.161,
+   "reference_median": 56.611,
+   "reference_range": [
+    56.376,
+    56.793
+   ],
+   "change_vs_reference_pct": 0.9715426330571875
+  },
+  {
+   "key": "code_c1_aggregate_end_to_end_throughput",
+   "unit": "tokens_per_second",
+   "per_run": [
+    43.482,
+    43.081,
+    42.655
+   ],
+   "median": 43.081,
+   "reference_median": 41.625,
+   "reference_range": [
+    40.704,
+    41.9
+   ],
+   "change_vs_reference_pct": 3.4978978978978947
+  },
+  {
+   "key": "code_c2_aggregate_end_to_end_throughput",
+   "unit": "tokens_per_second",
+   "per_run": [
+    64.492,
+    62.533,
+    66.334
+   ],
+   "median": 64.492,
+   "reference_median": 65.78,
+   "reference_range": [
+    64.676,
+    66.832
+   ],
+   "change_vs_reference_pct": -1.9580419580419561
+  },
+  {
+   "key": "code_c4_aggregate_end_to_end_throughput",
+   "unit": "tokens_per_second",
+   "per_run": [
+    94.085,
+    95.505,
+    93.875
+   ],
+   "median": 94.085,
+   "reference_median": 95.901,
+   "reference_range": [
+    90.213,
+    101.571
+   ],
+   "change_vs_reference_pct": -1.8936194617365842
+  },
+  {
+   "key": "prose_decode_throughput",
+   "unit": "tokens_per_second",
+   "per_run": [
+    33.594,
+    33.103,
+    33.907
+   ],
+   "median": 33.594,
+   "reference_median": 33.403,
+   "reference_range": [
+    33.402,
+    33.471
+   ],
+   "change_vs_reference_pct": 0.5718049277011028
+  },
+  {
+   "key": "code_ttft",
+   "unit": "seconds",
+   "per_run": [
+    0.391,
+    0.384,
+    0.387
+   ],
+   "median": 0.387,
+   "reference_median": 0.4,
+   "reference_range": [
+    0.387,
+    0.403
+   ],
+   "change_vs_reference_pct": -3.2499999999999973
+  },
+  {
+   "key": "prose_ttft",
+   "unit": "seconds",
+   "per_run": [
+    0.375,
+    0.376,
+    0.376
+   ],
+   "median": 0.376,
+   "reference_median": 0.375,
+   "reference_range": [
+    0.373,
+    0.376
+   ],
+   "change_vs_reference_pct": 0.2666666666666595
+  },
+  {
+   "key": "code_c1_per_stream_ttft",
+   "unit": "seconds",
+   "per_run": [
+    0.406,
+    0.406,
+    0.389
+   ],
+   "median": 0.406,
+   "reference_median": 0.352,
+   "reference_range": [
+    0.34,
+    0.384
+   ],
+   "change_vs_reference_pct": 15.340909090909104
+  },
+  {
+   "key": "code_c2_per_stream_ttft",
+   "unit": "seconds",
+   "per_run": [
+    0.441,
+    0.543,
+    0.439
+   ],
+   "median": 0.441,
+   "reference_median": 0.482,
+   "reference_range": [
+    0.44,
+    0.639
+   ],
+   "change_vs_reference_pct": -8.506224066390033
+  },
+  {
+   "key": "code_c4_per_stream_ttft",
+   "unit": "seconds",
+   "per_run": [
+    0.523,
+    0.549,
+    0.615
+   ],
+   "median": 0.549,
+   "reference_median": 0.521,
+   "reference_range": [
+    0.519,
+    0.753
+   ],
+   "change_vs_reference_pct": 5.374280230326289
+  },
+  {
+   "key": "prefill_8k_cold_throughput",
+   "unit": "tokens_per_second",
+   "per_run": [
+    2557.069,
+    2375.668,
+    2532.204
+   ],
+   "median": 2532.204,
+   "reference_median": 2610.637,
+   "reference_range": [
+    2573.002,
+    2640.951
+   ],
+   "change_vs_reference_pct": -3.004362536806149
+  },
+  {
+   "key": "prefill_8k_replay_throughput",
+   "unit": "tokens_per_second",
+   "per_run": [
+    9510.21,
+    9636.967,
+    9769.711
+   ],
+   "median": 9636.967,
+   "reference_median": 9600.375,
+   "reference_range": [
+    9585.177,
+    9843.35
+   ],
+   "change_vs_reference_pct": 0.38115177792534816
+  },
+  {
+   "key": "prefill_32k_cold_throughput",
+   "unit": "tokens_per_second",
+   "per_run": [
+    2666.158,
+    2673.089,
+    2660.709
+   ],
+   "median": 2666.158,
+   "reference_median": 2733.601,
+   "reference_range": [
+    2718.4,
+    2803.737
+   ],
+   "change_vs_reference_pct": -2.4671852256419324
+  },
+  {
+   "key": "prefill_32k_replay_throughput",
+   "unit": "tokens_per_second",
+   "per_run": [
+    37311.58,
+    36951.376,
+    37951.227
+   ],
+   "median": 37311.58,
+   "reference_median": 37728.202,
+   "reference_range": [
+    36844.348,
+    38129.593
+   ],
+   "change_vs_reference_pct": -1.1042720774236625
+  },
+  {
+   "key": "prefill_64k_cold_throughput",
+   "unit": "tokens_per_second",
+   "per_run": [
+    2548.073,
+    2606.358,
+    2615.556
+   ],
+   "median": 2606.358,
+   "reference_median": 2613.315,
+   "reference_range": [
+    2600.572,
+    2753.685
+   ],
+   "change_vs_reference_pct": -0.2662136022637873
+  },
+  {
+   "key": "prefill_64k_replay_throughput",
+   "unit": "tokens_per_second",
+   "per_run": [
+    40182.223,
+    39150.442,
+    39890.438
+   ],
+   "median": 39890.438,
+   "reference_median": 40214.03,
+   "reference_range": [
+    39290.592,
+    40472.809
+   ],
+   "change_vs_reference_pct": -0.8046743885156471
+  }
+ ],
+ "integrity": {
+  "requests": 162,
+  "completed_streams": 162,
+  "native_validation_errors": 0,
+  "protocol_errors": 0,
+  "runtime_errors": 0,
+  "prefill_token_matches": "54/54",
+  "decode_output_gates": {
+   "code": "15/15",
+   "prose": "15/15",
+   "structured": "15/15"
+  },
+  "oom_events": 0,
+  "rank0_min_available_gib": [
+   3.39,
+   3.46,
+   3.51
+  ]
+ },
+ "drafter_acceptance_ratio_by_suite": {
+  "E23": [
+   0.6008,
+   0.6131,
+   0.6206
+  ],
+  "E22b_reference_window": [
+   0.6213,
+   0.6106,
+   0.6111
+  ]
+ },
+ "boot_receipt": {
+  "modules": 2,
+  "families": [
+   "draft_lm_head",
+   "fc"
+  ],
+  "added_packed_bytes": 247071104,
+  "prefill_bf16_min_tokens": 2048,
+  "group_size": 128,
+  "receipts": [
+   {
+    "family": "draft_lm_head",
+    "original_bytes": 317194240,
+    "packed_bytes": 161874112,
+    "padded_k": 4096,
+    "padded_n": 38912,
+    "shape_nk": [
+     38720,
+     4096
+    ]
+   },
+   {
+    "bf16_retained_bytes": 167772160,
+    "family": "fc",
+    "original_bytes": 167772160,
+    "packed_bytes": 85196992,
+    "padded_k": 20480,
+    "padded_n": 4096,
+    "shape_nk": [
+     4096,
+     20480
+    ]
+   }
+  ]
+ },
+ "matched_probes": {
+  "protocol": "Same native P1/P2 as the E22b record, run on the E23 load before the suites.",
+  "e23": {
+   "c1_ttft_seconds": {
+    "n": 30,
+    "median": 0.3869,
+    "mean": 0.3836,
+    "slow_share_ge_0_36": "25/30",
+    "max": 0.408
+   },
+   "c1_aggregate_tokens_per_second_median": 43.885,
+   "prefill_8k_cold": {
+    "n": 10,
+    "median_eff": 2630.9,
+    "mean_eff": 2607.4,
+    "median_ttft": 3.114
+   },
+   "native_receipt_sha256": {
+    "P1": "ece9d6366e1d0a5cbe580fe3e6284345e5c047c6daa37a7a8c84fb7693aaee1d",
+    "P2": "04c504a52f6cf6b52c77649f8f493ca58e6712411beed44d6ae72be92f22dd4a"
+   }
+  },
+  "e22b": {
+   "path": "docs/historical_benchmarks/experiments/2026-09-23-e22b-drafter-context-bf16/matched-probes.json",
+   "sha256": "b77647078ee7569bf243291e4a429e09abede5b587eede54848bf16e626f295a"
+  }
+ },
+ "external_review": "Independent review (read-only, sanitized bundle): C2/C4 losses not established beyond noise; the 32K cold prefill deficit is the most credible cost, possibly from the direct F.linear fallback bypassing the vendor BF16 linear backend and from candidate selection on the INT8 head during chunked-prefill proposals. fc saves about 83 MB per step, not 168 MB. Proposed ablations (head-only, fc-only, vendor fallback, shape-limited dispatch) were not run.",
+ "owner_decision": "close E23 and look for a larger lever"
+}

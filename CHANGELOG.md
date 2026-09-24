@@ -7,6 +7,13 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Archived the discarded E23 experiment. It gave the DFlash2 drafter an INT8 copy of the
+  shared `lm_head` and a hybrid INT8/BF16 `fc` projection. The archive holds its report and
+  portable numeric extract, and the benchmark index has a new row for it.
+  - Three suites against E22b showed small gains on C1 (+3.50%) and code decode (+0.97%).
+  - C2 and C4 lost about 2%, and 32K cold prefill lost 2.47%.
+  - The owner closed the experiment. Its overlay and code are not part of the tree, and the
+    default recipe is unchanged.
 - Added the E22b drafter component under `scripts/node/experiments/e03/drafter-w8a16/`: it
   converts 30 BF16 linears of the DFlash2 drafter to the accepted E20/E21 INT8 group-128
   Marlin format and keeps the drafter's context K/V projection in BF16. Its drafter

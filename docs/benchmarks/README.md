@@ -32,6 +32,7 @@ under `docs/plots/`.
 
 | Experiment | Evidence / recorded outcome |
 | --- | --- |
+| [2026-09-23-e23-drafter-head](experiments/2026-09-23-e23-drafter-head.md) | 3 full suites / 162 requests on one retained load plus matched probes; against E22b: C1 +3.50%, code decode +0.97%; C2 -1.96%, C4 -1.89%; 32K cold prefill -2.47% below the E22b range in every suite. Zero errors; relayed-client series excluded; outcome discard, owner closed it |
 | [2026-09-23-e22b-drafter-context-bf16](experiments/2026-09-23-e22b-drafter-context-bf16.md) | 3 full suites / 162 requests on one retained load plus matched diagnostic probes; code decode +3.03%, C1 +2.23%, prose +2.97% against E21, C4 unchanged, zero errors, gates 45/45; owner accepts, outcome promote; became the September 23 E22b reference |
 | [2026-09-23-e22-drafter-w8a16](experiments/2026-09-23-e22-drafter-w8a16.md) | 3 full suites / 162 requests plus one supplementary suite and matched probes; code, C1 and prose gains, C4 unchanged, a real 8K cold prefill loss (-3.0% in matched probes) from the converted context K/V projection; outcome superseded by E22b |
 | [2026-09-23-e21-bf16-residue](experiments/2026-09-23-e21-bf16-residue.md) | 3 full suites / 162 requests on one retained load; C4 +9.88% and C2 +4.68% with every suite outside the E03 range, prose +4.02%, C1 +1.21%; code gate 13/15 from two output-budget stops; zero errors; owner accepts, outcome promote; became the September 23 E21 reference without a separate reproduction run |
