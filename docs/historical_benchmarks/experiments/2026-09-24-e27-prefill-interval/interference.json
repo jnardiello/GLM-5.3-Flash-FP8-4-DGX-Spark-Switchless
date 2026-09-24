@@ -25,11 +25,15 @@
   "receipts": {
     "e22b": {
       "native_receipt_sha256": "b8422854892336d97e3912746ef010c49512214989288b2b1906d75689863cc5",
-      "measured_on": "2026-09-24"
+      "measured_on": "2026-09-24",
+      "cache_salt_sha256": "fc81427fa6ab19eb5cd28262a5f2edc1ae399ead198697179e3eca62600eb00b",
+      "comparison_id": "glm53-nq2-3x-20260911-v1"
     },
     "e27": {
       "native_receipt_sha256": "a3fa73ec84504b885d01803c937a778d6ebf13abc5070e34392014d4da43180a",
-      "measured_on": "2026-09-24"
+      "measured_on": "2026-09-24",
+      "cache_salt_sha256": "81e62d23e08bfccf93f60024e7574ea7e09f2486761c20a0296857b9e3148747",
+      "comparison_id": "glm53-nq2-3x-20260911-v1"
     }
   },
   "receipt_validation_errors": {
@@ -1085,5 +1089,13 @@
         ]
       }
     }
-  }
+  },
+  "coldness": "Each interfering prompt starts with a nonce derived from the comparison ID, depth, decoder count and run; each variant used its own fresh cache salt, whose hash is recorded above.",
+  "limitations": [
+    "The window end is reconstructed as submission time plus the prefill request's own TTFT timer; the two timer origins differ slightly.",
+    "The coverage guard checks the last usage event; an unchanged trailing usage event could accept a background stream that stopped generating inside the window. In these runs every background stream kept generating well after the window (1,024-token outputs).",
+    "The longest-pause metric counts usage events even when the cumulative token count does not change and clips gaps at the window edges; it is the longest gap between usage reports, and the reported values are medians of per-stream maxima (single E27 samples reached 3.44 s).",
+    "Raw per-event timelines are not retained in the portable extract."
+  ],
+  "review_note": "An independent review on 2026-09-24 confirmed the token and window arithmetic of all 24 trials and raised the limitations above; the Rigmark extension should be corrected before further use."
 }

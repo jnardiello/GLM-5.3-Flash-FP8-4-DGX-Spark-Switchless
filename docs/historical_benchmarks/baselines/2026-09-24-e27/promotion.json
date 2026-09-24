@@ -66,13 +66,14 @@
   },
   "baseline": {
     "path": "docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json",
-    "sha256": "9af7e2326f3267715b1e5cc98207d7ddfd9983c44607b3f8ddaebb89a420600d"
+    "sha256": "5c03b3dea924590debfd2dee9308eec5921a7a96404cf2243c8222cfeebb298a"
   },
   "rollback": "scripts/node/reference/baseline-20260924-e22b.env",
   "notes": [
     "The encoded default produces a launcher command byte-identical, on all four ranks, to the measured E27 candidate (E22b default plus the candidate overlay).",
     "The E22b rollback produces a launcher command byte-identical, on all four ranks, to the previous E22b default.",
     "During the measurement window check-f0 first failed on a pending systemd reload on rank 1, unrelated to E27; after systemctl daemon-reload, which restarts no service, it passed.",
-    "Live identity check PASS against 2026-09-24-e27 after the coordinated restart."
+    "Live identity check PASS against 2026-09-24-e27 after the coordinated restart.",
+    "The baseline record was corrected on 2026-09-24 after an independent review (see its corrections field); no measured value changed."
   ]
 }

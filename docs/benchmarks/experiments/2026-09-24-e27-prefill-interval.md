@@ -19,8 +19,9 @@ tokens lasts about 2.5 s, and running requests advance once per step.
 
 The serving image already has a native knob for this, `--prefill-schedule-interval`. While
 requests decode, it admits prefill work on one step in N and runs decode-only steps in
-between. It stops deferring while requests wait in the queue, and a prefill with nobody
-decoding is unaffected. E27 sets N = 8 and changes nothing else.
+between. Once requests are left waiting in the queue, it stops deferring until the queue
+drains; a prefill with nobody decoding is not deferred. E27 sets N = 8 and changes nothing
+else.
 
 ## Measurement
 
@@ -43,10 +44,14 @@ Results, with details in the [baseline report](../baselines/2026-09-24-e27.md):
 - **The arriving request's TTFT:** +15% to +37%, only while others decode.
 - **Against the same-day control:**
   - C4 per-stream TTFT +35% and C4 aggregate −3.3%;
-  - code and prose decode −1.9% and −2.2%, not separable from run variation;
-  - prefill, replay, C1 and C2 unchanged.
-- **Four simultaneous 32K contexts:** unchanged against E22b, because the cadence is not
-  applied while requests wait.
+  - code decode −1.85% and prose −2.25%, unresolved: all three candidate code-decode
+    suites sit below both controls, but one load and run order cannot separate the
+    setting from load or warmup effects;
+  - C1 +3.34%, code TTFT +3.47% and C1 per-stream TTFT +3.01%;
+  - prefill and replay within about 2%, and C2 within 1.6%.
+- **Four simultaneous 32K contexts:** close to E22b in median (12.6 → 12.0 tok/s per stream,
+  TTFT 35.9 → 35.1 s), because the queue bypass applies. The last stream to start decodes
+  faster, about 44 → 57 tok/s, and starts later, about 52 → 55 s.
 
 Measured integrity:
 - 162/162 candidate requests and 108/108 control requests, with zero errors;
@@ -63,7 +68,22 @@ that the standard suites do not measure. The outcome was therefore `decision_req
 and the owner decided to promote.
 
 The obvious follow-up is E27b: apply the cadence only to prefills with at least 2,048
-remaining tokens, so that short concurrent prompts are never deferred.
+remaining tokens, so that short concurrent prompts are not deferred.
+
+## Review corrections
+
+An independent review after promotion confirmed the mechanism and the interference
+arithmetic, and led to these corrections on 2026-09-24:
+
+- The frozen baseline JSON had wrongly marked the host memory observers as enabled. It now
+  says they were off and lists the edit in its `corrections` field. No measured value
+  changed.
+- The queue bypass is remembered scheduler state, not a check made on each arrival, and the
+  four-context case is close to E22b rather than identical.
+- The interference extract now records hashed cache salts and the phase's limitations: the
+  window end uses the arriving request's own timer, the coverage guard relies on the last
+  usage event, and the pause metric counts usage events without new tokens.
+- Code decode, prose and C4 drops are recorded as unresolved rather than as run variation.
 
 [Portable numeric extract](../../historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/results.json) ·
 [Interference extract](../../historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/interference.json) ·

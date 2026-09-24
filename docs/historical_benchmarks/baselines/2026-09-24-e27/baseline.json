@@ -46,7 +46,8 @@
     "observed_kv_capacity": {
       "tokens": 1344328,
       "maximum_concurrency_at_262144_tokens": 5.13,
-      "interpretation": "Engine-reported aggregate capacity, not a guarantee of that many simultaneous full-context requests"
+      "interpretation": "Engine-reported aggregate capacity, not a guarantee of that many simultaneous full-context requests",
+      "verified_on": "E27 boot on 2026-09-24: 1,344,328 tokens, 5.13x at 262,144 tokens, identical to E22b."
     },
     "active_kda_quantization": {
       "module": "KDA in_proj_qkvgfab",
@@ -298,11 +299,10 @@
         "sampling": "CUDA and pinned-host allocator counters from a background thread; no CUDA synchronization; process-lifetime peaks are not reset"
       },
       "external_host_observer": {
-        "enabled_during_measurement": true,
-        "meminfo_hz": 5,
-        "process_pss_period_seconds": 5
+        "enabled_during_measurement": false,
+        "note": "The external host-memory observers were not run in the E27 window."
       },
-      "overhead": "Not measured separately; reported performance includes these observers."
+      "overhead": "Not measured separately; the in-process GPU worker probe remained active during measurement."
     },
     "mhc_prefill": {
       "enabled": true,
@@ -976,7 +976,7 @@
   },
   "memory": {
     "status": "not_sampled",
-    "note": "The host memory observers were not run in the E27 window. Engine logs show no OOM or allocation retry; E27 changes scheduling only and allocates no memory."
+    "note": "The host memory observers were not run in the E27 window. Engine logs show no OOM or allocation retry. E27 adds no weights or buffers, but different batching can change KV residency and memory lifetimes; memory was not measured."
   },
   "provenance": {
     "previous_baseline": {
@@ -985,7 +985,7 @@
     },
     "accepted_series": {
       "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/results.json",
-      "sha256": "9b0453b4737fa497e723e713fe45fbd2a99ff6c265cad3820f12f90ed1a9a45f"
+      "sha256": "bc634a6b489460db57a481cc56a813255e33b8a1397c12da31ab82e65a986544"
     },
     "owner_decision": {
       "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/owner-decision.json",
@@ -993,7 +993,7 @@
     },
     "interference": {
       "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/interference.json",
-      "sha256": "1dce8b964b0fc6793db47b71a9f61795fd017b82d3c9021bbd39721bb22ceae1"
+      "sha256": "34007b6525f6b8b748a7ad8928dc8d54efd24da5c8251832175aa1a4148d2ca0"
     },
     "long_context_diagnostic": {
       "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/long-context-diagnostic.json",
@@ -1006,11 +1006,13 @@
     "The interference phase uses a local Rigmark extension; its source hash is recorded and it is not part of the frozen suite.",
     "The cadence is not applied while requests wait; several long contexts arriving together behave as on E22b.",
     "Host memory observers were not run in this window.",
-    "Generated-answer quality is not a performance gate; native output gates are recorded as measured."
+    "Generated-answer quality is not a performance gate; native output gates are recorded as measured.",
+    "Code decode -1.85%, prose -2.25% and C4 -3.27% against the same-day control remain unresolved observations.",
+    "The prefill cadence's queue bypass is latched scheduler state, not recomputed on each arrival; several long prompts arriving together mostly keep the E22b behaviour, with the last one decoding faster but starting later."
   ],
   "interference": {
     "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/interference.json",
-    "sha256": "1dce8b964b0fc6793db47b71a9f61795fd017b82d3c9021bbd39721bb22ceae1",
+    "sha256": "34007b6525f6b8b748a7ad8928dc8d54efd24da5c8251832175aa1a4148d2ca0",
     "medians": {
       "32768/1": {
         "background_decode_tokens_per_second_before": 42.0,
@@ -1041,5 +1043,16 @@
         "interferer_effective_prefill_tokens_per_second": 1653.372
       }
     }
-  }
+  },
+  "corrections": [
+    {
+      "date": "2026-09-24",
+      "reason": "Independent review after publication",
+      "changes": [
+        "system.instrumentation.external_host_observer.enabled_during_measurement corrected from true (copied from the E22b record) to false, matching the memory section and the report.",
+        "Added observed_kv_capacity.verified_on, memory.note on KV residency, two limits, and updated the hashes of the corrected interference and results extracts."
+      ],
+      "measurements_changed": false
+    }
+  ]
 }

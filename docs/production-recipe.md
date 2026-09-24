@@ -163,18 +163,25 @@ E21, rather than the generated tokens.
 E27 adds the image's native `--prefill-schedule-interval 8` and changes scheduling only.
 
 - **How it works.** While requests are in decode, the engine admits prefill work on one
-  step in eight and runs decode-only steps, on full decode CUDA graphs, in between.
+  step in eight and runs decode-only steps in between. Those steps are eligible for the
+  full decode CUDA graphs.
 - **Why.** Without it, a step that carries a long prompt's prefill chunk (up to 8,192
   tokens, about 2.5 s) is the only step in which running requests advance. Another
   client's 32K cold prompt then holds them at about 1.5 tokens per second for 14 s.
 - **Effect.** With the cadence, running requests keep 6–11 tokens per second during that
   prefill. The arriving request's first token comes 15–37% later.
-- **What is unaffected.**
-  - A prefill with no running decode is unchanged.
-  - The engine stops deferring while requests wait in the queue, so several long prompts
-    that arrive together behave as before.
+- **Limits.**
+  - A prefill with no running decode is not deferred.
+  - Once requests are left waiting in the queue, the scheduler stops deferring until the
+    queue drains. Several long prompts that arrive together therefore behave largely as
+    before; the last one decodes faster but starts a few seconds later.
+  - The longest pause of a running stream does not shrink, because a prefill step still
+    carries a full chunk.
+  - Weights and cache namespace are unchanged, but different batching can change answers
+    slightly.
 - **Cost in the standard suite.** C4, whose streams start together, pays +35% per-stream
   TTFT and -3% throughput against a same-day control. The owner accepted that trade-off.
+  Code decode (-1.85%) and prose (-2.25%) against that control remain unresolved.
 
 The KV pool is **15 GiB per rank**, compared with 16 GiB in the September 18 and
 September 11 references. The configured per-request context limit remains

@@ -4,7 +4,7 @@
   "experiment_id": "2026-09-24-e27-prefill-interval",
   "title": "E27: native prefill cadence (--prefill-schedule-interval 8) on the E22b recipe",
   "outcome": "promote",
-  "outcome_detail": "Owner accepted. Running agents decode 3-5x faster while another request cold-prefills 8-32K tokens; C4 per-stream TTFT +35% and C4 throughput -3.3% against the same-day control; other standard metrics within about 2%.",
+  "outcome_detail": "Owner accepted. Running agents decode 2.9-5.4x faster while another request cold-prefills 8-32K tokens; against the same-day control, C4 per-stream TTFT +35.1% and C4 -3.3%, code decode -1.85% and prose -2.25% (unresolved: all three candidate code-decode suites are below both controls, but load and order effects are not separated), C1 +3.3%, code TTFT +3.5% and C1 per-stream TTFT +3.0%; prefill and replay within about 2%.",
   "reference": {
     "baseline_id": "2026-09-23-e22b",
     "baseline_sha256": "7454e85cb1b1ac6ad4a04f4f88bca19b98955d238f0c4b315bf28aace31866bd"
@@ -464,7 +464,7 @@
   },
   "interference": {
     "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/interference.json",
-    "sha256": "1dce8b964b0fc6793db47b71a9f61795fd017b82d3c9021bbd39721bb22ceae1"
+    "sha256": "34007b6525f6b8b748a7ad8928dc8d54efd24da5c8251832175aa1a4148d2ca0"
   },
   "long_context_diagnostic": {
     "path": "docs/historical_benchmarks/experiments/2026-09-24-e27-prefill-interval/long-context-diagnostic.json",
@@ -482,5 +482,8 @@
   "notes": [
     "check-f0 first failed on a pending systemd reload on rank 1 (not caused by E27); after systemctl daemon-reload, which restarts no service, it passed.",
     "Host memory observers were not run in this window; no OOM or allocation-retry event was observed in engine logs."
+  ],
+  "unresolved_observations": [
+    "Code decode -1.85%, prose -2.25% and C4 -3.27% against the same-day control are neither attributed to E27 nor dismissed; three candidate suites followed by two control suites on single loads do not separate the setting from load, warmup or order effects."
   ]
 }

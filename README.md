@@ -50,7 +50,7 @@ not complete agent-task timings.
 E27 adds the engine's native `--prefill-schedule-interval 8`. While requests are
 generating, a newly arrived prompt is prefilled on one engine step in eight, with
 decode-only steps in between. Before E27, a long cold prompt stalled every running request
-for the whole prefill. A new Rigmark phase measures exactly that case:
+for the whole prefill. A new Rigmark phase measures that case:
 
 | Another request cold-prefills | Running agents | Their decode, E22b → E27 | Its first token, E22b → E27 |
 | --- | ---: | ---: | ---: |
@@ -64,6 +64,8 @@ their first token.
 
 - **C4 per-stream TTFT:** +35% against the same-day control.
 - **C4 throughput:** −3.3% against the same control.
+- **Unresolved:** code decode −1.85% and prose −2.25% against the same control are
+  recorded but neither attributed to E27 nor dismissed.
 - **Details:** the [current benchmark report](docs/benchmarks/baselines/2026-09-24-e27.md)
   lists both comparisons with per-run values, the interference phase, counts and
   limitations.

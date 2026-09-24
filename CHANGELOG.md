@@ -131,6 +131,16 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- Corrected the September 24 E27 records after an independent review; no measured value
+  changed.
+  - The frozen baseline no longer claims that the host memory observers ran. Its new
+    `corrections` field lists the edit, and the promotion record carries the new hash.
+  - The interference extract records hashed cache salts and the phase's limitations.
+  - The results extract names every metric that moved by more than 2%, and marks code
+    decode, prose and C4 against the same-day control as unresolved.
+  - The reports, README, recipe guide and template no longer claim that several long
+    prompts behave exactly as before, that answers or memory are untouched, or that
+    decode-only steps always use full CUDA graphs.
 - The README performance table now shows two comparisons for every metric: against the
   frozen E22b medians, as before, and against the same-day E22b control over the same
   LAN client path. The frozen comparison alone hid the C4 cost (−3.3%) and overstated

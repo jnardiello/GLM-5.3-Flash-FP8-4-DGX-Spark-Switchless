@@ -161,7 +161,8 @@ records how the default was applied. The immediate rollback is
 
 Rigmark's optional interference phase (`--interference-depths`) measures running
 requests' decode while another request cold-prefills. The E27 record stores its
-reference values and Rigmark source hash; use it for scheduling candidates.
+reference values, Rigmark source hash and known limitations; use it for scheduling
+candidates once those limitations are fixed in Rigmark.
 
 The [previous E22b reference](docs/historical_benchmarks/baselines/2026-09-23-e22b/baseline.json),
 the [E21 reference](docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json)
