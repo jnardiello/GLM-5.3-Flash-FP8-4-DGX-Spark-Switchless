@@ -23,7 +23,7 @@ from typing import Any, Callable
 
 
 REPO = Path(__file__).resolve().parents[1]
-BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json"
+BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json"
 ADAPTIVE_DEFAULTS = {
     "VLLM_ADAPTIVE_K_ENABLE": "1", "VLLM_ADAPTIVE_K_LO": "3",
     "VLLM_ADAPTIVE_K_HI": "5", "VLLM_ADAPTIVE_K_MODE": "per-request",
@@ -190,7 +190,7 @@ safe_options = (
     "--max-model-len", "--max-num-seqs", "--max-num-batched-tokens", "--kv-cache-dtype",
     "--kv-cache-memory-bytes", "--kv-cache-memory",
     "--scheduler-cls", "--moe-backend", "--speculative-config",
-    "--prefill-schedule-interval",
+    "--prefill-schedule-interval", "--compilation-config",
 )
 option_values = {key: [] for key in safe_options}
 for index, item in enumerate(command):
@@ -391,6 +391,9 @@ def expected_f0(baseline: Path | None = None) -> dict[str, Any]:
         # Absent in records before E27, which ran with the engine default of 1 (no cadence).
         "prefill_schedule_interval": str(
             (system.get("engine_arguments") or {}).get("prefill_schedule_interval", 1)),
+        # Absent in records before E28, which let vLLM choose the CUDA graph capture limit.
+        "max_cudagraph_capture_size": str(
+            (system.get("engine_arguments") or {}).get("max_cudagraph_capture_size", "")),
         "image_id": system.get("serving_image_id"),
         "runtime_identity": system.get("operational_identity") or {},
         "sparkcache_mode": "on" if system.get("sparkcache") else "off",
@@ -436,6 +439,16 @@ def adaptive_env(value: str) -> dict[str, str]:
 SCHEDULER_FLAGS = ("VLLM_E27B_SHORT_PREFILL_TOKENS", "VLLM_E27C_CADENCE_WHEN_QUEUED")
 
 
+def compilation_flag(expected: dict[str, Any]) -> list[str]:
+    """Expected --compilation-config values, compared without JSON quotes."""
+    size = expected.get("max_cudagraph_capture_size", "")
+    return [] if not size else ["{max_cudagraph_capture_size:" + size + "}"]
+
+
+def unquoted(values: list[str | None]) -> list[str]:
+    return [(value or "").replace('"', "") for value in values]
+
+
 def interval_flag(expected: dict[str, Any]) -> list[str]:
     """Expected --prefill-schedule-interval values: none for the engine default of 1."""
     value = expected.get("prefill_schedule_interval", "1")
@@ -478,6 +491,8 @@ def recipe_problems(recipe: dict[str, str], expected: dict[str, Any]) -> list[st
         problems.append("baseline KV memory budget")
     if flag_values(args, "--prefill-schedule-interval") != interval_flag(expected):
         problems.append("baseline prefill schedule interval")
+    if unquoted(flag_values(args, "--compilation-config")) != compilation_flag(expected):
+        problems.append("baseline compilation config")
     if recipe.get("sparkcache_mode", "off") != expected["sparkcache_mode"]:
         problems.append("baseline SparkCache mode")
     if recipe.get("spark_mhc_prefill_shard", "0") != expected["spark_mhc_prefill_shard"]:
@@ -634,6 +649,8 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
             problems.append(f"rank {rank}: command --kv-cache-memory-bytes")
         if options.get("--prefill-schedule-interval", []) != interval_flag(expected):
             problems.append(f"rank {rank}: command --prefill-schedule-interval")
+        if unquoted(options.get("--compilation-config", [])) != compilation_flag(expected):
+            problems.append(f"rank {rank}: command --compilation-config")
         speculative = container.get("speculative") or {}
         if (speculative.get("method"), speculative.get("model"),
                 speculative.get("num_speculative_tokens")) != ("dflash", "/draft", int(expected["spec_tokens"])):

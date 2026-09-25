@@ -71,7 +71,7 @@ with tempfile.TemporaryDirectory(prefix="tp4-encoder-launcher.") as temp:
         assert mounts(argv, TARGET)[0].startswith(str(Path.home()) + "/tp4/sparkcache/")
         assert argv[argv.index("--entrypoint") + 1] == "/opt/sircl-serving/entrypoint.sh"
         assert argv[argv.index("--node-rank") + 1] == str(rank)
-        assert "--kv-cache-memory-bytes=16106127360" in argv
+        assert "--kv-cache-memory-bytes=17179869184" in argv
         assert "--kv-transfer-config" in argv
 
     mount = f'_TEST_ENCODER_MOUNT="-v $SPARKCACHE_ENCODER:{TARGET}:ro"\n'

@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "record_type": "host_memory_summary",
+  "method": "MemAvailable from /proc/meminfo sampled once per second on every rank, read-only, from the first suite start to the last suite end; earlyoom on the nodes acts below 524,288 KiB (SIGTERM) and 102,400 KiB (SIGKILL).",
+  "ranks": {
+    "0": {
+      "samples": 1743,
+      "min_kib": 2226416,
+      "median_kib": 3686024,
+      "max_kib": 3975136
+    },
+    "1": {
+      "samples": 1743,
+      "min_kib": 6346684,
+      "median_kib": 8421916,
+      "max_kib": 8850948
+    },
+    "2": {
+      "samples": 1743,
+      "min_kib": 6754424,
+      "median_kib": 8494344,
+      "max_kib": 8915216
+    },
+    "3": {
+      "samples": 1743,
+      "min_kib": 6383092,
+      "median_kib": 8016020,
+      "max_kib": 8881436
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "schema": "tp4-iac-promotion/v1",
+  "baseline_id": "2026-09-25-e28b",
+  "owner_decision": "promote",
+  "status": "deployed_without_restart_identity_verified",
+  "measured_recipe_encoded": true,
+  "runtime_sources_unchanged": true,
+  "promotion_method": "launcher_command_parity",
+  "promotion_method_reason": "Owner decision under the repository promotion rule: the accepted suites were measured on the loaded E28b candidate, which was still serving, so the default was deployed without a restart and without a reproduction run.",
+  "candidate_overlays": {
+    "draft_depth_7": {
+      "path": "scripts/node/experiments/e03/draft-depth-7/delta.env",
+      "measured_sha256": "2285c7b9ebed417420a5170170f5fb30423e4d4fe325ca907bfe63fc3d0c8b47",
+      "status": "measured as E28 on the E27c recipe; encoded in the default; retained as the record of the measured candidate"
+    },
+    "kv_16gib": {
+      "path": "scripts/node/experiments/e03/kv-16gib/delta.env",
+      "measured_sha256": "e37be97b78aaffec5efe4a0b1624e5a43b0f8c083a8fe05132000ef7d0fac3f3",
+      "status": "measured as E28b on the E28 recipe; encoded in the default; retained as the record of the measured candidate"
+    }
+  },
+  "local_validation": {
+    "offline_check": "PASS",
+    "four_rank_command_parity_with_measured_candidate": "PASS",
+    "four_rank_command_parity_of_e27c_rollback_with_measured_e27c": "PASS",
+    "mounted_source_hashes": "PASS",
+    "historical_identity_selection": "PASS",
+    "previous_baseline_unchanged": {
+      "path": "docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json",
+      "sha256": "28e8f0319bc3ca3c0cee50fb51dc5d5c377a0104a3de88d818d54f320702c354"
+    },
+    "figures_visually_reviewed": true,
+    "plotter_matplotlib_version": "3.11.2",
+    "figures_sha256": {
+      "docs/plots/comparisons/2026-09-25-e28b-vs-2026-09-25-e27c/generation.png": "35a828f691135b590968c07d4408142db39ea7e38306bd0233396d4409715703",
+      "docs/plots/comparisons/2026-09-25-e28b-vs-2026-09-25-e27c/generation.svg": "e443667809c47a60e425240ea5655757da793dd7446de7b7fecb7cf005d0ea23",
+      "docs/plots/comparisons/2026-09-25-e28b-vs-2026-09-25-e27c/prefill.png": "1d3323de3b0e54cf541758a506356523a2e74fdcd949ea4c63cf1e8ff8c8dad2",
+      "docs/plots/comparisons/2026-09-25-e28b-vs-2026-09-25-e27c/prefill.svg": "1dfc951d2f113b235c10d2ca5f05b99cc51e6838b7d65dcd4f23a2085240ce18"
+    }
+  },
+  "new_deployments": 1,
+  "new_lifecycle_actions": 0,
+  "new_measurement_requests": 0,
+  "live_default_apply": {
+    "date": "2026-09-25",
+    "restart": false,
+    "deploy": "PASS",
+    "autostart_tp4_env": "none; the next boot selects the E28b default",
+    "deployed_cluster_env_matches_local": "4/4",
+    "host_actions": [
+      "systemctl daemon-reload on ranks 2 and 3 after the deploy left tp4-fabric-iptables.service with NeedDaemonReload=yes; it restarts no service"
+    ],
+    "check_f0": {
+      "result": "PASS",
+      "problems": []
+    },
+    "per_rank_running_identity": {
+      "ranks_checked": 4,
+      "num_speculative_tokens_7": "4/4",
+      "adaptive_k_hi_7": "4/4",
+      "compilation_config_max_cudagraph_capture_size_72": "4/4",
+      "kv_cache_memory_bytes_17179869184": "4/4",
+      "e27c_scheduler_sha256": "4/4",
+      "rank0_boot_lines": [
+        "E27C_CADENCE_WHEN_QUEUED_READY interval=8",
+        "E27B_SHORT_PREFILL_READY tokens=2048 interval=8",
+        "draft-budget active=1 source=SchedulerOutput.resolve_num_spec_tokens_to_schedule engine_k=7"
+      ]
+    },
+    "health": 200
+  },
+  "live_reproduction": {
+    "status": "not_required_by_owner_decision",
+    "executed_runs": 0,
+    "executed_requests": 0
+  },
+  "baseline": {
+    "path": "docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json",
+    "sha256": "a3bbb516b2df6df47f48f881f96e536840e9512e2b4ec26617e1f09f3460b0bf"
+  },
+  "rollback": "scripts/node/reference/baseline-20260925-e27c.env",
+  "notes": [
+    "The encoded default produces a launcher command byte-identical, on all four ranks, to the measured E28b candidate (E27c recipe plus the draft-depth-7 and 16 GiB KV overlays).",
+    "The E27c rollback produces a launcher command byte-identical, on all four ranks, to the measured E27c load.",
+    "Live identity check PASS against 2026-09-25-e28b with no TP4_ENV, on the load that ran the accepted suites."
+  ]
+}

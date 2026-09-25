@@ -5,7 +5,7 @@ artifacts for the four cluster hosts. Nothing in this directory runs merely beca
 it exists in the repository; deploy, bootstrap, launcher, and configuration choices
 select the files explicitly.
 
-The base configuration is the [accepted September 25 E27c recipe](../../docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json).
+The base configuration is the [accepted September 25 E28b recipe](../../docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json).
 The previous E03 reference, the earlier September 19 base, September 18 and September 11 remain historical references with their own
 rollback assets; the September 12 filenames below belong to the September 11
 reference's later capture.
@@ -44,7 +44,8 @@ reference's later capture.
 | shared `scripts/node/etc/common/` files | `/etc/sysctl.d/`, `/etc/sudoers.d/`, `/usr/local/sbin/`, `/etc/systemd/system/` | bootstrap/deploy-host |
 | GRUB drop-in | `/etc/default/grub.d/zz-tp4-perf.cfg` | bootstrap/deploy-host and `tp4-iommu.sh` |
 | built NCCL library | `$NCCL_DIR/libnccl.so.2` | `scripts/node/nccl/install-nccl.sh` |
-| E27 reference overlay selected through `TP4_ENV` (immediate rollback) | `~/tp4/scripts/node/reference/baseline-20260924-e27.env` | `scripts/deploy.sh` |
+| E27c reference overlay selected through `TP4_ENV` (immediate rollback) | `~/tp4/scripts/node/reference/baseline-20260925-e27c.env` | `scripts/deploy.sh` |
+| E27 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260924-e27.env` | `scripts/deploy.sh` |
 | E22b reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260924-e22b.env` | `scripts/deploy.sh` |
 | E21 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260923-e21.env` | `scripts/deploy.sh` |
 | E03 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260919-e03.env` | `scripts/deploy.sh` |
@@ -89,8 +90,9 @@ dequantizes the same weights into a shared scratch and runs BF16 linear executio
 The scratch and inverse map occupy about 49.13 MiB per rank. The GPU worker's
 allocator probe is retained because it was active in the accepted measurement.
 
-The configured KV pool is 15 GiB per rank; the measured engine reported 1,344,328
-tokens of pooled capacity while retaining the 262,144-token per-request limit.
+The configured KV pool is 16 GiB per rank (E28b); with seven draft tokens the measured
+engine reported 1,365,066 tokens of pooled capacity while retaining the 262,144-token
+per-request limit.
 Those values do not guarantee six simultaneous full-context sessions. See
 [`production-recipe.md`](../../docs/production-recipe.md#hybrid-kda-projections-and-memory)
 for the measured configuration and its limits.
@@ -124,9 +126,13 @@ when reproducing the Current recipe: its E22b JSON, which E27 and E27c keep unch
 `experiments/e03/drafter-w8a16/kv-transfer-config-e22b.json`, separate from the E21, E03
 and earlier cache computations, and its spelling is part of the hash.
 
-For the immediate return to E27, use
-[`reference/baseline-20260924-e27.env`](reference/baseline-20260924-e27.env). It removes
-only the E27c scheduler mount and its two flags.
+For the immediate return to E27c, use
+[`reference/baseline-20260925-e27c.env`](reference/baseline-20260925-e27c.env). It restores
+five draft tokens and the 15 GiB KV pool.
+
+For the return to E27, use
+[`reference/baseline-20260924-e27.env`](reference/baseline-20260924-e27.env). It also removes
+the E27c scheduler mount and its two flags.
 
 For the return to E22b, use
 [`reference/baseline-20260924-e22b.env`](reference/baseline-20260924-e22b.env). It also
@@ -200,4 +206,4 @@ The first three inspect deployed nodes and require site configuration. The final
 command is fully offline and validates source syntax, manifests, templates, links,
 fixtures, the adaptive-k policy, hybrid dispatch contracts, and payload preparation
 without SSH, Docker, a GPU, or `cluster.env`. Offline checks do not constitute a new
-live deployment of the accepted E27c defaults.
+live deployment of the accepted E28b defaults.

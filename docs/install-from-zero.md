@@ -336,7 +336,8 @@ replay connector pin, draft-budget scheduler startup marker and the
 `E21_BF16_RESIDUE_W8A16_READY` line with 67 modules and the `E22_DRAFTER_W8A16_READY`
 line with 30 modules on every rank, `--prefill-schedule-interval 8` in every rank's
 command (E27), and the `E27C_CADENCE_WHEN_QUEUED_READY` and `E27B_SHORT_PREFILL_READY`
-lines on rank 0 (E27c). All E21, E22b, E27 and E27c sources are tracked in the checkout
+lines on rank 0 (E27c), `num_spec_tokens=7` and `GPU KV cache size: 1,365,066 tokens` in the
+rank-0 log (E28b). All E21, E22b, E27 and E27c sources are tracked in the checkout
 and need no extra operator payload. Run the
 [post-boot functional gates](operations.md#post-boot-functional-gates) within two
 minutes of readiness, then verify the accepted identity with `./scripts/check-f0.py`.

@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-25-e28-draft-depth-7",
+  "date": "2026-09-25",
+  "decision": "accepted; promoted inside E28b with a 16 GiB KV pool",
+  "statement": "The owner accepted E28 after reviewing the three suites, the acceptance probes with and without thinking, the user-experience trade-offs and the memory impact, then asked to raise the KV pool to 16 GiB so that five full-length agents fit together. E28b, measured separately, was promoted.",
+  "accepted_trade_off": "Code decode +10.5% on long answers (and faster code reasoning with thinking) against about +56 ms C1 per-stream TTFT, cached-replay TTFT about +80-110 ms at 8K-32K, C1 end-to-end -2.2% on 256-token answers and 4.9% less KV token capacity in the same 15 GiB pool (1,278,751 tokens; five simultaneous agents fit about 255,750 tokens each instead of 262,144).",
+  "follow_up": "Raise the KV pool to 16 GiB (E28b); explain the cached-replay TTFT cost."
+}

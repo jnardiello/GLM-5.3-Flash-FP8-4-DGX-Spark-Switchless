@@ -1,0 +1,560 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "experiment_id": "2026-09-25-e28-draft-depth-7",
+  "title": "E28: seven draft tokens for a single request on the E27c recipe",
+  "outcome": "superseded",
+  "outcome_detail": "Accepted by the owner and promoted inside E28b, which adds a 16 GiB KV pool. Against the frozen E27c medians: code decode +10.5% (all three suites above the E27c range), prose +1.2%, C2 +0.2%, C4 -0.3%, C1 end-to-end -2.2%, C1 per-stream TTFT +16.5% (about +56 ms), cached replay -8.2% at 8K and -9.6% at 32K, cold prefill +0.8% to +1.2%. Structured output reaches 7.8 tokens per step. KV capacity 1,278,751 tokens (-4.9%).",
+  "reference": {
+    "baseline_id": "2026-09-25-e27c",
+    "baseline_sha256": "28e8f0319bc3ca3c0cee50fb51dc5d5c377a0104a3de88d818d54f320702c354"
+  },
+  "coverage": "One coordinated transition from E27c, then on one retained E28 load: acceptance probes without and with thinking and three complete native suites (162 requests).",
+  "client_transport": "Direct LAN HTTP to the rank-0 API, like the E27c reference.",
+  "candidate": {
+    "overlay": "scripts/node/experiments/e03/draft-depth-7/delta.env",
+    "measured_overlay_sha256": "2285c7b9ebed417420a5170170f5fb30423e4d4fe325ca907bfe63fc3d0c8b47"
+  },
+  "runs": [
+    {
+      "run": "run-1",
+      "receipt_sha256": "aa8a2589ddc0f09a5d690043005a9a0e47b154ce8bfc303c7171c6d4b9527ec1",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-25-e28-draft-depth-7/run-1.json",
+        "sha256": "ecb5676397ff4a3969a0e357ecdaf9c62676af0da68a3c9c431aa517ee5b8449"
+      }
+    },
+    {
+      "run": "run-2",
+      "receipt_sha256": "848687f80612f8c35d63675931ba436b837a1b2c61e82978a91362e3293d7bb9",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-25-e28-draft-depth-7/run-2.json",
+        "sha256": "9dda8b4596d633a34b6821ce376d672a7fe81e52793fc74227e2a56ba7c3e315"
+      }
+    },
+    {
+      "run": "run-3",
+      "receipt_sha256": "f8a07dead653437c7e8ac2e70a6c2023b1bf2e2be416a8b5e45056f4eea9bdfb",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-25-e28-draft-depth-7/run-3.json",
+        "sha256": "466d1c2891dad0edac9e0e9dfb0ae9718acf9593701a53b2b539fc4abdd8b2c6"
+      }
+    }
+  ],
+  "performance_metrics": [
+    {
+      "key": "code_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "code",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        62.019,
+        63.748,
+        61.188
+      ],
+      "median": 62.019,
+      "dispersion": {
+        "minimum": 61.188,
+        "maximum": 63.748,
+        "sample_stdev": 1.3059863450026297
+      },
+      "current_baseline_median": 56.124,
+      "current_baseline_per_run": [
+        54.824,
+        57.287,
+        56.124
+      ],
+      "change_vs_current_baseline_pct": 10.503527902501595
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "1",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        43.976,
+        41.22,
+        42.63
+      ],
+      "median": 42.63,
+      "dispersion": {
+        "minimum": 41.22,
+        "maximum": 43.976,
+        "sample_stdev": 1.3781238454265763
+      },
+      "current_baseline_median": 43.581,
+      "current_baseline_per_run": [
+        43.039,
+        43.581,
+        44.38
+      ],
+      "change_vs_current_baseline_pct": -2.1821435946857584
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "2",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        66.649,
+        62.065,
+        66.789
+      ],
+      "median": 66.649,
+      "dispersion": {
+        "minimum": 62.065,
+        "maximum": 66.789,
+        "sample_stdev": 2.6878997997197263
+      },
+      "current_baseline_median": 66.52,
+      "current_baseline_per_run": [
+        68.265,
+        66.52,
+        65.083
+      ],
+      "change_vs_current_baseline_pct": 0.19392663860493822
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "4",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        94.126,
+        97.632,
+        96.403
+      ],
+      "median": 96.403,
+      "dispersion": {
+        "minimum": 94.126,
+        "maximum": 97.632,
+        "sample_stdev": 1.7789138071681083
+      },
+      "current_baseline_median": 96.696,
+      "current_baseline_per_run": [
+        96.7,
+        94.084,
+        96.696
+      ],
+      "change_vs_current_baseline_pct": -0.30301149995862514
+    },
+    {
+      "key": "prose_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "prose",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        33.661,
+        33.512,
+        33.519
+      ],
+      "median": 33.519,
+      "dispersion": {
+        "minimum": 33.512,
+        "maximum": 33.661,
+        "sample_stdev": 0.08407734534344066
+      },
+      "current_baseline_median": 33.12,
+      "current_baseline_per_run": [
+        33.662,
+        33.104,
+        33.12
+      ],
+      "change_vs_current_baseline_pct": 1.204710144927539
+    },
+    {
+      "key": "code_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "code",
+        "ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.401,
+        0.387,
+        0.405
+      ],
+      "median": 0.401,
+      "dispersion": {
+        "minimum": 0.387,
+        "maximum": 0.405,
+        "sample_stdev": 0.009451631252505225
+      },
+      "current_baseline_median": 0.39,
+      "current_baseline_per_run": [
+        0.39,
+        0.386,
+        0.402
+      ],
+      "change_vs_current_baseline_pct": 2.820512820512823
+    },
+    {
+      "key": "prose_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "prose",
+        "ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.376,
+        0.376,
+        0.377
+      ],
+      "median": 0.376,
+      "dispersion": {
+        "minimum": 0.376,
+        "maximum": 0.377,
+        "sample_stdev": 0.0005773502691896262
+      },
+      "current_baseline_median": 0.376,
+      "current_baseline_per_run": [
+        0.376,
+        0.376,
+        0.377
+      ],
+      "change_vs_current_baseline_pct": 0.0
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "1",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.395,
+        0.396,
+        0.399
+      ],
+      "median": 0.396,
+      "dispersion": {
+        "minimum": 0.395,
+        "maximum": 0.399,
+        "sample_stdev": 0.0020816659994661348
+      },
+      "current_baseline_median": 0.34,
+      "current_baseline_per_run": [
+        0.34,
+        0.337,
+        0.34
+      ],
+      "change_vs_current_baseline_pct": 16.470588235294116
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "2",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.463,
+        0.447,
+        0.454
+      ],
+      "median": 0.454,
+      "dispersion": {
+        "minimum": 0.447,
+        "maximum": 0.463,
+        "sample_stdev": 0.00802080627701065
+      },
+      "current_baseline_median": 0.446,
+      "current_baseline_per_run": [
+        0.46,
+        0.446,
+        0.446
+      ],
+      "change_vs_current_baseline_pct": 1.793721973094172
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "4",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.519,
+        0.519,
+        0.518
+      ],
+      "median": 0.519,
+      "dispersion": {
+        "minimum": 0.518,
+        "maximum": 0.519,
+        "sample_stdev": 0.0005773502691896262
+      },
+      "current_baseline_median": 0.525,
+      "current_baseline_per_run": [
+        0.525,
+        0.592,
+        0.52
+      ],
+      "change_vs_current_baseline_pct": -1.142857142857144
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2585.857,
+        2580.134,
+        2538.755
+      ],
+      "median": 2580.134,
+      "dispersion": {
+        "minimum": 2538.755,
+        "maximum": 2585.857,
+        "sample_stdev": 25.70205171447077
+      },
+      "current_baseline_median": 2558.895,
+      "current_baseline_per_run": [
+        2602.898,
+        2546.988,
+        2558.895
+      ],
+      "change_vs_current_baseline_pct": 0.830006702111655
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        8581.389,
+        8662.467,
+        8675.834
+      ],
+      "median": 8662.467,
+      "dispersion": {
+        "minimum": 8581.389,
+        "maximum": 8675.834,
+        "sample_stdev": 51.10801763259282
+      },
+      "current_baseline_median": 9431.975,
+      "current_baseline_per_run": [
+        9353.221,
+        9431.975,
+        9493.59
+      ],
+      "change_vs_current_baseline_pct": -8.158503388738836
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2783.248,
+        2714.681,
+        2685.153
+      ],
+      "median": 2714.681,
+      "dispersion": {
+        "minimum": 2685.153,
+        "maximum": 2783.248,
+        "sample_stdev": 50.3255490084312
+      },
+      "current_baseline_median": 2689.31,
+      "current_baseline_per_run": [
+        2689.31,
+        2662.879,
+        2730.835
+      ],
+      "change_vs_current_baseline_pct": 0.9434018391334617
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        35640.596,
+        32898.277,
+        33491.346
+      ],
+      "median": 33491.346,
+      "dispersion": {
+        "minimum": 32898.277,
+        "maximum": 35640.596,
+        "sample_stdev": 1442.8744400802848
+      },
+      "current_baseline_median": 37056.262,
+      "current_baseline_per_run": [
+        36702.756,
+        37056.262,
+        37317.912
+      ],
+      "change_vs_current_baseline_pct": -9.620279563006125
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2752.234,
+        2665.0,
+        2679.077
+      ],
+      "median": 2679.077,
+      "dispersion": {
+        "minimum": 2665.0,
+        "maximum": 2752.234,
+        "sample_stdev": 46.832822062452365
+      },
+      "current_baseline_median": 2646.928,
+      "current_baseline_per_run": [
+        2646.928,
+        2640.063,
+        2671.68
+      ],
+      "change_vs_current_baseline_pct": 1.2145778049119713
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        39944.292,
+        39405.502,
+        39124.802
+      ],
+      "median": 39405.502,
+      "dispersion": {
+        "minimum": 39124.802,
+        "maximum": 39944.292,
+        "sample_stdev": 416.4634866347821
+      },
+      "current_baseline_median": 39931.684,
+      "current_baseline_per_run": [
+        40004.175,
+        39654.356,
+        39931.684
+      ],
+      "change_vs_current_baseline_pct": -1.3177055092392314
+    }
+  ],
+  "integrity": {
+    "requests": 162,
+    "completed_streams": 162,
+    "visible_responses": 162,
+    "native_validation_errors": 0,
+    "protocol_errors": 0,
+    "runtime_errors": 0,
+    "prefill_token_matches": "54/54",
+    "decode_output_gates": {
+      "code": "15/15",
+      "prose": "15/15",
+      "structured": "15/15"
+    },
+    "finish_reasons": {
+      "stop": 45,
+      "length": 117
+    },
+    "code_output_budget_stops": 0,
+    "client_probe_timeouts": 0
+  },
+  "acceptance_probes": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-25-e28-draft-depth-7/acceptance-probes.json",
+    "sha256": "94f80d4eb63b56d6f457ae1e818795c10d47b5b20b9106e998f1b1cc321c8dfb"
+  },
+  "owner_decision": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-25-e28-draft-depth-7/owner-decision.json",
+    "sha256": "3c0836217a774f204faa31e7d55d59bdcf9ceafd3f624ce71601142d54827e2b"
+  },
+  "post_boot_gates": {
+    "coherent_response": "PASS",
+    "tool_call": "PASS",
+    "elapsed_from_health_seconds": 3.51
+  },
+  "boot": {
+    "num_speculative_tokens": 7,
+    "cudagraph_capture_sizes": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      24,
+      32,
+      40,
+      48,
+      56,
+      64,
+      72
+    ],
+    "kv_cache_tokens": 1278751,
+    "maximum_concurrency_at_262144_tokens": 4.88,
+    "engine_k_in_draft_budget_line": 7,
+    "VLLM_ADAPTIVE_K_HI_on_ranks": "4/4"
+  },
+  "memory": "MemAvailable after the window: rank 0 4.8 GB, ranks 1-3 9.5-9.6 GB (E27c at idle: 4.4 / 9.2 GB); swap unused; rank-0 CUDA allocator 102.8 GB current, zero OOM and zero allocation retries.",
+  "notes": [
+    "Short 256-token C1 answers do not decode faster (per-stream 44.2-46.5 tok/s against 45.4-47.0 on E27c); the gain comes from long answers.",
+    "The cached-replay TTFT cost was not explained in this window.",
+    "Host memory observers were not run; no OOM or allocation retry was observed in engine logs."
+  ]
+}

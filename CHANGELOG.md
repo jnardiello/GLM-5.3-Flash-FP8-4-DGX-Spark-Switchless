@@ -7,6 +7,28 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Published the September 25 E28b frozen baseline and its promotion record. E28b is the E27c
+  recipe with seven draft tokens for a single request and a 16 GiB KV pool per rank.
+  - The DFlash2 drafter is trained with blocks of 8, so one request now drafts seven tokens
+    (`SPEC_TOKENS=7`, table `[[1,1,7],[2,6,3]]`, `VLLM_ADAPTIVE_K_HI=7`); batches of 2–6
+    keep three. `--compilation-config={"max_cudagraph_capture_size":72}` keeps the E27c CUDA
+    graph set.
+  - Seven tokens hold about 5% fewer KV tokens per GiB, so the pool grows from 15 to 16 GiB:
+    1,365,066 tokens, 5.21 full 262,144-token contexts. Rank 0 kept at least 2.1 GiB
+    available during the three suites.
+  - Against E27c: code decode +8.7%, C2 +1.4%, C4 −3.2%, C1 −0.9%, C1 per-stream TTFT
+    +15.9%, cached replay −8.1% at 8K and −10.2% at 32K. Three native suites, 162 requests,
+    zero errors, 45/45 output gates; the default was deployed onto the measured load
+    without a restart and the live identity check passed.
+- Published the E28 and E28b experiment records: suite extracts, the drafter acceptance
+  probes (E27c and E28, with and without thinking), per-second host-memory samples, owner
+  decisions, reports and index rows. E28, seven draft tokens with the 15 GiB pool, is
+  recorded as superseded.
+- Added the E28 and E28b candidate overlays under `scripts/node/experiments/e03/draft-depth-7/`
+  and `scripts/node/experiments/e03/kv-16gib/`, and an offline test covering four-rank
+  launcher parity of both with the E27c recipe and the E28b default, and overlay refusals.
+- Added `scripts/node/reference/baseline-20260925-e27c.env`, the complete E27c recipe, as the
+  one-step rollback from E28b.
 - Published the September 25 E27c frozen baseline and its promotion record. E27c keeps
   E27's `--prefill-schedule-interval 8` and mounts the serving image's scheduler with one
   reviewed patch from `scripts/node/experiments/e03/queued-cadence/`.
@@ -155,6 +177,12 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- The default recipe in `cluster.env.example` is now E28b. `scripts/check-f0.py` validates
+  seven draft tokens, the adaptive table and high state, the CUDA graph limit
+  (`--compilation-config`) and the 16 GiB KV budget by default, and requires the absence of
+  the graph limit for older records. The README, recipe, operations, installation and node
+  guides, `AGENTS.md` and the comparison figures now describe E28b against E27c; the E27c
+  report is marked superseded.
 - The default recipe in `cluster.env.example` is now E27c. `scripts/check-f0.py`
   validates the E27c scheduler hash, both flags and the rank-0 boot lines by default, and
   requires the flags' absence for older records. The README, recipe, operations,

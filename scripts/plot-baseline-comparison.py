@@ -13,9 +13,9 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json"
-PREVIOUS_BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json"
-OUTPUT_DIR = ROOT / "docs/plots/comparisons/2026-09-25-e27c-vs-2026-09-24-e27"
+BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json"
+PREVIOUS_BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json"
+OUTPUT_DIR = ROOT / "docs/plots/comparisons/2026-09-25-e28b-vs-2026-09-25-e27c"
 TEAL, INK, MUTED = "#087f74", "#172b46", "#536478"
 PREVIOUS_COLOR = "#92a5ba"
 # Match the owner's descriptive convention in the accepted reports: within about the
@@ -110,7 +110,7 @@ def figure(output_dir, name, title, panels, current, previous, captions, note):
     fig = plt.figure(figsize=(17.2, height), facecolor="white")
     axes = [fig.add_axes([0.145, 0.23, 0.26, 0.47]), fig.add_axes([0.650, 0.23, 0.255, 0.47])]
     fig.text(0.035, 0.935, title, fontsize=23, fontweight="bold", color=INK)
-    fig.text(0.035, 0.88, "GLM-5.3-Flash · Four GB10 nodes · E27c scheduler over E27 · Native Rigmark",
+    fig.text(0.035, 0.88, "GLM-5.3-Flash · Four GB10 nodes · E28b seven draft tokens and 16 GiB KV over E27c · Native Rigmark",
              fontsize=12, color=MUTED)
     fig.legend(handles=[Patch(color=PREVIOUS_COLOR, label=captions[0]),
                         Patch(color=TEAL, label=captions[1])],
@@ -134,8 +134,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
     args = parser.parse_args()
-    current, current_caption = read_baseline(BASELINE, "Current E27c")
-    previous, previous_caption = read_baseline(PREVIOUS_BASELINE, "Previous E27")
+    current, current_caption = read_baseline(BASELINE, "Current E28b")
+    previous, previous_caption = read_baseline(PREVIOUS_BASELINE, "Previous E27c")
     import matplotlib
 
     matplotlib.use("Agg")

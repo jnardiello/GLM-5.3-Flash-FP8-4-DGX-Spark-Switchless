@@ -378,6 +378,9 @@ assert output.getvalue() == "BASELINE CHECK FAIL\n"
 def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
     exp = check.expected_f0(path)
     rec = recipe()
+    low, high = exp["adaptive_tokens"]
+    rec.update(spec_tokens=exp["spec_tokens"],
+               spec_extra_json=f'"num_speculative_tokens_per_batch_size":[[1,1,{high}],[2,6,{low}]]')
     rec.update(image=exp["image_digest"], image_digest=exp["image_digest"],
                sparkcache_mode=exp["sparkcache_mode"],
                spark_mhc_prefill_shard=exp["spark_mhc_prefill_shard"], **exp["payload_pins"])
@@ -390,14 +393,21 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
         rec[name] = rec[name].replace("17179869184", exp["kv_cache_memory_bytes"])
         if exp["prefill_schedule_interval"] != "1":
             rec[name] += " --prefill-schedule-interval " + exp["prefill_schedule_interval"]
+        if exp["max_cudagraph_capture_size"]:
+            rec[name] += ' --compilation-config={"max_cudagraph_capture_size":' + exp["max_cudagraph_capture_size"] + "}"
     ranks = [probe(rank) for rank in range(4)]
     identity = exp["runtime_identity"]
     for rank, item in enumerate(ranks):
         c = item["remote"]["container"]
+        c["speculative"].update(num_speculative_tokens=int(exp["spec_tokens"]),
+                                num_speculative_tokens_per_batch_size=[[1, 1, high], [2, 6, low]])
         c.update(image_reference=rec["image"], image_digests=[exp["image_digest"]],
                  image_id=exp["image_id"], runtime_files=deepcopy(identity.get("container_file_sha256", {})))
         c["options"]["--kv-cache-memory-bytes"] = [exp["kv_cache_memory_bytes"]]
         c["options"]["--prefill-schedule-interval"] = check.interval_flag(exp)
+        c["options"]["--compilation-config"] = (
+            ['{"max_cudagraph_capture_size":' + exp["max_cudagraph_capture_size"] + "}"]
+            if exp["max_cudagraph_capture_size"] else [])
         c["environment"].update(exp["adaptive_env"])
         c["environment"].update(identity.get("environment", {}))
         c["runtime_workers"] = [{"pid": 100 + rank, "patched_nccl_loaded": True}]
@@ -416,22 +426,37 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
     return rec, exp, ranks
 
 
-assert check.BASELINE == BASELINES / "2026-09-25-e27c/baseline.json"
+assert check.BASELINE == BASELINES / "2026-09-25-e28b/baseline.json"
 HISTORICAL = ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21",
-              "2026-09-23-e22b", "2026-09-24-e27", "2026-09-25-e27c")
+              "2026-09-23-e22b", "2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b")
 for name in HISTORICAL:
     baseline_path = BASELINES / name / "baseline.json"
     baseline_recipe, baseline_expected, baseline_ranks = baseline_fixture(baseline_path)
     assert check.evaluate(baseline_recipe, baseline_expected, baseline_ranks, endpoint()) == [], name
     # Records before E27 ran without the cadence and must refuse it; E27 requires it.
     assert baseline_expected["prefill_schedule_interval"] == (
-        "8" if name in ("2026-09-24-e27", "2026-09-25-e27c") else "1"), name
+        "8" if name in ("2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b") else "1"), name
     # Records before E27c ran the image's scheduler and must refuse the E27c flags.
     flags = set(baseline_expected["runtime_identity"].get("environment", {})) & set(check.SCHEDULER_FLAGS)
-    assert flags == (set(check.SCHEDULER_FLAGS) if name == "2026-09-25-e27c" else set()), name
+    assert flags == (set(check.SCHEDULER_FLAGS) if name in ("2026-09-25-e27c", "2026-09-25-e28b")
+                     else set()), name
+    # Only E28b fixes the CUDA graph capture limit.
+    assert baseline_expected["max_cudagraph_capture_size"] == ("72" if name == "2026-09-25-e28b" else ""), name
 
 current_recipe, current_expected, current_ranks = baseline_fixture(check.BASELINE)
-assert current_expected["baseline_id"] == "2026-09-25-e27c"
+assert current_expected["baseline_id"] == "2026-09-25-e28b"
+assert current_expected["spec_tokens"] == "7" and current_expected["adaptive_tokens"] == [3, 7]
+assert current_expected["kv_cache_memory_bytes"] == "17179869184"
+for bad in ("", ' --compilation-config={"max_cudagraph_capture_size":96}'):
+    wrong_compilation = deepcopy(current_recipe)
+    wrong_compilation["extra_vllm_args"] = wrong_compilation["extra_vllm_args"].replace(
+        ' --compilation-config={"max_cudagraph_capture_size":72}', bad)
+    assert "baseline compilation config" in check.recipe_problems(wrong_compilation, current_expected), bad
+for bad in ([], ['{"max_cudagraph_capture_size":96}']):
+    wrong_live_compilation = deepcopy(current_ranks)
+    wrong_live_compilation[3]["remote"]["container"]["options"]["--compilation-config"] = bad
+    assert "rank 3: command --compilation-config" in check.evaluate(
+        current_recipe, current_expected, wrong_live_compilation, endpoint()), bad
 scheduler_target = "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py"
 assert scheduler_target in current_expected["runtime_identity"]["container_file_sha256"]
 for key in check.SCHEDULER_FLAGS:
@@ -478,15 +503,15 @@ for bad in ([], ["4"], ["8", "8"]):
 assert current_expected["runtime_identity"]["e21_boot_receipt"]["modules"] == 67
 assert current_expected["runtime_identity"]["e22_boot_receipt"]["modules"] == 30
 assert current_expected["runtime_identity"]["e22_boot_receipt"]["context_kv_w8a16"] is False
-assert current_expected["kv_cache_memory_bytes"] == "16106127360"
+assert BASELINES.joinpath("2026-09-25-e27c/baseline.json").exists()
 assert current_expected["runtime_identity"]["kda_boot_receipt"]["prefill_bf16_min_tokens"] == 2048
 
 wrong_kv = deepcopy(current_recipe)
 for name in ("extra_vllm_args", "base_extra_vllm_args"):
-    wrong_kv[name] = wrong_kv[name].replace("16106127360", "17179869184")
+    wrong_kv[name] = wrong_kv[name].replace("17179869184", "16106127360")
 assert "baseline KV memory budget" in check.recipe_problems(wrong_kv, current_expected)
 wrong_live_kv = deepcopy(current_ranks)
-wrong_live_kv[2]["remote"]["container"]["options"]["--kv-cache-memory-bytes"] = ["17179869184"]
+wrong_live_kv[2]["remote"]["container"]["options"]["--kv-cache-memory-bytes"] = ["16106127360"]
 assert any("rank 2: command --kv-cache-memory-bytes" in problem for problem in
            check.evaluate(current_recipe, current_expected, wrong_live_kv, endpoint()))
 
@@ -586,6 +611,7 @@ try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-overlay.") as temp:
         isolated = Path(temp)
         for relative in ("scripts/lib/common.sh", "scripts/node/bootstrap/versions.env",
+                         "scripts/node/reference/baseline-20260925-e27c.env",
                          "scripts/node/reference/baseline-20260924-e27.env",
                          "scripts/node/reference/baseline-20260924-e22b.env",
                          "scripts/node/reference/baseline-20260923-e21.env",
@@ -604,7 +630,8 @@ RELAY_DEST=operator@192.0.2.23
 '''
         check.REPO = isolated
         for overlay, baseline in (
-            (None, "2026-09-25-e27c"),
+            (None, "2026-09-25-e28b"),
+            ("scripts/node/reference/baseline-20260925-e27c.env", "2026-09-25-e27c"),
             ("scripts/node/reference/baseline-20260924-e27.env", "2026-09-24-e27"),
             ("scripts/node/reference/baseline-20260924-e22b.env", "2026-09-23-e22b"),
             ("scripts/node/reference/baseline-20260923-e21.env", "2026-09-23-e21"),
@@ -627,17 +654,22 @@ RELAY_DEST=operator@192.0.2.23
             problems = check.recipe_problems(effective, selected)
             assert problems == [], (baseline, problems)
             if overlay:
-                # Every historical return drops the E27c scheduler flags from the current base,
-                # and every return before E27 also drops the cadence.
+                # Every historical return restores five draft tokens and no fixed graph limit;
+                # returns before E27c also drop the scheduler flags, and returns before E27
+                # also drop the cadence.
                 against_current = check.recipe_problems(effective, current_expected)
+                assert "effective recipe mismatch: spec_tokens" in against_current, baseline
+                assert "baseline compilation config" in against_current, baseline
                 for key in check.SCHEDULER_FLAGS:
-                    assert "baseline runtime environment: " + key in against_current, baseline
+                    assert ("baseline runtime environment: " + key in against_current) == (
+                        baseline != "2026-09-25-e27c"), baseline
                 assert ("baseline prefill schedule interval" in against_current) == (
-                    baseline != "2026-09-24-e27"), baseline
+                    baseline not in ("2026-09-24-e27", "2026-09-25-e27c")), baseline
                 assert effective["extra_docker_env"] != effective["base_extra_docker_env"]
-                if baseline == "2026-09-24-e27":
-                    # E27c only adds the scheduler mount and flags: same engine arguments.
-                    assert effective["extra_vllm_args"] == effective["base_extra_vllm_args"]
+                if baseline in ("2026-09-24-e27", "2026-09-25-e27c"):
+                    # E28b adds the graph limit and 1 GiB of KV to the engine arguments.
+                    assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]
+                    assert "baseline KV memory budget" in against_current
                 elif baseline == "2026-09-23-e22b":
                     assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]
                 elif baseline in ("2026-09-23-e21", "2026-09-19-e03"):
@@ -648,8 +680,9 @@ RELAY_DEST=operator@192.0.2.23
                 elif baseline == "2026-09-19":
                     assert "baseline mHC prefill flag" in check.recipe_problems(effective, current_expected)
                 else:
+                    # September 18 and 11 used a 16 GiB pool too, so only other fields differ.
                     assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]
-                    assert "baseline KV memory budget" in check.recipe_problems(effective, current_expected)
+                    assert "baseline KV memory budget" not in against_current, baseline
             changed_site = deepcopy(effective)
             changed_site["container"] += "-other"
             assert "TP4_ENV changed protected field: container" in check.recipe_problems(changed_site, selected)

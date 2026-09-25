@@ -1,0 +1,500 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "experiment_id": "2026-09-25-e28b-kv16",
+  "title": "E28b: E28 with a 16 GiB KV pool per rank",
+  "outcome": "promote",
+  "outcome_detail": "Owner accepted. KV capacity 1,365,066 tokens (5.21 full 262,144-token contexts). Against the frozen E27c medians: code decode +8.7%, C1 end-to-end -0.9%, C2 +1.4%, C4 -3.2%, prose +0.5%, C1 per-stream TTFT +15.9%, cached replay -8.1% at 8K and -10.2% at 32K, cold prefill 0% to +1.9%. Against E28 every metric is within 3%.",
+  "reference": {
+    "baseline_id": "2026-09-25-e27c",
+    "baseline_sha256": "28e8f0319bc3ca3c0cee50fb51dc5d5c377a0104a3de88d818d54f320702c354"
+  },
+  "includes": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-25-e28-draft-depth-7/results.json",
+    "sha256": "b70ce69c202dbbc62a4465eabdfde58b888755155dfdd6d8285ffa1394a0a4e3"
+  },
+  "coverage": "One coordinated transition from E28, then on one retained E28b load: three complete native suites (162 requests) with per-second host-memory sampling on every rank.",
+  "client_transport": "Direct LAN HTTP to the rank-0 API.",
+  "candidate": {
+    "overlay": "scripts/node/experiments/e03/kv-16gib/delta.env",
+    "measured_overlay_sha256": "e37be97b78aaffec5efe4a0b1624e5a43b0f8c083a8fe05132000ef7d0fac3f3"
+  },
+  "runs": [
+    {
+      "run": "run-1",
+      "receipt_sha256": "afe56eb0cf02e482fe20d9e7e3000c2c08ab24c82fca0c9800114151f3cc34c9",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-25-e28b-kv16/run-1.json",
+        "sha256": "291a9b9dd7fa9c5c0a53036989caf234d5b150da4cced143b9f4ed0af2715232"
+      }
+    },
+    {
+      "run": "run-2",
+      "receipt_sha256": "33deeb9f5cbbe62a42a8b7f00aae9cfb910ef09a8040681c56944b780b3e134c",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-25-e28b-kv16/run-2.json",
+        "sha256": "cac1e5f2c824f81bc7fbc94196732041f57d648a5ccb58ab9c66d3e131658658"
+      }
+    },
+    {
+      "run": "run-3",
+      "receipt_sha256": "e5b5f3e025bb2043ceaada292ed935d84f074a796180c3c28b8de1f45fd3d9c0",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-25-e28b-kv16/run-3.json",
+        "sha256": "999f62a33d9d196658cd4038940ce767864ad794c799e9f774c0efa8e25902bc"
+      }
+    }
+  ],
+  "performance_metrics": [
+    {
+      "key": "code_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "code",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        62.633,
+        61.008,
+        59.344
+      ],
+      "median": 61.008,
+      "dispersion": {
+        "minimum": 59.344,
+        "maximum": 62.633,
+        "sample_stdev": 1.64453853709787
+      },
+      "current_baseline_median": 56.124,
+      "change_vs_current_baseline_pct": 8.702159503955526,
+      "e28_median": 62.019,
+      "change_vs_e28_pct": -1.6301456005417627
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "1",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        42.485,
+        44.257,
+        43.179
+      ],
+      "median": 43.179,
+      "dispersion": {
+        "minimum": 42.485,
+        "maximum": 44.257,
+        "sample_stdev": 0.8929076100022881
+      },
+      "current_baseline_median": 43.581,
+      "change_vs_current_baseline_pct": -0.9224203207819944,
+      "e28_median": 42.63,
+      "change_vs_e28_pct": 1.287825475017592
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "2",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        66.577,
+        67.47,
+        69.311
+      ],
+      "median": 67.47,
+      "dispersion": {
+        "minimum": 66.577,
+        "maximum": 69.311,
+        "sample_stdev": 1.3941237391279202
+      },
+      "current_baseline_median": 66.52,
+      "change_vs_current_baseline_pct": 1.4281419122068595,
+      "e28_median": 66.649,
+      "change_vs_e28_pct": 1.2318264340050082
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "4",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        93.535,
+        93.64,
+        97.442
+      ],
+      "median": 93.64,
+      "dispersion": {
+        "minimum": 93.535,
+        "maximum": 97.442,
+        "sample_stdev": 2.2260157980870936
+      },
+      "current_baseline_median": 96.696,
+      "change_vs_current_baseline_pct": -3.1604202862579602,
+      "e28_median": 96.403,
+      "change_vs_e28_pct": -2.8660933788367635
+    },
+    {
+      "key": "prose_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "prose",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        33.809,
+        33.111,
+        33.28
+      ],
+      "median": 33.28,
+      "dispersion": {
+        "minimum": 33.111,
+        "maximum": 33.809,
+        "sample_stdev": 0.36414420220566424
+      },
+      "current_baseline_median": 33.12,
+      "change_vs_current_baseline_pct": 0.48309178743962466,
+      "e28_median": 33.519,
+      "change_vs_e28_pct": -0.7130284316357803
+    },
+    {
+      "key": "code_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "code",
+        "ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.386,
+        0.39,
+        0.401
+      ],
+      "median": 0.39,
+      "dispersion": {
+        "minimum": 0.386,
+        "maximum": 0.401,
+        "sample_stdev": 0.007767453465154036
+      },
+      "current_baseline_median": 0.39,
+      "change_vs_current_baseline_pct": 0.0,
+      "e28_median": 0.401,
+      "change_vs_e28_pct": -2.7431421446384063
+    },
+    {
+      "key": "prose_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "prose",
+        "ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.376,
+        0.375,
+        0.378
+      ],
+      "median": 0.376,
+      "dispersion": {
+        "minimum": 0.375,
+        "maximum": 0.378,
+        "sample_stdev": 0.0015275252316519481
+      },
+      "current_baseline_median": 0.376,
+      "change_vs_current_baseline_pct": 0.0,
+      "e28_median": 0.376,
+      "change_vs_e28_pct": 0.0
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "1",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.409,
+        0.394,
+        0.39
+      ],
+      "median": 0.394,
+      "dispersion": {
+        "minimum": 0.39,
+        "maximum": 0.409,
+        "sample_stdev": 0.01001665280087779
+      },
+      "current_baseline_median": 0.34,
+      "change_vs_current_baseline_pct": 15.882352941176467,
+      "e28_median": 0.396,
+      "change_vs_e28_pct": -0.5050505050505054
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "2",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.462,
+        0.468,
+        0.448
+      ],
+      "median": 0.462,
+      "dispersion": {
+        "minimum": 0.448,
+        "maximum": 0.468,
+        "sample_stdev": 0.010263202878893778
+      },
+      "current_baseline_median": 0.446,
+      "change_vs_current_baseline_pct": 3.587443946188344,
+      "e28_median": 0.454,
+      "change_vs_e28_pct": 1.7621145374449354
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "4",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.867,
+        0.525,
+        0.521
+      ],
+      "median": 0.525,
+      "dispersion": {
+        "minimum": 0.521,
+        "maximum": 0.867,
+        "sample_stdev": 0.19861856240878728
+      },
+      "current_baseline_median": 0.525,
+      "change_vs_current_baseline_pct": 0.0,
+      "e28_median": 0.519,
+      "change_vs_e28_pct": 1.1560693641618507
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2592.683,
+        2524.306,
+        2558.395
+      ],
+      "median": 2558.395,
+      "dispersion": {
+        "minimum": 2524.306,
+        "maximum": 2592.683,
+        "sample_stdev": 34.18854826302707
+      },
+      "current_baseline_median": 2558.895,
+      "change_vs_current_baseline_pct": -0.01953968412146649,
+      "e28_median": 2580.134,
+      "change_vs_e28_pct": -0.8425531387129518
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        8564.102,
+        8783.724,
+        8670.646
+      ],
+      "median": 8670.646,
+      "dispersion": {
+        "minimum": 8564.102,
+        "maximum": 8783.724,
+        "sample_stdev": 109.82719828894814
+      },
+      "current_baseline_median": 9431.975,
+      "change_vs_current_baseline_pct": -8.071787722083654,
+      "e28_median": 8662.467,
+      "change_vs_e28_pct": 0.09441883010925278
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2785.522,
+        2737.134,
+        2739.303
+      ],
+      "median": 2739.303,
+      "dispersion": {
+        "minimum": 2737.134,
+        "maximum": 2785.522,
+        "sample_stdev": 27.332212576616126
+      },
+      "current_baseline_median": 2689.31,
+      "change_vs_current_baseline_pct": 1.8589526681565136,
+      "e28_median": 2714.681,
+      "change_vs_e28_pct": 0.9069942287878333
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        32152.031,
+        33262.007,
+        34480.037
+      ],
+      "median": 33262.007,
+      "dispersion": {
+        "minimum": 32152.031,
+        "maximum": 34480.037,
+        "sample_stdev": 1164.4208673207454
+      },
+      "current_baseline_median": 37056.262,
+      "change_vs_current_baseline_pct": -10.239173611196954,
+      "e28_median": 33491.346,
+      "change_vs_e28_pct": -0.6847709255997055
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2692.74,
+        2703.217,
+        2642.957
+      ],
+      "median": 2692.74,
+      "dispersion": {
+        "minimum": 2642.957,
+        "maximum": 2703.217,
+        "sample_stdev": 32.195709388053615
+      },
+      "current_baseline_median": 2646.928,
+      "change_vs_current_baseline_pct": 1.730761093614934,
+      "e28_median": 2679.077,
+      "change_vs_e28_pct": 0.5099890745954504
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        39290.992,
+        39331.834,
+        38941.122
+      ],
+      "median": 39290.992,
+      "dispersion": {
+        "minimum": 38941.122,
+        "maximum": 39331.834,
+        "sample_stdev": 214.7607012498627
+      },
+      "current_baseline_median": 39931.684,
+      "change_vs_current_baseline_pct": -1.6044702747823076,
+      "e28_median": 39405.502,
+      "change_vs_e28_pct": -0.2905939378719297
+    }
+  ],
+  "integrity": {
+    "requests": 162,
+    "completed_streams": 162,
+    "visible_responses": 162,
+    "native_validation_errors": 0,
+    "protocol_errors": 0,
+    "runtime_errors": 0,
+    "prefill_token_matches": "54/54",
+    "decode_output_gates": {
+      "code": "15/15",
+      "prose": "15/15",
+      "structured": "15/15"
+    },
+    "finish_reasons": {
+      "stop": 45,
+      "length": 117
+    },
+    "code_output_budget_stops": 0,
+    "client_probe_timeouts": 0
+  },
+  "host_memory": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-25-e28b-kv16/host-memory.json",
+    "sha256": "4c60b0a4e6d33e054cd5ba64e90524c86387607ce3b1beb26f5a4d35c1a76807"
+  },
+  "owner_decision": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-25-e28b-kv16/owner-decision.json",
+    "sha256": "e753170892bd1fad2ecba93e0ddbae5f73cb7cec5cf869624fa0bf5e85b0f8f4"
+  },
+  "post_boot_gates": {
+    "coherent_response": "PASS",
+    "tool_call": "PASS",
+    "elapsed_from_health_seconds": 3.47
+  },
+  "boot": {
+    "kv_cache_memory_bytes_per_rank": 17179869184,
+    "kv_cache_tokens": 1365066,
+    "maximum_concurrency_at_262144_tokens": 5.21,
+    "num_speculative_tokens": 7,
+    "cudagraph_capture_sizes_max": 72
+  },
+  "notes": [
+    "C4 per-stream TTFT was 0.867 s in suite 1 and 0.521-0.525 s in suites 2-3; the median is 0.525 s.",
+    "C4 aggregate 93.5 / 93.6 / 97.4 tok/s against 94.1-96.7 on E27c; recorded, not attributed to the KV pool."
+  ]
+}
