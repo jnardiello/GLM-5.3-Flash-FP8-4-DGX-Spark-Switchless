@@ -331,8 +331,12 @@ from the tracked `scripts/node/experiments/e03/drafter-w8a16/kv-transfer-config-
 `~/tp4/experiments/e03/drafter-w8a16/`), which names the `SparkContextCacheConnector`, the target and
 drafter checkpoint hashes it accepts, a 4,096–262,144-token span, store and restore
 enabled with `recompute` on a failed load, and the cache root under the runtime cache
-volume. The connector, encoder, and SIRCL bundle/runtime are untracked operator
-payload; the archived sources did not include a license notice. Their locations are
+volume. The connector and encoder come from the Apache-2.0
+[SparkCache](https://github.com/FujitsuPolycom/sparkcache) project, with this project's
+pending-publication change, memory corrections and replay views applied. The SIRCL
+bundle and runtime come from the Apache-2.0 [SparkRing](https://github.com/FujitsuPolycom/sparkring)
+project. [Third-party payload](third-party.md) records the provenance of every file. The
+checkout does not include these files yet. Their locations are
 `SPARKCACHE_CONNECTOR`, `SPARKCACHE_ENCODER`, and `SIRCL_DIR`
 (see [`install-from-zero.md`](install-from-zero.md#8-place-the-sparkcache-and-sircl-payload))
 and verified against `scripts/node/sparkcache/SHA256SUMS` and

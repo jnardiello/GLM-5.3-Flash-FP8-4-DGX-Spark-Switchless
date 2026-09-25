@@ -7,6 +7,11 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Added `docs/third-party.md`. It maps every pinned SparkCache and SIRCL file to its source
+  and marks it upstream, modified by this project or this project's own. It lists the
+  project's changes: pending-publication wait, memory corrections, replay views and GID
+  preflight. Files whose exact upstream bytes are not yet matched to a public commit are
+  marked provenance pending.
 - Published the September 25 E29 frozen baseline and its promotion record. E29 is the E28b
   recipe plus the end-drain overlay in its load B configuration.
   - The default `EXTRA_DOCKER_ENV` mounts `experiments/e03/end-drain/scheduler.py` instead of
@@ -216,6 +221,9 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- CREDITS, the README prerequisites, installation step 8 and the production recipe now
+  link SparkCache and SparkRing SIRCL directly and state their Apache-2.0 licenses. They
+  replace the earlier "no license notice" wording, which described only the archived copies.
 - The default recipe in `cluster.env.example` is now E28b. `scripts/check-f0.py` validates
   seven draft tokens, the adaptive table and high state, the CUDA graph limit
   (`--compilation-config`) and the 16 GiB KV budget by default, and requires the absence of

@@ -218,12 +218,23 @@ approved use, the revision differs, or any node is incomplete.
 
 ## 8. Place the SparkCache and SIRCL payload
 
-The September 19 configuration (`SPARKCACHE_MODE=on`) needs operator-supplied
-SparkCache connector/encoder files and the SIRCL bundle/runtime. These payloads are
-not redistributed here; see [CREDITS](../CREDITS.md). Obtain the original connector
-from its provider or an authorized copy matching the input pin in
-[`prepare-sparkcache.py`](../scripts/prepare-sparkcache.py). The original hybrid
-encoder comes from the digest-pinned R10 image.
+The current configuration (`SPARKCACHE_MODE=on`, since September 19) needs two
+Apache-2.0 components that this checkout pins by hash but does not include yet:
+
+- the [SparkCache](https://github.com/FujitsuPolycom/sparkcache) connector and encoder;
+- the [SparkRing SIRCL](https://github.com/FujitsuPolycom/sparkring) bundle and runtime.
+
+[Third-party payload](third-party.md) lists every file with its upstream commit, which
+bytes are upstream and what this project changed.
+
+- **Encoder.** The original hybrid encoder comes from the digest-pinned R10 image and is
+  byte-identical to SparkCache commit `66057174`.
+- **Connector.** The connector input pinned in
+  [`prepare-sparkcache.py`](../scripts/prepare-sparkcache.py) already contains this
+  project's pending-publication change, so the image's connector alone does not match it.
+  Obtain that input from the maintainer until the change is published.
+- **SIRCL.** Fifteen of the SIRCL bundle files come unchanged from the public SparkRing
+  overlay. The remaining upstream files come from the SparkRing R10 runtime.
 
 On a host where that image is installed, copy the encoder out of a **stopped** temporary
 container; this does not launch inference or use the serving container:

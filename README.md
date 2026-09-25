@@ -96,9 +96,11 @@ nodes before creating the site configuration.
 | Hosts and access | Ubuntu, NVIDIA driver, Docker with GPU support, `rdma-core`, and SSH access over a trusted management LAN/VPN |
 | Storage | At least 330 GiB free per node for a fresh model fetch, plus image and runtime-cache space |
 | Pinned artifacts | Image, target weights, drafter, and patched NCCL from the [installation procedure](docs/install-from-zero.md) |
-| Operator payload | Original SparkCache connector, encoder from the pinned image, and SIRCL bundle/runtime; follow [payload preparation](docs/install-from-zero.md#8-place-the-sparkcache-and-sircl-payload) |
+| Third-party payload | The [SparkCache](https://github.com/FujitsuPolycom/sparkcache) connector and encoder and the [SparkRing SIRCL](https://github.com/FujitsuPolycom/sparkring) bundle and runtime, both Apache-2.0; follow [payload preparation](docs/install-from-zero.md#8-place-the-sparkcache-and-sircl-payload) |
 
-The operator payload is pinned by hash and is not redistributed here. DFlash2 carries
+The checkout pins that payload by hash but does not include it yet. [Third-party payload](docs/third-party.md)
+lists every file: where it comes from, which bytes are upstream and what this project
+changed. DFlash2 carries
 non-commercial terms; review [credits and licenses](CREDITS.md). The API has no
 authentication or TLS, so keep it on a trusted network or behind an authenticating
 proxy.
