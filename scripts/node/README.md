@@ -5,7 +5,7 @@ artifacts for the four cluster hosts. Nothing in this directory runs merely beca
 it exists in the repository; deploy, bootstrap, launcher, and configuration choices
 select the files explicitly.
 
-The base configuration is the [accepted September 25 E28b recipe](../../docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json).
+The base configuration is the [accepted September 25 E29 recipe](../../docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json).
 The previous E03 reference, the earlier September 19 base, September 18 and September 11 remain historical references with their own
 rollback assets; the September 12 filenames below belong to the September 11
 reference's later capture.
@@ -68,11 +68,13 @@ script activates `/etc` state only under `--apply`; it never reboots a node.
 
 ## Current engine and cache payload
 
-The current recipe mounts 21 vLLM modules: retained cache allocation, worker/probe,
+The current recipe mounts 22 vLLM modules: retained cache allocation, worker/probe,
 indexer and hybrid-KDA sources, the E03 model and mHC per-call sharding modules, the
 E21 residual-projection module, the E22b drafter override and conversion module, and the
-E27c scheduler from [`experiments/e03/queued-cadence/`](experiments/e03/queued-cadence/README.md),
-whose `SHA256SUMS` the launcher verifies whenever it is mounted. The KDA hook is mounted from
+E29 scheduler and engine core from [`experiments/e03/end-drain/`](experiments/e03/end-drain/README.md).
+The E29 scheduler is the E27c scheduler from
+[`experiments/e03/queued-cadence/`](experiments/e03/queued-cadence/README.md) plus one
+additions-only patch; the launcher verifies each directory's `SHA256SUMS` whenever it is mounted. The KDA hook is mounted from
 [`experiments/e03/bf16-residue/`](experiments/e03/bf16-residue/README.md), which also
 converts 67 KDA output and MLA attention projections per rank to the same INT8 format
 when `VLLM_E21_BF16_RESIDUE_W8A16=1`; the launcher verifies that directory's
@@ -206,4 +208,4 @@ The first three inspect deployed nodes and require site configuration. The final
 command is fully offline and validates source syntax, manifests, templates, links,
 fixtures, the adaptive-k policy, hybrid dispatch contracts, and payload preparation
 without SSH, Docker, a GPU, or `cluster.env`. Offline checks do not constitute a new
-live deployment of the accepted E28b defaults.
+live deployment of the accepted E29 defaults.

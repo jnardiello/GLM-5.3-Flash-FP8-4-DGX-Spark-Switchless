@@ -5,25 +5,28 @@ one-step rollback comments live in [`cluster.env.example`](../cluster.env.exampl
 host/software pins live in `scripts/node/bootstrap/versions.env`, model file manifests
 in `scripts/node/model-manifests/`, and NCCL pins in `scripts/node/nccl/`.
 
-The **Current** recipe is the [accepted September 25 E28b reference](historical_benchmarks/baselines/2026-09-25-e28b/baseline.json):
+The **Current** recipe is the [accepted September 25 E29 reference](historical_benchmarks/baselines/2026-09-25-e29/baseline.json):
 R10, SIRCL, hybrid KDA, E03 mHC prefill sharding, SparkCache replay views,
 batch-uniform adaptive verification capped by the effective draft budget, E21
 8-bit residual attention projections, E22b 8-bit DFlash2 drafter linears, the E27
-prefill cadence (`--prefill-schedule-interval 8`), the E27c scheduler and E28b: seven draft
-tokens for a single request with a 16 GiB KV pool per rank. It retains the 262,144-token
+prefill cadence (`--prefill-schedule-interval 8`), the E27c scheduler, E28b (seven draft
+tokens for a single request with a 16 GiB KV pool per rank) and E29 (no speculative step
+past a possible length finish, 4 ms idle coalescing). It retains the 262,144-token
 context limit. `cluster.env.example` encodes these values directly,
 without an experiment overlay.
 
 The performance reference contains three complete native Rigmark suites / 162 requests
-measured on one retained candidate load. By owner decision the promotion used
+measured on one candidate load. By owner decision the promotion used
 four-rank launcher-command parity with that measured candidate instead of a separate
-reproduction run; the [promotion record](historical_benchmarks/baselines/2026-09-25-e28b/promotion.json)
+reproduction run; the [promotion record](historical_benchmarks/baselines/2026-09-25-e29/promotion.json)
 records the parity and live identity checks.
 
-The [previous E27c reference](historical_benchmarks/baselines/2026-09-25-e27c/baseline.json)
+The [previous E28b reference](historical_benchmarks/baselines/2026-09-25-e28b/baseline.json)
 remains frozen at three suites / 162 requests. Its complete return is
-[`baseline-20260925-e27c.env`](../scripts/node/reference/baseline-20260925-e27c.env), the
-immediate rollback. The [E27 reference](historical_benchmarks/baselines/2026-09-24-e27/baseline.json)
+[`baseline-20260925-e28b.env`](../scripts/node/reference/baseline-20260925-e28b.env), the
+immediate rollback. The [E27c reference](historical_benchmarks/baselines/2026-09-25-e27c/baseline.json)
+and its complete return [`baseline-20260925-e27c.env`](../scripts/node/reference/baseline-20260925-e27c.env),
+the [E27 reference](historical_benchmarks/baselines/2026-09-24-e27/baseline.json)
 and its complete return [`baseline-20260924-e27.env`](../scripts/node/reference/baseline-20260924-e27.env),
 the [E22b reference](historical_benchmarks/baselines/2026-09-23-e22b/baseline.json)
 and its complete return [`baseline-20260924-e22b.env`](../scripts/node/reference/baseline-20260924-e22b.env),
@@ -217,8 +220,8 @@ E28b uses the full training block of the DFlash2 drafter for a single request:
   still accepted the fifth position in 39–58% of steps; with seven, the sixth and seventh
   are accepted in roughly 30% of code steps and over 90% of structured steps.
 - **Effect.** Code decode +8.7% against E27c; structured output reaches 7.8 tokens per step.
-  Short answers do not gain, a single request's first token comes about 50 ms later, and
-  cached replay at 8K–32K is about 0.1 s slower (cause not yet identified).
+  Alone, E28b delayed a request that arrived right after another one ended by about 50 ms,
+  and cached replay at 8K–32K by up to 0.1 s. E29 removes most of that, as described below.
 - **Graphs.** `--compilation-config={"max_cudagraph_capture_size":72}` keeps the E27c CUDA
   graph set; without it vLLM would capture sizes up to 96.
 
@@ -232,6 +235,32 @@ window. During the three E28b suites rank 0, which also runs the API server and 
 core, kept at least 2.1 GiB available; `earlyoom` on the nodes acts below 0.5 GiB. The
 earlier 16 GiB failure on September 19 ran six parallel agents on a larger memory
 footprint.
+
+E29 changes only the boundaries of a request. The
+[overlay](../scripts/node/experiments/e03/end-drain/README.md) mounts two files, each with an
+additions-only patch:
+
+- **Why.** With asynchronous scheduling the engine queues a request's next step before the
+  output of the step in flight has returned. The vendor guard skips that step only when one
+  token is missing. With seven drafts, a request limited by `max_tokens` usually finished
+  inside a step that could produce several tokens, so the queued step verified drafts for a
+  finished request and the next request waited behind it.
+- **Hold (`VLLM_E29_END_DRAIN=1`, scheduler).** A running request whose committed outputs
+  plus pending placeholders reach `max_tokens` is not given another step until that output
+  arrives. It resumes if tokens are still missing. Other requests are scheduled normally,
+  and structured-output requests keep the vendor pipeline.
+- **Coalescing (`VLLM_E29_IDLE_COALESCE_MS=4`, engine core).** When requests arrive at an
+  idle engine, the loop keeps taking arrivals for 4 ms after the first before scheduling. In
+  a C2/C4 group the arrivals spread over at most 3.17 ms, and without the window the first
+  request was prefilled alone in 22 of 24 groups. The window refuses data parallelism.
+- **Trace (`VLLM_E29_TRACE=0`).** Arrival, dispatch, hold and resume logging exists for
+  diagnosis and stays off.
+- **Effect against E28b.** C1/C2/C4 per-stream TTFT −13.2%/−14.7%/−9.8%, code decode +3.2%,
+  no metric worse beyond noise. A replay sent right after its cold request still waits for
+  the SparkCache connector to publish that request; at 8K–32K it stays 56–82 ms slower than on
+  E27c. A request that ends on EOS can still leave one step behind it.
+- **Signature.** Rank 0 logs `E29_END_DRAIN_READY trace=0` and
+  `E29_IDLE_COALESCE_READY ms=4 trace=0` at startup.
 
 The GPU worker retains the allocator probe present during measurement. It reads
 cached allocator counters once per second after warmup without synchronizing CUDA
@@ -353,7 +382,7 @@ restores the complete E27c recipe: five draft tokens and a 15 GiB KV pool.
 restores the complete E27 recipe: the image's own scheduler.
 [`baseline-20260924-e22b.env`](../scripts/node/reference/baseline-20260924-e22b.env)
 restores the complete E22b recipe, without the prefill cadence. E27 and E27c keep the E22b
-cache namespace because they change no cached state; E28b keeps it as well.
+cache namespace because they change no cached state; E28b and E29 keep it as well.
 [`baseline-20260923-e21.env`](../scripts/node/reference/baseline-20260923-e21.env)
 restores the complete E21 recipe: the vendor drafter, no E22 module or flags and the E21
 cache namespace. [`baseline-20260919-e03.env`](../scripts/node/reference/baseline-20260919-e03.env)
@@ -421,31 +450,28 @@ Generated-code quality audits remain separate from performance acceptance.
 
 ## Qualification and reproduction
 
-The [current reference](historical_benchmarks/baselines/2026-09-25-e28b/baseline.json)
-uses exactly three complete native Rigmark suites / 162 requests on one retained
-candidate load, measured over direct LAN HTTP like the E27c reference. All streams
-completed visibly, with zero measurement/protocol/runtime errors, 45/45 native output gates
-and 54/54 prefill token counts. Both functional gates passed after the candidate boot.
-Host memory was sampled once per second on every rank during the suites.
+The [current reference](historical_benchmarks/baselines/2026-09-25-e29/baseline.json)
+uses exactly three complete native Rigmark suites / 162 requests on one candidate load,
+measured over direct LAN HTTP like the E28b reference. All streams completed visibly,
+with zero measurement/protocol/runtime errors, 45/45 native output gates and 54/54 prefill
+token counts. Both functional gates passed after the candidate boot. Host memory was
+sampled once per second on every rank; rank 0 kept at least 1.95 GiB available.
 
-Against the frozen E27c medians:
-- code decode +8.7%, prose +0.5%;
-- C1 -0.9%, C2 +1.4%, C4 -1.2% (suites 2–3; the owner excluded suite 1's C4 block, whose
-  rounds all started staggered);
-- C1 per-stream TTFT +15.9%, cached replay -8.1% at 8K and -10.2% at 32K;
-- cold prefill 0% to +1.9%.
+Against the frozen E28b medians:
+- code decode +3.2%, prose +2.5%;
+- C1 +1.7%, C2 +0.1%, C4 +1.9% end-to-end;
+- C1/C2/C4 per-stream TTFT −13.2%/−14.7%/−9.8%;
+- cold prefill −0.4% to +2.2%, cached replay +3.6%/+2.7%/−1.0% at 8K/32K/64K.
 
-The same recipe with a 15 GiB pool (E28) measured the same values within 3%, so the larger
-pool does not change performance. See the [dated report](benchmarks/baselines/2026-09-25-e28b.md)
-for all 16 metrics, the acceptance probes, the memory samples, counts and limits.
+See the [dated report](benchmarks/baselines/2026-09-25-e29.md) for all 16 metrics, the
+diagnosis, the owner-requested prefill re-runs, the memory samples, counts and limits.
 
-The [promotion record](historical_benchmarks/baselines/2026-09-25-e28b/promotion.json)
+The [promotion record](historical_benchmarks/baselines/2026-09-25-e29/promotion.json)
 records:
 - the owner's decision to promote without a separate reproduction run;
 - the four-rank launcher-command parity between the encoded default and the measured
   candidate;
-- the deployment of the default onto the still-serving measured load, without a restart;
-- the live identity check. Follow the
+- the deployment of the default and the live identity check. Follow the
 [coordinated migration](operations.md#migrate-the-accepted-overlay-to-defaults) when a
 default must be applied to a stack loaded from an overlay.
 

@@ -1,0 +1,234 @@
+{
+  "schema": 1,
+  "record_type": "targeted_rerun_extract",
+  "reason": "Owner request after the suites: re-run the prefill section, where anomalous slowdowns appeared (three 64K replays at 1.77-1.97 s, a slower 8K cold median in suite 3).",
+  "method": "Three native executions of the frozen Rigmark with the suite settings, --runs 1 (the minimum decode section) and --skip-concurrency, on a second load B after a coordinated restart; fresh cache salt per execution. The three suites remain the formal measurement; the six-execution medians are supplementary.",
+  "receipts": {
+    "prefill-run-1": "f2837112f77b68776f5877febed19e4d29d31051e71af114d97aac4842cf1513",
+    "prefill-run-2": "65c3763c238fc7fd38cf4abe7b5d7434a2e503a643b97a86b7cab0c1126d499c",
+    "prefill-run-3": "59fb144b155f0665393ff10f9654be787023fb4d03ffc3a8fd24656d649815f9"
+  },
+  "integrity": {
+    "native_validation_errors": 0,
+    "runtime_errors": 0,
+    "prefill_token_matches": "54/54"
+  },
+  "metrics": {
+    "prefill_8k_cold_throughput": {
+      "per_suite": [
+        2654.884,
+        2615.95,
+        2391.311
+      ],
+      "per_targeted_run": [
+        2564.346,
+        2556.215,
+        2520.852
+      ],
+      "median_of_six": 2560.2805,
+      "ttft_seconds_at_median_of_six": 3.199649413413882,
+      "request_ttft_seconds": [
+        3.06645,
+        3.07617,
+        3.085634,
+        3.094765,
+        3.098801,
+        3.126847,
+        3.131558,
+        3.135367,
+        3.194577,
+        3.204738,
+        3.210875,
+        3.249695,
+        3.27196,
+        3.312296,
+        3.37444,
+        3.425736,
+        3.553038,
+        3.602445
+      ],
+      "change_vs_e28b_pct": 0.07369854928577742,
+      "change_vs_e27c_pct": 0.05414446470057839
+    },
+    "prefill_8k_replay_throughput": {
+      "per_suite": [
+        8910.217,
+        8982.141,
+        9005.543
+      ],
+      "per_targeted_run": [
+        8170.943,
+        8237.272,
+        8806.074
+      ],
+      "median_of_six": 8858.1455,
+      "ttft_seconds_at_median_of_six": 0.924798537120439,
+      "request_ttft_seconds": [
+        0.896262,
+        0.908911,
+        0.909662,
+        0.910559,
+        0.912032,
+        0.919394,
+        0.920004,
+        0.920301,
+        0.922768,
+        0.927448,
+        0.929371,
+        0.930267,
+        0.944083,
+        0.963976,
+        0.994504,
+        1.002577,
+        1.020598,
+        1.131481
+      ],
+      "change_vs_e28b_pct": 2.1624628660886382,
+      "change_vs_e27c_pct": -6.083874268114576
+    },
+    "prefill_32k_cold_throughput": {
+      "per_suite": [
+        2783.711,
+        2758.093,
+        2764.797
+      ],
+      "per_targeted_run": [
+        2786.363,
+        2704.441,
+        2719.562
+      ],
+      "median_of_six": 2761.4449999999997,
+      "ttft_seconds_at_median_of_six": 11.866251183709979,
+      "request_ttft_seconds": [
+        11.698124,
+        11.728566,
+        11.730093,
+        11.746482,
+        11.760134,
+        11.771336,
+        11.77156,
+        11.851864,
+        11.870675,
+        11.880674,
+        11.887271,
+        12.048997,
+        12.062079,
+        12.116366,
+        12.135847,
+        12.374829,
+        12.44562,
+        12.511434
+      ],
+      "change_vs_e28b_pct": 0.8083078067668975,
+      "change_vs_e27c_pct": 2.6822865344642217
+    },
+    "prefill_32k_replay_throughput": {
+      "per_suite": [
+        33504.873,
+        34155.534,
+        35042.766
+      ],
+      "per_targeted_run": [
+        34502.111,
+        31869.255,
+        33701.151
+      ],
+      "median_of_six": 33928.3425,
+      "ttft_seconds_at_median_of_six": 0.9658002008203024,
+      "request_ttft_seconds": [
+        0.882589,
+        0.918819,
+        0.935086,
+        0.94823,
+        0.949739,
+        0.95369,
+        0.957062,
+        0.958542,
+        0.959376,
+        0.965915,
+        0.972311,
+        0.978007,
+        0.982141,
+        0.983566,
+        1.001556,
+        1.022997,
+        1.028201,
+        1.03008
+      ],
+      "change_vs_e28b_pct": 2.0032931265993694,
+      "change_vs_e27c_pct": -8.441001145771269
+    },
+    "prefill_64k_cold_throughput": {
+      "per_suite": [
+        2691.591,
+        2681.976,
+        2669.894
+      ],
+      "per_targeted_run": [
+        2713.949,
+        2662.082,
+        2627.772
+      ],
+      "median_of_six": 2675.935,
+      "ttft_seconds_at_median_of_six": 24.490878889061207,
+      "request_ttft_seconds": [
+        23.70057,
+        24.025417,
+        24.147836,
+        24.216455,
+        24.228742,
+        24.277245,
+        24.317182,
+        24.34842,
+        24.419396,
+        24.435717,
+        24.54629,
+        24.618323,
+        24.752473,
+        24.871984,
+        24.939761,
+        24.942583,
+        25.030535,
+        25.241294
+      ],
+      "change_vs_e28b_pct": -0.6240855039847827,
+      "change_vs_e27c_pct": 1.095874160536292
+    },
+    "prefill_64k_replay_throughput": {
+      "per_suite": [
+        38880.916,
+        40118.907,
+        36985.952
+      ],
+      "per_targeted_run": [
+        39926.551,
+        39553.144,
+        39883.422
+      ],
+      "median_of_six": 39718.282999999996,
+      "ttft_seconds_at_median_of_six": 1.6500209739680844,
+      "request_ttft_seconds": [
+        1.620863,
+        1.621584,
+        1.623015,
+        1.633544,
+        1.634931,
+        1.635811,
+        1.638183,
+        1.641414,
+        1.642215,
+        1.643189,
+        1.652658,
+        1.65691,
+        1.661755,
+        1.673353,
+        1.685557,
+        1.771916,
+        1.868754,
+        1.966998
+      ],
+      "change_vs_e28b_pct": 1.0875037209546592,
+      "change_vs_e27c_pct": -0.5344152277675174
+    }
+  }
+}

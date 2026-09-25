@@ -426,25 +426,30 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
     return rec, exp, ranks
 
 
-assert check.BASELINE == BASELINES / "2026-09-25-e28b/baseline.json"
+assert check.BASELINE == BASELINES / "2026-09-25-e29/baseline.json"
 HISTORICAL = ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21",
-              "2026-09-23-e22b", "2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b")
+              "2026-09-23-e22b", "2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b", "2026-09-25-e29")
+E27_FLAGS = {"VLLM_E27B_SHORT_PREFILL_TOKENS", "VLLM_E27C_CADENCE_WHEN_QUEUED"}
+E29_FLAGS = {"VLLM_E29_END_DRAIN", "VLLM_E29_IDLE_COALESCE_MS", "VLLM_E29_TRACE"}
+assert E27_FLAGS | E29_FLAGS == set(check.SCHEDULER_FLAGS)
 for name in HISTORICAL:
     baseline_path = BASELINES / name / "baseline.json"
     baseline_recipe, baseline_expected, baseline_ranks = baseline_fixture(baseline_path)
     assert check.evaluate(baseline_recipe, baseline_expected, baseline_ranks, endpoint()) == [], name
     # Records before E27 ran without the cadence and must refuse it; E27 requires it.
     assert baseline_expected["prefill_schedule_interval"] == (
-        "8" if name in ("2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b") else "1"), name
-    # Records before E27c ran the image's scheduler and must refuse the E27c flags.
+        "8" if name in ("2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b", "2026-09-25-e29") else "1"), name
+    # Records before E27c ran the image's scheduler and must refuse the E27c flags; records
+    # before E29 must refuse the E29 flags.
     flags = set(baseline_expected["runtime_identity"].get("environment", {})) & set(check.SCHEDULER_FLAGS)
-    assert flags == (set(check.SCHEDULER_FLAGS) if name in ("2026-09-25-e27c", "2026-09-25-e28b")
-                     else set()), name
-    # Only E28b fixes the CUDA graph capture limit.
-    assert baseline_expected["max_cudagraph_capture_size"] == ("72" if name == "2026-09-25-e28b" else ""), name
+    assert flags == (E27_FLAGS | E29_FLAGS if name == "2026-09-25-e29" else E27_FLAGS
+                     if name in ("2026-09-25-e27c", "2026-09-25-e28b") else set()), name
+    # E28b and E29 fix the CUDA graph capture limit.
+    assert baseline_expected["max_cudagraph_capture_size"] == (
+        "72" if name in ("2026-09-25-e28b", "2026-09-25-e29") else ""), name
 
 current_recipe, current_expected, current_ranks = baseline_fixture(check.BASELINE)
-assert current_expected["baseline_id"] == "2026-09-25-e28b"
+assert current_expected["baseline_id"] == "2026-09-25-e29"
 assert current_expected["spec_tokens"] == "7" and current_expected["adaptive_tokens"] == [3, 7]
 assert current_expected["kv_cache_memory_bytes"] == "17179869184"
 for bad in ("", ' --compilation-config={"max_cudagraph_capture_size":96}'):
@@ -611,6 +616,7 @@ try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-overlay.") as temp:
         isolated = Path(temp)
         for relative in ("scripts/lib/common.sh", "scripts/node/bootstrap/versions.env",
+                         "scripts/node/reference/baseline-20260925-e28b.env",
                          "scripts/node/reference/baseline-20260925-e27c.env",
                          "scripts/node/reference/baseline-20260924-e27.env",
                          "scripts/node/reference/baseline-20260924-e22b.env",
@@ -630,7 +636,8 @@ RELAY_DEST=operator@192.0.2.23
 '''
         check.REPO = isolated
         for overlay, baseline in (
-            (None, "2026-09-25-e28b"),
+            (None, "2026-09-25-e29"),
+            ("scripts/node/reference/baseline-20260925-e28b.env", "2026-09-25-e28b"),
             ("scripts/node/reference/baseline-20260925-e27c.env", "2026-09-25-e27c"),
             ("scripts/node/reference/baseline-20260924-e27.env", "2026-09-24-e27"),
             ("scripts/node/reference/baseline-20260924-e22b.env", "2026-09-23-e22b"),
@@ -654,19 +661,25 @@ RELAY_DEST=operator@192.0.2.23
             problems = check.recipe_problems(effective, selected)
             assert problems == [], (baseline, problems)
             if overlay:
-                # Every historical return restores five draft tokens and no fixed graph limit;
-                # returns before E27c also drop the scheduler flags, and returns before E27
-                # also drop the cadence.
+                # Every return drops the E29 flags. Returns before E28b also restore five draft
+                # tokens and no fixed graph limit; returns before E27c also drop the E27c flags,
+                # and returns before E27 also drop the cadence.
                 against_current = check.recipe_problems(effective, current_expected)
-                assert "effective recipe mismatch: spec_tokens" in against_current, baseline
-                assert "baseline compilation config" in against_current, baseline
+                assert ("effective recipe mismatch: spec_tokens" in against_current) == (
+                    baseline != "2026-09-25-e28b"), baseline
+                assert ("baseline compilation config" in against_current) == (
+                    baseline != "2026-09-25-e28b"), baseline
                 for key in check.SCHEDULER_FLAGS:
                     assert ("baseline runtime environment: " + key in against_current) == (
-                        baseline != "2026-09-25-e27c"), baseline
+                        key in E29_FLAGS or baseline not in ("2026-09-25-e27c", "2026-09-25-e28b")), baseline
                 assert ("baseline prefill schedule interval" in against_current) == (
-                    baseline not in ("2026-09-24-e27", "2026-09-25-e27c")), baseline
+                    baseline not in ("2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b")), baseline
                 assert effective["extra_docker_env"] != effective["base_extra_docker_env"]
-                if baseline in ("2026-09-24-e27", "2026-09-25-e27c"):
+                if baseline == "2026-09-25-e28b":
+                    # E29 changes only the docker mounts and environment.
+                    assert effective["extra_vllm_args"] == effective["base_extra_vllm_args"]
+                    assert "baseline KV memory budget" not in against_current
+                elif baseline in ("2026-09-24-e27", "2026-09-25-e27c"):
                     # E28b adds the graph limit and 1 GiB of KV to the engine arguments.
                     assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]
                     assert "baseline KV memory budget" in against_current

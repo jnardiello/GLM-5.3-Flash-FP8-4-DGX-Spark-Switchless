@@ -1,0 +1,70 @@
+{
+  "schema": "tp4-iac-promotion/v1",
+  "baseline_id": "2026-09-25-e29",
+  "owner_decision": "promote",
+  "status": "encoded_live_apply_pending_restart",
+  "measured_recipe_encoded": true,
+  "runtime_sources_unchanged": true,
+  "promotion_method": "launcher_command_parity",
+  "promotion_method_reason": "Owner decision under the repository promotion rule: the accepted suites were measured on E29 load B; the default encodes that recipe with four-rank launcher-command parity instead of a reproduction run. E28b was restored after the window, so applying the default requires one coordinated restart.",
+  "candidate_overlays": {
+    "end_drain_load_a": {
+      "path": "scripts/node/experiments/e03/end-drain/delta.env",
+      "measured_sha256": "20d70e4a8542795974b9e7f8455e75ca20a9313e91a2aa9d532ab2e318f32f7a",
+      "status": "diagnosis load (trace on, 0 ms window); retained as the record of the measured candidate"
+    },
+    "end_drain_load_b": {
+      "path": "scripts/node/experiments/e03/end-drain/delta-b.env",
+      "measured_sha256": "b0257bbe75f0775e5515b0d475402ebbbebe461dd35ebb2c85978e7662680ec2",
+      "status": "measured configuration (three suites); encoded in the default; retained as the record of the measured candidate"
+    }
+  },
+  "local_validation": {
+    "offline_check": "PASS",
+    "four_rank_command_parity_with_measured_candidate": "PASS (argument-for-argument identical dry-run of the default and of the E28b rollback plus delta-b.env)",
+    "four_rank_command_parity_of_e28b_rollback_with_measured_e28b": "PASS",
+    "mounted_source_hashes": "PASS",
+    "historical_identity_selection": "PASS",
+    "previous_baseline_unchanged": {
+      "path": "docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json",
+      "sha256": "e00c6ca245da482ce58179663cd8cc455b7aa54bde3905c881ba2c968cca87a5"
+    },
+    "figures_visually_reviewed": true,
+    "plotter_matplotlib_version": "3.11.2",
+    "figures_sha256": {
+      "docs/plots/comparisons/2026-09-25-e29-vs-2026-09-25-e28b/generation.png": "e1470318021f7f02a0d61df14502de6dd617308e47b843e8e2de6a4be3dd3cb0",
+      "docs/plots/comparisons/2026-09-25-e29-vs-2026-09-25-e28b/generation.svg": "7c3433fa7e4dec55786df827cdae0c5176b94d6b3a88c9c05128900c172e123f",
+      "docs/plots/comparisons/2026-09-25-e29-vs-2026-09-25-e28b/prefill.png": "436359f2441c86279c7f15f3c7810e80f0c07578ac101c6983d0f11474f015b1",
+      "docs/plots/comparisons/2026-09-25-e29-vs-2026-09-25-e28b/prefill.svg": "2fd9a1661870907c7e450c589c344aab726cf169d3f5460e1987d86c7d545dde"
+    }
+  },
+  "measured_load_identity": {
+    "load": "E29 load B",
+    "per_rank_docker_arguments_and_environment_match_overlay_dry_run": "4/4",
+    "rank0_boot_lines": [
+      "E29_END_DRAIN_READY trace=0",
+      "E29_IDLE_COALESCE_READY ms=4 trace=0",
+      "E27C_CADENCE_WHEN_QUEUED_READY interval=8",
+      "E27B_SHORT_PREFILL_READY tokens=2048 interval=8"
+    ],
+    "post_boot_gates": "PASS, 3 s after health"
+  },
+  "new_measurement_requests": 0,
+  "live_default_apply": {
+    "status": "pending",
+    "requires": "owner authorization for one coordinated restart onto the default, then both gates and scripts/check-f0.py"
+  },
+  "live_reproduction": {
+    "status": "not_required_by_owner_decision",
+    "executed_runs": 0,
+    "executed_requests": 0
+  },
+  "baseline": {
+    "path": "docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json",
+    "sha256": "f7d7b0dfa9eec863c183ff46dbafb2f32ab8e2c140afb5e75f515322af15895e"
+  },
+  "rollback": {
+    "path": "scripts/node/reference/baseline-20260925-e28b.env",
+    "sha256": "0ce5037942235b08f2d3190b0360709cd68d784206c1f3a630924cf9b0b40b33"
+  }
+}

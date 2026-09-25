@@ -23,7 +23,7 @@ from typing import Any, Callable
 
 
 REPO = Path(__file__).resolve().parents[1]
-BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json"
+BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json"
 ADAPTIVE_DEFAULTS = {
     "VLLM_ADAPTIVE_K_ENABLE": "1", "VLLM_ADAPTIVE_K_LO": "3",
     "VLLM_ADAPTIVE_K_HI": "5", "VLLM_ADAPTIVE_K_MODE": "per-request",
@@ -150,6 +150,7 @@ safe_env_names = (
     "VLLM_ADAPTIVE_K_LOG_EVERY", "NCCL_ALGO", "NCCL_IB_HCA", "NCCL_IB_GID_INDEX",
     "NCCL_IB_ROCE_VERSION_NUM", "NCCL_IB_ADDR_FAMILY", "NCCL_IB_QPS_PER_CONNECTION",
     "VLLM_E27B_SHORT_PREFILL_TOKENS", "VLLM_E27C_CADENCE_WHEN_QUEUED",
+    "VLLM_E29_END_DRAIN", "VLLM_E29_IDLE_COALESCE_MS", "VLLM_E29_TRACE",
 )
 identity = p.get("runtime_identity") or {}
 safe_env_names = set(safe_env_names) | set(identity.get("environment", {}))
@@ -435,8 +436,10 @@ def adaptive_env(value: str) -> dict[str, str]:
     return {key: parsed.get(key, default) for key, default in ADAPTIVE_DEFAULTS.items()}
 
 
-# Scheduler flags that only records from E27c on may carry; older records require absence.
-SCHEDULER_FLAGS = ("VLLM_E27B_SHORT_PREFILL_TOKENS", "VLLM_E27C_CADENCE_WHEN_QUEUED")
+# Scheduler flags that only records from E27c (E27B/E27C) or E29 (E29) on may carry; older
+# records require absence.
+SCHEDULER_FLAGS = ("VLLM_E27B_SHORT_PREFILL_TOKENS", "VLLM_E27C_CADENCE_WHEN_QUEUED",
+                   "VLLM_E29_END_DRAIN", "VLLM_E29_IDLE_COALESCE_MS", "VLLM_E29_TRACE")
 
 
 def compilation_flag(expected: dict[str, Any]) -> list[str]:

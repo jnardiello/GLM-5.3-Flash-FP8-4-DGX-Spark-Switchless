@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "record_type": "host_memory_summary",
+  "method": "MemAvailable from /proc/meminfo sampled once per second on every rank, read-only, over load B (cohort screen, three suites, interference and the four-context diagnostic); earlyoom on the nodes acts below 524,288 KiB (SIGTERM) and 102,400 KiB (SIGKILL).",
+  "ranks": {
+    "0": {
+      "samples": 2730,
+      "min_kib": 2041804,
+      "median_kib": 3726588,
+      "max_kib": 3975384
+    },
+    "1": {
+      "samples": 2731,
+      "min_kib": 6608484,
+      "median_kib": 8069676,
+      "max_kib": 8958900
+    },
+    "2": {
+      "samples": 2730,
+      "min_kib": 6312604,
+      "median_kib": 8532304,
+      "max_kib": 8972612
+    },
+    "3": {
+      "samples": 2730,
+      "min_kib": 6479372,
+      "median_kib": 8495956,
+      "max_kib": 8990324
+    }
+  }
+}

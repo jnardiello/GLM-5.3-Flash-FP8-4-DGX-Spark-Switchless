@@ -45,7 +45,7 @@ RELAY_DEST=operator@192.0.2.23
             (root / "empty.env").write_text(e27c)
             (root / "candidate.env").write_text(e27c + delta)
             (root / "kv.env").write_text(e27c + delta + "\n" + kv)
-            (root / "default.env").write_text("")
+            (root / "default.env").write_text((REPO / "scripts/node/reference/baseline-20260925-e28b.env").read_text())
             env = dict(os.environ, TP4_DRY_RUN="1")
             env.pop("TP4_ENV", None)
             forbidden = root / "forbidden.log"
@@ -79,7 +79,7 @@ RELAY_DEST=operator@192.0.2.23
                 kv16 = argv(launch("kv.env", rank))
                 self.assertEqual(Counter(after) - Counter(kv16), Counter(["--kv-cache-memory-bytes=16106127360"]))
                 self.assertEqual(Counter(kv16) - Counter(after), Counter(["--kv-cache-memory-bytes=17179869184"]))
-                # The promoted E28b default is exactly that measured command.
+                # The complete E28b return (the E28b default before E29) is exactly that measured command.
                 self.assertEqual(argv(launch("default.env", rank)), kv16)
 
             bad = {

@@ -89,13 +89,15 @@ Then verify these signatures that `docker ps` does not prove:
 | E21 residual projections | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E21_BF16_RESIDUE_W8A16_READY` on every rank: 67 modules in the `kda_o_proj`, `mla_fused_qkv_a_proj`, `mla_o_proj` and `mla_q_b_proj` families, `mla_layout=q_lora`, group 128, threshold 2048, added scratch 79,691,776 bytes; `VLLM_E21_BF16_RESIDUE_W8A16=1` and matching `experiments/e03/bf16-residue/` source hashes |
 | E22b drafter conversion | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E22_DRAFTER_W8A16_READY` on every rank: 30 modules in the `down_proj`, `gate_up_proj`, `kernel_projection`, `o_proj` and `qkv_proj` families, `context_kv_w8a16` false, 0 added scratch bytes; `VLLM_E22_DRAFTER_W8A16=1`, `VLLM_E22_CONTEXT_KV_W8A16=0` and matching `experiments/e03/drafter-w8a16/` source hashes; the drafter CUDA graphs are captured fresh at every boot |
 | E27 prefill cadence | `docker inspect`, `./scripts/check-f0.py` | `--prefill-schedule-interval 8` exactly once in every rank's command; no boot log line, because the argument is native to the image |
-| E27c scheduler | rank-0 logs, `docker inspect`, `./scripts/check-f0.py` | `E27C_CADENCE_WHEN_QUEUED_READY interval=8` and `E27B_SHORT_PREFILL_READY tokens=2048 interval=8` on rank 0; `VLLM_E27B_SHORT_PREFILL_TOKENS=2048`, `VLLM_E27C_CADENCE_WHEN_QUEUED=1` and the `experiments/e03/queued-cadence/scheduler.py` hash mounted over `vllm/v1/core/sched/scheduler.py` on every rank; `E27C_CADENCE_KEPT_WHILE_QUEUED` appears the first time long prompts are queued while others decode |
+| E27c scheduler | rank-0 logs, `docker inspect`, `./scripts/check-f0.py` | `E27C_CADENCE_WHEN_QUEUED_READY interval=8` and `E27B_SHORT_PREFILL_READY tokens=2048 interval=8` on rank 0; `VLLM_E27B_SHORT_PREFILL_TOKENS=2048`, `VLLM_E27C_CADENCE_WHEN_QUEUED=1` and the E29 scheduler below (which contains the E27c patch) mounted over `vllm/v1/core/sched/scheduler.py` on every rank; `E27C_CADENCE_KEPT_WHILE_QUEUED` appears the first time long prompts are queued while others decode |
+| E29 end-drain and idle coalescing | rank-0 logs, `docker inspect`, `./scripts/check-f0.py` | `E29_END_DRAIN_READY trace=0` and `E29_IDLE_COALESCE_READY ms=4 trace=0` on rank 0; `VLLM_E29_END_DRAIN=1`, `VLLM_E29_IDLE_COALESCE_MS=4` and `VLLM_E29_TRACE=0` on every rank, with the `experiments/e03/end-drain/scheduler.py` hash mounted over `vllm/v1/core/sched/scheduler.py` and the `experiments/e03/end-drain/core.py` hash over `vllm/v1/engine/core.py`; the first request held at a length finish logs `E29_END_DRAIN_HELD` |
 
-The default [accepted E28b recipe](benchmarks/baselines/2026-09-25-e28b.md) retains those
+The default [accepted E29 recipe](benchmarks/baselines/2026-09-25-e29.md) retains those
 signatures, including the E03 `SPARK_MHC_PREFILL_SHARD=1` and its measured source
 mounts, the E21 residual projections, the E22b drafter conversion with its own cache
-namespace, the E27 prefill cadence and the E27c scheduler, and adds seven draft tokens for a
-single request with a 16 GiB KV pool. Eligible eager long prefills log
+namespace, the E27 prefill cadence, the E27c scheduler patch, and seven draft tokens for a
+single request with a 16 GiB KV pool (E28b). E29 adds the length-finish hold and the 4 ms
+idle-coalescing window. Eligible eager long prefills log
 `SPARK_MHC_PREFILL rows=6912 owner_rows=1728 rs=90 ag=95 aux=5` on all four ranks;
 this is a workload activation receipt, not a requirement to run extra inference during
 an identity-only check. Runtime sources keep their `experiments/e03/` paths to preserve
@@ -115,8 +117,10 @@ limit, expect `draft-budget first-cap budget=3` and aggregate `limited_requests`
 `trimmed_tokens`. These count placeholder handouts, not accepted tokens or saved compute.
 An adaptive-policy fallback invalidates activation.
 
-The complete immediate return is `TP4_ENV=scripts/node/reference/baseline-20260925-e27c.env`:
-the E27c recipe with five draft tokens and a 15 GiB KV pool, with the same cache namespace.
+The complete immediate return is `TP4_ENV=scripts/node/reference/baseline-20260925-e28b.env`:
+the E28b recipe with the E27c scheduler and the image's engine core, with the same cache
+namespace. `baseline-20260925-e27c.env` restores the E27c recipe with five draft tokens and a
+15 GiB KV pool.
 `baseline-20260924-e27.env` restores the E27 recipe with the image's own scheduler.
 `baseline-20260924-e22b.env` restores the E22b recipe without the prefill cadence.
 `baseline-20260923-e21.env` restores the E21 recipe with the vendor drafter, no E22 module
@@ -145,6 +149,7 @@ verdict is needed:
 ```sh
 ./scripts/check-f0.py
 ./scripts/check-f0.py --base-url http://127.0.0.1:8000
+TP4_ENV=scripts/node/reference/baseline-20260925-e28b.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json
 TP4_ENV=scripts/node/reference/baseline-20260925-e27c.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json
 TP4_ENV=scripts/node/reference/baseline-20260924-e27.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json
 TP4_ENV=scripts/node/reference/baseline-20260924-e22b.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-23-e22b/baseline.json
@@ -157,10 +162,10 @@ TP4_ENV=scripts/node/reference/baseline-20260918.env ./scripts/check-f0.py --bas
 
 The second form uses an already-established localhost SSH tunnel when the management LAN
 is not directly reachable. The checker reads the local `cluster.env` and honors `TP4_ENV`
-as the effective delta. By default it validates the **September 25 E28b** identity from
-[the current reference](historical_benchmarks/baselines/2026-09-25-e28b/baseline.json), including
+as the effective delta. By default it validates the **September 25 E29** identity from
+[the current reference](historical_benchmarks/baselines/2026-09-25-e29/baseline.json), including
 seven draft tokens, the adaptive table and high state, the CUDA graph limit, the 16 GiB KV
-budget, the E27c scheduler hash, flags and rank-0 boot lines, the E27 prefill cadence in the recipe
+budget, the E29 scheduler and engine-core hashes, the E27c and E29 flags and rank-0 boot lines, the E27 prefill cadence in the recipe
 and every rank's command, the E22b drafter sources/flags/boot signature, the E21 sources/flag/boot signature, the mHC sources/flag, replay connector, draft-budget scheduler/activation, hybrid KDA,
 KV byte budget and image content ID. Historical `--baseline` selection also requires
 the matching complete runtime recipe. A baseline-changing delta fails the check.
@@ -524,7 +529,8 @@ below is full-cluster and must fall within an authorized service window.
 | --- | --- | --- |
 | Overlay result is bad | `./scripts/tp4ctl restart` with no `TP4_ENV` | base `cluster.env` signatures and gates return |
 | Production engine knob is bad | restore the rollback documented beside the value in `cluster.env.example`, update local `cluster.env`, deploy, restart | all runtime signatures plus task gate |
-| Restore the previous E27c reference | use the [complete E27c rollback](#restore-the-previous-e27c-reference) | `num_spec_tokens=5`, no `VLLM_ADAPTIVE_K_HI` or `--compilation-config`, `--kv-cache-memory-bytes=16106127360`, same scheduler mount and cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json` with the same overlay, both gates |
+| Restore the previous E28b reference | use the [complete E28b rollback](#restore-the-previous-e28b-reference) | E27c scheduler mounted over `vllm/v1/core/sched/scheduler.py`, no engine-core mount, no `VLLM_E29_` flag or boot line, seven draft tokens and 16 GiB KV retained, same cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json` with the same overlay, both gates |
+| Restore the older E27c reference | use the [complete E27c rollback](#restore-the-older-e27c-reference) | `num_spec_tokens=5`, no `VLLM_ADAPTIVE_K_HI` or `--compilation-config`, `--kv-cache-memory-bytes=16106127360`, same scheduler mount and cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json` with the same overlay, both gates |
 | Restore the older E27 reference | use the [complete E27 rollback](#restore-the-older-e27-reference) | no scheduler mount over `vllm/v1/core/sched/scheduler.py`, no `VLLM_E27B_`/`VLLM_E27C_` flag or boot line, `--prefill-schedule-interval 8` retained, same cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json` with the same overlay, both gates |
 | Restore the older E22b reference | use the [complete E22b rollback](#restore-the-older-e22b-reference) | no `--prefill-schedule-interval` in any rank's command, same mounts, flags and cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-23-e22b/baseline.json` with the same overlay, both gates |
 | Restore the older E21 reference | use the [complete E21 rollback](#restore-the-older-e21-reference) | vendor drafter, no E22 mount, flags or boot signature, E21 cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json` with the same overlay, both gates |
@@ -544,13 +550,37 @@ An IOMMU revert exit code 4 means GRUB was not safely regenerated: do not reboot
 Never use `EXTRA_DOCKER_ENV=""` as a generic rollback. Never purge a model to recover
 space without a fresh disk census and explicit owner decision.
 
-### Restore the previous E27c reference
+### Restore the previous E28b reference
 
 The immediate complete return is
+[`baseline-20260925-e28b.env`](../scripts/node/reference/baseline-20260925-e28b.env). It
+mounts the E27c scheduler again, removes the engine-core mount and the three `VLLM_E29_`
+flags, and keeps seven draft tokens, the 16 GiB KV pool, the other mounts and the cache
+namespace, so the same persistent cache is reused.
+
+In the authorized window, first stop using the currently serving recipe. Then:
+
+```sh
+export TP4_ENV=scripts/node/reference/baseline-20260925-e28b.env
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Complete both functional gates within two minutes of /health 200.
+./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json
+```
+
+Keep this overlay for subsequent lifecycle commands and configure autostart to use it
+before an unattended reboot. Returning to current defaults requires a coordinated stop
+with the rollback overlay, then deploy/start without it and removal of that autostart
+selection.
+
+### Restore the older E27c reference
+
+The complete return is
 [`baseline-20260925-e27c.env`](../scripts/node/reference/baseline-20260925-e27c.env). It
-restores five draft tokens and the 15 GiB KV pool, and removes `VLLM_ADAPTIVE_K_HI=7` and the
-CUDA graph limit; the scheduler, other mounts and the cache namespace are unchanged, so the
-same persistent cache is reused.
+restores the E28b return with five draft tokens and the 15 GiB KV pool, and removes
+`VLLM_ADAPTIVE_K_HI=7` and the CUDA graph limit; the scheduler, other mounts and the cache
+namespace are unchanged, so the same persistent cache is reused.
 
 In the authorized window, first stop using the currently serving recipe. Then:
 
@@ -713,7 +743,7 @@ export TP4_ENV=scripts/node/reference/baseline-20260918.env
 
 Keep this overlay for later lifecycle commands. For unattended autostart, install a
 systemd drop-in that sets this same `TP4_ENV` and run `systemctl daemon-reload`; otherwise
-a later reboot would select the accepted E28b default recipe. Returning to the current defaults
+a later reboot would select the accepted E29 default recipe. Returning to the current defaults
 requires a coordinated transition with no overlay and removal of that drop-in. Preserve
 both persistent-cache directories; do not reuse their contents across quantization
 recipes. The frozen baseline medians are not remeasured as part of rollback.

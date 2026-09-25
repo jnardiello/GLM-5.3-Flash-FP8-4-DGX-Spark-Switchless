@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "record_type": "scheduling_diagnostics",
+  "interference_protocol_2": {
+    "receipt_sha256": "d5cbe41bb04c2162c4f15ab4f43ccfdef98eba788aaaebd383acea3025cacf96",
+    "reference": "E27c protocol-2 receipt (E28b keeps it as its reference)",
+    "cells": {
+      "1K x1": {
+        "background_decode_tokens_per_second_during": 14.711,
+        "interferer_ttft_seconds": 0.816,
+        "background_max_progress_gap_seconds": 0.669
+      },
+      "1K x3": {
+        "background_decode_tokens_per_second_during": 6.694,
+        "interferer_ttft_seconds": 1.002,
+        "background_max_progress_gap_seconds": 0.785
+      },
+      "8K x1": {
+        "background_decode_tokens_per_second_during": 3.905,
+        "interferer_ttft_seconds": 3.91,
+        "background_max_progress_gap_seconds": 2.661
+      },
+      "8K x3": {
+        "background_decode_tokens_per_second_during": 5.568,
+        "interferer_ttft_seconds": 4.391,
+        "background_max_progress_gap_seconds": 2.666
+      },
+      "32K x1": {
+        "background_decode_tokens_per_second_during": 7.926,
+        "interferer_ttft_seconds": 15.575,
+        "background_max_progress_gap_seconds": 2.898
+      },
+      "32K x3": {
+        "background_decode_tokens_per_second_during": 6.559,
+        "interferer_ttft_seconds": 17.566,
+        "background_max_progress_gap_seconds": 2.88
+      }
+    }
+  },
+  "four_contexts_32k": {
+    "c4@32768": {
+      "requests": 8,
+      "decode_tps_median_per_stream": 15.71,
+      "ttft_median_s": 35.422,
+      "ms_per_step_median": 422.83,
+      "acceptance_median": 0.9755
+    }
+  },
+  "four_contexts_32k_e27c_reference": {
+    "decode_tps_median_per_stream": 13.67,
+    "ttft_median_s": 36.65
+  }
+}

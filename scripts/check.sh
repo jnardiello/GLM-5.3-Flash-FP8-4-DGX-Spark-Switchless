@@ -96,6 +96,8 @@ python3 scripts/tests/test-drafter-w8a16-config.py
 python3 scripts/tests/test-long-prefill-cadence-config.py
 python3 scripts/tests/test-queued-cadence-config.py
 python3 scripts/tests/test-draft-depth-7-config.py
+python3 scripts/tests/test-end-drain-config.py
+python3 scripts/tests/test-end-drain-policy.py
 python3 scripts/tests/test-accepted-recipe.py
 python3 scripts/tests/test-f0-reference.py
 ./scripts/tests/test-host-lifecycle.sh

@@ -1,0 +1,193 @@
+--- a/vllm/v1/core/sched/scheduler.py
++++ b/vllm/v1/core/sched/scheduler.py
+@@ -105,6 +105,43 @@
+     return 0 < remaining < limit and admitted + remaining <= limit
+ 
+ 
++# E29 (TP4 candidate): under async scheduling the vendor length guard skips another
++# step only when the step in flight is certain to reach max_tokens (O + 1 >= M). With
++# seven drafts a length-capped request usually finishes inside a step that could
++# produce several tokens, so one more speculative step is already queued and runs for
++# nothing while the next request waits. With VLLM_E29_END_DRAIN=1 a running request is
++# not given another step while its step in flight may finish it (O + P >= M); it
++# resumes normally if that output falls short. EOS and stop strings are unchanged.
++# Unset or 0 keeps the vendor behaviour exactly.
++def _e29_flag(name: str) -> bool:
++    import os
++
++    value = os.environ.get(name, "0")
++    if value not in ("0", "1"):
++        raise ValueError(f"{name} must be 0 or 1")
++    return value == "1"
++
++
++def _e29_end_drain_holds(
++    output_tokens: int,
++    placeholders: int,
++    max_tokens: int | None,
++    is_prefill_chunk: bool,
++    structured_output: bool,
++) -> bool:
++    """Whether the step in flight may already finish this request by length, so
++    another speculative step dispatched now could be wasted work. Structured
++    output is excluded: its grammar mask for retained drafts is only validated
++    while a step is in flight, so it keeps the vendor pipeline."""
++    return (
++        not is_prefill_chunk
++        and not structured_output
++        and placeholders > 0
++        and max_tokens is not None
++        and output_tokens + placeholders >= max_tokens
++    )
++
++
+ class Scheduler(SchedulerInterface):
+     def __init__(
+         self,
+@@ -391,6 +428,15 @@
+                 self.e27b_short_prefill_tokens,
+                 self.scheduler_config.prefill_schedule_interval,
+             )
++        # E29: hold a request whose step in flight may finish it by length
++        # (False = vendor behaviour). Trace logs every hold and resume.
++        self.e29_end_drain = _e29_flag("VLLM_E29_END_DRAIN")
++        self.e29_trace = _e29_flag("VLLM_E29_TRACE")
++        self.e29_held_ids: set[str] = set()
++        self.e29_holds = 0
++        self.e29_resumes = 0
++        if self.e29_end_drain:
++            logger.info("E29_END_DRAIN_READY trace=%d", int(self.e29_trace))
+         self.scheduler_reserve_full_isl = (
+             self.scheduler_config.scheduler_reserve_full_isl
+         )
+@@ -694,6 +740,15 @@
+             and self.current_step >= request.next_decode_eligible_step
+             for request in self.running
+         )
++        if self.e29_end_drain and has_eligible_decode:
++            # E29: a held request decodes nothing this step, so it must not make
++            # the cadence defer a waiting prefill into an empty step.
++            has_eligible_decode = any(
++                not request.is_prefill_chunk
++                and self.current_step >= request.next_decode_eligible_step
++                and not self._e29_would_hold(request)
++                for request in self.running
++            )
+         defer_prefills = (
+             throttle_prefills
+             and (not self.prefill_capacity_bound or self.e27c_cadence_when_queued)
+@@ -722,6 +777,13 @@
+                 # Async scheduling: Avoid scheduling an extra step when we are sure that
+                 # the previous step has reached request.max_tokens. We don't schedule
+                 # partial draft tokens since this prevents uniform decode optimizations.
++                req_index += 1
++                continue
++
++            if self._e29_would_hold(request):
++                # E29: the step in flight may already finish this request; collect
++                # its output before dispatching a speculative step past the finish.
++                self._e29_count_hold(request)
+                 req_index += 1
+                 continue
+ 
+@@ -1635,6 +1697,53 @@
+                 len(self.waiting),
+             )
+ 
++    def _e29_would_hold(self, request: Request) -> bool:
++        """E29: whether this running request is held for this step."""
++        return self.e29_end_drain and _e29_end_drain_holds(
++            request.num_output_tokens,
++            request.num_output_placeholders,
++            request.max_tokens,
++            request.is_prefill_chunk,
++            request.use_structured_output,
++        )
++
++    def _e29_count_hold(self, request: Request) -> None:
++        """E29: count one hold per request episode (empty steps may repeat it)."""
++        if request.request_id in self.e29_held_ids:
++            return
++        self.e29_held_ids.add(request.request_id)
++        self.e29_holds += 1
++        if self.e29_trace:
++            logger.info(
++                "E29_TRACE hold req=%s out=%d placeholders=%d max=%d step=%d t=%.6f",
++                request.request_id,
++                request.num_output_tokens,
++                request.num_output_placeholders,
++                request.max_tokens,
++                self.current_step,
++                time.monotonic(),
++            )
++        if self.e29_holds == 1 or self.e29_holds % 1000 == 0:
++            logger.info(
++                "E29_END_DRAIN_HELD count=%d resumed=%d",
++                self.e29_holds,
++                self.e29_resumes,
++            )
++
++    def _e29_count_resume(self, request: Request) -> None:
++        """E29: the held step did not finish the request; it is scheduled again."""
++        self.e29_held_ids.discard(request.request_id)
++        self.e29_resumes += 1
++        if self.e29_trace:
++            logger.info(
++                "E29_TRACE resume req=%s out=%d max=%d step=%d t=%.6f",
++                request.request_id,
++                request.num_output_tokens,
++                request.max_tokens,
++                self.current_step,
++                time.monotonic(),
++            )
++
+     def _build_kv_connector_meta(
+         self, connector: KVConnectorBase_V1, scheduler_output: SchedulerOutput
+     ) -> KVConnectorMetadata:
+@@ -1670,6 +1779,16 @@
+         assert request.status == RequestStatus.RUNNING, (
+             "Only running requests can be preempted"
+         )
++        if request.request_id in self.e29_held_ids:
++            # E29: preemption resets placeholders and ends the hold episode.
++            self.e29_held_ids.discard(request.request_id)
++            if self.e29_trace:
++                logger.info(
++                    "E29_TRACE preempted-held req=%s step=%d t=%.6f",
++                    request.request_id,
++                    self.current_step,
++                    time.monotonic(),
++                )
+         self._free_request_blocks(request)
+         self.encoder_cache_manager.free(request)
+         self._inflight_prefills.discard(request)
+@@ -1707,6 +1826,11 @@
+         #    scheduling step.
+         # 3. If some tokens (e.g. spec tokens) are rejected later, the number of
+         #    computed tokens will be adjusted in update_from_output.
++        if self.e29_held_ids:
++            # E29: count resumes from the final scheduled set.
++            for req_id in scheduler_output.num_scheduled_tokens:
++                if req_id in self.e29_held_ids:
++                    self._e29_count_resume(self.requests[req_id])
+         num_scheduled_tokens = scheduler_output.num_scheduled_tokens
+         for req_id, num_scheduled_token in num_scheduled_tokens.items():
+             request = self.requests[req_id]
+@@ -2778,6 +2902,17 @@
+     ) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+         assert request.is_finished()
+ 
++        if request.request_id in self.e29_held_ids:
++            self.e29_held_ids.discard(request.request_id)
++            if self.e29_trace:
++                logger.info(
++                    "E29_TRACE finished-held req=%s out=%d max=%d step=%d t=%.6f",
++                    request.request_id,
++                    request.num_output_tokens,
++                    request.max_tokens,
++                    self.current_step,
++                    time.monotonic(),
++                )
+         self._inflight_prefills.discard(request)
+         connector_delay_free_blocks, kv_xfer_params = self._connector_finished(request)
+ 

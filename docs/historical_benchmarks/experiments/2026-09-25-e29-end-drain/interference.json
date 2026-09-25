@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "measurement": "Rigmark interference phase, protocol 2: background decode progress before and during another request's cold prefill",
+  "rigmark": {
+    "protocol": 2,
+    "note": "Same local Rigmark extension as the E27c interference record; the standard suites use the unmodified frozen source."
+  },
+  "settings": {
+    "interference_decoders": [
+      1,
+      3
+    ],
+    "interference_depths": [
+      1024,
+      8192,
+      32768
+    ],
+    "interference_runs": 3,
+    "interference_settle_seconds": 2.0,
+    "interference_tokens": 1024,
+    "interference_protocol": 2
+  },
+  "client_transport": "direct LAN HTTP to the rank-0 API, same client as the E27c record",
+  "receipts": {
+    "e29": {
+      "native_receipt_sha256": "d5cbe41bb04c2162c4f15ab4f43ccfdef98eba788aaaebd383acea3025cacf96",
+      "measured_on": "2026-09-25",
+      "cache_salt_sha256": "7f7a05542f502e61ce04cb2a2b3b7c04babfd6cf1ae8aa620f23cb0b8d297a10",
+      "comparison_id": "glm53-nq2-3x-20260911-v1",
+      "executions": 1
+    }
+  },
+  "medians": {
+    "1024/1": {
+      "background_decode_tokens_per_second_before": 46.0,
+      "background_decode_tokens_per_second_during": 14.711,
+      "background_max_progress_gap_seconds": 0.669,
+      "interferer_ttft_seconds": 0.816,
+      "interferer_effective_prefill_tokens_per_second": 1255.336,
+      "background_time_lost_seconds_median": 0.5460550786516855
+    },
+    "1024/3": {
+      "background_decode_tokens_per_second_before": 24.5,
+      "background_decode_tokens_per_second_during": 6.694,
+      "background_max_progress_gap_seconds": 0.785,
+      "interferer_ttft_seconds": 1.002,
+      "interferer_effective_prefill_tokens_per_second": 1022.295,
+      "background_time_lost_seconds_median": 0.7915484444444443
+    },
+    "8192/1": {
+      "background_decode_tokens_per_second_before": 47.5,
+      "background_decode_tokens_per_second_during": 3.905,
+      "background_max_progress_gap_seconds": 2.661,
+      "interferer_ttft_seconds": 3.91,
+      "interferer_effective_prefill_tokens_per_second": 2094.877,
+      "background_time_lost_seconds_median": 3.5257135263157893
+    },
+    "8192/3": {
+      "background_decode_tokens_per_second_before": 23.0,
+      "background_decode_tokens_per_second_during": 5.568,
+      "background_max_progress_gap_seconds": 2.666,
+      "interferer_ttft_seconds": 4.391,
+      "interferer_effective_prefill_tokens_per_second": 1865.755,
+      "background_time_lost_seconds_median": 3.3366373333333335
+    },
+    "32768/1": {
+      "background_decode_tokens_per_second_before": 46.0,
+      "background_decode_tokens_per_second_during": 7.926,
+      "background_max_progress_gap_seconds": 2.898,
+      "interferer_ttft_seconds": 15.575,
+      "interferer_effective_prefill_tokens_per_second": 2103.828,
+      "background_time_lost_seconds_median": 12.833841966292134
+    },
+    "32768/3": {
+      "background_decode_tokens_per_second_before": 26.0,
+      "background_decode_tokens_per_second_during": 6.559,
+      "background_max_progress_gap_seconds": 2.88,
+      "interferer_ttft_seconds": 17.566,
+      "interferer_effective_prefill_tokens_per_second": 1865.386,
+      "background_time_lost_seconds_median": 13.085555905660378
+    }
+  },
+  "limitations": [
+    "One execution (three runs per cell); the E27c record is the comparison, and E28b was not measured with this phase."
+  ]
+}

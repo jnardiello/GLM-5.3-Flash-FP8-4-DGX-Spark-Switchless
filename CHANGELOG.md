@@ -7,6 +7,43 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Published the September 25 E29 frozen baseline and its promotion record. E29 is the E28b
+  recipe plus the end-drain overlay in its load B configuration.
+  - The default `EXTRA_DOCKER_ENV` mounts `experiments/e03/end-drain/scheduler.py` instead of
+    the E27c scheduler and `experiments/e03/end-drain/core.py` over the image's engine core,
+    and sets `VLLM_E29_END_DRAIN=1`, `VLLM_E29_IDLE_COALESCE_MS=4` and `VLLM_E29_TRACE=0`.
+    The dry-run default is argument-for-argument identical to the measured load on all four
+    ranks.
+  - Against E28b: C1/C2/C4 per-stream TTFT −13.2% / −14.7% / −9.8%, code decode +3.2%, prose
+    +2.5%, no metric worse beyond noise. Three native suites, 162 requests, zero errors,
+    45/45 output gates.
+  - `scripts/check-f0.py` selects the E29 identity by default and checks both mounted files,
+    the three flags and both rank-0 boot lines. Older records now also refuse the E29 flags.
+  - The launcher verifies `experiments/e03/end-drain/SHA256SUMS` whenever either file is
+    mounted.
+- Added `scripts/node/reference/baseline-20260925-e28b.env`, the complete E28b recipe, as the
+  one-step rollback from E29.
+- Added the E29 end-drain candidate overlay under `scripts/node/experiments/e03/end-drain/`,
+  applied on the E28b default. With asynchronous scheduling and seven drafts, a request
+  limited by `max_tokens` usually finishes inside a step that could produce several tokens,
+  so one more speculative step for it is already queued and delays the next request's first
+  token by about 50–100 ms. The overlay changes only request boundaries:
+  - `VLLM_E29_END_DRAIN=1` (scheduler) does not dispatch another step for a request whose
+    step in flight may reach `max_tokens`; the request resumes if tokens are still missing.
+  - `VLLM_E29_IDLE_COALESCE_MS` (engine core, 0–5 ms) collects requests that arrive together
+    at an idle engine before the first schedule, so they are prefilled in one step.
+  - `VLLM_E29_TRACE=1` logs arrival, dispatch, hold and resume times for diagnosis.
+  Both overrides are their base plus an additions-only patch; with the flags unset they
+  behave as E28b. Offline tests cover provenance, flag parsing, four-rank launcher parity,
+  overlay refusals, and a model of the async accounting (invariant, placeholders, liveness,
+  no step dispatched past a length finish). `delta.env` is the traced diagnosis load;
+  `delta-b.env` sets the 4 ms window measured there.
+- Published the E29 experiment record and report: three native suites (162 requests, zero
+  errors) against the E28b medians show C1 per-stream TTFT −13.2%, C2 −14.7%, C4 −9.8%,
+  code decode +3.2%, cached replay +3.6% / +2.7% / −1.0% at 8K / 32K / 64K. The rest of the
+  replay cost is a wait for the cache connector to publish the preceding request. Three
+  owner-requested prefill re-runs are recorded separately; over six executions replay is
+  +2.2% / +2.0% / +1.1% against E28b. The owner promoted it.
 - Published the September 25 E28b frozen baseline and its promotion record. E28b is the E27c
   recipe with seven draft tokens for a single request and a 16 GiB KV pool per rank.
   - The DFlash2 drafter is trained with blocks of 8, so one request now drafts seven tokens

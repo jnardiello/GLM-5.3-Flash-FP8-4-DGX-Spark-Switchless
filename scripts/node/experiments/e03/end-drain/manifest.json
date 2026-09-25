@@ -1,0 +1,66 @@
+{
+  "schema": "tp4-experiment-candidate/v1",
+  "experiment": "E29",
+  "candidate": "end-drain",
+  "status": "promoted",
+  "status_note": "Promoted on 2026-09-25 as the E29 reference; cluster.env.example mounts both files with VLLM_E29_END_DRAIN=1, VLLM_E29_IDLE_COALESCE_MS=4 and VLLM_E29_TRACE=0 (the load B configuration). Both overlays refuse the E29 default; apply them on scripts/node/reference/baseline-20260925-e28b.env to reproduce the measured loads.",
+  "summary": "E28b plus two flagged boundary changes that leave interior k=7 decode steps unchanged. VLLM_E29_END_DRAIN=1 stops the async scheduler from dispatching another speculative step for a request whose step in flight may already reach max_tokens; the vendor guard skips only when completion is certain, so with seven drafts a length-capped request usually ends with one useless verification step that the next request waits behind. VLLM_E29_IDLE_COALESCE_MS keeps collecting requests for a fixed window after the first arrival at an idle engine, so requests released together are prefilled in one step. VLLM_E29_TRACE=1 logs arrivals, dispatches, retirements, holds and resumes.",
+  "parent": {
+    "recipe": "cluster.env.example defaults (accepted E28b)",
+    "baseline_id": "2026-09-25-e28b",
+    "baseline_sha256": "e00c6ca245da482ce58179663cd8cc455b7aa54bde3905c881ba2c968cca87a5"
+  },
+  "files": {
+    "scheduler.py": {
+      "vendor_path": "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py",
+      "vendor_sha256": "122d9722b48f8cec267d2136a18c184b8901a5a0a46187eab7030d6227f1983d",
+      "parent_candidate": "scripts/node/experiments/e03/queued-cadence/scheduler.py",
+      "parent_sha256": "f44c2872c89ba1f5602f6c2dd087ae822f3faed24ce0e3db88b38651bdb23bee",
+      "patch": "scheduler.patch",
+      "patch_base": "parent_candidate",
+      "patch_sha256": "8ef7a1ef31912dc138fc47ba229144e518a0be3e09ed5537a57771297a5efb49",
+      "candidate_sha256": "f41d6e9e4363b271ad8543a5ef7063b546952d4c0bd35565cee034884a61baec",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py",
+      "change": "The E27c scheduler mounted by E28b plus scheduler.patch, additions only: next to the vendor length guard, a non-prefill running request with output placeholders is skipped for this step when committed outputs plus placeholders reach max_tokens (equivalently C + 1 >= N + M under C = N + O + P - 1). Other requests stay schedulable, the request resumes once the pending output shows it still needs tokens, and EOS or stop handling is unchanged. With VLLM_E29_END_DRAIN unset or 0 the file behaves as the parent."
+    },
+    "core.py": {
+      "vendor_path": "/usr/local/lib/python3.12/dist-packages/vllm/v1/engine/core.py",
+      "vendor_sha256": "8181b9297d5c4a65a98d4a7d716f286dcae10d1a2dbf2f65f80bfa11d517c462",
+      "patch": "core.patch",
+      "patch_base": "vendor",
+      "patch_sha256": "903f61ea159c0564b0b68d5e5f00286390de2c7e470f23da561cd0d4a35fe421",
+      "candidate_sha256": "3a9a038f9a24cdeeb984846f0c170652f389d3f9442a652e73985836409c06be",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/v1/engine/core.py",
+      "change": "The serving image's engine core plus core.patch, additions only: after an idle engine takes its first ADD, _process_input_queue keeps taking inputs until one fixed deadline VLLM_E29_IDLE_COALESCE_MS later (0-5 ms; 0 = vendor loop), stopping early on shutdown, pause or no runnable request; it refuses a nonzero window with data parallelism. VLLM_E29_TRACE=1 logs enqueue, dispatch, retirement and coalescing times on one monotonic clock."
+    }
+  },
+  "activation": {
+    "flags": {
+      "VLLM_E29_END_DRAIN": "1",
+      "VLLM_E29_IDLE_COALESCE_MS": "0 in load A (delta.env); 4 in load B (delta-b.env), covering the 3.17 ms maximum arrival spread of 21 cohorts measured in load A",
+      "VLLM_E29_TRACE": "1 in load A; 0 in load B and in every Rigmark suite"
+    },
+    "overlay": "scripts/node/experiments/e03/end-drain/delta.env",
+    "overlay_load_b": "scripts/node/experiments/e03/end-drain/delta-b.env",
+    "boot_signatures": [
+      "E29_END_DRAIN_READY trace=1",
+      "E29_IDLE_COALESCE_READY ms=0 trace=1"
+    ],
+    "runtime_signatures": [
+      "E29_END_DRAIN_HELD",
+      "E29_TRACE"
+    ]
+  },
+  "preserved": {
+    "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "sparkcache_config_sha256": "f7d8989486907766c8df7ceaf67731fd2ec95e3bf474a6f63bb4303e41fbe4bc",
+    "num_speculative_tokens": 7,
+    "kv_cache_memory_bytes_per_rank": 17179869184,
+    "context_tokens": 262144,
+    "max_num_seqs": 6,
+    "max_num_batched_tokens": 8192
+  },
+  "evidence": "Live E28b diagnosis on 2026-09-25 with the frozen Rigmark client: an isolated 256-token C1 reached its first token in 0.339 s and a replay issued 5 s after its cold in 0.840/0.835/1.613 s at 8K/32K/64K, while a request submitted as soon as another finished waited 0.39-0.48 s. Over 40 length-capped predecessors, the next request took 0.333-0.338 s when the predecessor's last step emitted one token (vendor guard fired) and 0.388-0.439 s otherwise. Rigmark issues C1 rounds and each warm replay immediately after the previous request.",
+  "expected_cost": "A request whose held step falls short is scheduled after that output instead of overlapping it: one scheduling bubble near max_tokens, possibly repeated after further rejections. An isolated request at an idle engine waits up to the coalescing window.",
+  "not_included": "Cancelling or preempting work already dispatched to the workers, and any change to EOS-finished requests."
+}

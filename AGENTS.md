@@ -19,7 +19,7 @@ for each part of the requested task before substantive work:
 For installation, read both [`docs/install-from-zero.md`](docs/install-from-zero.md)
 and [`docs/operations.md`](docs/operations.md). The default recipe is
 [`cluster.env.example`](cluster.env.example); its measured identity and performance
-record is [`docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json`](docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json). Preserve its
+record is [`docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json`](docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json). Preserve its
 non-site settings unless the owner requests a variant. Use this checklist to navigate
 the existing procedures:
 
@@ -144,35 +144,37 @@ benchmark interface. Do not recreate it with private wrapper scripts, blanket ca
 qualification prerequisites, or a parallel benchmark/admission framework; necessary
 measurement fixes belong in Rigmark.
 
-Run one experiment at a time. Use the owner-accepted **September 25, 2026 E28b**
-reference in [`docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json`](docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json)
+Run one experiment at a time. Use the owner-accepted **September 25, 2026 E29**
+reference in [`docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json`](docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json)
 for future comparisons. Its fixed medians use exactly three complete native Rigmark
-suites (162 requests) measured on one retained load of the E28b candidate: the E27c recipe
-with seven draft tokens for a single request and a 16 GiB KV pool per rank. The client reached the
+suites (162 requests) measured on one load of the E29 candidate. That is the E28b recipe
+(seven draft tokens for a single request and a 16 GiB KV pool per rank) plus the end-drain
+scheduler and a 4 ms idle-coalescing window in the engine core. The client reached the
 rank-0 API over direct LAN HTTP; keep that path for comparisons of small effects.
 
 The IaC defaults in `cluster.env.example` select those measured sources: the E03 mHC
 6,912-row prefill, replay views and effective draft-budget cap, the E21 residual
 projections, the E22b drafter conversion and its cache namespace, and the E27 prefill
-cadence with the E27c scheduler, and the E28b draft length and 16 GiB KV pool, retaining
-hybrid KDA.
+cadence with the E27c scheduler, the E28b draft length and 16 GiB KV pool, and the E29
+end-drain scheduler and idle coalescing, retaining hybrid KDA.
 `scripts/check-f0.py` selects this identity by default without inference. The
-[promotion record](docs/historical_benchmarks/baselines/2026-09-25-e28b/promotion.json)
+[promotion record](docs/historical_benchmarks/baselines/2026-09-25-e29/promotion.json)
 records how the default was applied. The immediate rollback is
-`scripts/node/reference/baseline-20260925-e27c.env`, the complete E27c recipe.
+`scripts/node/reference/baseline-20260925-e28b.env`, the complete E28b recipe.
 
 Rigmark's optional interference phase (`--interference-depths`) measures running
 requests' decode while another request cold-prefills. Use its protocol 2, which the
-E27c record stores with its Rigmark source hash (E28b keeps those values as its reference), for scheduling candidates, together with
+E29 record stores with its Rigmark source hash (one execution; the E27c record holds the earlier values), for scheduling candidates, together with
 several long contexts arriving at once: the standard suites cover neither case.
 
-The [previous E27c reference](docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json),
+The [previous E28b reference](docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json),
+the [E27c reference](docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json),
 the [E27 reference](docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json),
 the [E22b reference](docs/historical_benchmarks/baselines/2026-09-23-e22b/baseline.json),
 the [E21 reference](docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json)
 and the [E03 reference](docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json)
 remain immutable at three suites / 162 requests each; their complete returns are
-`baseline-20260925-e27c.env`, `baseline-20260924-e27.env`, `baseline-20260924-e22b.env`,
+`baseline-20260925-e28b.env`, `baseline-20260925-e27c.env`, `baseline-20260924-e27.env`, `baseline-20260924-e22b.env`,
 `baseline-20260923-e21.env` and
 `baseline-20260919-e03.env`,
 and the older pre-E03 return is `scripts/node/reference/baseline-20260919.env`.

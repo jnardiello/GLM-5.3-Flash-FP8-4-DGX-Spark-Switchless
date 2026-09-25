@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "record_type": "targeted_probe_summary",
+  "method": "Frozen Rigmark client and request builder, suite settings (no thinking, cache salt, code prompt, 256 tokens), one request or cohort at a time on an otherwise idle service. Successor = a request submitted as soon as the previous stream ended.",
+  "e28b_reference_on_live_service": {
+    "successor_after_length_finish_40_requests": {
+      "last_step_1_token": {
+        "n": 10,
+        "median_s": 0.335
+      },
+      "last_step_2_or_more": {
+        "n": 30,
+        "median_s": 0.404,
+        "max_s": 0.439
+      }
+    },
+    "c1_idle_median_s": 0.339,
+    "c1_back_to_back_median_s": 0.392,
+    "c1_after_eos_median_s": 0.403,
+    "replay_5_s_after_cold_s": {
+      "8K": 0.84,
+      "32K": 0.835,
+      "64K": 1.613
+    },
+    "c2_simultaneous_from_idle_staggered": "2/3"
+  },
+  "load_a_end_drain": {
+    "successor_after_length_finish_40_requests": {
+      "last_step_1_token": {
+        "n": 13,
+        "median_s": 0.335801
+      },
+      "last_step_2_or_more": {
+        "n": 27,
+        "median_s": 0.336316,
+        "max_s": 0.361029
+      }
+    },
+    "c1_idle_median_s": 0.3439665,
+    "c1_back_to_back_median_s": 0.335658,
+    "c1_after_eos_median_s": 0.40270950000000005,
+    "immediate_replay_after_cold_s": {
+      "8K": [
+        0.924216,
+        0.904904,
+        0.900071
+      ],
+      "32K": [
+        0.863365,
+        0.943198,
+        0.992159
+      ],
+      "64K": [
+        1.642886,
+        1.726021,
+        1.797374
+      ]
+    },
+    "c1_after_immediate_replay_median_s": 0.336502,
+    "cohorts_staggered": "22/24",
+    "cohort_arrival_spread_ms": {
+      "cohorts": 21,
+      "median": 1.45,
+      "max": 3.17,
+      "first_request_dispatched_alone_after_ms": 0.7
+    }
+  },
+  "load_b_end_drain_coalesce_4ms": {
+    "cohorts_staggered": "0/24",
+    "c2_per_stream_ttft_s": [
+      0.399,
+      0.4,
+      0.404,
+      0.404,
+      0.398,
+      0.399,
+      0.401,
+      0.402,
+      0.401,
+      0.401,
+      0.399,
+      0.399,
+      0.394,
+      0.395,
+      0.39,
+      0.39,
+      0.397,
+      0.397,
+      0.392,
+      0.393,
+      0.391,
+      0.391,
+      0.565,
+      0.565
+    ],
+    "c4_per_stream_ttft_s": [
+      0.501,
+      0.501,
+      0.501,
+      0.501,
+      0.48,
+      0.48,
+      0.48,
+      0.48,
+      0.478,
+      0.478,
+      0.477,
+      0.478,
+      0.479,
+      0.479,
+      0.479,
+      0.48,
+      0.48,
+      0.48,
+      0.48,
+      0.481,
+      0.476,
+      0.475,
+      0.475,
+      0.476,
+      0.478,
+      0.478,
+      0.478,
+      0.478,
+      0.474,
+      0.474,
+      0.474,
+      0.474,
+      0.479,
+      0.479,
+      0.479,
+      0.479,
+      0.477,
+      0.477,
+      0.477,
+      0.477,
+      0.477,
+      0.477,
+      0.477,
+      0.477,
+      0.472,
+      0.472,
+      0.471,
+      0.472
+    ]
+  },
+  "remaining_replay_cost": "An immediate replay waits for the connector to confirm on all four ranks that the cold request context was published; in load B every one of the 27 replays waited 6-170 ms (median about 78 ms) before restoring. Seven drafts end the cold request sooner, so the replay arrives earlier in that publication."
+}

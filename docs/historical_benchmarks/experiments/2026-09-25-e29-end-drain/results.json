@@ -1,0 +1,513 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "experiment_id": "2026-09-25-e29-end-drain",
+  "title": "E29: no speculative step past a possible length finish, plus 4 ms idle coalescing",
+  "outcome": "promote",
+  "outcome_detail": "Owner accepted; current reference. Against the frozen E28b medians: C1 per-stream TTFT -13.2%, C2 -14.7%, C4 -9.8%; code decode +3.2%, prose +2.5%, C1/C2/C4 end-to-end +1.7%/+0.1%/+1.9%; cold prefill -0.4% to +2.2%; cached replay +3.6% at 8K, +2.7% at 32K, -1.0% at 64K (six of nine 64K replays 1.62-1.64 s, three 1.77-1.97 s). With three targeted prefill re-runs requested by the owner (six executions), replay is +2.2% / +2.0% / +1.1% against E28b and -6.1% / -8.4% / -0.5% against E27c; cold prefill -0.6% to +0.8% against E28b. Against E27c: C1 TTFT at its level, C2 and C4 TTFT better, code decode +12.2%, replay still -4.8% at 8K and -7.8% at 32K.",
+  "reference": {
+    "baseline_id": "2026-09-25-e28b",
+    "baseline_sha256": "e00c6ca245da482ce58179663cd8cc455b7aa54bde3905c881ba2c968cca87a5"
+  },
+  "coverage": "Load A (END_DRAIN, window 0 ms, trace) for targeted probes and arrival measurement; load B (END_DRAIN, 4 ms window, trace off): cohort screen, three complete native suites (162 requests), one protocol-2 interference execution and the four-context 32K diagnostic, with per-second host-memory sampling. Coordinated four-rank transitions; E28b restored afterwards.",
+  "client_transport": "Direct LAN HTTP to the rank-0 API.",
+  "candidate": {
+    "overlay_load_a": {
+      "path": "scripts/node/experiments/e03/end-drain/delta.env",
+      "sha256": "20d70e4a8542795974b9e7f8455e75ca20a9313e91a2aa9d532ab2e318f32f7a"
+    },
+    "overlay_load_b": {
+      "path": "scripts/node/experiments/e03/end-drain/delta-b.env",
+      "sha256": "b0257bbe75f0775e5515b0d475402ebbbebe461dd35ebb2c85978e7662680ec2"
+    },
+    "manifest": {
+      "path": "scripts/node/experiments/e03/end-drain/manifest.json",
+      "sha256": "0e28a56da69ad3412f4c890cbe793336fb77aba6214bc50db199be8637dfea98"
+    },
+    "scheduler_sha256": "f41d6e9e4363b271ad8543a5ef7063b546952d4c0bd35565cee034884a61baec",
+    "engine_core_sha256": "3a9a038f9a24cdeeb984846f0c170652f389d3f9442a652e73985836409c06be"
+  },
+  "launcher_parity": "Running docker arguments and environment matched the overlay dry-run on all four ranks for both loads.",
+  "runs": [
+    {
+      "run": "run-1",
+      "receipt_sha256": "46e054ac6ca58c11c5b1f2f1e2f6d237c2d1066c1789b99da669fb25544e5ca0",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-25-e29-end-drain/run-1.json",
+        "sha256": "f278ddfe38237b9d9740c625d7f762b1f8f9cc7bc7aac24164048c8f0db6cf74"
+      }
+    },
+    {
+      "run": "run-2",
+      "receipt_sha256": "4fbfabf9d3644f09801ed05ceabb715f021a7ad6484021af99df627b10440c1d",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-25-e29-end-drain/run-2.json",
+        "sha256": "5644b0d96ac0c5257e5eb0a3293abb86a18eaf7fb4c86080b7b148d702ea8705"
+      }
+    },
+    {
+      "run": "run-3",
+      "receipt_sha256": "ac27b87c236c4ec7203ab5603fd396333bdaf3d56bba3715b1217bc6532e33a4",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-25-e29-end-drain/run-3.json",
+        "sha256": "f11b778e646bf2cfe2ee53ab7b63108c58722942527ef58991b2fb9bac456b7a"
+      }
+    }
+  ],
+  "performance_metrics": [
+    {
+      "key": "code_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "code",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        62.947,
+        62.988,
+        61.522
+      ],
+      "median": 62.947,
+      "dispersion": {
+        "minimum": 61.522,
+        "maximum": 62.988,
+        "sample_stdev": 0.8348115555820582
+      },
+      "current_baseline_median": 61.008,
+      "change_vs_current_baseline_pct": 3.1782717020718594,
+      "e27c_median": 56.124,
+      "change_vs_e27c_pct": 12.157009479010762
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "1",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        43.917,
+        44.394,
+        43.571
+      ],
+      "median": 43.917,
+      "dispersion": {
+        "minimum": 43.571,
+        "maximum": 44.394,
+        "sample_stdev": 0.41323399343874573
+      },
+      "current_baseline_median": 43.179,
+      "change_vs_current_baseline_pct": 1.7091641770304997,
+      "e27c_median": 43.581,
+      "change_vs_e27c_pct": 0.7709781785640497
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "2",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        67.518,
+        69.141,
+        65.69
+      ],
+      "median": 67.518,
+      "dispersion": {
+        "minimum": 65.69,
+        "maximum": 69.141,
+        "sample_stdev": 1.7265145042348606
+      },
+      "current_baseline_median": 67.47,
+      "change_vs_current_baseline_pct": 0.07114273010227037,
+      "e27c_median": 66.52,
+      "change_vs_e27c_pct": 1.5003006614552086
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "4",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        97.351,
+        97.462,
+        96.109
+      ],
+      "median": 97.351,
+      "dispersion": {
+        "minimum": 96.109,
+        "maximum": 97.462,
+        "sample_stdev": 0.751165095035709
+      },
+      "current_baseline_median": 95.541,
+      "change_vs_current_baseline_pct": 1.8944746234600875,
+      "e27c_median": 96.696,
+      "change_vs_e27c_pct": 0.6773806569041131
+    },
+    {
+      "key": "prose_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "prose",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        33.791,
+        34.281,
+        34.126
+      ],
+      "median": 34.126,
+      "dispersion": {
+        "minimum": 33.791,
+        "maximum": 34.281,
+        "sample_stdev": 0.2504495957273648
+      },
+      "current_baseline_median": 33.28,
+      "change_vs_current_baseline_pct": 2.5420673076922973,
+      "e27c_median": 33.12,
+      "change_vs_e27c_pct": 3.037439613526571
+    },
+    {
+      "key": "code_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "code",
+        "ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.385,
+        0.386,
+        0.389
+      ],
+      "median": 0.386,
+      "dispersion": {
+        "minimum": 0.385,
+        "maximum": 0.389,
+        "sample_stdev": 0.0020816659994661348
+      },
+      "current_baseline_median": 0.39,
+      "change_vs_current_baseline_pct": -1.0256410256410264,
+      "e27c_median": 0.39,
+      "change_vs_e27c_pct": -1.0256410256410264
+    },
+    {
+      "key": "prose_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "prose",
+        "ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.376,
+        0.376,
+        0.375
+      ],
+      "median": 0.376,
+      "dispersion": {
+        "minimum": 0.375,
+        "maximum": 0.376,
+        "sample_stdev": 0.0005773502691896262
+      },
+      "current_baseline_median": 0.376,
+      "change_vs_current_baseline_pct": 0.0,
+      "e27c_median": 0.376,
+      "change_vs_e27c_pct": 0.0
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "1",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.338,
+        0.342,
+        0.343
+      ],
+      "median": 0.342,
+      "dispersion": {
+        "minimum": 0.338,
+        "maximum": 0.343,
+        "sample_stdev": 0.002645751311064593
+      },
+      "current_baseline_median": 0.394,
+      "change_vs_current_baseline_pct": -13.197969543147206,
+      "e27c_median": 0.34,
+      "change_vs_e27c_pct": 0.5882352941176475
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "2",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.393,
+        0.394,
+        0.394
+      ],
+      "median": 0.394,
+      "dispersion": {
+        "minimum": 0.393,
+        "maximum": 0.394,
+        "sample_stdev": 0.0005773502691896262
+      },
+      "current_baseline_median": 0.462,
+      "change_vs_current_baseline_pct": -14.71861471861472,
+      "e27c_median": 0.446,
+      "change_vs_e27c_pct": -11.659192825112106
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "4",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.472,
+        0.476,
+        0.472
+      ],
+      "median": 0.472,
+      "dispersion": {
+        "minimum": 0.472,
+        "maximum": 0.476,
+        "sample_stdev": 0.002309401076758505
+      },
+      "current_baseline_median": 0.523,
+      "change_vs_current_baseline_pct": -9.751434034416834,
+      "e27c_median": 0.525,
+      "change_vs_e27c_pct": -10.095238095238104
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2654.884,
+        2615.95,
+        2391.311
+      ],
+      "median": 2615.95,
+      "dispersion": {
+        "minimum": 2391.311,
+        "maximum": 2654.884,
+        "sample_stdev": 142.27277966755727
+      },
+      "current_baseline_median": 2558.395,
+      "change_vs_current_baseline_pct": 2.2496526142366537,
+      "e27c_median": 2558.895,
+      "change_vs_e27c_pct": 2.229673355100535
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        8910.217,
+        8982.141,
+        9005.543
+      ],
+      "median": 8982.141,
+      "dispersion": {
+        "minimum": 8910.217,
+        "maximum": 9005.543,
+        "sample_stdev": 49.67856958488187
+      },
+      "current_baseline_median": 8670.646,
+      "change_vs_current_baseline_pct": 3.5925235559149686,
+      "e27c_median": 9431.975,
+      "change_vs_e27c_pct": -4.769245041467992
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2783.711,
+        2758.093,
+        2764.797
+      ],
+      "median": 2764.797,
+      "dispersion": {
+        "minimum": 2758.093,
+        "maximum": 2783.711,
+        "sample_stdev": 13.285110311924337
+      },
+      "current_baseline_median": 2739.303,
+      "change_vs_current_baseline_pct": 0.9306747008271865,
+      "e27c_median": 2689.31,
+      "change_vs_e27c_pct": 2.806928171166585
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        33504.873,
+        34155.534,
+        35042.766
+      ],
+      "median": 34155.534,
+      "dispersion": {
+        "minimum": 33504.873,
+        "maximum": 35042.766,
+        "sample_stdev": 771.9731470064247
+      },
+      "current_baseline_median": 33262.007,
+      "change_vs_current_baseline_pct": 2.686329180316756,
+      "e27c_median": 37056.262,
+      "change_vs_e27c_pct": -7.827902339421075
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2691.591,
+        2681.976,
+        2669.894
+      ],
+      "median": 2681.976,
+      "dispersion": {
+        "minimum": 2669.894,
+        "maximum": 2691.591,
+        "sample_stdev": 10.871850179860594
+      },
+      "current_baseline_median": 2692.74,
+      "change_vs_current_baseline_pct": -0.39974152721761735,
+      "e27c_median": 2646.928,
+      "change_vs_e27c_pct": 1.3241009955692118
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        38880.916,
+        40118.907,
+        36985.952
+      ],
+      "median": 38880.916,
+      "dispersion": {
+        "minimum": 36985.952,
+        "maximum": 40118.907,
+        "sample_stdev": 1577.916205496034
+      },
+      "current_baseline_median": 39290.992,
+      "change_vs_current_baseline_pct": -1.0436896070223958,
+      "e27c_median": 39931.684,
+      "change_vs_e27c_pct": -2.6314141922990366
+    }
+  ],
+  "integrity": {
+    "requests": 162,
+    "completed_streams": 162,
+    "visible_responses": 162,
+    "native_validation_errors": 0,
+    "protocol_errors": 0,
+    "runtime_errors": 0,
+    "prefill_token_matches": "54/54",
+    "decode_output_gates": {
+      "code": "15/15",
+      "prose": "15/15",
+      "structured": "15/15"
+    },
+    "finish_reasons": {
+      "stop": 45,
+      "length": 117
+    },
+    "code_output_budget_stops": 0,
+    "client_probe_timeouts": 0
+  },
+  "host_memory": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-25-e29-end-drain/host-memory.json",
+    "sha256": "bb19878d2951bb23860b67347ace3661e9aad9417d8d612beafa5d5f460d3f77"
+  },
+  "screening": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-25-e29-end-drain/screening.json",
+    "sha256": "9df058ca99c40c939b21ba44d16b4806b0131f437b1f38c60557f2ad1ada4c63"
+  },
+  "scheduling_diagnostics": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-25-e29-end-drain/scheduling-diagnostics.json",
+    "sha256": "47147dfba6a887e95ae7fb5fcd6f404cf82d7d8bf540b52dacbd7f792230e131"
+  },
+  "owner_decision": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-25-e29-end-drain/owner-decision.json"
+  },
+  "prefill_reruns": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-25-e29-end-drain/prefill-reruns.json",
+    "sha256": "4ac4dd0152f0310de9478ddcaf58f47738faf147ea61ace2721ce63c624b4d62"
+  },
+  "post_boot_gates": {
+    "load_a": "PASS (4 s after health)",
+    "load_b": "PASS (3 s after health)"
+  },
+  "notes": [
+    "Structured-output requests keep the vendor pipeline (excluded from the hold), as required by the external review.",
+    "A request that ends on EOS can still leave one speculative step behind it; C1 after an EOS-finished answer stays near 0.40 s, as on E27c and E28b.",
+    "The first suite attempt was stopped by the operator seconds after its start, before any receipt, to inspect each suite before the next; its partial log is retained privately."
+  ]
+}

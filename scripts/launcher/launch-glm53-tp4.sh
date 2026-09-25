@@ -477,6 +477,14 @@ case "${EXTRA_DOCKER_ENV:-}" in
         || { echo "[launch] ERROR: E27c scheduler source manifest failed" >&2; exit 1; }
     fi ;;
 esac
+# Likewise for the E29 scheduler and engine core, when either is mounted.
+case "${EXTRA_DOCKER_ENV:-}" in
+  *end-drain/scheduler.py:*|*end-drain/core.py:*)
+    if [ "$DRY_RUN" != 1 ]; then
+      (cd "$ENV_DIR/experiments/e03/end-drain" && sha256sum -c SHA256SUMS) \
+        || { echo "[launch] ERROR: E29 end-drain source manifest failed" >&2; exit 1; }
+    fi ;;
+esac
 if [ "$ASYNC_SCHEDULING" = "1" ]; then
   ASYNCFLAG="--async-scheduling"
 fi

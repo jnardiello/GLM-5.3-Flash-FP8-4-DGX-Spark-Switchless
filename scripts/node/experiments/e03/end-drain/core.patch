@@ -1,0 +1,167 @@
+--- a/vllm/v1/engine/core.py
++++ b/vllm/v1/engine/core.py
+@@ -97,6 +97,32 @@
+ logger = init_logger(__name__)
+ 
+ 
++# E29 (TP4 candidate): when the engine goes from no work to work because requests
++# arrived, keep collecting arrivals until one fixed deadline, VLLM_E29_IDLE_COALESCE_MS
++# after the first request was taken, before the first schedule. Requests released
++# together (for example several agents after a barrier) are then prefilled in one step
++# instead of the first alone. The deadline never moves; shutdown, pause or no runnable
++# request end the wait. Only the blocking single-DP loop coalesces. 0 (default) keeps
++# the vendor loop exactly. VLLM_E29_TRACE=1 logs arrival, dispatch and retirement times.
++def _e29_idle_coalesce_seconds() -> float:
++    value = float(os.environ.get("VLLM_E29_IDLE_COALESCE_MS", "0"))
++    if not 0 <= value <= 5:
++        raise ValueError("VLLM_E29_IDLE_COALESCE_MS must be within 0-5")
++    return value / 1000
++
++
++def _e29_trace() -> bool:
++    value = os.environ.get("VLLM_E29_TRACE", "0")
++    if value not in ("0", "1"):
++        raise ValueError("VLLM_E29_TRACE must be 0 or 1")
++    return value == "1"
++
++
++def _e29_remaining(deadline: float, now: float) -> float:
++    """Seconds left before the fixed coalescing deadline (never negative)."""
++    return max(0.0, deadline - now)
++
++
+ HANDSHAKE_TIMEOUT_MINS = 5
+ 
+ _R = TypeVar("_R")  # Return type for collective_rpc
+@@ -687,6 +713,18 @@
+             with self.log_error_detail(scheduler_output):
+                 exec_future = self.model_executor.execute_model(
+                     scheduler_output, non_block=True
++                )
++            if getattr(self, "e29_trace", False):
++                self.e29_step += 1
++                self.e29_step_ids[id(scheduler_output)] = self.e29_step
++                logger.info(
++                    "E29_TRACE dispatch step=%d reqs=%d tokens=%d new=%s queued=%d t=%.6f",
++                    self.e29_step,
++                    len(scheduler_output.num_scheduled_tokens),
++                    scheduler_output.total_num_scheduled_tokens,
++                    ",".join(r.req_id for r in scheduler_output.scheduled_new_reqs),
++                    len(batch_queue),
++                    time.monotonic(),
+                 )
+             if self.is_ec_consumer:
+                 model_executed = scheduler_output.total_num_scheduled_tokens > 0
+@@ -737,6 +775,12 @@
+                 # call failed - raise that exception.
+                 exec_model_fut.result()
+                 raise RuntimeError("unexpected error")
++        if getattr(self, "e29_trace", False):
++            logger.info(
++                "E29_TRACE retire step=%d t=%.6f",
++                self.e29_step_ids.pop(id(scheduler_output), -1),
++                time.monotonic(),
++            )
+ 
+         # Before processing the model output, process any aborts that happened
+         # during the model execution.
+@@ -1102,6 +1146,22 @@
+ 
+             self.addresses = addresses
+             self.process_input_queue_block = True
++            # E29: idle coalescing window (0 = vendor loop) and arrival tracing.
++            self.e29_coalesce_s = _e29_idle_coalesce_seconds()
++            self.e29_trace = _e29_trace()
++            self.e29_step = 0
++            self.e29_step_ids: dict[int, int] = {}
++            if (
++                self.e29_coalesce_s
++                and vllm_config.parallel_config.data_parallel_size > 1
++            ):
++                raise ValueError("VLLM_E29_IDLE_COALESCE_MS requires data_parallel_size 1")
++            if self.e29_coalesce_s or self.e29_trace:
++                logger.info(
++                    "E29_IDLE_COALESCE_READY ms=%g trace=%d",
++                    self.e29_coalesce_s * 1000,
++                    int(self.e29_trace),
++                )
+             self._init_data_parallel(vllm_config)
+ 
+             super().__init__(
+@@ -1452,6 +1512,7 @@
+         """Exits when an engine step needs to be performed."""
+ 
+         waited = False
++        e29_first = None
+         while not self.has_work() and self.is_running():
+             # Notify callbacks waiting for engine to become idle.
+             self._notify_idle_state_callbacks()
+@@ -1465,6 +1526,12 @@
+             block = self.process_input_queue_block
+             try:
+                 req = self.input_queue.get(block=block)
++                if (
++                    e29_first is None
++                    and self.e29_coalesce_s
++                    and req[0] == EngineCoreRequestType.ADD
++                ):
++                    e29_first = time.monotonic()
+                 self._handle_client_request(*req)
+             except queue.Empty:
+                 break
+@@ -1478,7 +1545,42 @@
+         while not self.input_queue.empty():
+             req = self.input_queue.get_nowait()
+             self._handle_client_request(*req)
++
++        # E29: the engine was idle and requests arrived; collect the ones released
++        # together until the fixed deadline before the first schedule.
++        if (
++            self.e29_coalesce_s
++            and e29_first is not None
++            and self.process_input_queue_block
++            and self.scheduler.has_unfinished_requests()
++        ):
++            self._e29_coalesce(e29_first)
+ 
++    def _e29_coalesce(self, first: float) -> None:
++        deadline = first + self.e29_coalesce_s
++        taken = 0
++        while (
++            self.is_running()
++            and self.scheduler.pause_state == PauseState.UNPAUSED
++            and self.scheduler.has_unfinished_requests()
++        ):
++            remaining = _e29_remaining(deadline, time.monotonic())
++            if remaining <= 0:
++                break
++            try:
++                req = self.input_queue.get(timeout=remaining)
++            except queue.Empty:
++                break
++            self._handle_client_request(*req)
++            taken += 1
++        if self.e29_trace:
++            logger.info(
++                "E29_TRACE coalesce first=%.6f end=%.6f taken=%d",
++                first,
++                time.monotonic(),
++                taken,
++            )
++
+     def _process_engine_step(self) -> bool:
+         """Called only when there are unfinished local requests."""
+ 
+@@ -1806,6 +1908,12 @@
+                             self.aborts_queue.put_nowait(request)
+ 
+                     # Push to input queue for core busy loop.
++                    if self.e29_trace and request_type == EngineCoreRequestType.ADD:
++                        logger.info(
++                            "E29_TRACE enqueue req=%s t=%.6f",
++                            request[0].request_id,
++                            time.monotonic(),
++                        )
+                     self.input_queue.put_nowait((request_type, request))
+ 
+     def process_output_sockets(

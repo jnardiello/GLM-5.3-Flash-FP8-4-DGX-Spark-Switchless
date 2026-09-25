@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-25-e29-end-drain",
+  "date": "2026-09-25",
+  "decision": "promote",
+  "statement": "The owner reviewed the final numbers, including three targeted prefill re-runs, judged the prefill results acceptable and decided to keep E29 as the new baseline.",
+  "accepted_trade_off": "Against E28b: C1/C2/C4 per-stream TTFT -13.2%/-14.7%/-9.8%, code decode +3.2%, no metric worse beyond noise. Against E27c cached replay remains 56-82 ms slower at 8K/32K because an immediate replay waits for the cache connector to publish the preceding request."
+}

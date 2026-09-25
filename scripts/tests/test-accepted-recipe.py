@@ -11,7 +11,7 @@ import subprocess
 import tempfile
 
 REPO = Path(__file__).resolve().parents[2]
-REFERENCE = REPO / "docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json"
+REFERENCE = REPO / "docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json"
 record = json.loads(REFERENCE.read_text())
 sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
 for item in record["provenance"].values():
@@ -39,6 +39,7 @@ e21_rollback = (REPO / "scripts/node/reference/baseline-20260923-e21.env").read_
 e22b_rollback = (REPO / "scripts/node/reference/baseline-20260924-e22b.env").read_text()
 e27_rollback = (REPO / "scripts/node/reference/baseline-20260924-e27.env").read_text()
 e27c_rollback = (REPO / "scripts/node/reference/baseline-20260925-e27c.env").read_text()
+e28b_rollback = (REPO / "scripts/node/reference/baseline-20260925-e28b.env").read_text()
 # The historical E03 measurement: previous base plus the three E03 deltas.
 historical_e03 = "\n".join([previous, (e03 / "candidate.env").read_text(),
                             (e03 / "replay-views/delta.env").read_text(),
@@ -52,10 +53,18 @@ historical_e22b = "\n".join([e21_rollback, (e03 / "drafter-w8a16/delta-context-b
 historical_e27 = "\n".join([e22b_rollback, 'EXTRA_VLLM_ARGS+=" --prefill-schedule-interval 8"'])
 # The measured E27c load: the E27 default plus the queued-cadence overlay.
 historical_e27c = "\n".join([e27_rollback, (e03 / "queued-cadence/delta.env").read_text()])
-# The measured E28b candidate: the E28 recipe (E27c plus the draft-depth-7 overlay, promoted
+# The measured E28b load: the E28 recipe (E27c plus the draft-depth-7 overlay, promoted
 # locally before the window) plus the 16 GiB KV overlay.
-historical_candidate = "\n".join([e27c_rollback, (e03 / "draft-depth-7/delta.env").read_text(),
-                                  (e03 / "kv-16gib/delta.env").read_text()])
+historical_e28b = "\n".join([e27c_rollback, (e03 / "draft-depth-7/delta.env").read_text(),
+                             (e03 / "kv-16gib/delta.env").read_text()])
+# The measured E29 candidate (load B): the complete E28b recipe plus the end-drain overlay.
+historical_candidate = "\n".join([e28b_rollback, (e03 / "end-drain/delta-b.env").read_text()])
+SCHED = "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py:ro"
+E29_ADDED = [str(Path.home()) + "/tp4/experiments/e03/end-drain/scheduler.py:" + SCHED,
+             "-v", str(Path.home()) + "/tp4/experiments/e03/end-drain/core.py:"
+             "/usr/local/lib/python3.12/dist-packages/vllm/v1/engine/core.py:ro",
+             "-e", "VLLM_E29_END_DRAIN=1", "-e", "VLLM_E29_IDLE_COALESCE_MS=4", "-e", "VLLM_E29_TRACE=0"]
+E29_REMOVED = [str(Path.home()) + "/tp4/experiments/e03/queued-cadence/scheduler.py:" + SCHED]
 E28B_ADDED = ['{"method":"dflash","model":"/draft","num_speculative_tokens":7,'
               '"num_speculative_tokens_per_batch_size":[[1,1,7],[2,6,3]],"kv_cache_dtype":"fp8_e4m3"}',
               "-e", "VLLM_ADAPTIVE_K_HI=7", '--compilation-config={"max_cudagraph_capture_size":72}',
@@ -83,6 +92,8 @@ RELAY_DEST=operator@192.0.2.23
     (root / "rollback-e22b.env").write_text(e22b_rollback)
     (root / "rollback-e27.env").write_text(e27_rollback)
     (root / "rollback-e27c.env").write_text(e27c_rollback)
+    (root / "rollback-e28b.env").write_text(e28b_rollback)
+    (root / "historical-e28b.env").write_text(historical_e28b)
     (root / "historical-e27c.env").write_text(historical_e27c)
     (root / "historical-e27.env").write_text(historical_e27)
     (root / "historical-e22b.env").write_text(historical_e22b)
@@ -123,11 +134,16 @@ RELAY_DEST=operator@192.0.2.23
             assert source.startswith(str(Path.home()) + "/tp4/")
             local = REPO / "scripts/node" / source.split("/tp4/", 1)[1]
             assert sha(local) == digest, local
-        # Immediate rollback: exactly the measured E27c command, five draft tokens and 15 GiB.
+        # Immediate rollback: exactly the measured E28b command, with the E27c scheduler.
+        e28b_restored = launch(rank, "rollback-e28b.env")
+        assert e28b_restored == launch(rank, "historical-e28b.env"), f"rank {rank}: E28b rollback drifted"
+        assert Counter(current) - Counter(e28b_restored) == Counter(E29_ADDED), f"rank {rank}: E29 delta"
+        assert Counter(e28b_restored) - Counter(current) == Counter(E29_REMOVED), f"rank {rank}: E29 removed"
+        # Older E27c return: exactly the measured E27c command, five draft tokens and 15 GiB.
         e27c_restored = launch(rank, "rollback-e27c.env")
         assert e27c_restored == launch(rank, "historical-e27c.env"), f"rank {rank}: E27c rollback drifted"
-        assert Counter(current) - Counter(e27c_restored) == Counter(E28B_ADDED), f"rank {rank}: E28b delta"
-        assert Counter(e27c_restored) - Counter(current) == Counter(E28B_REMOVED), f"rank {rank}: E28b removed"
+        assert Counter(e28b_restored) - Counter(e27c_restored) == Counter(E28B_ADDED), f"rank {rank}: E28b delta"
+        assert Counter(e27c_restored) - Counter(e28b_restored) == Counter(E28B_REMOVED), f"rank {rank}: E28b removed"
         # Older E27 return: exactly the measured E27 command, without the E27c scheduler.
         e27_restored = launch(rank, "rollback-e27.env")
         assert e27_restored == launch(rank, "historical-e27.env"), f"rank {rank}: E27 rollback drifted"

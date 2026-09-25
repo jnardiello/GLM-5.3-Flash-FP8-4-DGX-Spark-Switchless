@@ -351,8 +351,9 @@ RELAY_DEST=operator@192.0.2.23
                 self.assertEqual(Counter(before) - Counter(after), Counter([old_cfg]))
                 self.assertEqual(Counter(after) - Counter(before),
                                  Counter([new_cfg, "-v", override, "-v", module, "-e", flags[0], "-e", flags[1]]))
-                # The E22b return is exactly the measured E22b command; the E27c default
-                # adds only the prefill cadence and the E27c scheduler mount and flags.
+                # The E22b return is exactly the measured E22b command; the E29 default adds the
+                # prefill cadence, the E29 scheduler (E27c patch included) and engine core with
+                # their flags, and the E28b draft length and KV pool.
                 self.assertEqual(argv(launch("e22b.env", rank)), after)
                 current = argv(launch("empty.env", rank))
                 spec = lambda k: ('{"method":"dflash","model":"/draft","num_speculative_tokens":%d,'
@@ -362,11 +363,14 @@ RELAY_DEST=operator@192.0.2.23
                                  Counter([spec(5), "--kv-cache-memory-bytes=16106127360"]))
                 self.assertEqual(Counter(current) - Counter(after), Counter([
                     "--prefill-schedule-interval", "8", "-v",
-                    str(Path.home()) + "/tp4/experiments/e03/queued-cadence/scheduler.py:"
+                    str(Path.home()) + "/tp4/experiments/e03/end-drain/scheduler.py:"
                     "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py:ro",
                     "-e", "VLLM_E27B_SHORT_PREFILL_TOKENS=2048", "-e", "VLLM_E27C_CADENCE_WHEN_QUEUED=1",
                     spec(7), "-e", "VLLM_ADAPTIVE_K_HI=7", '--compilation-config={"max_cudagraph_capture_size":72}',
-                    "--kv-cache-memory-bytes=17179869184"]))
+                    "--kv-cache-memory-bytes=17179869184", "-v",
+                    str(Path.home()) + "/tp4/experiments/e03/end-drain/core.py:"
+                    "/usr/local/lib/python3.12/dist-packages/vllm/v1/engine/core.py:ro",
+                    "-e", "VLLM_E29_END_DRAIN=1", "-e", "VLLM_E29_IDLE_COALESCE_MS=4", "-e", "VLLM_E29_TRACE=0"]))
                 mounts = [after[i + 1] for i, item in enumerate(after[:-1]) if item == "-v"]
                 targets = [item.split(":")[1] for item in mounts]
                 self.assertEqual(len(targets), len(set(targets)), "Duplicate container mount")
