@@ -16,8 +16,10 @@ Versions and releases are created only at the owner's explicit request.
   - Seven tokens hold about 5% fewer KV tokens per GiB, so the pool grows from 15 to 16 GiB:
     1,365,066 tokens, 5.21 full 262,144-token contexts. Rank 0 kept at least 2.1 GiB
     available during the three suites.
-  - Against E27c: code decode +8.7%, C2 +1.4%, C4 −3.2%, C1 −0.9%, C1 per-stream TTFT
-    +15.9%, cached replay −8.1% at 8K and −10.2% at 32K. Three native suites, 162 requests,
+  - Against E27c: code decode +8.7%, C2 +1.4%, C4 −1.2%, C1 −0.9%, C1 per-stream TTFT
+    +15.9%, cached replay −8.1% at 8K and −10.2% at 32K. The two C4 medians use suites 2–3:
+    the owner excluded suite 1's C4 block, whose rounds all started staggered; the values
+    stay in the record. Three native suites, 162 requests,
     zero errors, 45/45 output gates; the default was deployed onto the measured load
     without a restart and the live identity check passed.
 - Published the E28 and E28b experiment records: suite extracts, the drafter acceptance

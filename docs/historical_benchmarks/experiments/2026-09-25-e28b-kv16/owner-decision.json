@@ -4,5 +4,6 @@
   "date": "2026-09-25",
   "decision": "promote",
   "statement": "The owner asked to raise the KV pool of the accepted E28 recipe to 16 GiB, noting that the earlier 16 GiB failure ran six parallel agents rather than the five used now, and accepted E28b as the new baseline.",
-  "accepted_trade_off": "Against E27c: code decode +8.7% with seven draft tokens, C1 per-stream TTFT +15.9% (about +54 ms), cached replay -8.1% at 8K and -10.2% at 32K, C4 -3.2% within the E27c spread; 1 GiB more KV per rank with rank 0 keeping at least 2.1 GB available."
+  "accepted_trade_off": "Against E27c: code decode +8.7% with seven draft tokens, C1 per-stream TTFT +15.9% (about +54 ms), cached replay -8.1% at 8K and -10.2% at 32K; 1 GiB more KV per rank with rank 0 keeping at least 2.1 GB available.",
+  "metric_exclusion": "The owner excluded suite 1 C4 block (all rounds staggered) from the C4 medians; the values are retained in the records."
 }

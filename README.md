@@ -20,13 +20,13 @@ output gates passing.
 | Code decode, one request | 61.01 tok/s | 56.12 tok/s · +8.70% |
 | Code C1, end-to-end | 43.18 tok/s | 43.58 tok/s · ≈ unchanged (-0.92%) |
 | Code C2, aggregate end-to-end | 67.47 tok/s | 66.52 tok/s · ≈ unchanged (+1.43%) |
-| Code C4, aggregate end-to-end | 93.64 tok/s | 96.70 tok/s · -3.16% |
+| Code C4, aggregate end-to-end | 95.54 tok/s | 96.70 tok/s · ≈ unchanged (-1.19%) |
 | Prose decode | 33.28 tok/s | 33.12 tok/s · ≈ unchanged (+0.48%) |
 | Code TTFT | 0.390 s | 0.390 s · ≈ unchanged (+0.00%) |
 | Prose TTFT | 0.376 s | 0.376 s · ≈ unchanged (+0.00%) |
 | C1 per-stream TTFT | 0.394 s | 0.340 s · +15.88% |
 | C2 per-stream TTFT | 0.462 s | 0.446 s · +3.59% |
-| C4 per-stream TTFT | 0.525 s | 0.525 s · ≈ unchanged (+0.00%) |
+| C4 per-stream TTFT | 0.523 s | 0.525 s · ≈ unchanged (-0.38%) |
 | Prefill 8K, cold | 2,558.4 tok/s | 2,558.9 tok/s · ≈ unchanged (-0.02%) |
 | Prefill 8K, replay | 8,670.6 tok/s | 9,432.0 tok/s · -8.07% |
 | Prefill 32K, cold | 2,739.3 tok/s | 2,689.3 tok/s · ≈ unchanged (+1.86%) |
@@ -35,7 +35,8 @@ output gates passing.
 | Prefill 64K, replay | 39,291.0 tok/s | 39,931.7 tok/s · ≈ unchanged (-1.60%) |
 
 Both baselines were measured over the same direct LAN client path. Percentages use
-unrounded values. “≈ unchanged” marks owner-accepted changes of roughly 1–2%, with the
+unrounded values. The two C4 rows use suites 2–3: the owner excluded suite 1's C4 block,
+whose three rounds all started staggered; the excluded values stay in the frozen record. “≈ unchanged” marks owner-accepted changes of roughly 1–2%, with the
 exact delta retained; it does not establish statistical equivalence.
 Higher throughput and lower TTFT are better. C1/C2/C4 mean one, two or four concurrent
 requests. Decode excludes the initial wait; end-to-end speed includes it. TTFT is time

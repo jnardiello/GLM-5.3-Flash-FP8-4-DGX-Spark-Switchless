@@ -32,8 +32,8 @@
     "figures_visually_reviewed": true,
     "plotter_matplotlib_version": "3.11.2",
     "figures_sha256": {
-      "docs/plots/comparisons/2026-09-25-e28b-vs-2026-09-25-e27c/generation.png": "35a828f691135b590968c07d4408142db39ea7e38306bd0233396d4409715703",
-      "docs/plots/comparisons/2026-09-25-e28b-vs-2026-09-25-e27c/generation.svg": "e443667809c47a60e425240ea5655757da793dd7446de7b7fecb7cf005d0ea23",
+      "docs/plots/comparisons/2026-09-25-e28b-vs-2026-09-25-e27c/generation.png": "82251e2bf9e1e5002e64a39d3952cda086d9705a9ca86140c47513d4dc3c3a38",
+      "docs/plots/comparisons/2026-09-25-e28b-vs-2026-09-25-e27c/generation.svg": "861fcd08e618c1bdcb2e3d46a6715c43ff7a0a7d3271b804cffe561005357e06",
       "docs/plots/comparisons/2026-09-25-e28b-vs-2026-09-25-e27c/prefill.png": "1d3323de3b0e54cf541758a506356523a2e74fdcd949ea4c63cf1e8ff8c8dad2",
       "docs/plots/comparisons/2026-09-25-e28b-vs-2026-09-25-e27c/prefill.svg": "1dfc951d2f113b235c10d2ca5f05b99cc51e6838b7d65dcd4f23a2085240ce18"
     }
@@ -76,12 +76,13 @@
   },
   "baseline": {
     "path": "docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json",
-    "sha256": "a3bbb516b2df6df47f48f881f96e536840e9512e2b4ec26617e1f09f3460b0bf"
+    "sha256": "e00c6ca245da482ce58179663cd8cc455b7aa54bde3905c881ba2c968cca87a5"
   },
   "rollback": "scripts/node/reference/baseline-20260925-e27c.env",
   "notes": [
     "The encoded default produces a launcher command byte-identical, on all four ranks, to the measured E28b candidate (E27c recipe plus the draft-depth-7 and 16 GiB KV overlays).",
     "The E27c rollback produces a launcher command byte-identical, on all four ranks, to the measured E27c load.",
-    "Live identity check PASS against 2026-09-25-e28b with no TP4_ENV, on the load that ran the accepted suites."
+    "Live identity check PASS against 2026-09-25-e28b with no TP4_ENV, on the load that ran the accepted suites.",
+    "By owner decision the two C4 medians use suites 2-3; suite 1's C4 block (all rounds staggered) is excluded and retained in the baseline record."
   ]
 }

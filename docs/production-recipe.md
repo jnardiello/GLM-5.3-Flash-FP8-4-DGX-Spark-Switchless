@@ -430,7 +430,8 @@ Host memory was sampled once per second on every rank during the suites.
 
 Against the frozen E27c medians:
 - code decode +8.7%, prose +0.5%;
-- C1 -0.9%, C2 +1.4%, C4 -3.2% (runs 93.5 / 93.6 / 97.4 against 94.1–96.7);
+- C1 -0.9%, C2 +1.4%, C4 -1.2% (suites 2–3; the owner excluded suite 1's C4 block, whose
+  rounds all started staggered);
 - C1 per-stream TTFT +15.9%, cached replay -8.1% at 8K and -10.2% at 32K;
 - cold prefill 0% to +1.9%.
 

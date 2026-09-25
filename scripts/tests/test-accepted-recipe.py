@@ -27,7 +27,10 @@ for item in record["receipts"].values():
 assert record["performance"]["included_run_count"] == 3
 assert record["functional"]["measured_requests"]["count"] == 162
 for row in record["performance"]["metrics"]:
-    assert len(row["per_run"]) == 3 and statistics.median(row["per_run"]) == row["median"]
+    # A metric may exclude a run by recorded owner decision; the value and reason stay in the record.
+    assert len(row["per_run"]) + len(row.get("excluded_per_run", [])) == 3, row["key"]
+    assert all(item["reason"] for item in row.get("excluded_per_run", [])), row["key"]
+    assert statistics.median(row["per_run"]) == row["median"], row["key"]
 
 e03 = REPO / "scripts/node/experiments/e03"
 previous = (REPO / "scripts/node/reference/baseline-20260919.env").read_text()

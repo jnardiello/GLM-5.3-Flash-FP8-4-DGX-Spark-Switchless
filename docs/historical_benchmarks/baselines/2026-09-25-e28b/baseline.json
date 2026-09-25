@@ -562,7 +562,7 @@
     }
   },
   "performance": {
-    "aggregation": "Median of the three native per-run metric values; dispersion is descriptive, not a confidence interval.",
+    "aggregation": "Median of the included native per-run values: three runs for every metric except the two C4 metrics, which use runs 2-3 after an owner exclusion; dispersion is descriptive, not a confidence interval.",
     "run_order": [
       "run-1",
       "run-2",
@@ -643,16 +643,26 @@
         ],
         "unit": "tokens_per_second",
         "per_run": [
-          93.535,
           93.64,
           97.442
         ],
-        "median": 93.64,
+        "median": 95.541,
         "dispersion": {
-          "minimum": 93.535,
+          "minimum": 93.64,
           "maximum": 97.442,
-          "sample_stdev": 2.2260157980870936
-        }
+          "sample_stdev": 2.6884199820712484
+        },
+        "excluded_per_run": [
+          {
+            "run": "run-1",
+            "value": 93.535,
+            "reason": "Owner decision: suite 1's C4 block is excluded; all three of its rounds started staggered (one stream first, the other three 0.5-0.9 s later). The E27c reference keeps its own staggered rounds (3 of 9)."
+          }
+        ],
+        "included_runs": [
+          "run-2",
+          "run-3"
+        ]
       },
       {
         "key": "prose_decode_throughput",
@@ -769,16 +779,26 @@
         ],
         "unit": "seconds",
         "per_run": [
-          0.867,
           0.525,
           0.521
         ],
-        "median": 0.525,
+        "median": 0.523,
         "dispersion": {
           "minimum": 0.521,
-          "maximum": 0.867,
-          "sample_stdev": 0.19861856240878728
-        }
+          "maximum": 0.525,
+          "sample_stdev": 0.0028284271247461927
+        },
+        "excluded_per_run": [
+          {
+            "run": "run-1",
+            "value": 0.867,
+            "reason": "Owner decision: suite 1's C4 block is excluded; all three of its rounds started staggered (one stream first, the other three 0.5-0.9 s later). The E27c reference keeps its own staggered rounds (3 of 9)."
+          }
+        ],
+        "included_runs": [
+          "run-2",
+          "run-3"
+        ]
       },
       {
         "key": "prefill_8k_cold_throughput",
@@ -912,6 +932,18 @@
           "sample_stdev": 214.7607012498627
         }
       }
+    ],
+    "metric_exclusions": [
+      {
+        "metric": "code_c4_aggregate_end_to_end_throughput",
+        "run": "run-1",
+        "reason": "Owner decision: suite 1's C4 block is excluded; all three of its rounds started staggered (one stream first, the other three 0.5-0.9 s later). The E27c reference keeps its own staggered rounds (3 of 9)."
+      },
+      {
+        "metric": "code_c4_per_stream_ttft",
+        "run": "run-1",
+        "reason": "Owner decision: suite 1's C4 block is excluded; all three of its rounds started staggered (one stream first, the other three 0.5-0.9 s later). The E27c reference keeps its own staggered rounds (3 of 9)."
+      }
     ]
   },
   "functional": {
@@ -1026,11 +1058,11 @@
     },
     "accepted_series": {
       "path": "docs/historical_benchmarks/experiments/2026-09-25-e28b-kv16/results.json",
-      "sha256": "0bdf72ebb19a5f1a0c8b6f53a14b0eb3f32b25670f15c5d1420a86a69317df39"
+      "sha256": "3a2920d00be6e256f3afa2aebaf84f25d97f0d8a0cc1688b26cc406aeb937714"
     },
     "owner_decision": {
       "path": "docs/historical_benchmarks/experiments/2026-09-25-e28b-kv16/owner-decision.json",
-      "sha256": "e753170892bd1fad2ecba93e0ddbae5f73cb7cec5cf869624fa0bf5e85b0f8f4"
+      "sha256": "a46ec4d2197c897250d5a1938fe398f5c8533b4d1c1df1aad191382e9e8526aa"
     },
     "host_memory": {
       "path": "docs/historical_benchmarks/experiments/2026-09-25-e28b-kv16/host-memory.json",

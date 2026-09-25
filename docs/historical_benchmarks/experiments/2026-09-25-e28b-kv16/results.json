@@ -4,7 +4,7 @@
   "experiment_id": "2026-09-25-e28b-kv16",
   "title": "E28b: E28 with a 16 GiB KV pool per rank",
   "outcome": "promote",
-  "outcome_detail": "Owner accepted. KV capacity 1,365,066 tokens (5.21 full 262,144-token contexts). Against the frozen E27c medians: code decode +8.7%, C1 end-to-end -0.9%, C2 +1.4%, C4 -3.2%, prose +0.5%, C1 per-stream TTFT +15.9%, cached replay -8.1% at 8K and -10.2% at 32K, cold prefill 0% to +1.9%. Against E28 every metric is within 3%.",
+  "outcome_detail": "Owner accepted. KV capacity 1,365,066 tokens (5.21 full 262,144-token contexts). Against the frozen E27c medians: code decode +8.7%, C1 end-to-end -0.9%, C2 +1.4%, C4 -1.2% (runs 2-3; suite 1 C4 excluded by the owner), prose +0.5%, C1 per-stream TTFT +15.9%, cached replay -8.1% at 8K and -10.2% at 32K, cold prefill 0% to +1.9%. Against E28 every metric is within 3%.",
   "reference": {
     "baseline_id": "2026-09-25-e27c",
     "baseline_sha256": "28e8f0319bc3ca3c0cee50fb51dc5d5c377a0104a3de88d818d54f320702c354"
@@ -131,20 +131,30 @@
         "median"
       ],
       "per_run": [
-        93.535,
         93.64,
         97.442
       ],
-      "median": 93.64,
+      "median": 95.541,
+      "excluded_per_run": [
+        {
+          "run": "run-1",
+          "value": 93.535,
+          "reason": "Owner decision: suite 1's C4 block is excluded; all three of its rounds started staggered (one stream first, the other three 0.5-0.9 s later). The E27c reference keeps its own staggered rounds (3 of 9)."
+        }
+      ],
+      "included_runs": [
+        "run-2",
+        "run-3"
+      ],
       "dispersion": {
-        "minimum": 93.535,
+        "minimum": 93.64,
         "maximum": 97.442,
-        "sample_stdev": 2.2260157980870936
+        "sample_stdev": 2.6884199820712484
       },
       "current_baseline_median": 96.696,
-      "change_vs_current_baseline_pct": -3.1604202862579602,
+      "change_vs_current_baseline_pct": -1.1944651278232825,
       "e28_median": 96.403,
-      "change_vs_e28_pct": -2.8660933788367635
+      "change_vs_e28_pct": -0.8941630447185347
     },
     {
       "key": "prose_decode_throughput",
@@ -281,20 +291,30 @@
         "median"
       ],
       "per_run": [
-        0.867,
         0.525,
         0.521
       ],
-      "median": 0.525,
+      "median": 0.523,
+      "excluded_per_run": [
+        {
+          "run": "run-1",
+          "value": 0.867,
+          "reason": "Owner decision: suite 1's C4 block is excluded; all three of its rounds started staggered (one stream first, the other three 0.5-0.9 s later). The E27c reference keeps its own staggered rounds (3 of 9)."
+        }
+      ],
+      "included_runs": [
+        "run-2",
+        "run-3"
+      ],
       "dispersion": {
         "minimum": 0.521,
-        "maximum": 0.867,
-        "sample_stdev": 0.19861856240878728
+        "maximum": 0.525,
+        "sample_stdev": 0.0028284271247461927
       },
       "current_baseline_median": 0.525,
-      "change_vs_current_baseline_pct": 0.0,
+      "change_vs_current_baseline_pct": -0.38095238095238126,
       "e28_median": 0.519,
-      "change_vs_e28_pct": 1.1560693641618507
+      "change_vs_e28_pct": 0.7707129094412338
     },
     {
       "key": "prefill_8k_cold_throughput",
@@ -479,7 +499,7 @@
   },
   "owner_decision": {
     "path": "docs/historical_benchmarks/experiments/2026-09-25-e28b-kv16/owner-decision.json",
-    "sha256": "e753170892bd1fad2ecba93e0ddbae5f73cb7cec5cf869624fa0bf5e85b0f8f4"
+    "sha256": "a46ec4d2197c897250d5a1938fe398f5c8533b4d1c1df1aad191382e9e8526aa"
   },
   "post_boot_gates": {
     "coherent_response": "PASS",
@@ -493,8 +513,20 @@
     "num_speculative_tokens": 7,
     "cudagraph_capture_sizes_max": 72
   },
+  "metric_exclusions": [
+    {
+      "metric": "code_c4_aggregate_end_to_end_throughput",
+      "run": "run-1",
+      "reason": "Owner decision: suite 1's C4 block is excluded; all three of its rounds started staggered (one stream first, the other three 0.5-0.9 s later). The E27c reference keeps its own staggered rounds (3 of 9)."
+    },
+    {
+      "metric": "code_c4_per_stream_ttft",
+      "run": "run-1",
+      "reason": "Owner decision: suite 1's C4 block is excluded; all three of its rounds started staggered (one stream first, the other three 0.5-0.9 s later). The E27c reference keeps its own staggered rounds (3 of 9)."
+    }
+  ],
   "notes": [
-    "C4 per-stream TTFT was 0.867 s in suite 1 and 0.521-0.525 s in suites 2-3; the median is 0.525 s.",
-    "C4 aggregate 93.5 / 93.6 / 97.4 tok/s against 94.1-96.7 on E27c; recorded, not attributed to the KV pool."
+    "Suite 1 C4: aggregate 93.5 tok/s and per-stream TTFT 0.867 s, all three rounds staggered; excluded from the C4 medians by owner decision and retained here.",
+    "Staggered C4 rounds (one stream first, three 0.5-0.9 s later) also occur on E27c (3 of 9 rounds) and in suite 2 of E28b (1 of 3); they are an intermittent scheduling behaviour, not a transport error."
   ]
 }
