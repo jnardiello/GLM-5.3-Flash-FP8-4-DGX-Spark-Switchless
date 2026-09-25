@@ -1,0 +1,177 @@
+--- a/vllm/v1/core/sched/scheduler.py
++++ b/vllm/v1/core/sched/scheduler.py
+@@ -71,6 +71,38 @@
+ from vllm.v1.utils import record_function_or_nullcontext
+ 
+ logger = init_logger(__name__)
++
++
++# E27b (TP4 candidate): with the native prefill cadence, a throttled step still
++# admits a prefill whose remaining uncached work is below
++# VLLM_E27B_SHORT_PREFILL_TOKENS, up to that many prefill tokens per step in
++# total. Longer prefills keep waiting for the cadence. Unset or 0 keeps the
++# vendor behaviour exactly.
++def _e27b_short_prefill_tokens() -> int:
++    import os
++
++    tokens = int(os.environ.get("VLLM_E27B_SHORT_PREFILL_TOKENS", "0"))
++    if tokens < 0:
++        raise ValueError("VLLM_E27B_SHORT_PREFILL_TOKENS must not be negative")
++    return tokens
++
++
++# E27c (TP4 candidate): with VLLM_E27C_CADENCE_WHEN_QUEUED=1 the prefill cadence
++# keeps deferring while requests wait in the queue, instead of switching itself off
++# through the capacity latch. Unset or 0 keeps the vendor latch.
++def _e27c_cadence_when_queued() -> bool:
++    import os
++
++    value = os.environ.get("VLLM_E27C_CADENCE_WHEN_QUEUED", "0")
++    if value not in ("0", "1"):
++        raise ValueError("VLLM_E27C_CADENCE_WHEN_QUEUED must be 0 or 1")
++    return value == "1"
++
++
++def _e27b_admits(remaining: int, admitted: int, limit: int) -> bool:
++    """Whether a throttled step may still admit a prefill of ``remaining``
++    tokens after ``admitted`` short-prefill tokens in the same step."""
++    return 0 < remaining < limit and admitted + remaining <= limit
+ 
+ 
+ class Scheduler(SchedulerInterface):
+@@ -340,6 +372,25 @@
+         # prefill batch fully drained the waiting queue. Prefill throttling
+         # is disabled in this case.
+         self.prefill_capacity_bound = False
++        # E27b: short-prefill limit on throttled steps (0 = vendor behaviour).
++        self.e27b_short_prefill_tokens = _e27b_short_prefill_tokens()
++        self.e27b_step_short_prefill = 0
++        self.e27b_admitted = 0
++        self.e27b_deferred = 0
++        # E27c: keep the cadence while requests are queued (False = vendor latch).
++        self.e27c_cadence_when_queued = _e27c_cadence_when_queued()
++        self.e27c_latch_overrides = 0
++        if self.e27c_cadence_when_queued:
++            logger.info(
++                "E27C_CADENCE_WHEN_QUEUED_READY interval=%d",
++                self.scheduler_config.prefill_schedule_interval,
++            )
++        if self.e27b_short_prefill_tokens:
++            logger.info(
++                "E27B_SHORT_PREFILL_READY tokens=%d interval=%d",
++                self.e27b_short_prefill_tokens,
++                self.scheduler_config.prefill_schedule_interval,
++            )
+         self.scheduler_reserve_full_isl = (
+             self.scheduler_config.scheduler_reserve_full_isl
+         )
+@@ -644,8 +695,12 @@
+             for request in self.running
+         )
+         defer_prefills = (
+-            throttle_prefills and not self.prefill_capacity_bound
++            throttle_prefills
++            and (not self.prefill_capacity_bound or self.e27c_cadence_when_queued)
+         ) and has_eligible_decode
++        if defer_prefills and self.prefill_capacity_bound:
++            self._e27c_count_override()
++        self.e27b_step_short_prefill = 0
+ 
+         # First, schedule the RUNNING requests.
+         req_index = 0
+@@ -676,7 +731,13 @@
+                 req_index += 1
+                 continue
+ 
+-            if defer_prefills and request.is_prefill_chunk:
++            if (
++                defer_prefills
++                and request.is_prefill_chunk
++                and not self._e27b_admit(
++                    request.num_tokens - request.num_computed_tokens
++                )
++            ):
+                 # Defer this in-progress chunk to a cadence-aligned step;
+                 # decodes still run to fill this step.
+                 req_index += 1
+@@ -881,6 +942,9 @@
+         # Next, schedule the WAITING requests.
+         if not preempted_reqs and self._pause_state == PauseState.UNPAUSED:
+             step_skipped_waiting = create_request_queue(self.policy)
++            # E27b: long prefills set aside on this throttled step, returned to
++            # the front of the waiting queue in their original order.
++            e27b_deferred = create_request_queue(self.policy)
+ 
+             while (self.waiting or self.skipped_waiting) and token_budget > 0:
+                 if input_budget <= draft_slots:
+@@ -1094,7 +1158,18 @@
+                     # KVTransfer: loading remote KV, do not allocate for new work.
+                     assert num_external_computed_tokens > 0
+                     num_new_tokens = 0
+-                elif defer_prefills and num_computed_tokens < request.num_tokens - 1:
++                elif (
++                    defer_prefills
++                    and num_computed_tokens < request.num_tokens - 1
++                    and not self._e27b_admit(request.num_tokens - num_computed_tokens)
++                ):
++                    if self.e27b_short_prefill_tokens:
++                        # E27b: keep this long prefill waiting in order and
++                        # look for short prefills behind it.
++                        request_queue.pop_request()
++                        e27b_deferred.prepend_request(request)
++                        self._e27b_count_deferred(request)
++                        continue
+                     # DP prefill balancing: defer this step's local prefill
+                     # compute to a cadence-aligned step.
+                     break
+@@ -1345,6 +1420,8 @@
+             # re-queue requests skipped in this pass ahead of older skipped items.
+             if step_skipped_waiting:
+                 self.skipped_waiting.prepend_requests(step_skipped_waiting)
++            if e27b_deferred:
++                self.waiting.prepend_requests(e27b_deferred)
+ 
+             # DP prefill balancing: on a step that admitted prefills (release),
+             # record whether it was capacity-bound.
+@@ -1523,7 +1600,41 @@
+         with record_function_or_nullcontext("schedule: update_after_schedule"):
+             self._update_after_schedule(scheduler_output)
+         return scheduler_output
++
++    def _e27b_admit(self, remaining: int) -> bool:
++        """E27b: admit a short prefill on a throttled step, within the limit."""
++        limit = self.e27b_short_prefill_tokens
++        if not _e27b_admits(remaining, self.e27b_step_short_prefill, limit):
++            return False
++        self.e27b_step_short_prefill += remaining
++        self.e27b_admitted += 1
++        if self.e27b_admitted == 1 or self.e27b_admitted % 1000 == 0:
++            logger.info(
++                "E27B_SHORT_PREFILL_ADMITTED count=%d remaining=%d deferred=%d",
++                self.e27b_admitted,
++                remaining,
++                self.e27b_deferred,
++            )
++        return True
++
++    def _e27b_count_deferred(self, request: Request) -> None:
++        self.e27b_deferred += 1
++        if self.e27b_deferred == 1 or self.e27b_deferred % 1000 == 0:
++            logger.info(
++                "E27B_LONG_PREFILL_DEFERRED count=%d remaining=%d",
++                self.e27b_deferred,
++                request.num_tokens - request.num_computed_tokens,
++            )
+ 
++    def _e27c_count_override(self) -> None:
++        self.e27c_latch_overrides += 1
++        if self.e27c_latch_overrides == 1 or self.e27c_latch_overrides % 1000 == 0:
++            logger.info(
++                "E27C_CADENCE_KEPT_WHILE_QUEUED count=%d waiting=%d",
++                self.e27c_latch_overrides,
++                len(self.waiting),
++            )
++
+     def _build_kv_connector_meta(
+         self, connector: KVConnectorBase_V1, scheduler_output: SchedulerOutput
+     ) -> KVConnectorMetadata:

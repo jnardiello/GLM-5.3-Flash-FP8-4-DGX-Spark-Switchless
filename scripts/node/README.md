@@ -5,7 +5,7 @@ artifacts for the four cluster hosts. Nothing in this directory runs merely beca
 it exists in the repository; deploy, bootstrap, launcher, and configuration choices
 select the files explicitly.
 
-The base configuration is the [accepted September 24 E27 recipe](../../docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json).
+The base configuration is the [accepted September 25 E27c recipe](../../docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json).
 The previous E03 reference, the earlier September 19 base, September 18 and September 11 remain historical references with their own
 rollback assets; the September 12 filenames below belong to the September 11
 reference's later capture.
@@ -44,7 +44,8 @@ reference's later capture.
 | shared `scripts/node/etc/common/` files | `/etc/sysctl.d/`, `/etc/sudoers.d/`, `/usr/local/sbin/`, `/etc/systemd/system/` | bootstrap/deploy-host |
 | GRUB drop-in | `/etc/default/grub.d/zz-tp4-perf.cfg` | bootstrap/deploy-host and `tp4-iommu.sh` |
 | built NCCL library | `$NCCL_DIR/libnccl.so.2` | `scripts/node/nccl/install-nccl.sh` |
-| E22b reference overlay selected through `TP4_ENV` (immediate rollback) | `~/tp4/scripts/node/reference/baseline-20260924-e22b.env` | `scripts/deploy.sh` |
+| E27 reference overlay selected through `TP4_ENV` (immediate rollback) | `~/tp4/scripts/node/reference/baseline-20260924-e27.env` | `scripts/deploy.sh` |
+| E22b reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260924-e22b.env` | `scripts/deploy.sh` |
 | E21 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260923-e21.env` | `scripts/deploy.sh` |
 | E03 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260919-e03.env` | `scripts/deploy.sh` |
 | September 19 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260919.env` | `scripts/deploy.sh` |
@@ -66,9 +67,11 @@ script activates `/etc` state only under `--apply`; it never reboots a node.
 
 ## Current engine and cache payload
 
-The current recipe mounts 20 vLLM modules: retained cache allocation, worker/probe,
+The current recipe mounts 21 vLLM modules: retained cache allocation, worker/probe,
 indexer and hybrid-KDA sources, the E03 model and mHC per-call sharding modules, the
-E21 residual-projection module, and the E22b drafter override and conversion module. The KDA hook is mounted from
+E21 residual-projection module, the E22b drafter override and conversion module, and the
+E27c scheduler from [`experiments/e03/queued-cadence/`](experiments/e03/queued-cadence/README.md),
+whose `SHA256SUMS` the launcher verifies whenever it is mounted. The KDA hook is mounted from
 [`experiments/e03/bf16-residue/`](experiments/e03/bf16-residue/README.md), which also
 converts 67 KDA output and MLA attention projections per rank to the same INT8 format
 when `VLLM_E21_BF16_RESIDUE_W8A16=1`; the launcher verifies that directory's
@@ -117,13 +120,17 @@ not distribute unlicensed operator payload automatically.
 `SPARKCACHE_CONNECTOR_SHA256` and `SPARKCACHE_ENCODER_SHA256` pin the selected
 modules, and `SPARKCACHE_CONFIG_SHA256` pins the tracked JSON. Keep those values
 consistent with `sparkcache/SHA256SUMS`. Preserve the JSON's measured cache namespace
-when reproducing the Current recipe: its E22b JSON, which E27 keeps unchanged, is
+when reproducing the Current recipe: its E22b JSON, which E27 and E27c keep unchanged, is
 `experiments/e03/drafter-w8a16/kv-transfer-config-e22b.json`, separate from the E21, E03
 and earlier cache computations, and its spelling is part of the hash.
 
-For the immediate return to E22b, use
-[`reference/baseline-20260924-e22b.env`](reference/baseline-20260924-e22b.env). It removes
-only the E27 `--prefill-schedule-interval 8` engine argument.
+For the immediate return to E27, use
+[`reference/baseline-20260924-e27.env`](reference/baseline-20260924-e27.env). It removes
+only the E27c scheduler mount and its two flags.
+
+For the return to E22b, use
+[`reference/baseline-20260924-e22b.env`](reference/baseline-20260924-e22b.env). It also
+removes the E27 `--prefill-schedule-interval 8` engine argument.
 
 For the return to E21, use
 [`reference/baseline-20260923-e21.env`](reference/baseline-20260923-e21.env). It restores
@@ -193,4 +200,4 @@ The first three inspect deployed nodes and require site configuration. The final
 command is fully offline and validates source syntax, manifests, templates, links,
 fixtures, the adaptive-k policy, hybrid dispatch contracts, and payload preparation
 without SSH, Docker, a GPU, or `cluster.env`. Offline checks do not constitute a new
-live deployment of the accepted E27 defaults.
+live deployment of the accepted E27c defaults.

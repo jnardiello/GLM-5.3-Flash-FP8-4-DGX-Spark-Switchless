@@ -7,6 +7,30 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Published the September 25 E27c frozen baseline and its promotion record. E27c keeps
+  E27's `--prefill-schedule-interval 8` and mounts the serving image's scheduler with one
+  reviewed patch from `scripts/node/experiments/e03/queued-cadence/`.
+  - Short prefills (fewer than 2,048 remaining tokens, up to 2,048 per step) are admitted
+    at once, and a deferred long request no longer blocks shorter ones behind it.
+  - The cadence stays on while requests are queued, instead of switching itself off.
+  - Against E27: C4 per-stream TTFT -27.1%, C2 +2.4%, C4 +1.2%, C1 -1.8%, cold prefill
+    -1.6% to -3.3%. With four 32K prompts arriving together, the first stream decodes at
+    about 12 tok/s instead of 6; the last starts about 7% later.
+  - Three native suites, 162 requests, zero errors, 44/45 output gates (one code answer
+    reached the output budget); the default was deployed onto the measured load without a
+    restart and the live identity check passed.
+- Published the E27b and E27c experiment records: per-suite extracts, protocol-2
+  interference extracts (E27, E27b, E27c on the same client), four-simultaneous-32K
+  diagnostics, owner decisions, reports and index rows. E27b, the short-prefill part alone
+  (`scripts/node/experiments/e03/long-prefill-cadence/`), is recorded as superseded: the
+  owner accepted it as a candidate and it was promoted inside E27c.
+- Added the E27b and E27c candidate directories with their overlays, manifests and
+  `SHA256SUMS`, which the launcher verifies whenever a scheduler is mounted, and offline
+  tests covering vendor provenance, the exact patch scope, the 2,047/2,048/2,049-token
+  boundaries, the per-step limit, flag parsing, four-rank launcher parity and overlay
+  refusals.
+- Added `scripts/node/reference/baseline-20260924-e27.env`, the complete E27 recipe, as the
+  one-step rollback from E27c.
 - Published the September 24 E27 frozen baseline, its promotion record and the E27
   experiment records.
   - Frozen baseline: three native suites, 162 requests.
@@ -131,6 +155,15 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- The default recipe in `cluster.env.example` is now E27c. `scripts/check-f0.py`
+  validates the E27c scheduler hash, both flags and the rank-0 boot lines by default, and
+  requires the flags' absence for older records. The README, recipe, operations,
+  installation and node guides, `AGENTS.md` and the comparison figures now describe E27c
+  against E27.
+- The E27 baseline report is marked superseded and explains what later measurements
+  showed: the running agents' net delay is about the same as without the cadence (the
+  3-5x figures are rates inside the prefill window), short prompts waited for the cadence,
+  and several long contexts arriving together were not fixed.
 - Corrected the September 24 E27 records after an independent review; no measured value
   changed.
   - The frozen baseline no longer claims that the host memory observers ran. Its new

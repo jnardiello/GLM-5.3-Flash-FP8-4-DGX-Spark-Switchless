@@ -93,6 +93,8 @@ python3 scripts/tests/test-adaptive-draft-budget.py
 python3 scripts/tests/test-draft-budget-config.py
 python3 scripts/tests/test-bf16-residue-config.py
 python3 scripts/tests/test-drafter-w8a16-config.py
+python3 scripts/tests/test-long-prefill-cadence-config.py
+python3 scripts/tests/test-queued-cadence-config.py
 python3 scripts/tests/test-accepted-recipe.py
 python3 scripts/tests/test-f0-reference.py
 ./scripts/tests/test-host-lifecycle.sh

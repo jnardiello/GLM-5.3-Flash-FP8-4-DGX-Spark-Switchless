@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "record_type": "diagnostic_not_benchmark",
+  "tool": "private diagnostic reusing the frozen Rigmark client and prefill prompt construction; four cold 32,768-token prompts submitted together, two repetitions, 256 output tokens each",
+  "note": "Repetitive filler with about 98% drafter acceptance; only comparisons between variants are meaningful. Streams are listed in order of first token.",
+  "variants": {
+    "e27b": {
+      "repetitions": [
+        {
+          "rep": 1,
+          "streams_by_first_token": [
+            {
+              "ttft_seconds": 16.121,
+              "decode_tokens_per_second": 6.183
+            },
+            {
+              "ttft_seconds": 30.119,
+              "decode_tokens_per_second": 9.091
+            },
+            {
+              "ttft_seconds": 41.305,
+              "decode_tokens_per_second": 14.966
+            },
+            {
+              "ttft_seconds": 54.986,
+              "decode_tokens_per_second": 51.886
+            }
+          ],
+          "ms_per_step": 654.69,
+          "acceptance": 0.9761
+        },
+        {
+          "rep": 2,
+          "streams_by_first_token": [
+            {
+              "ttft_seconds": 15.146,
+              "decode_tokens_per_second": 6.077
+            },
+            {
+              "ttft_seconds": 29.306,
+              "decode_tokens_per_second": 9.027
+            },
+            {
+              "ttft_seconds": 40.54,
+              "decode_tokens_per_second": 14.709
+            },
+            {
+              "ttft_seconds": 54.546,
+              "decode_tokens_per_second": 53.825
+            }
+          ],
+          "ms_per_step": 663.38,
+          "acceptance": 0.9762
+        }
+      ]
+    }
+  }
+}

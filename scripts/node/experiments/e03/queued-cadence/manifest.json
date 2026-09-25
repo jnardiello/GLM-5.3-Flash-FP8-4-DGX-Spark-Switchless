@@ -1,0 +1,59 @@
+{
+  "schema": "tp4-experiment-candidate/v1",
+  "experiment": "E27c",
+  "candidate": "queued-cadence",
+  "status": "promoted",
+  "summary": "E27b plus the prefill cadence kept while requests wait in the queue: the vendor capacity latch no longer switches --prefill-schedule-interval 8 off, so several long contexts arriving together are prefilled one chunk per cadence step while the streams already decoding keep generating. Short prefills below 2,048 remaining tokens are still admitted on deferred steps, as in E27b.",
+  "parent": {
+    "recipe": "cluster.env.example defaults (accepted E27, max-num-seqs 6)",
+    "baseline_id": "2026-09-24-e27",
+    "baseline_sha256": "5c03b3dea924590debfd2dee9308eec5921a7a96404cf2243c8222cfeebb298a"
+  },
+  "files": {
+    "scheduler.py": {
+      "vendor_path": "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py",
+      "vendor_sha256": "122d9722b48f8cec267d2136a18c184b8901a5a0a46187eab7030d6227f1983d",
+      "patch": "scheduler.patch",
+      "patch_sha256": "acdd9afb820b9f8ce4e73479fbd395d8e8b4f2b645e019b2dd2d04c887309eb1",
+      "candidate_sha256": "f44c2872c89ba1f5602f6c2dd087ae822f3faed24ce0e3db88b38651bdb23bee",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py",
+      "change": "The serving image's scheduler with scheduler.patch applied: the E27b predicate on both prefill-deferral gates, plus VLLM_E27C_CADENCE_WHEN_QUEUED=1 which lets a throttled step defer prefills even when the capacity latch is set. The latch is still computed on release steps, and the cadence and decode-eligibility checks are the vendor ones. With both variables unset or 0 every gate reduces to the vendor condition."
+    }
+  },
+  "activation": {
+    "flags": {
+      "VLLM_E27B_SHORT_PREFILL_TOKENS": "2048",
+      "VLLM_E27C_CADENCE_WHEN_QUEUED": "1"
+    },
+    "engine_arguments": {
+      "prefill_schedule_interval": "8 (unchanged from E27)"
+    },
+    "overlay": "scripts/node/experiments/e03/queued-cadence/delta.env",
+    "boot_signatures": [
+      "E27C_CADENCE_WHEN_QUEUED_READY interval=8",
+      "E27B_SHORT_PREFILL_READY tokens=2048 interval=8"
+    ],
+    "runtime_signatures": [
+      "E27C_CADENCE_KEPT_WHILE_QUEUED",
+      "E27B_SHORT_PREFILL_ADMITTED",
+      "E27B_LONG_PREFILL_DEFERRED"
+    ]
+  },
+  "preserved": {
+    "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "sparkcache_config_sha256": "f7d8989486907766c8df7ceaf67731fd2ec95e3bf474a6f63bb4303e41fbe4bc",
+    "kv_cache_memory_bytes_per_rank": 16106127360,
+    "context_tokens": 262144,
+    "max_num_seqs": 6,
+    "max_num_batched_tokens": 8192
+  },
+  "threshold_rationale": "2,048 is below the 2,304-token KDA block, so an admitted short prefill always completes in one final chunk and never meets block alignment; the per-step total bounds the extra step time to about one short prefill.",
+  "not_included": "A conditional 2,304-token chunk cap for long prefills while others decode; it is a separate experiment.",
+  "includes": {
+    "candidate": "E27b long-prefill-cadence",
+    "manifest": "scripts/node/experiments/e03/long-prefill-cadence/manifest.json",
+    "manifest_sha256": "b2a817924b0ce011fee34dafdcc5a711ab84f32c6289e37240cd7563c0f45275"
+  },
+  "expected_cost": "Queued long prompts wait for one cadence step per chunk; the estimate before measurement is 12-15% longer time to first token for prompts that arrive while others decode.",
+  "status_note": "Promoted on 2026-09-25 as the E27c reference; cluster.env.example mounts this scheduler with both flags. This overlay refuses the E27c default and is the record of the measured candidate."
+}

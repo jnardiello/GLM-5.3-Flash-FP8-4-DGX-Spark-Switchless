@@ -10,72 +10,80 @@ contains the infrastructure as code, runtime patches, and guides to
 
 ## Measured performance
 
-Current accepted baseline: **24/09/2026 · E27, decode-only steps while another request
-prefills**, measured with native [Rigmark](https://github.com/alexellis/rigmark).
+Current accepted baseline: **25/09/2026 · E27c, long prefills paced while agents
+generate**, measured with native [Rigmark](https://github.com/alexellis/rigmark).
 Frozen medians of **three complete runs: 162/162 requests**, zero measurement/runtime
-errors and 45/45 native output gates passing.
+errors and 44/45 native output gates passing (one code answer reached the 8,192-token
+output budget).
 
-| Workload | Current · 24/09/2026 E27 | vs previous [📊 23/09/2026 E22b](docs/benchmarks/baselines/2026-09-23-e22b.md) frozen medians | vs same-day E22b control (LAN) |
-| --- | ---: | ---: | ---: |
-| Code decode, one request | 55.11 tok/s | 56.61 tok/s · -2.65% | 56.15 tok/s · ≈ unchanged (-1.85%) |
-| Code C1, end-to-end | 44.38 tok/s | 41.62 tok/s · +6.61% | 42.94 tok/s · +3.34% |
-| Code C2, aggregate end-to-end | 64.95 tok/s | 65.78 tok/s · ≈ unchanged (-1.26%) | 63.95 tok/s · ≈ unchanged (+1.57%) |
-| Code C4, aggregate end-to-end | 95.51 tok/s | 95.90 tok/s · ≈ unchanged (-0.41%) | 98.73 tok/s · -3.27% |
-| Prose decode | 32.62 tok/s | 33.40 tok/s · -2.34% | 33.37 tok/s · -2.25% |
-| Code TTFT | 0.403 s | 0.400 s · ≈ unchanged (+0.75%) | 0.390 s · +3.47% |
-| Prose TTFT | 0.376 s | 0.375 s · ≈ unchanged (+0.27%) | 0.373 s · ≈ unchanged (+0.67%) |
-| C1 per-stream TTFT | 0.376 s | 0.352 s · +6.82% | 0.365 s · +3.01% |
-| C2 per-stream TTFT | 0.456 s | 0.482 s · -5.39% | 0.463 s · ≈ unchanged (-1.41%) |
-| C4 per-stream TTFT | 0.720 s | 0.521 s · +38.20% | 0.533 s · +35.08% |
-| Prefill 8K, cold | 2,609.3 tok/s | 2,610.6 tok/s · ≈ unchanged (-0.05%) | 2,648.3 tok/s · ≈ unchanged (-1.47%) |
-| Prefill 8K, replay | 9,589.5 tok/s | 9,600.4 tok/s · ≈ unchanged (-0.11%) | 9,533.6 tok/s · ≈ unchanged (+0.59%) |
-| Prefill 32K, cold | 2,779.9 tok/s | 2,733.6 tok/s · ≈ unchanged (+1.69%) | 2,728.6 tok/s · ≈ unchanged (+1.88%) |
-| Prefill 32K, replay | 37,652.9 tok/s | 37,728.2 tok/s · ≈ unchanged (-0.20%) | 36,830.8 tok/s · +2.23% |
-| Prefill 64K, cold | 2,690.4 tok/s | 2,613.3 tok/s · +2.95% | 2,645.7 tok/s · ≈ unchanged (+1.69%) |
-| Prefill 64K, replay | 40,046.3 tok/s | 40,214.0 tok/s · ≈ unchanged (-0.42%) | 39,884.6 tok/s · ≈ unchanged (+0.41%) |
+| Workload | Current · 25/09/2026 E27c | vs previous [📊 24/09/2026 E27](docs/benchmarks/baselines/2026-09-24-e27.md) |
+| --- | ---: | ---: |
+| Code decode, one request | 56.12 tok/s | 55.11 tok/s · ≈ unchanged (+1.84%) |
+| Code C1, end-to-end | 43.58 tok/s | 44.38 tok/s · ≈ unchanged (-1.79%) |
+| Code C2, aggregate end-to-end | 66.52 tok/s | 64.95 tok/s · +2.41% |
+| Code C4, aggregate end-to-end | 96.70 tok/s | 95.51 tok/s · ≈ unchanged (+1.24%) |
+| Prose decode | 33.12 tok/s | 32.62 tok/s · ≈ unchanged (+1.52%) |
+| Code TTFT | 0.390 s | 0.403 s · -3.23% |
+| Prose TTFT | 0.376 s | 0.376 s · ≈ unchanged (+0.00%) |
+| C1 per-stream TTFT | 0.340 s | 0.376 s · -9.57% |
+| C2 per-stream TTFT | 0.446 s | 0.456 s · ≈ unchanged (-2.19%) |
+| C4 per-stream TTFT | 0.525 s | 0.720 s · -27.08% |
+| Prefill 8K, cold | 2,558.9 tok/s | 2,609.3 tok/s · ≈ unchanged (-1.93%) |
+| Prefill 8K, replay | 9,432.0 tok/s | 9,589.5 tok/s · ≈ unchanged (-1.64%) |
+| Prefill 32K, cold | 2,689.3 tok/s | 2,779.9 tok/s · -3.26% |
+| Prefill 32K, replay | 37,056.3 tok/s | 37,652.9 tok/s · ≈ unchanged (-1.58%) |
+| Prefill 64K, cold | 2,646.9 tok/s | 2,690.4 tok/s · ≈ unchanged (-1.62%) |
+| Prefill 64K, replay | 39,931.7 tok/s | 40,046.3 tok/s · ≈ unchanged (-0.29%) |
 
-The first comparison uses the frozen medians of the previous September 23 E22b baseline,
-measured through an SSH tunnel. The second uses the mean of two E22b control suites
-measured on the same day as E27, over the same direct LAN client path. It is the fairer
-reference for differences of a few percent: for example C4 is −3.3% against it, and the
-frozen comparison hides that. Percentages use unrounded values.
-“≈ unchanged” marks owner-accepted changes of roughly 1–2%, with the exact delta
-retained; it does not establish statistical equivalence.
+Both baselines were measured over the same direct LAN client path. Percentages use
+unrounded values. “≈ unchanged” marks owner-accepted changes of roughly 1–2%, with the
+exact delta retained; it does not establish statistical equivalence.
 Higher throughput and lower TTFT are better. C1/C2/C4 mean one, two or four concurrent
 requests. Decode excludes the initial wait; end-to-end speed includes it. TTFT is time
 to first token. Concurrency outputs cap at 256 tokens; long decode allows 8,192.
 Cold prefill uses a fresh cache salt per run. These are inference measurements,
 not complete agent-task timings.
 
-E27 adds the engine's native `--prefill-schedule-interval 8`. While requests are
-generating, a newly arrived prompt is prefilled on one engine step in eight, with
-decode-only steps in between. Before E27, a long cold prompt stalled every running request
-for the whole prefill. A new Rigmark phase measures that case:
+**What E27c changes.** E27 added the engine's native `--prefill-schedule-interval 8`:
+while requests generate, prefill work runs on one engine step in eight, so a long prompt
+arriving from another client no longer freezes the agents already generating. It had two
+costs, which E27c removes with a small patch of the image's scheduler:
 
-| Another request cold-prefills | Running agents | Their decode, E22b → E27 | Its first token, E22b → E27 |
+- **Short prompts waited for the cadence too.** E27c admits a prompt with fewer than
+  2,048 tokens left to compute at once. C4 per-stream TTFT returns from 0.720 s to
+  0.525 s, the level before E27.
+- **The cadence switched itself off when requests queued up.** When several long
+  contexts arrived together, the first stream to start generating still stalled while the
+  others prefilled. E27c keeps the cadence on while requests are queued.
+
+| Four 32K prompts arriving together | 1st stream | 2nd | 3rd | 4th |
+| --- | ---: | ---: | ---: | ---: |
+| Decode, E27 | 6.2 tok/s | 9.1 | 15.0–15.3 | 56–57 |
+| Decode, **E27c** | **11.3–12.5** | **10.9–11.0** | 14.8–15.0 | 68–72 |
+| First token, E27 → E27c | 15–16 → 16–18 s | 29–30 → 29–31 s | 41 → 43–44 s | 55 → 58–60 s |
+
+With a single long prompt arriving next to running agents, E27c keeps E27's behaviour:
+they go on generating at about 7 tok/s instead of about 1.5 during a 32K prefill. Short
+and medium prompts now reach their first token much sooner:
+
+| Prompt arriving while agents generate | Agents | Its first token, E27 → E27c | Longest pause of the agents |
 | --- | ---: | ---: | ---: |
-| 8K tokens | 1 | 2.2 → **11.5** tok/s | 3.6 → 4.7 s |
-| 8K tokens | 3 | 2.1 → **6.1** tok/s | 3.8 → 5.0 s |
-| 32K tokens | 1 | 1.6 → **8.7** tok/s | 14.2 → 16.3 s |
-| 32K tokens | 3 | 1.4 → **7.0** tok/s | 13.9 → 19.1 s |
+| 1K tokens | 3 | 1.98 → **0.91** s | 0.68 → 0.67 s |
+| 8K tokens | 3 | 5.79 → **3.74** s | 2.66 → 2.66 s |
+| 32K tokens | 3 | 18.6 → 18.4 s | 2.66 → 2.97 s |
 
-The owner accepted the cost: requests that arrive while others generate wait longer for
-their first token.
-
-- **C4 per-stream TTFT:** +35% against the same-day control.
-- **C4 throughput:** −3.3% against the same control.
-- **Unresolved:** code decode −1.85% and prose −2.25% against the same control are
-  recorded but neither attributed to E27 nor dismissed.
-- **Details:** the [current benchmark report](docs/benchmarks/baselines/2026-09-24-e27.md)
-  lists both comparisons with per-run values, the interference phase, counts and
-  limitations.
+The cadence spreads the arriving prefill instead of removing it: the agents' total delay
+is about the same, but their streams keep moving. A cadence step still carries one prefill
+chunk of up to 8,192 tokens (about 2.6 s), which caps the first stream near 12 tok/s when
+several long contexts arrive together. The [current benchmark report](docs/benchmarks/baselines/2026-09-25-e27c.md)
+lists per-run values, the interference phase, counts and limitations.
 
 The graphs compare current and previous medians side by side, with each delta calculated
-against the previous September 23 E22b baseline. Click an image for its SVG version.
+against the previous September 24 E27 baseline. Click an image for its SVG version.
 
-[![Current E27 versus previous September 23 E22b baseline: generation throughput, time to first token and percentage changes.](docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/generation.png)](docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/generation.svg)
+[![Current E27c versus previous September 24 E27 baseline: generation throughput, time to first token and percentage changes.](docs/plots/comparisons/2026-09-25-e27c-vs-2026-09-24-e27/generation.png)](docs/plots/comparisons/2026-09-25-e27c-vs-2026-09-24-e27/generation.svg)
 
-[![Current E27 versus previous September 23 E22b baseline: cold prefill, immediate replay and percentage changes at 8K, 32K and 64K.](docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/prefill.png)](docs/plots/comparisons/2026-09-24-e27-vs-2026-09-23-e22b/prefill.svg)
+[![Current E27c versus previous September 24 E27 baseline: cold prefill, immediate replay and percentage changes at 8K, 32K and 64K.](docs/plots/comparisons/2026-09-25-e27c-vs-2026-09-24-e27/prefill.png)](docs/plots/comparisons/2026-09-25-e27c-vs-2026-09-24-e27/prefill.svg)
 
 The [benchmark archive](docs/benchmarks/README.md) retains earlier baselines, experiments
 and separate reproduction results. See [local Rigmark reports](docs/rigmark_reports/README.md)
@@ -86,7 +94,7 @@ The [current recipe](docs/production-recipe.md), encoded in
 DFlash2 with adaptive verification capped by its effective draft budget, E03 mHC prefill
 sharding, hybrid INT8/BF16 KDA input projections, E21 8-bit weights for the KDA output
 and MLA attention projections, E22b 8-bit weights for the DFlash2 drafter, the E27 prefill
-cadence, SparkCache replay views and SIRCL/patched NCCL.
+cadence with the E27c scheduler, SparkCache replay views and SIRCL/patched NCCL.
 The **15 GiB KV pool per rank** and **262,144-token context limit** are retained.
 
 ## Install with an agent
@@ -112,9 +120,9 @@ proxy.
 Replace the placeholders below, then give this prompt to the agent in the checkout:
 
 ```text
-Install this repository's accepted September 24, 2026 E27 recipe on my four nodes.
+Install this repository's accepted September 25, 2026 E27c recipe on my four nodes.
 Read AGENTS.md, docs/install-from-zero.md, and docs/operations.md first.
-Use docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json and cluster.env.example as the reference.
+Use docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json and cluster.env.example as the reference.
 
 SSH targets in rank order:
 0: <user@rank0-host>

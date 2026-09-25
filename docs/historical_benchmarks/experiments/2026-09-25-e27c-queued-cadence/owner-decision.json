@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-25-e27c-queued-cadence",
+  "date": "2026-09-25",
+  "decision": "promote",
+  "statement": "The owner accepted E27c as the new baseline after reviewing the three suites, the protocol-2 interference phase and the four-simultaneous-32K diagnostic against E27 and E27b.",
+  "accepted_trade_off": "Queued long prompts wait for the cadence (last of four simultaneous 32K prompts about +7% time to first token; cold prefill and replay 1-3% below the frozen E27 medians, within the spread between the functionally identical E27b and E27c loads) in exchange for C4 per-stream TTFT -27% against E27 and the first of several simultaneous long contexts decoding at about 12 tok/s instead of 6.",
+  "follow_up": "Smaller prefill chunks, or a longer interval, while others decode, to raise the first stream beyond about 12 tok/s."
+}

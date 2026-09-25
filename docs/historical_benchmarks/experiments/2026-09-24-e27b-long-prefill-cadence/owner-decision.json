@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-24-e27b-long-prefill-cadence",
+  "date": "2026-09-25",
+  "decision": "accepted as candidate; promoted as part of E27c",
+  "statement": "The owner accepted E27b as a candidate, treating C1 end-to-end -3.98% against the frozen E27 median as measurement noise (single-request scheduling is identical to E27; -0.77% against the same-day E22b control), and asked for E27c on top of it. E27c, which contains E27b, was promoted."
+}

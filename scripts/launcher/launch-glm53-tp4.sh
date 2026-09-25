@@ -462,6 +462,21 @@ case "${EXTRA_DOCKER_ENV:-}" in
         || { echo "[launch] ERROR: E22 drafter W8A16 source manifest failed" >&2; exit 1; }
     fi ;;
 esac
+# Likewise for the E27b scheduler candidate, when its scheduler is mounted.
+case "${EXTRA_DOCKER_ENV:-}" in
+  *long-prefill-cadence/scheduler.py:*)
+    if [ "$DRY_RUN" != 1 ]; then
+      (cd "$ENV_DIR/experiments/e03/long-prefill-cadence" && sha256sum -c SHA256SUMS) \
+        || { echo "[launch] ERROR: E27b scheduler source manifest failed" >&2; exit 1; }
+    fi ;;
+esac
+case "${EXTRA_DOCKER_ENV:-}" in
+  *queued-cadence/scheduler.py:*)
+    if [ "$DRY_RUN" != 1 ]; then
+      (cd "$ENV_DIR/experiments/e03/queued-cadence" && sha256sum -c SHA256SUMS) \
+        || { echo "[launch] ERROR: E27c scheduler source manifest failed" >&2; exit 1; }
+    fi ;;
+esac
 if [ "$ASYNC_SCHEDULING" = "1" ]; then
   ASYNCFLAG="--async-scheduling"
 fi

@@ -1,0 +1,496 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "experiment_id": "2026-09-24-e27b-long-prefill-cadence",
+  "title": "E27b: the E27 prefill cadence applied to long prefills only",
+  "outcome": "superseded",
+  "outcome_detail": "Accepted by the owner as a candidate and promoted inside E27c. Against the frozen E27 medians: C4 per-stream TTFT -27.2%, code decode +4.5%, C2 +2.8%, prose +2.1%, C1 end-to-end -4.0% (treated as noise by the owner), prefill and replay within -2.1% to +1.0%. The arriving request reaches its first token 2-54% sooner with running agents; the time those agents lose is unchanged. Several long contexts arriving together still stall the first stream (6.1 tok/s), as on E27.",
+  "reference": {
+    "baseline_id": "2026-09-24-e27",
+    "baseline_sha256": "5c03b3dea924590debfd2dee9308eec5921a7a96404cf2243c8222cfeebb298a"
+  },
+  "coverage": "The protocol-2 interference phase on E27 (same-day reference), one coordinated transition, then on one retained E27b load: the interference phase, three complete native suites (162 requests) and the four-simultaneous-32K diagnostic.",
+  "client_transport": "Direct LAN HTTP to the rank-0 API, like the E27 reference.",
+  "candidate": {
+    "overlay": "scripts/node/experiments/e03/long-prefill-cadence/delta.env",
+    "manifest": {
+      "path": "scripts/node/experiments/e03/long-prefill-cadence/manifest.json",
+      "sha256": "b2a817924b0ce011fee34dafdcc5a711ab84f32c6289e37240cd7563c0f45275"
+    }
+  },
+  "runs": [
+    {
+      "run": "run-1",
+      "receipt_sha256": "32654dfe5e77a879bb34392c4c416b11cf23db63b84d8994f9acd4f360b4ef48",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-24-e27b-long-prefill-cadence/run-1.json",
+        "sha256": "522b4f5b248c04d21cd7f42137001a46a22b9ce8890f641aaf0c3c58b483be6d"
+      }
+    },
+    {
+      "run": "run-2",
+      "receipt_sha256": "1384fb9310b7503484a5960fea8d8e05c2102b30f70e002179e444bebd9c3d32",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-24-e27b-long-prefill-cadence/run-2.json",
+        "sha256": "9d39518874d4ce882e6f10254aa7756761aa1fa31e874e18e2d53d5009b5e4b6"
+      }
+    },
+    {
+      "run": "run-3",
+      "receipt_sha256": "c65801faa91851d743e35691e11c6211cd8099f83ce101ad8b98a6c4b56c80c2",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-24-e27b-long-prefill-cadence/run-3.json",
+        "sha256": "89bf7ba5cdda4c8b64bdadd77cf78d50cd41166475756a5266bf845e0d71082f"
+      }
+    }
+  ],
+  "performance_metrics": [
+    {
+      "key": "code_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "code",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        57.801,
+        56.024,
+        57.606
+      ],
+      "median": 57.606,
+      "dispersion": {
+        "minimum": 56.024,
+        "maximum": 57.801,
+        "sample_stdev": 0.9745492975387825
+      },
+      "current_baseline_median": 55.108,
+      "change_vs_current_baseline_pct": 4.532917180808603,
+      "same_day_e22b_lan_control_mean": 56.149,
+      "change_vs_same_day_e22b_control_pct": 2.594881476072594
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "1",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        42.161,
+        42.613,
+        43.217
+      ],
+      "median": 42.613,
+      "dispersion": {
+        "minimum": 42.161,
+        "maximum": 43.217,
+        "sample_stdev": 0.5298200952524659
+      },
+      "current_baseline_median": 44.377,
+      "change_vs_current_baseline_pct": -3.975032111228796,
+      "same_day_e22b_lan_control_mean": 42.942,
+      "change_vs_same_day_e22b_control_pct": -0.7661496902799139
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "2",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        61.479,
+        66.759,
+        68.0
+      ],
+      "median": 66.759,
+      "dispersion": {
+        "minimum": 61.479,
+        "maximum": 68.0,
+        "sample_stdev": 3.462704193738376
+      },
+      "current_baseline_median": 64.954,
+      "change_vs_current_baseline_pct": 2.7788896757705563,
+      "same_day_e22b_lan_control_mean": 63.947,
+      "change_vs_same_day_e22b_control_pct": 4.397391589910391
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "4",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        95.541,
+        95.745,
+        93.874
+      ],
+      "median": 95.541,
+      "dispersion": {
+        "minimum": 93.874,
+        "maximum": 95.745,
+        "sample_stdev": 1.0264133345457573
+      },
+      "current_baseline_median": 95.507,
+      "change_vs_current_baseline_pct": 0.03559948485450471,
+      "same_day_e22b_lan_control_mean": 98.735,
+      "change_vs_same_day_e22b_control_pct": -3.234921760267385
+    },
+    {
+      "key": "prose_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "prose",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        34.382,
+        33.32,
+        32.829
+      ],
+      "median": 33.32,
+      "dispersion": {
+        "minimum": 32.829,
+        "maximum": 34.382,
+        "sample_stdev": 0.7938024523351708
+      },
+      "current_baseline_median": 32.623,
+      "change_vs_current_baseline_pct": 2.1365294424179346,
+      "same_day_e22b_lan_control_mean": 33.3725,
+      "change_vs_same_day_e22b_control_pct": -0.1573151546932414
+    },
+    {
+      "key": "code_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "code",
+        "ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.386,
+        0.387,
+        0.406
+      ],
+      "median": 0.387,
+      "dispersion": {
+        "minimum": 0.386,
+        "maximum": 0.406,
+        "sample_stdev": 0.011269427669584655
+      },
+      "current_baseline_median": 0.403,
+      "change_vs_current_baseline_pct": -3.970223325062038,
+      "same_day_e22b_lan_control_mean": 0.3895,
+      "change_vs_same_day_e22b_control_pct": -0.641848523748396
+    },
+    {
+      "key": "prose_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "prose",
+        "ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.375,
+        0.376,
+        0.378
+      ],
+      "median": 0.376,
+      "dispersion": {
+        "minimum": 0.375,
+        "maximum": 0.378,
+        "sample_stdev": 0.0015275252316519481
+      },
+      "current_baseline_median": 0.376,
+      "change_vs_current_baseline_pct": 0.0,
+      "same_day_e22b_lan_control_mean": 0.3735,
+      "change_vs_same_day_e22b_control_pct": 0.6693440428380193
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "1",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.345,
+        0.336,
+        0.388
+      ],
+      "median": 0.345,
+      "dispersion": {
+        "minimum": 0.336,
+        "maximum": 0.388,
+        "sample_stdev": 0.027790885796126284
+      },
+      "current_baseline_median": 0.376,
+      "change_vs_current_baseline_pct": -8.244680851063837,
+      "same_day_e22b_lan_control_mean": 0.365,
+      "change_vs_same_day_e22b_control_pct": -5.479452054794526
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "2",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.464,
+        0.457,
+        0.46
+      ],
+      "median": 0.46,
+      "dispersion": {
+        "minimum": 0.457,
+        "maximum": 0.464,
+        "sample_stdev": 0.0035118845842842493
+      },
+      "current_baseline_median": 0.456,
+      "change_vs_current_baseline_pct": 0.8771929824561412,
+      "same_day_e22b_lan_control_mean": 0.4625,
+      "change_vs_same_day_e22b_control_pct": -0.540540540540541
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "4",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "per_run": [
+        0.558,
+        0.524,
+        0.521
+      ],
+      "median": 0.524,
+      "dispersion": {
+        "minimum": 0.521,
+        "maximum": 0.558,
+        "sample_stdev": 0.02055075018906449
+      },
+      "current_baseline_median": 0.72,
+      "change_vs_current_baseline_pct": -27.222222222222214,
+      "same_day_e22b_lan_control_mean": 0.533,
+      "change_vs_same_day_e22b_control_pct": -1.688555347091934
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2634.177,
+        2637.027,
+        2550.318
+      ],
+      "median": 2634.177,
+      "dispersion": {
+        "minimum": 2550.318,
+        "maximum": 2637.027,
+        "sample_stdev": 49.259356238180715
+      },
+      "current_baseline_median": 2609.345,
+      "change_vs_current_baseline_pct": 0.9516564501819551,
+      "same_day_e22b_lan_control_mean": 2648.264,
+      "change_vs_same_day_e22b_control_pct": -0.5319333722015626
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        9559.919,
+        9565.434,
+        9545.516
+      ],
+      "median": 9559.919,
+      "dispersion": {
+        "minimum": 9545.516,
+        "maximum": 9565.434,
+        "sample_stdev": 10.284197894504521
+      },
+      "current_baseline_median": 9589.485,
+      "change_vs_current_baseline_pct": -0.3083168699883332,
+      "same_day_e22b_lan_control_mean": 9533.551500000001,
+      "change_vs_same_day_e22b_control_pct": 0.27657583850046297
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2744.518,
+        2685.863,
+        2720.358
+      ],
+      "median": 2720.358,
+      "dispersion": {
+        "minimum": 2685.863,
+        "maximum": 2744.518,
+        "sample_stdev": 29.478861494298023
+      },
+      "current_baseline_median": 2779.897,
+      "change_vs_current_baseline_pct": -2.1417700008309573,
+      "same_day_e22b_lan_control_mean": 2728.6215,
+      "change_vs_same_day_e22b_control_pct": -0.30284522789254653
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        36575.184,
+        37614.734,
+        38044.772
+      ],
+      "median": 37614.734,
+      "dispersion": {
+        "minimum": 36575.184,
+        "maximum": 38044.772,
+        "sample_stdev": 755.5666497942653
+      },
+      "current_baseline_median": 37652.856,
+      "change_vs_current_baseline_pct": -0.10124597188591226,
+      "same_day_e22b_lan_control_mean": 36830.849,
+      "change_vs_same_day_e22b_control_pct": 2.128338122208355
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        2659.647,
+        2684.48,
+        2658.837
+      ],
+      "median": 2659.647,
+      "dispersion": {
+        "minimum": 2658.837,
+        "maximum": 2684.48,
+        "sample_stdev": 14.576793417392395
+      },
+      "current_baseline_median": 2690.397,
+      "change_vs_current_baseline_pct": -1.1429539952653829,
+      "same_day_e22b_lan_control_mean": 2645.719,
+      "change_vs_same_day_e22b_control_pct": 0.526435347064442
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "per_run": [
+        39830.603,
+        40018.563,
+        40167.151
+      ],
+      "median": 40018.563,
+      "dispersion": {
+        "minimum": 39830.603,
+        "maximum": 40167.151,
+        "sample_stdev": 168.65740009854065
+      },
+      "current_baseline_median": 40046.294,
+      "change_vs_current_baseline_pct": -0.06924735657187096,
+      "same_day_e22b_lan_control_mean": 39884.614,
+      "change_vs_same_day_e22b_control_pct": 0.33584128456151163
+    }
+  ],
+  "integrity": {
+    "requests": 162,
+    "completed_streams": 162,
+    "visible_responses": 162,
+    "native_validation_errors": 0,
+    "protocol_errors": 0,
+    "runtime_errors": 0,
+    "prefill_token_matches": "54/54",
+    "decode_output_gates": {
+      "code": "15/15",
+      "prose": "15/15",
+      "structured": "15/15"
+    },
+    "finish_reasons": {
+      "stop": 45,
+      "length": 117
+    },
+    "code_output_budget_stops": 0,
+    "client_probe_timeouts": 0
+  },
+  "interference": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-24-e27b-long-prefill-cadence/interference.json",
+    "sha256": "09f4e87986328dc89c8bc741671f4b807338a794bd08851cea5fe0fe1045882a"
+  },
+  "long_context_diagnostic": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-24-e27b-long-prefill-cadence/long-context-diagnostic.json",
+    "sha256": "5c9463e9783cad95d828eee9c7ac711a02f175d6f16a32813f66b539678385c3"
+  },
+  "owner_decision": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-24-e27b-long-prefill-cadence/owner-decision.json",
+    "sha256": "62e5d13a797c9a30634e20889b60942d6e3d55760a888b588e0c14bd28124acf"
+  },
+  "post_boot_gates": {
+    "coherent_response": "PASS",
+    "tool_call": "PASS",
+    "elapsed_from_health_seconds": 3.0
+  },
+  "notes": [
+    "Boot logged E27B_SHORT_PREFILL_READY tokens=2048 interval=8; the scheduler mounted on all four ranks had the recorded hash.",
+    "Host memory observers were not run; no OOM or allocation retry was observed in engine logs."
+  ]
+}

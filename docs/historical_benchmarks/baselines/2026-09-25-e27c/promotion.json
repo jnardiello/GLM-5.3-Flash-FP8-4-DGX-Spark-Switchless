@@ -1,0 +1,85 @@
+{
+  "schema": "tp4-iac-promotion/v1",
+  "baseline_id": "2026-09-25-e27c",
+  "owner_decision": "promote",
+  "status": "deployed_without_restart_identity_verified",
+  "measured_recipe_encoded": true,
+  "runtime_sources_unchanged": true,
+  "promotion_method": "launcher_command_parity",
+  "promotion_method_reason": "Owner decision under the repository promotion rule: the accepted suites were measured on the loaded E27c candidate, which was still serving, so the default was deployed without a restart and without a reproduction run.",
+  "candidate_overlay": {
+    "path": "scripts/node/experiments/e03/queued-cadence/delta.env",
+    "measured_sha256": "fcbde37ea2d39aebe66e674d70fbbad743f81d2e3a63478d454fb43598fb2cae",
+    "current_sha256": "79d365912a153be904498a2b32d185e444e1d8a5c778acf548ee14a7e671b1cd",
+    "status": "retained as the record of the measured candidate; only its header comment changed, and it now refuses the E27c default"
+  },
+  "measured_scheduler_sha256": "f44c2872c89ba1f5602f6c2dd087ae822f3faed24ce0e3db88b38651bdb23bee",
+  "includes": {
+    "experiment": "E27b",
+    "results": "docs/historical_benchmarks/experiments/2026-09-24-e27b-long-prefill-cadence/results.json",
+    "measured_overlay_sha256": "2f45930cffc83cfd77033658154009535ed7d4b0d8ab7813337346e6c8000a28"
+  },
+  "local_validation": {
+    "offline_check": "PASS",
+    "four_rank_command_parity_with_measured_candidate": "PASS",
+    "four_rank_command_parity_of_e27_rollback_with_measured_e27": "PASS",
+    "mounted_source_hashes": "PASS",
+    "historical_identity_selection": "PASS",
+    "previous_baseline_unchanged": {
+      "path": "docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json",
+      "sha256": "5c03b3dea924590debfd2dee9308eec5921a7a96404cf2243c8222cfeebb298a"
+    },
+    "figures_visually_reviewed": true,
+    "plotter_matplotlib_version": "3.11.2",
+    "figures_sha256": {
+      "docs/plots/comparisons/2026-09-25-e27c-vs-2026-09-24-e27/generation.png": "cd45d872603d520e9847918685c977d7b3337c1ab1029f318ae1e052539948e6",
+      "docs/plots/comparisons/2026-09-25-e27c-vs-2026-09-24-e27/generation.svg": "12186d18a76d2e0fc05ebfab016ffb8f45ffe29aef517387f222d3010174bcfd",
+      "docs/plots/comparisons/2026-09-25-e27c-vs-2026-09-24-e27/prefill.png": "d37a88bb52075aa5bebfb76172fef6466805f11e65ae5de7d4bd91e593d65d98",
+      "docs/plots/comparisons/2026-09-25-e27c-vs-2026-09-24-e27/prefill.svg": "7854e06aeeb0b0754c3d6ac351c9f5bea4a0fc07454346e0c3e6ff7adde6d39f"
+    }
+  },
+  "new_deployments": 1,
+  "new_lifecycle_actions": 0,
+  "new_measurement_requests": 0,
+  "live_default_apply": {
+    "date": "2026-09-25",
+    "restart": false,
+    "deploy": "PASS",
+    "autostart_tp4_env": "none; the next boot selects the E27c default",
+    "deployed_cluster_env_matches_local": "4/4",
+    "host_actions": [
+      "systemctl daemon-reload on rank 2 after the deploy left tp4-fabric-iptables.service with NeedDaemonReload=yes; it restarts no service"
+    ],
+    "check_f0": {
+      "result": "PASS",
+      "problems": []
+    },
+    "per_rank_running_identity": {
+      "ranks_checked": 4,
+      "prefill_schedule_interval_8": "4/4",
+      "e27c_scheduler_sha256": "4/4",
+      "e27c_flags": "4/4",
+      "rank0_boot_lines": [
+        "E27C_CADENCE_WHEN_QUEUED_READY interval=8",
+        "E27B_SHORT_PREFILL_READY tokens=2048 interval=8"
+      ]
+    },
+    "health": 200,
+    "real_completion": "HTTP 200"
+  },
+  "live_reproduction": {
+    "status": "not_required_by_owner_decision",
+    "executed_runs": 0,
+    "executed_requests": 0
+  },
+  "baseline": {
+    "path": "docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json",
+    "sha256": "28e8f0319bc3ca3c0cee50fb51dc5d5c377a0104a3de88d818d54f320702c354"
+  },
+  "rollback": "scripts/node/reference/baseline-20260924-e27.env",
+  "notes": [
+    "The encoded default produces a launcher command byte-identical, on all four ranks, to the measured E27c candidate (E27 recipe plus the candidate overlay).",
+    "The E27 rollback produces a launcher command byte-identical, on all four ranks, to the measured E27 load.",
+    "Live identity check PASS against 2026-09-25-e27c with no TP4_ENV, on the load that ran the accepted suites."
+  ]
+}

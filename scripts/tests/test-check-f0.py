@@ -381,8 +381,11 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
     rec.update(image=exp["image_digest"], image_digest=exp["image_digest"],
                sparkcache_mode=exp["sparkcache_mode"],
                spark_mhc_prefill_shard=exp["spark_mhc_prefill_shard"], **exp["payload_pins"])
+    scheduler_env = {key: value for key, value in exp["runtime_identity"].get("environment", {}).items()
+                     if key in check.SCHEDULER_FLAGS}
     for name in ("extra_docker_env", "base_extra_docker_env"):
-        rec[name] = " ".join(f"-e {key}={value}" for key, value in exp["adaptive_env"].items())
+        rec[name] = " ".join(f"-e {key}={value}" for key, value in
+                             {**exp["adaptive_env"], **scheduler_env}.items())
     for name in ("extra_vllm_args", "base_extra_vllm_args"):
         rec[name] = rec[name].replace("17179869184", exp["kv_cache_memory_bytes"])
         if exp["prefill_schedule_interval"] != "1":
@@ -408,21 +411,59 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
             c["runtime_receipts"]["e21"] = deepcopy(identity["e21_boot_receipt"])
         if identity.get("e22_boot_receipt"):
             c["runtime_receipts"]["e22"] = deepcopy(identity["e22_boot_receipt"])
+        if identity.get("boot_lines"):
+            c["runtime_receipts"]["boot_lines"] = list(identity["boot_lines"])
     return rec, exp, ranks
 
 
-assert check.BASELINE == BASELINES / "2026-09-24-e27/baseline.json"
+assert check.BASELINE == BASELINES / "2026-09-25-e27c/baseline.json"
 HISTORICAL = ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21",
-              "2026-09-23-e22b", "2026-09-24-e27")
+              "2026-09-23-e22b", "2026-09-24-e27", "2026-09-25-e27c")
 for name in HISTORICAL:
     baseline_path = BASELINES / name / "baseline.json"
     baseline_recipe, baseline_expected, baseline_ranks = baseline_fixture(baseline_path)
     assert check.evaluate(baseline_recipe, baseline_expected, baseline_ranks, endpoint()) == [], name
     # Records before E27 ran without the cadence and must refuse it; E27 requires it.
-    assert baseline_expected["prefill_schedule_interval"] == ("8" if name == "2026-09-24-e27" else "1"), name
+    assert baseline_expected["prefill_schedule_interval"] == (
+        "8" if name in ("2026-09-24-e27", "2026-09-25-e27c") else "1"), name
+    # Records before E27c ran the image's scheduler and must refuse the E27c flags.
+    flags = set(baseline_expected["runtime_identity"].get("environment", {})) & set(check.SCHEDULER_FLAGS)
+    assert flags == (set(check.SCHEDULER_FLAGS) if name == "2026-09-25-e27c" else set()), name
 
 current_recipe, current_expected, current_ranks = baseline_fixture(check.BASELINE)
-assert current_expected["baseline_id"] == "2026-09-24-e27"
+assert current_expected["baseline_id"] == "2026-09-25-e27c"
+scheduler_target = "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py"
+assert scheduler_target in current_expected["runtime_identity"]["container_file_sha256"]
+for key in check.SCHEDULER_FLAGS:
+    missing = deepcopy(current_ranks)
+    missing[1]["remote"]["container"]["environment"].pop(key)
+    assert f"rank 1: runtime environment {key}" in check.evaluate(
+        current_recipe, current_expected, missing, endpoint()), key
+    missing_recipe = deepcopy(current_recipe)
+    missing_recipe["extra_docker_env"] = missing_recipe["extra_docker_env"].replace(
+        f" -e {key}=" + current_expected["runtime_identity"]["environment"][key], "")
+    assert "baseline runtime environment: " + key in check.recipe_problems(
+        missing_recipe, current_expected), key
+wrong_scheduler = deepcopy(current_ranks)
+wrong_scheduler[2]["remote"]["container"]["runtime_files"][scheduler_target] = "0" * 64
+assert f"rank 2: runtime file {scheduler_target}" in check.evaluate(
+    current_recipe, current_expected, wrong_scheduler, endpoint())
+for signature in current_expected["runtime_identity"]["boot_lines"]:
+    unsigned = deepcopy(current_ranks)
+    unsigned[0]["remote"]["container"]["runtime_receipts"]["boot_lines"].remove(signature)
+    assert "rank 0: boot signature " + signature in check.evaluate(
+        current_recipe, current_expected, unsigned, endpoint()), signature
+# The E27 record refuses a running or configured E27c scheduler.
+e27_recipe, e27_expected, e27_ranks = baseline_fixture(BASELINES / "2026-09-24-e27/baseline.json")
+for key in check.SCHEDULER_FLAGS:
+    extra = deepcopy(e27_ranks)
+    extra[1]["remote"]["container"]["environment"][key] = "1"
+    assert f"rank 1: unexpected runtime environment {key}" in check.evaluate(
+        e27_recipe, e27_expected, extra, endpoint()), key
+    extra_recipe = deepcopy(e27_recipe)
+    extra_recipe["extra_docker_env"] += f" -e {key}=1"
+    assert "baseline runtime environment: unexpected " + key in check.recipe_problems(
+        extra_recipe, e27_expected), key
 assert current_expected["prefill_schedule_interval"] == "8"
 for bad in ("", " --prefill-schedule-interval 4"):
     wrong_interval = deepcopy(current_recipe)
@@ -545,6 +586,7 @@ try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-overlay.") as temp:
         isolated = Path(temp)
         for relative in ("scripts/lib/common.sh", "scripts/node/bootstrap/versions.env",
+                         "scripts/node/reference/baseline-20260924-e27.env",
                          "scripts/node/reference/baseline-20260924-e22b.env",
                          "scripts/node/reference/baseline-20260923-e21.env",
                          "scripts/node/reference/baseline-20260919-e03.env",
@@ -562,7 +604,8 @@ RELAY_DEST=operator@192.0.2.23
 '''
         check.REPO = isolated
         for overlay, baseline in (
-            (None, "2026-09-24-e27"),
+            (None, "2026-09-25-e27c"),
+            ("scripts/node/reference/baseline-20260924-e27.env", "2026-09-24-e27"),
             ("scripts/node/reference/baseline-20260924-e22b.env", "2026-09-23-e22b"),
             ("scripts/node/reference/baseline-20260923-e21.env", "2026-09-23-e21"),
             ("scripts/node/reference/baseline-20260919-e03.env", "2026-09-19-e03"),
@@ -584,17 +627,19 @@ RELAY_DEST=operator@192.0.2.23
             problems = check.recipe_problems(effective, selected)
             assert problems == [], (baseline, problems)
             if overlay:
-                # Every historical return drops the E27 cadence from the current base.
-                assert "baseline prefill schedule interval" in check.recipe_problems(
-                    effective, current_expected), baseline
-                if baseline == "2026-09-23-e22b":
-                    # E27 only adds the cadence: same mounts, same cache namespace.
-                    assert effective["extra_docker_env"] == effective["base_extra_docker_env"]
+                # Every historical return drops the E27c scheduler flags from the current base,
+                # and every return before E27 also drops the cadence.
+                against_current = check.recipe_problems(effective, current_expected)
+                for key in check.SCHEDULER_FLAGS:
+                    assert "baseline runtime environment: " + key in against_current, baseline
+                assert ("baseline prefill schedule interval" in against_current) == (
+                    baseline != "2026-09-24-e27"), baseline
+                assert effective["extra_docker_env"] != effective["base_extra_docker_env"]
+                if baseline == "2026-09-24-e27":
+                    # E27c only adds the scheduler mount and flags: same engine arguments.
+                    assert effective["extra_vllm_args"] == effective["base_extra_vllm_args"]
+                elif baseline == "2026-09-23-e22b":
                     assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]
-                else:
-                    assert effective["extra_docker_env"] != effective["base_extra_docker_env"]
-                if baseline == "2026-09-23-e22b":
-                    pass
                 elif baseline in ("2026-09-23-e21", "2026-09-19-e03"):
                     # Same KV and mHC as E22b; the cache namespace pin also differs.
                     assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]

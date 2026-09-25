@@ -23,7 +23,7 @@ from typing import Any, Callable
 
 
 REPO = Path(__file__).resolve().parents[1]
-BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json"
+BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json"
 ADAPTIVE_DEFAULTS = {
     "VLLM_ADAPTIVE_K_ENABLE": "1", "VLLM_ADAPTIVE_K_LO": "3",
     "VLLM_ADAPTIVE_K_HI": "5", "VLLM_ADAPTIVE_K_MODE": "per-request",
@@ -149,6 +149,7 @@ safe_env_names = (
     "VLLM_ADAPTIVE_K_UP", "VLLM_ADAPTIVE_K_ALPHA", "VLLM_ADAPTIVE_K_SIGNAL",
     "VLLM_ADAPTIVE_K_LOG_EVERY", "NCCL_ALGO", "NCCL_IB_HCA", "NCCL_IB_GID_INDEX",
     "NCCL_IB_ROCE_VERSION_NUM", "NCCL_IB_ADDR_FAMILY", "NCCL_IB_QPS_PER_CONNECTION",
+    "VLLM_E27B_SHORT_PREFILL_TOKENS", "VLLM_E27C_CADENCE_WHEN_QUEUED",
 )
 identity = p.get("runtime_identity") or {}
 safe_env_names = set(safe_env_names) | set(identity.get("environment", {}))
@@ -257,6 +258,9 @@ if container and identity.get("kda_boot_receipt"):
             if "E21_BF16_RESIDUE_W8A16_READY " in line:
                 try: runtime_receipts["e21"] = json.loads(line.split("E21_BF16_RESIDUE_W8A16_READY ", 1)[1])
                 except json.JSONDecodeError: pass
+            for signature in identity.get("boot_lines", []):
+                if p.get("rank") == 0 and signature in line:
+                    runtime_receipts.setdefault("boot_lines", []).append(signature)
             if "E22_DRAFTER_W8A16_READY " in line:
                 try: runtime_receipts["e22"] = json.loads(line.split("E22_DRAFTER_W8A16_READY ", 1)[1])
                 except json.JSONDecodeError: pass
@@ -428,6 +432,10 @@ def adaptive_env(value: str) -> dict[str, str]:
     return {key: parsed.get(key, default) for key, default in ADAPTIVE_DEFAULTS.items()}
 
 
+# Scheduler flags that only records from E27c on may carry; older records require absence.
+SCHEDULER_FLAGS = ("VLLM_E27B_SHORT_PREFILL_TOKENS", "VLLM_E27C_CADENCE_WHEN_QUEUED")
+
+
 def interval_flag(expected: dict[str, Any]) -> list[str]:
     """Expected --prefill-schedule-interval values: none for the engine default of 1."""
     value = expected.get("prefill_schedule_interval", "1")
@@ -482,6 +490,11 @@ def recipe_problems(recipe: dict[str, str], expected: dict[str, Any]) -> list[st
         # Launcher-owned values, such as NCCL GID and LD_PRELOAD, are checked on
         # the actual container; only explicit EXTRA_DOCKER_ENV entries live here.
         if key in raw_env and raw_env[key] != str(value):
+            problems.append("baseline runtime environment: " + key)
+    for key in SCHEDULER_FLAGS:
+        if key in raw_env and key not in identity.get("environment", {}):
+            problems.append("baseline runtime environment: unexpected " + key)
+        elif key in identity.get("environment", {}) and key not in raw_env:
             problems.append("baseline runtime environment: " + key)
     try: table = json.loads("{" + recipe.get("spec_extra_json", "") + "}").get(
         "num_speculative_tokens_per_batch_size")
@@ -649,6 +662,9 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
         for key, value in identity.get("environment", {}).items():
             if env.get(key) != str(value):
                 problems.append(f"rank {rank}: runtime environment {key}")
+        for key in SCHEDULER_FLAGS:
+            if key in env and key not in identity.get("environment", {}):
+                problems.append(f"rank {rank}: unexpected runtime environment {key}")
         for path, sha in identity.get("container_file_sha256", {}).items():
             if container.get("runtime_files", {}).get(path) != sha:
                 problems.append(f"rank {rank}: runtime file {path}")
@@ -656,6 +672,10 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
         if (rank == 0 and identity.get("scheduler_boot_signature")
                 and not receipts.get("scheduler_boot_signature")):
             problems.append("rank 0: draft-budget scheduler boot signature")
+        if rank == 0:
+            for signature in identity.get("boot_lines", []):
+                if signature not in (receipts.get("boot_lines") or []):
+                    problems.append("rank 0: boot signature " + signature)
         kda = receipts.get("kda") or {}
         for key, value in identity.get("kda_boot_receipt", {}).items():
             if key == "padded_n":
