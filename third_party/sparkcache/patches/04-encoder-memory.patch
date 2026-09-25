@@ -1,0 +1,11 @@
+--- a/spark_context_cache_hybrid.py
++++ b/spark_context_cache_hybrid.py
+@@ -273,7 +273,7 @@
+                     f"layer {layer.name} carries {len(payload)} bytes, expected {expected}"
+                 )
+             parts.append(payload)
+-    return encode_page_snapshot_header(layout, counts) + b"".join(parts)
++    return b"".join([encode_page_snapshot_header(layout, counts), *parts])
+ 
+ 
+ def decode_page_snapshot(

@@ -2,11 +2,11 @@
   "schema": "tp4-iac-promotion/v1",
   "baseline_id": "2026-09-25-e29",
   "owner_decision": "promote",
-  "status": "encoded_live_apply_pending_restart",
+  "status": "deployed_restarted_identity_verified",
   "measured_recipe_encoded": true,
   "runtime_sources_unchanged": true,
   "promotion_method": "launcher_command_parity",
-  "promotion_method_reason": "Owner decision under the repository promotion rule: the accepted suites were measured on E29 load B; the default encodes that recipe with four-rank launcher-command parity instead of a reproduction run. E28b was restored after the window, so applying the default requires one coordinated restart.",
+  "promotion_method_reason": "Owner decision under the repository promotion rule: the accepted suites were measured on E29 load B; the default encodes that recipe with four-rank launcher-command parity instead of a reproduction run. E28b was restored after the window, so the default was applied with one owner-authorized coordinated restart.",
   "candidate_overlays": {
     "end_drain_load_a": {
       "path": "scripts/node/experiments/e03/end-drain/delta.env",
@@ -51,8 +51,41 @@
   },
   "new_measurement_requests": 0,
   "live_default_apply": {
-    "status": "pending",
-    "requires": "owner authorization for one coordinated restart onto the default, then both gates and scripts/check-f0.py"
+    "status": "applied",
+    "date": "2026-09-25",
+    "restart": true,
+    "restart_authorization": "owner",
+    "sequence": [
+      "idle check (0 running or waiting requests)",
+      "coordinated four-rank down",
+      "deploy",
+      "systemctl daemon-reload on all four ranks (restarts no service)",
+      "coordinated four-rank up"
+    ],
+    "deploy": "PASS",
+    "autostart_tp4_env": "none; autostart selects the E29 default",
+    "deployed_cluster_env_matches_local": "4/4",
+    "health": 200,
+    "post_boot_gates": "PASS, both within 4 s of health",
+    "check_f0": {
+      "baseline": "2026-09-25-e29",
+      "result": "PASS"
+    },
+    "per_rank_running_identity": {
+      "ranks_checked": 4,
+      "end_drain_scheduler_sha256_f41d6e9e4363b271": "4/4",
+      "end_drain_core_sha256_3a9a038f9a24cdee": "4/4",
+      "rank0_environment": [
+        "VLLM_E29_END_DRAIN=1",
+        "VLLM_E29_IDLE_COALESCE_MS=4",
+        "VLLM_E29_TRACE=0"
+      ],
+      "rank0_boot_lines": [
+        "E29_END_DRAIN_READY trace=0",
+        "E29_IDLE_COALESCE_READY ms=4 trace=0",
+        "E27C_CADENCE_WHEN_QUEUED_READY interval=8"
+      ]
+    }
   },
   "live_reproduction": {
     "status": "not_required_by_owner_decision",

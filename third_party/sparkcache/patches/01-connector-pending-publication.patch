@@ -1,0 +1,651 @@
+--- a/spark_context_cache_connector.py
++++ b/spark_context_cache_connector.py
+@@ -31,6 +31,7 @@
+ from __future__ import annotations
+ 
+ import contextlib
++import hashlib
+ import importlib
+ import json
+ import math
+@@ -143,6 +144,7 @@
+ _MAX_PAGE_BASE_BYTES_PER_FLIGHT = 1024**3
+ _MAX_PAGE_BASE_BYTES_TOTAL = 2 * 1024**3
+ _CONTEXT_DIGEST_NAMESPACE = "sparkcache-context-v2-multimodal"
++_REQUEST_CACHE_SALT_NAMESPACE = b"sparkcache-request-cache-salt-v1\0"
+ 
+ # The runtime is deliberately supplied by the embedding process instead of
+ # importing or constructing the optional streaming-snapshot runtime here.
+@@ -217,6 +219,24 @@
+ 
+ 
+ @dataclass
++class _PendingPublication:
++    ticket: str
++    generations: dict[int, str]
++    ready: set[int] = field(default_factory=set)
++    failed: bool = False
++    reported: dict[int, str] = field(default_factory=dict)
++
++
++@dataclass
++class _PublicationWait:
++    digest: str
++    ticket: str
++    deadline: float
++    fallback: bool = False
++    released: bool = False
++
++
++@dataclass
+ class _ReqPlan:
+     request_id: str
+     digest: str
+@@ -246,6 +266,11 @@
+     # alias and tail derivation cannot reproduce that identity and must not
+     # publish alternative keys for this plan.
+     has_multimodal_identity: bool = False
++    # Request cache salts are transported only as a domain-separated digest.
++    # Empty keeps legacy SparkCache keys byte-for-byte unchanged.
++    context_digest_salt: str = ""
++    # Private scheduler-to-worker attempt identity; never a plaintext cache salt.
++    publication_ticket: str = ""
+ 
+     @property
+     def group_block_ids(self) -> tuple[tuple[int, ...], ...]:
+@@ -470,6 +495,7 @@
+         default_factory=list
+     )
+     preempted_request_ids: tuple[str, ...] = ()
++    publication_probes: tuple[tuple[str, str], ...] = ()
+ 
+     # Keep the transport field descriptive while making inspection by an
+     # embedding runtime pleasantly direct.
+@@ -951,6 +977,27 @@
+                 " start while persistent cache initialization is unavailable"
+             )
+         self._async_page_capture_enabled = config.async_page_capture_enabled
++        # E09 opt-in candidate: use R10's existing no-forward connector steps
++        # while a replay is deferred. Zero preserves the installed behavior.
++        pending_ms = self._kv_transfer_config.get_from_extra_config(
++            "spark_cache_pending_wait_ms", 0
++        )
++        if type(pending_ms) is not int or not 0 <= pending_ms <= 5000:
++            raise RuntimeError("spark_cache_pending_wait_ms must be an integer in 0..5000")
++        if pending_ms and (
++            self._tp_degree != 4 or self._dcp_degree != 1
++            or self._storage_mode != "block_pages_v1"
++            or self._streaming_snapshots_enabled or self._async_page_capture_enabled
++        ):
++            raise RuntimeError("pending publication candidate requires TP4/DCP1 synchronous page snapshots")
++        self._pending_wait_seconds = pending_ms / 1000.0
++        self._pending_publication_limit = 64
++        self._pending_publications: dict[str, _PendingPublication] = {}
++        self._publication_waits: dict[str, _PublicationWait] = {}
++        self._publication_outcomes: dict[str, tuple[str, str]] = {}
++        self._active_publication: tuple[str, str] | None = None
++        self._publication_probes: tuple[tuple[str, str], ...] = ()
++        self._publication_emitted: dict[tuple[str, str], str] = {}
+         self._async_page_capture_runtime: Any = None
+         self._async_page_capture_settings: Any = None
+         self._async_page_capture_eligible: set[str] = set()
+@@ -1135,10 +1182,13 @@
+         self._prefix_digest_candidates: dict[
+             str,
+             tuple[
+-                tuple[int, int, int, tuple[MultimodalFeatureIdentity, ...]],
++                tuple[int, int, int, tuple[MultimodalFeatureIdentity, ...], str],
+                 tuple[tuple[int, str], ...],
+             ],
+         ] = {}
++        # NewRequestData omits Request.cache_salt. Retain only its derived,
++        # non-plaintext digest salt until scheduler metadata is built.
++        self._request_digest_salts: dict[str, str] = {}
+         self._store_progress: dict[str, tuple[str, int, int, list[list[int]]]] = {}
+         # Kept separate from the long-standing progress tuple so scheduler
+         # checkpoint/test adapters that seed that tuple remain compatible.
+@@ -1306,6 +1356,8 @@
+         token_ids: list[int],
+         span: int,
+         multimodal_features: Sequence[MultimodalFeatureIdentity] = (),
++        *,
++        context_digest_salt: str | None = None,
+     ) -> str:
+         # The salt must be identical on every role and rank: it names the
+         # shared context, not this process's shard. Pin both shard fields to
+@@ -1313,7 +1365,7 @@
+         # its physical rank, which would fork the namespace per worker.
+         return context_prefix_digest(
+             token_ids,
+-            self._context_digest_salt,
++            context_digest_salt or self._context_digest_salt,
+             token_count=span,
+             multimodal_features=multimodal_features,
+         )
+@@ -1323,6 +1375,8 @@
+         token_ids: Sequence[int],
+         span_tokens: int,
+         multimodal_features: Sequence[MultimodalFeatureIdentity] = (),
++        *,
++        context_digest_salt: str | None = None,
+     ) -> tuple[str, int]:
+         """Select the longest all-rank prefix eligible for tail publication."""
+ 
+@@ -1339,7 +1393,7 @@
+             return "", 0
+         candidates = chunk_prefix_digests(
+             token_ids,
+-            self._context_digest_salt,
++            context_digest_salt or self._context_digest_salt,
+             boundaries=range(first, span_tokens, self._chunk_tokens),
+             multimodal_features=multimodal_features,
+         )
+@@ -1353,6 +1407,29 @@
+         )
+         return selected or ("", 0)
+ 
++    def _request_context_digest_salt(self, cache_salt: str | None) -> str:
++        """Bind a non-empty vLLM request salt without retaining plaintext."""
++
++        if not cache_salt:
++            return self._context_digest_salt
++        encoded = cache_salt.encode("utf-8")
++        derived = hashlib.sha256(_REQUEST_CACHE_SALT_NAMESPACE + encoded).hexdigest()
++        return f"{self._context_digest_salt}:request-cache-salt-v1:{derived}"
++
++    def _remember_request_digest_salt(self, request: "Request") -> str:
++        request_id = request.request_id
++        derived = self._request_context_digest_salt(
++            getattr(request, "cache_salt", None)
++        )
++        previous = self._request_digest_salts.get(request_id)
++        if previous is not None and previous != derived:
++            raise RuntimeError("spark-context-cache: request cache salt changed")
++        self._request_digest_salts[request_id] = derived
++        return derived
++
++    def _plan_context_digest_salt(self, plan: _ReqPlan) -> str:
++        return plan.context_digest_salt or self._context_digest_salt
++
+     def _lookup_reusable(
+         self,
+         identity: CacheIdentity,
+@@ -1750,6 +1827,7 @@
+             return None
+         self._expire_shared_prefix_flights()
+         request_id = request.request_id
++        context_digest_salt = self._remember_request_digest_salt(request)
+ 
+         follower_digest = self._restore_flight_followers.get(request_id)
+         if follower_digest is not None:
+@@ -1783,6 +1861,7 @@
+             len(token_ids),
+             span_ceiling,
+             multimodal_features,
++            context_digest_salt,
+         )
+         cached = self._prefix_digest_candidates.get(request_id)
+         if cached is not None and cached[0] == signature:
+@@ -1792,7 +1871,7 @@
+             candidates = tuple(
+                 chunk_prefix_digests(
+                     token_ids,
+-                    self._context_digest_salt,
++                    context_digest_salt,
+                     boundaries=range(
+                         (
+                             (self._min_span + self._chunk_tokens - 1)
+@@ -1874,8 +1953,19 @@
+     def get_num_new_matched_tokens(
+         self, request: "Request", num_computed_tokens: int
+     ) -> tuple[int | None, bool]:
++        request_id = request.request_id
++        context_digest_salt = self._remember_request_digest_salt(request)
++        wait = getattr(self, "_publication_waits", {}).get(request_id)
++        if wait is not None and wait.fallback:
++            return 0, False
+         if not self._restore_enabled:
+             return 0, False
++        if wait is not None and num_computed_tokens == 0:
++            pending = self._pending_publication_admission(request_id, (), None, 0)
++            if pending == "wait":
++                return None, False
++            if pending == "fallback":
++                return 0, False
+         token_ids = list(request.prompt_token_ids or [])
+         multimodal_features = _multimodal_feature_identities(
+             request,
+@@ -1886,7 +1976,6 @@
+             # which media produced the KV state. Recompute without caching.
+             self.counters["multimodal_bypass"] += 1
+             return 0, False
+-        request_id = request.request_id
+         follower_digest = self._restore_flight_followers.get(request_id)
+         if follower_digest is not None:
+             # Shared-prefix leases can only adopt an empty request block table.
+@@ -1943,7 +2032,7 @@
+             )
+         candidates = chunk_prefix_digests(
+             token_ids,
+-            self._context_digest_salt,
++            context_digest_salt,
+             boundaries=range(
+                 first_candidate,
+                 span_ceiling + 1,
+@@ -1959,6 +2048,13 @@
+             ),
+             None,
+         )
++        pending = self._pending_publication_admission(
++            request_id, candidates, selected, num_computed_tokens
++        )
++        if pending == "wait":
++            return None, False
++        if pending == "fallback":
++            return 0, False
+         # Manifest-only probe: chunk payloads are re-read and re-hashed by
+         # every worker at load time, and any worker failure degrades to a
+         # rank-synchronous recompute, so hashing ~200 MB here would only
+@@ -2214,6 +2310,9 @@
+                     is_store=False,
+                     block_ids_by_group=group_blocks,
+                     shared_segments=shared_segments,
++                    context_digest_salt=self._request_digest_salts.get(
++                        request_id, self._context_digest_salt
++                    ),
+                 )
+             )
+         self._pending_async_loads.clear()
+@@ -2221,6 +2320,13 @@
+             token_ids = list(new_req.prompt_token_ids or [])
+             req_id = new_req.req_id
+             self._need_load.pop(req_id, None)
++            context_digest_salt = self._request_digest_salts.get(
++                req_id,
++                self._request_context_digest_salt(
++                    getattr(new_req, "cache_salt", None)
++                ),
++            )
++            self._request_digest_salts[req_id] = context_digest_salt
+             multimodal_features = _multimodal_feature_identities(
+                 new_req,
+                 len(token_ids),
+@@ -2238,12 +2344,18 @@
+                 has_multimodal_identity = any(
+                     feature.offset < span for feature in multimodal_features
+                 )
+-                digest = self._digest(token_ids, span, multimodal_features)
++                digest = self._digest(
++                    token_ids,
++                    span,
++                    multimodal_features,
++                    context_digest_salt=context_digest_salt,
++                )
+                 exact_token_ids = tuple(token_ids[:span])
+                 base_digest, base_span = self._publication_base(
+                     token_ids,
+                     span,
+                     multimodal_features,
++                    context_digest_salt=context_digest_salt,
+                 )
+                 admitted = self._admitted.get(req_id)
+                 if admitted is not None and admitted[0] == digest:
+@@ -2321,6 +2433,7 @@
+                             base_context_digest=base_digest,
+                             base_span_tokens=base_span,
+                             has_multimodal_identity=has_multimodal_identity,
++                            context_digest_salt=context_digest_salt,
+                         )
+                     )
+                 else:
+@@ -2346,6 +2459,9 @@
+             exact_token_ids = self._store_token_ids.get(req_id, ())
+             has_multimodal_identity = req_id in self._store_multimodal
+             base_digest, base_span = self._store_bases.get(req_id, ("", 0))
++            context_digest_salt = self._request_digest_salts.get(
++                req_id, self._context_digest_salt
++            )
+             if self._has_full_quorum(digest):
+                 del self._store_progress[req_id]
+                 self._store_token_ids.pop(req_id, None)
+@@ -2441,6 +2557,7 @@
+                     base_digest, base_span = self._publication_base(
+                         exact_token_ids,
+                         span,
++                        context_digest_salt=context_digest_salt,
+                     )
+                 del self._store_progress[req_id]
+                 self._store_token_ids.pop(req_id, None)
+@@ -2461,6 +2578,7 @@
+                         base_span_tokens=base_span,
+                         recurrent_boundary_blocks=recurrent_boundary_blocks,
+                         has_multimodal_identity=has_multimodal_identity,
++                        context_digest_salt=context_digest_salt,
+                     )
+                 )
+             else:
+@@ -2477,8 +2595,152 @@
+             # for requests whose final gather may still be in flight.
+             runtime.observe_metadata(meta)
+         self._reserve_async_page_capture_plans(meta)
++        self._prepare_publication_metadata(meta)
+         return meta
++
++    def _trace_publication(self, event: str, digest: str, ticket: str, **details) -> None:
++        # One event per state transition, not per token or polling iteration.
++        # Digests and tickets contain no plaintext cache salt.
++        logger.info("spark-context-cache: pending-trace %s", json.dumps({
++            "event": event, "digest": digest, "ticket": ticket,
++            "monotonic_ns": time.monotonic_ns(), **details,
++        }, sort_keys=True, separators=(",", ":")))
++
++    def _pending_publication_admission(
++        self, request_id, candidates, selected, num_computed_tokens
++    ) -> str:
++        if not getattr(self, "_pending_wait_seconds", 0) or num_computed_tokens > 0:
++            return "ready"
++        wait = self._publication_waits.get(request_id)
++        digest = wait.digest if wait is not None else (
++            selected[1] if selected is not None else next(
++                (d for _, d in reversed(candidates) if d in self._pending_publications),
++                None,
++            )
++        )
++        publication = self._pending_publications.get(digest)
++        if wait is None:
++            if publication is None:
++                return "ready"  # Ordinary cold misses never wait.
++            if len(self._publication_waits) >= self._pending_publication_limit:
++                self._trace_publication("fallback", digest, publication.ticket,
++                                        request_id=request_id, reason="waiter_capacity")
++                return "fallback"
++            wait = _PublicationWait(
++                digest, publication.ticket, time.monotonic() + self._pending_wait_seconds
++            )
++            self._publication_waits[request_id] = wait
++            self.counters["pending_wait_started"] = self.counters.get("pending_wait_started", 0) + 1
++            self._trace_publication("wait", digest, wait.ticket, request_id=request_id,
++                                    deadline=wait.deadline,
++                                    held_ranks=[r for r in range(self._tp_degree)
++                                                if digest in self._worker_held.get(r, ())])
++        changed = publication is None or publication.ticket != wait.ticket
++        generation_changed = publication is not None and any(
++            self._worker_generations.get(rank) != generation
++            for rank, generation in publication.generations.items()
++        )
++        if (wait.fallback or changed or generation_changed or publication.failed
++                or (wait.released and not self._has_full_quorum(digest))
++                or (not wait.released and time.monotonic() >= wait.deadline)):
++            if not wait.fallback:
++                self.counters["pending_wait_fallback"] = self.counters.get("pending_wait_fallback", 0) + 1
++                reason = ("changed_ticket" if changed else "worker_generation" if generation_changed
++                          else "worker_failure" if publication.failed
++                          else "lost_quorum" if wait.released else "deadline")
++                self._trace_publication("fallback", digest, wait.ticket,
++                                        request_id=request_id, reason=reason)
++            wait.fallback = True
++            return "fallback"
++        if publication.ready == set(range(self._tp_degree)) and self._has_full_quorum(digest):
++            if not wait.released:
++                self.counters["pending_wait_ready"] = self.counters.get("pending_wait_ready", 0) + 1
++                self._trace_publication("ready", digest, wait.ticket, request_id=request_id,
++                                        ready_ranks=sorted(publication.ready),
++                                        generations=publication.generations)
++            wait.released = True
++            return "ready"
++        return "wait"
+ 
++    def _prepare_publication_metadata(self, meta: SparkCacheConnectorMetadata) -> None:
++        if not getattr(self, "_pending_wait_seconds", 0) or self._role is not KVConnectorRole.SCHEDULER:
++            return
++        for plan in meta.plans:
++            if not plan.is_store:
++                continue
++            # A new attempt never inherits another attempt's confirmations.
++            ticket = uuid.uuid4().hex
++            plan.publication_ticket = ticket
++            self._pending_publications.pop(plan.digest, None)
++            while len(self._pending_publications) >= self._pending_publication_limit:
++                self._pending_publications.pop(next(iter(self._pending_publications)))
++            self._pending_publications[plan.digest] = _PendingPublication(
++                ticket, dict(self._worker_generations)
++            )
++            self._trace_publication("issued", plan.digest, ticket, request_id=plan.request_id,
++                                    generations=self._worker_generations)
++        probes = set()
++        for wait in self._publication_waits.values():
++            publication = self._pending_publications.get(wait.digest)
++            if (not wait.fallback and not wait.released and time.monotonic() < wait.deadline
++                    and publication is not None and publication.ticket == wait.ticket):
++                probes.add((wait.digest, wait.ticket))
++        meta.publication_probes = tuple(sorted(probes))
++
++    def _publication_outcome_locked(self, digest: str, ticket: str, state: str) -> None:
++        if not getattr(self, "_pending_wait_seconds", 0) or not ticket:
++            return
++        previous = self._publication_outcomes.pop(digest, None)
++        while len(self._publication_outcomes) >= self._pending_publication_limit:
++            self._publication_outcomes.pop(next(iter(self._publication_outcomes)))
++        self._publication_outcomes[digest] = (ticket, state)
++        if previous != (ticket, state):
++            self._trace_publication("worker_outcome", digest, ticket, state=state,
++                                    rank=self._physical_rank(), generation=self._stats_generation)
++
++    def _absorb_publication_outcomes(self, connector_output: Any) -> None:
++        if not getattr(self, "_pending_wait_seconds", 0):
++            return
++        stats = getattr(connector_output, "kv_connector_stats", None)
++        data = getattr(stats, "data", None)
++        reports = data.get("reports", []) if isinstance(data, dict) else []
++        if not isinstance(reports, list):
++            return
++        for report in reports:
++            if not isinstance(report, dict):
++                continue
++            rank, generation = report.get("rank"), report.get("generation")
++            if (type(rank) is not int or not 0 <= rank < self._tp_degree
++                    or not isinstance(generation, str)
++                    or self._worker_generations.get(rank) != generation
++                    or rank in self._worker_desynchronized):
++                continue
++            outcomes = report.get("pending_publications", [])
++            if not isinstance(outcomes, list) or len(outcomes) > self._pending_publication_limit:
++                continue
++            for outcome in outcomes:
++                if not isinstance(outcome, dict):
++                    continue
++                digest, ticket = outcome.get("digest"), outcome.get("ticket")
++                if not isinstance(digest, str) or not isinstance(ticket, str):
++                    continue
++                publication = self._pending_publications.get(digest)
++                if publication is None or publication.ticket != ticket:
++                    continue
++                state = outcome.get("state")
++                if isinstance(state, str) and publication.reported.get(rank) != state:
++                    publication.reported[rank] = state
++                    self._trace_publication("report_received", digest, ticket, state=state,
++                                            rank=rank, generation=generation,
++                                            held=digest in self._worker_held.get(rank, ()),
++                                            state_sequence=report.get("checkpoint", {}).get("state_sequence"))
++                expected = publication.generations.setdefault(rank, generation)
++                if expected != generation or outcome.get("state") in ("failed", "unknown"):
++                    publication.failed = True
++                elif (outcome.get("state") == "committed"
++                      and digest in self._worker_held.get(rank, ())):
++                    publication.ready.add(rank)
++
+     def _reserve_async_page_capture_plans(
+         self,
+         meta: SparkCacheConnectorMetadata,
+@@ -3951,6 +4213,7 @@
+         metadata = self._get_connector_metadata()
+         if not isinstance(metadata, SparkCacheConnectorMetadata):
+             return
++        self._publication_probes = metadata.publication_probes[:getattr(self, "_pending_publication_limit", 64)]
+         load_plans = [plan for plan in metadata.plans if not plan.is_store]
+         if not load_plans:
+             return
+@@ -4686,6 +4949,7 @@
+         # and _store_progress bounded without evicting live entries.
+         request_id = request.request_id
+         self._page_base_reads.cancel(request_id)
++        getattr(self, "_publication_waits", {}).pop(request_id, None)
+         self._emit_page_base_flight_summaries()
+         follower_digest = self._restore_flight_followers.get(request_id)
+         if follower_digest is not None:
+@@ -4731,6 +4995,7 @@
+         # optional scheduler-side digest cache. Request completion must remain
+         # idempotent for those callers.
+         getattr(self, "_prefix_digest_candidates", {}).pop(request_id, None)
++        getattr(self, "_request_digest_salts", {}).pop(request_id, None)
+         self._pending_async_loads.pop(request_id, None)
+         self._admitted.pop(request_id, None)
+         self._store_progress.pop(request_id, None)
+@@ -4966,6 +5231,7 @@
+             skipped_before_submit = False
+             with self._store_cv:
+                 if plan.digest in self._held:
++                    self._publication_outcome_locked(plan.digest, plan.publication_ticket, "committed")
+                     self.counters["store_skipped_present"] += 1
+                     logger.info(
+                         "spark-context-cache: store skipped; entry already"
+@@ -4974,6 +5240,7 @@
+                     )
+                     skipped_before_submit = True
+                 elif not self._store_accepting or self._store_inflight:
++                    self._publication_outcome_locked(plan.digest, plan.publication_ticket, "failed")
+                     self.counters["store_skipped_busy"] += 1
+                     logger.warning(
+                         "spark-context-cache: store skipped while saver busy digest=%s",
+@@ -4982,6 +5249,9 @@
+                     skipped_before_submit = True
+                 else:
+                     self._store_inflight = 1
++                    if self._pending_wait_seconds and plan.publication_ticket:
++                        self._active_publication = (plan.digest, plan.publication_ticket)
++                        self._publication_outcome_locked(plan.digest, plan.publication_ticket, "pending")
+             if skipped_before_submit:
+                 if self._async_page_capture_enabled:
+                     runtime = self._async_page_capture_runtime
+@@ -5267,6 +5537,9 @@
+                     != self._digest(
+                         list(snapshot.plan.token_ids),
+                         snapshot.plan.span_tokens,
++                        context_digest_salt=self._plan_context_digest_salt(
++                            snapshot.plan
++                        ),
+                     )
+                 ):
+                     raise RuntimeError(
+@@ -5318,7 +5591,9 @@
+                             identity=snapshot.identity,
+                             base_context_digest=snapshot.plan.base_context_digest,
+                             token_ids=snapshot.plan.token_ids,
+-                            identity_salt=self._context_digest_salt,
++                            identity_salt=self._plan_context_digest_salt(
++                                snapshot.plan
++                            ),
+                             layout=layout,
+                             base_block_counts=self._group_block_counts_for_span(
+                                 snapshot.plan.base_span_tokens
+@@ -5343,7 +5618,9 @@
+                         identity=snapshot.identity,
+                         base_context_digest=snapshot.plan.base_context_digest,
+                         token_ids=snapshot.plan.token_ids,
+-                        identity_salt=self._context_digest_salt,
++                        identity_salt=self._plan_context_digest_salt(
++                            snapshot.plan
++                        ),
+                         tail_chunks=chunks,
+                     )
+                 elif isinstance(snapshot, _HybridStoreSnapshot):
+@@ -5433,7 +5710,7 @@
+                 identity=snapshot.identity,
+                 source_context_digest=plan.digest,
+                 token_ids=plan.token_ids,
+-                identity_salt=self._context_digest_salt,
++                identity_salt=self._plan_context_digest_salt(plan),
+                 storage_mode="per_token_rows",
+             )
+         except Exception as error:  # noqa: BLE001 - exact entry remains usable
+@@ -5503,6 +5780,15 @@
+                 self._held.discard(digest)
+                 self._held.difference_update(additional_digests)
+                 self.counters["store_evicted" if evicted else "store_failed"] += 1
++            active = getattr(self, "_active_publication", None)
++            if active is not None and active[0] == digest:
++                current = self._publication_outcomes.get(digest)
++                # A late callback cannot complete a newer, skipped attempt.
++                if current is not None and current[0] == active[1]:
++                    self._publication_outcome_locked(
++                        digest, active[1], "committed" if committed else "failed"
++                    )
++                self._active_publication = None
+             self._store_inflight = 0
+             self._store_cv.notify_all()
+         if error is not None:
+@@ -5528,7 +5814,12 @@
+             else _SnapshotChunks(snapshot, self._dcp_degree, self._chunk_tokens)
+         )
+         if plan.base_context_digest and (
+-            plan.digest != self._digest(list(plan.token_ids), plan.span_tokens)
++            plan.digest
++            != self._digest(
++                list(plan.token_ids),
++                plan.span_tokens,
++                context_digest_salt=self._plan_context_digest_salt(plan),
++            )
+         ):
+             raise RuntimeError("tail publication result digest differs from request")
+         if isinstance(snapshot, _HybridStoreSnapshot) and plan.base_context_digest:
+@@ -5540,7 +5831,7 @@
+                     identity=snapshot.identity,
+                     base_context_digest=plan.base_context_digest,
+                     token_ids=plan.token_ids,
+-                    identity_salt=self._context_digest_salt,
++                    identity_salt=self._plan_context_digest_salt(plan),
+                     layout=layout,
+                     base_block_counts=self._group_block_counts_for_span(
+                         plan.base_span_tokens
+@@ -5564,7 +5855,7 @@
+                 identity=snapshot.identity,
+                 base_context_digest=plan.base_context_digest,
+                 token_ids=plan.token_ids,
+-                identity_salt=self._context_digest_salt,
++                identity_salt=self._plan_context_digest_salt(plan),
+                 tail_chunks=chunks,
+             )
+         elif isinstance(snapshot, _HybridStoreSnapshot):
+@@ -5918,6 +6209,7 @@
+ 
+     def update_connector_output(self, connector_output: Any) -> None:
+         self._absorb_quorum(connector_output)
++        self._absorb_publication_outcomes(connector_output)
+         self._release_async_page_capture_reservations(
+             tuple(getattr(connector_output, "finished_sending", None) or ())
+         )
+@@ -6101,6 +6393,24 @@
+             return None
+         with self._load_lock:
+             report = self._build_quorum_report_locked()
++            if self._pending_wait_seconds and self._publication_probes:
++                report["pending_publications"] = [
++                    {"digest": digest, "ticket": ticket,
++                     "state": outcome[1] if outcome and outcome[0] == ticket else "unknown"}
++                    for digest, ticket in self._publication_probes
++                    for outcome in (self._publication_outcomes.get(digest),)
++                ]
++                for item in report["pending_publications"]:
++                    key = (item["digest"], item["ticket"])
++                    if self._publication_emitted.get(key) == item["state"]:
++                        continue
++                    while len(self._publication_emitted) >= self._pending_publication_limit:
++                        self._publication_emitted.pop(next(iter(self._publication_emitted)))
++                    self._publication_emitted[key] = item["state"]
++                    self._trace_publication("report_emitted", *key, state=item["state"],
++                                            rank=report["rank"], generation=report["generation"],
++                                            held=item["digest"] in self._held,
++                                            state_sequence=report["checkpoint"]["state_sequence"])
+         runtime = self._streaming_runtime
+         status = getattr(runtime, "status", None)
+         if self._streaming_snapshots_enabled and callable(status):

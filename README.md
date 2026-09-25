@@ -96,11 +96,10 @@ nodes before creating the site configuration.
 | Hosts and access | Ubuntu, NVIDIA driver, Docker with GPU support, `rdma-core`, and SSH access over a trusted management LAN/VPN |
 | Storage | At least 330 GiB free per node for a fresh model fetch, plus image and runtime-cache space |
 | Pinned artifacts | Image, target weights, drafter, and patched NCCL from the [installation procedure](docs/install-from-zero.md) |
-| Third-party payload | The [SparkCache](https://github.com/FujitsuPolycom/sparkcache) connector and encoder and the [SparkRing SIRCL](https://github.com/FujitsuPolycom/sparkring) bundle and runtime, both Apache-2.0; follow [payload preparation](docs/install-from-zero.md#8-place-the-sparkcache-and-sircl-payload) |
+| Third-party payload | Included: the [SparkCache](https://github.com/FujitsuPolycom/sparkcache) connector and encoder and the [SparkRing SIRCL](https://github.com/FujitsuPolycom/sparkring) bundle and runtime, both Apache-2.0, under [`third_party/`](third_party/); generate the SIRCL site files as in [payload preparation](docs/install-from-zero.md#8-prepare-the-sparkcache-and-sircl-payload) |
 
-The checkout pins that payload by hash but does not include it yet. [Third-party payload](docs/third-party.md)
-lists every file: where it comes from, which bytes are upstream and what this project
-changed. DFlash2 carries
+[Third-party payload](docs/third-party.md) lists every included file: where it comes
+from, which bytes are upstream and what this project changed. DFlash2 carries
 non-commercial terms; review [credits and licenses](CREDITS.md). The API has no
 authentication or TLS, so keep it on a trusted network or behind an authenticating
 proxy.
@@ -123,7 +122,7 @@ Run the read-only preflight on all four targets and use their actual hardware
 and network mappings. Confirm the cable map and keep site values in ignored
 cluster.env. Follow the documented artifact preparation, deployment, startup,
 functional gates, and identity checks. Preserve the pinned recipe and hashes.
-If an operator payload is missing, report exactly what I must supply.
+If a required artifact is missing, report exactly what I must supply.
 Continue actions already authorized without asking again at each tool call;
 ask only about missing inputs or actions outside that scope.
 Do not run Rigmark or replace frozen measurements unless I request it.

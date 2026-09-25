@@ -1,7 +1,7 @@
 # E03 replay views connector
 
-This component is selected by the accepted defaults. Its measured payload remains
-operator-supplied; [IaC reproduction status](../../../../../docs/historical_benchmarks/baselines/2026-09-19-e03/promotion.json)
+This component is selected by the accepted defaults. Its measured connector is included
+in [`third_party/sparkcache/`](../../../../../third_party/sparkcache/README.md); [IaC reproduction status](../../../../../docs/historical_benchmarks/baselines/2026-09-19-e03/promotion.json)
 is separate from the archived experiments.
 
 This follow-up preserves the measured E03 computation and cache format. It replaces
@@ -20,9 +20,9 @@ Native performance measurements are kept in the separate
 
 ## Prepare and check
 
-The connector and encoder are operator-supplied payload under the terms in
-[CREDITS](../../../../../CREDITS.md). Do not redistribute the generated connector.
-`prepare.py` requires the current connector hash and verifies its exact output hash;
+The connector and encoder are Apache-2.0 SparkCache files; see
+[CREDITS](../../../../../CREDITS.md). The prepared connector is identical to the included
+copy. `prepare.py` requires the current connector hash and verifies its exact output hash;
 it refuses to overwrite an existing file. From the repository root:
 
 ```sh

@@ -1,0 +1,316 @@
+--- a/spark_context_cache_connector.py
++++ b/spark_context_cache_connector.py
+@@ -5525,165 +5525,175 @@
+             snapshot = self._store_queue.get()
+             if snapshot is None:
+                 return
+-            commit_started = time.perf_counter()
+             try:
+-                chunks = (
+-                    None
+-                    if isinstance(snapshot, _HybridStoreSnapshot)
+-                    else _SnapshotChunks(snapshot, self._dcp_degree, self._chunk_tokens)
++                self._commit_store_snapshot(snapshot)
++            finally:
++                # Do not retain the previous payload while queue.get() blocks.
++                del snapshot
++
++    def _commit_store_snapshot(
++        self, snapshot: _StoreSnapshot | _HybridStoreSnapshot
++    ) -> None:
++        """Commit one item so every payload alias dies before the next wait."""
++        commit_started = time.perf_counter()
++        try:
++            chunks = (
++                None
++                if isinstance(snapshot, _HybridStoreSnapshot)
++                else _SnapshotChunks(snapshot, self._dcp_degree, self._chunk_tokens)
++            )
++            if snapshot.plan.base_context_digest and (
++                snapshot.plan.digest
++                != self._digest(
++                    list(snapshot.plan.token_ids),
++                    snapshot.plan.span_tokens,
++                    context_digest_salt=self._plan_context_digest_salt(
++                        snapshot.plan
++                    ),
+                 )
+-                if snapshot.plan.base_context_digest and (
+-                    snapshot.plan.digest
+-                    != self._digest(
+-                        list(snapshot.plan.token_ids),
+-                        snapshot.plan.span_tokens,
+-                        context_digest_salt=self._plan_context_digest_salt(
+-                            snapshot.plan
+-                        ),
++            ):
++                raise RuntimeError(
++                    "tail publication result digest differs from request"
++                )
++            if (
++                isinstance(snapshot, _HybridStoreSnapshot)
++                and snapshot.plan.base_context_digest
++            ):
++                layout = self._page_layout
++                if layout is None:
++                    raise RuntimeError("block-page layout was not registered")
++                result_snapshot = snapshot.encoded_pages
++                verified_base_snapshot = None
++                reused_pages = getattr(
++                    result_snapshot, "reused_pages_by_group", None
++                )
++                if reused_pages is not None:
++                    base = self._store.lookup(
++                        snapshot.identity,
++                        snapshot.plan.base_context_digest,
++                        verify_chunks=True,
+                     )
+-                ):
+-                    raise RuntimeError(
+-                        "tail publication result digest differs from request"
+-                    )
+-                if (
+-                    isinstance(snapshot, _HybridStoreSnapshot)
+-                    and snapshot.plan.base_context_digest
+-                ):
+-                    layout = self._page_layout
+-                    if layout is None:
+-                        raise RuntimeError("block-page layout was not registered")
+-                    result_snapshot = snapshot.encoded_pages
+-                    verified_base_snapshot = None
+-                    reused_pages = getattr(
+-                        result_snapshot, "reused_pages_by_group", None
+-                    )
+-                    if reused_pages is not None:
+-                        base = self._store.lookup(
+-                            snapshot.identity,
+-                            snapshot.plan.base_context_digest,
+-                            verify_chunks=True,
++                    if not base.is_hit:
++                        raise RuntimeError(
++                            f"page extension base is unavailable: {base.reason}"
+                         )
+-                        if not base.is_hit:
+-                            raise RuntimeError(
+-                                f"page extension base is unavailable: {base.reason}"
+-                            )
+-                        base_counts = self._group_block_counts_for_span(
+-                            snapshot.plan.base_span_tokens
+-                        )
+-                        base_snapshot = self._store.restore_page_snapshot(
+-                            base,
+-                            layout=layout,
+-                            result_block_counts=base_counts,
+-                            result_boundary_tokens=snapshot.plan.base_span_tokens,
+-                        )
+-                        if self._publication_schema != "page-tail-cow-v2":
+-                            result_snapshot = materialize_page_extension_capture(
+-                                layout,
+-                                base_snapshot,
+-                                result_snapshot,
+-                                base_block_counts=base_counts,
+-                                result_block_counts=snapshot.block_counts,
+-                                reused_pages_by_group=reused_pages,
+-                            )
+-                        verified_base_snapshot = base_snapshot
+-                    try:
+-                        receipt = self._store.commit_page_extension(
+-                            identity=snapshot.identity,
+-                            base_context_digest=snapshot.plan.base_context_digest,
+-                            token_ids=snapshot.plan.token_ids,
+-                            identity_salt=self._plan_context_digest_salt(
+-                                snapshot.plan
+-                            ),
+-                            layout=layout,
+-                            base_block_counts=self._group_block_counts_for_span(
+-                                snapshot.plan.base_span_tokens
+-                            ),
++                    base_counts = self._group_block_counts_for_span(
++                        snapshot.plan.base_span_tokens
++                    )
++                    base_snapshot = self._store.restore_page_snapshot(
++                        base,
++                        layout=layout,
++                        result_block_counts=base_counts,
++                        result_boundary_tokens=snapshot.plan.base_span_tokens,
++                    )
++                    if self._publication_schema != "page-tail-cow-v2":
++                        result_snapshot = materialize_page_extension_capture(
++                            layout,
++                            base_snapshot,
++                            result_snapshot,
++                            base_block_counts=base_counts,
+                             result_block_counts=snapshot.block_counts,
+-                            base_boundary_tokens=snapshot.plan.base_span_tokens,
+-                            result_boundary_tokens=snapshot.plan.span_tokens,
+-                            result_snapshot=result_snapshot,
+-                            verified_base_snapshot=verified_base_snapshot,
++                            reused_pages_by_group=reused_pages,
+                         )
+-                    except PageDeltaDepthExceeded:
+-                        receipt = self._store.commit_page_snapshot(
+-                            identity=snapshot.identity,
+-                            context_digest=snapshot.plan.digest,
+-                            span_tokens=snapshot.plan.span_tokens,
+-                            snapshot=snapshot.encoded_pages,
+-                        )
+-                        self.counters["page_delta_compactions"] += 1
+-                elif snapshot.plan.base_context_digest:
+-                    assert chunks is not None
+-                    receipt = self._store.commit_extension(
++                    verified_base_snapshot = base_snapshot
++                try:
++                    receipt = self._store.commit_page_extension(
+                         identity=snapshot.identity,
+                         base_context_digest=snapshot.plan.base_context_digest,
+                         token_ids=snapshot.plan.token_ids,
+                         identity_salt=self._plan_context_digest_salt(
+                             snapshot.plan
+                         ),
+-                        tail_chunks=chunks,
++                        layout=layout,
++                        base_block_counts=self._group_block_counts_for_span(
++                            snapshot.plan.base_span_tokens
++                        ),
++                        result_block_counts=snapshot.block_counts,
++                        base_boundary_tokens=snapshot.plan.base_span_tokens,
++                        result_boundary_tokens=snapshot.plan.span_tokens,
++                        result_snapshot=result_snapshot,
++                        verified_base_snapshot=verified_base_snapshot,
+                     )
+-                elif isinstance(snapshot, _HybridStoreSnapshot):
++                except PageDeltaDepthExceeded:
+                     receipt = self._store.commit_page_snapshot(
+                         identity=snapshot.identity,
+                         context_digest=snapshot.plan.digest,
+                         span_tokens=snapshot.plan.span_tokens,
+                         snapshot=snapshot.encoded_pages,
+                     )
+-                else:
+-                    assert chunks is not None
+-                    receipt = self._store.commit(
+-                        identity=snapshot.identity,
+-                        context_digest=snapshot.plan.digest,
+-                        chunks=chunks,
+-                        span_tokens=snapshot.plan.span_tokens,
+-                    )
+-                alias_digests = self._publish_row_prefix_aliases(snapshot)
+-                with self._capacity_lock:
+-                    self._note_capacity_commit_locked(
+-                        receipt.allocated_bytes_upper_bound
+-                    )
+-                    evicted = self._post_commit_was_evicted_locked(
+-                        snapshot.identity,
+-                        snapshot.plan.digest,
+-                        force_maintenance=bool(alias_digests),
+-                    )
+-                    logger.info(
+-                        "spark-context-cache: rank %d committed %d tokens"
+-                        " digest=%s manifest=%s in %.1f ms",
+-                        snapshot.rank,
+-                        receipt.committed_tokens,
+-                        snapshot.plan.digest[:12],
+-                        receipt.manifest_digest[:12],
+-                        1e3 * (time.perf_counter() - commit_started),
+-                    )
+-                    if receipt.publication is not None:
+-                        logger.info(receipt.publication.format_compact())
+-                    self._finish_store(
+-                        snapshot.plan.digest,
+-                        committed=not evicted,
+-                        evicted=evicted,
+-                        additional_digests=(
+-                            self._surviving_alias_digests(
+-                                snapshot.identity,
+-                                alias_digests,
+-                            )
+-                            if not evicted
+-                            else ()
+-                        ),
+-                    )
+-            except Exception as error:  # noqa: BLE001 - never kill serving
+-                self._finish_store(
++                    self.counters["page_delta_compactions"] += 1
++            elif snapshot.plan.base_context_digest:
++                assert chunks is not None
++                receipt = self._store.commit_extension(
++                    identity=snapshot.identity,
++                    base_context_digest=snapshot.plan.base_context_digest,
++                    token_ids=snapshot.plan.token_ids,
++                    identity_salt=self._plan_context_digest_salt(
++                        snapshot.plan
++                    ),
++                    tail_chunks=chunks,
++                )
++            elif isinstance(snapshot, _HybridStoreSnapshot):
++                receipt = self._store.commit_page_snapshot(
++                    identity=snapshot.identity,
++                    context_digest=snapshot.plan.digest,
++                    span_tokens=snapshot.plan.span_tokens,
++                    snapshot=snapshot.encoded_pages,
++                )
++            else:
++                assert chunks is not None
++                receipt = self._store.commit(
++                    identity=snapshot.identity,
++                    context_digest=snapshot.plan.digest,
++                    chunks=chunks,
++                    span_tokens=snapshot.plan.span_tokens,
++                )
++            alias_digests = self._publish_row_prefix_aliases(snapshot)
++            with self._capacity_lock:
++                self._note_capacity_commit_locked(
++                    receipt.allocated_bytes_upper_bound
++                )
++                evicted = self._post_commit_was_evicted_locked(
++                    snapshot.identity,
+                     snapshot.plan.digest,
+-                    committed=False,
+-                    error=error,
++                    force_maintenance=bool(alias_digests),
+                 )
+-                continue
+-            finally:
+-                encoded_pages = getattr(snapshot, "encoded_pages", None)
+-                release = getattr(encoded_pages, "release", None)
+-                if callable(release):
+-                    release()
++                logger.info(
++                    "spark-context-cache: rank %d committed %d tokens"
++                    " digest=%s manifest=%s in %.1f ms",
++                    snapshot.rank,
++                    receipt.committed_tokens,
++                    snapshot.plan.digest[:12],
++                    receipt.manifest_digest[:12],
++                    1e3 * (time.perf_counter() - commit_started),
++                )
++                if receipt.publication is not None:
++                    logger.info(receipt.publication.format_compact())
++                self._finish_store(
++                    snapshot.plan.digest,
++                    committed=not evicted,
++                    evicted=evicted,
++                    additional_digests=(
++                        self._surviving_alias_digests(
++                            snapshot.identity,
++                            alias_digests,
++                        )
++                        if not evicted
++                        else ()
++                    ),
++                )
++        except Exception as error:  # noqa: BLE001 - never kill serving
++            self._finish_store(
++                snapshot.plan.digest,
++                committed=False,
++                error=error,
++            )
++            return
++        finally:
++            encoded_pages = getattr(snapshot, "encoded_pages", None)
++            release = getattr(encoded_pages, "release", None)
++            if callable(release):
++                release()
+ 
+     def _publish_row_prefix_aliases(
+         self,

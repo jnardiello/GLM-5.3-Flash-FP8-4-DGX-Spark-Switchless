@@ -44,14 +44,14 @@ the existing procedures:
    the maintainer's site values or hand-edit generated files.
 4. **Account for every artifact before startup.** Follow the installation guide for
    host pins, the image digest/content ID, target model manifest, drafter revision,
-   patched NCCL, and deployed runtime overrides. Prepare the operator-supplied
-   SparkCache connector and encoder with `scripts/prepare-sparkcache.py`; its inputs
-   and outputs must match the recorded hashes. Supply the SIRCL bundle/runtime and
-   verify its private per-rank peer/GID files as described in
-   [payload installation](docs/install-from-zero.md#8-place-the-sparkcache-and-sircl-payload).
-   Check [`CREDITS.md`](CREDITS.md) for acquisition and use terms. Required operator
-   payload is not included in the checkout. If it is missing, name the exact artifact,
-   expected pin, and acquisition/preparation step; continue independent preparation.
+   patched NCCL, and deployed runtime overrides. The SparkCache connector and encoder
+   and the SIRCL bundle/runtime are included under `third_party/` and deployed with
+   their pins; generate the private SIRCL per-rank peer/GID files with
+   `scripts/sircl-site-files.sh` as described in
+   [payload preparation](docs/install-from-zero.md#8-prepare-the-sparkcache-and-sircl-payload).
+   Check [`CREDITS.md`](CREDITS.md) and [`docs/third-party.md`](docs/third-party.md) for
+   provenance and terms. If a required artifact is missing, name it, its expected pin,
+   and its acquisition or preparation step; continue independent preparation.
    Never fabricate payload or change a checksum to accept a substitute. A rebuilt NCCL
    binary follows its documented candidate procedure, not automatic pin replacement.
 5. **Preview, install, and verify.** With `cluster.env` complete and no `TP4_ENV` for

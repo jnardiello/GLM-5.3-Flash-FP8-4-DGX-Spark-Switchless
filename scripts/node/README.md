@@ -23,7 +23,7 @@ reference's later capture.
 | `patches/` | frozen previous adaptive scheduler and CPU-only policy tests, retained for rollback |
 | `reference/` | complete previous September 19 and September 18 overlays, original GLM model and cache JSON; separate frozen September 11 overlay, launcher/controller, artifact pins and private-archive autostart template |
 | `sparkcache/` | previous base cache JSON and manifest for current replay views plus rollback connector/encoder payloads |
-| `sircl/` | SHA-256 manifest of the untracked SIRCL bundle/runtime payload |
+| `sircl/` | SHA-256 manifest of the SIRCL bundle/runtime in `third_party/sparkring-sircl/`; the ignored `SHA256SUMS.site` and `site/` hold generated site files |
 | `flusher-unconditional.sh` | temporary page-cache flusher used while model weights load |
 | `sparse_attn_indexer_kpool_sm121.py` | SM121 sparse-attention patch deployed as `sparse_attn_indexer_kpool.py`; mounted only in the September 11 configuration (`SPARKCACHE_MODE=off`) |
 | `ssh-config.example` | optional workstation SSH alias example |
@@ -58,9 +58,9 @@ reference's later capture.
 | `scripts/node/overrides/**/*.py` | `~/tp4/overrides/…` (same relative layout) | `scripts/deploy.sh` |
 | `scripts/node/sparkcache/kv-transfer-config.json` and `SHA256SUMS` | `~/tp4/sparkcache/` | `scripts/deploy.sh` |
 | `scripts/node/sircl/SHA256SUMS` and the gitignored per-site `SHA256SUMS.site` | `~/tp4/sircl/` | `scripts/deploy.sh` |
-| prepared connector and encoder | `SPARKCACHE_CONNECTOR` and `SPARKCACHE_ENCODER` under `~/tp4/sparkcache/` | operator, using `scripts/prepare-sparkcache.py`; pinned by configuration and manifest |
-| preserved original connector for September 18 | `~/tp4/sparkcache/spark_context_cache_connector-20260918.py` | operator; emitted by the same preparer and selected by the September 18 overlay |
-| untracked SIRCL bundle and runtime | `~/tp4/sircl/{bundle,runtime}/` | operator, per [`install-from-zero.md`](../../docs/install-from-zero.md#8-place-the-sparkcache-and-sircl-payload); verified by `verify-node.sh` and the launcher |
+| `third_party/sparkcache/*.py` (current and rollback connectors, encoder) | `~/tp4/sparkcache/` | `scripts/deploy.sh`; pinned by configuration and manifest |
+| `third_party/sparkring-sircl/{bundle,runtime}/*` and `scripts/sircl_gid_check.py` | `~/tp4/sircl/{bundle,runtime}/` | `scripts/deploy.sh`; verified by `verify-node.sh` and the launcher |
+| generated `scripts/node/sircl/site/*` (ignored) | `~/tp4/sircl/runtime/` | `scripts/deploy.sh` after [`scripts/sircl-site-files.sh`](../../docs/install-from-zero.md#8-prepare-the-sparkcache-and-sircl-payload) |
 
 `scripts/deploy.sh` and `scripts/deploy-host.sh` are additive. They copy and verify
 managed content but do not delete stray files or restart containers. The bootstrap
@@ -99,8 +99,9 @@ Those values do not guarantee six simultaneous full-context sessions. See
 [`production-recipe.md`](../../docs/production-recipe.md#hybrid-kda-projections-and-memory)
 for the measured configuration and its limits.
 
-The SparkCache connector and encoder remain operator-supplied files. Prepare them
-from the pinned original sources in a private staging directory:
+The SparkCache connector and encoder are included in `third_party/sparkcache/`. The
+tools below rebuild them from the upstream encoder and the connector with patch 01
+applied, for an operator who prefers to derive them:
 
 ```sh
 python3 scripts/prepare-sparkcache.py \
@@ -118,8 +119,8 @@ encoder correction uses one join with identical output bytes. It emits those two
 `spark_context_cache_connector-20260918.py`, preserving the original for rollback.
 The second command emits the separate current replay views connector; it verifies both
 input/output pins and refuses to replace an existing file. Preserve the corrected base
-connector for September 19 rollback as well. Stage all outputs on the configured paths; deployment does
-not distribute unlicensed operator payload automatically.
+connector for September 19 rollback as well. The outputs are identical to the included
+files.
 
 `SPARKCACHE_CONNECTOR_SHA256` and `SPARKCACHE_ENCODER_SHA256` pin the selected
 modules, and `SPARKCACHE_CONFIG_SHA256` pins the tracked JSON. Keep those values

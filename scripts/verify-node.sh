@@ -296,7 +296,7 @@ for m in $P_MOUNTS; do
   [ -e "$m" ] || mmiss="$mmiss ${m##*/}"
 done
 say mounts "${mmiss:-ok}"
-# Validate the operator payload selected by the effective recipe, including a
+# Validate the payload selected by the effective recipe, including a
 # historical connector kept beside the current one for rollback.
 check_selected_payload() {
   local path=$1 expected=$2 found
@@ -313,8 +313,8 @@ say selected_connector "$(check_selected_payload "$P_SPARKCACHE_CONNECTOR" "$P_S
 say selected_encoder "$(check_selected_payload "$P_SPARKCACHE_ENCODER" "$P_SPARKCACHE_ENCODER_SHA256")"
 say freegib "$(df -BG --output=avail "$HOME" 2>/dev/null | tail -1 | tr -dc '0-9')"
 say psline "$(sudo -n docker ps --filter "name=$P_CONTAINER" --format '{{.Names}} {{.Status}}' 2>/dev/null | head -1)"
-# SparkCache payloads: the deployed SHA256SUMS must be satisfied by operator-placed
-# files (the connector and the SIRCL bundle/runtime are not redistributed by the repository).
+# SparkCache payloads: the deployed SHA256SUMS must be satisfied by the files deploy.sh
+# places from third_party/ (and, for SIRCL, by the generated site files).
 # SHA256SUMS pins portable files; an optional SHA256SUMS.site pins site-generated files
 # (SIRCL per-rank peer/GID env) and is required for sircl.
 for d in sparkcache sircl; do
@@ -591,7 +591,7 @@ check_node() {   # check_node <host> <rank>
         ok) row "$host" "$d payload" PASS "every file in ~/tp4/$d manifests present and unchanged" ;;
         no-manifest) row "$host" "$d payload" FAIL "~/tp4/$d/SHA256SUMS missing (run scripts/deploy.sh)" ;;
         no-site-manifest) row "$host" "$d payload" FAIL "~/tp4/$d/SHA256SUMS.site missing (create it in the checkout, then scripts/deploy.sh)" ;;
-        *) row "$host" "$d payload" FAIL "${v:-probe failed}: place the operator payload under ~/tp4/$d (docs/install-from-zero.md)" ;;
+        *) row "$host" "$d payload" FAIL "${v:-probe failed}: run scripts/deploy.sh (and scripts/sircl-site-files.sh for SIRCL; docs/install-from-zero.md)" ;;
       esac
     fi
   done

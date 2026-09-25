@@ -29,9 +29,9 @@ $USAGE
 Managed files: cluster.env, scripts/launcher/launch-glm53-tp4.sh, scripts/tp4ctl, the
 regular-file September 11 reference controller, September 18 rollback assets, the flusher,
 model and NCCL GID helpers/manifests, the indexer patch, scripts/node/patches/*.py (minus tests),
-scripts/node/moe-configs/*.json, vLLM overrides, payload manifests, and the TP4_ENV overlay
-when set. Operator-supplied SparkCache/SIRCL payloads are staged separately. Host assets:
-scripts/deploy-host.sh.
+scripts/node/moe-configs/*.json, vLLM overrides, the vendored SparkCache/SIRCL payload
+(third_party/) with its manifests, the generated SIRCL site files when present, and the
+TP4_ENV overlay when set. Host assets: scripts/deploy-host.sh.
 EOF
 }
 # --help must work in a checkout that has no cluster.env yet.
@@ -92,9 +92,9 @@ FILES=(
   "scripts/render_chat_template.py:tp4/scripts/render_chat_template.py"
   "scripts/lib/common.sh:tp4/scripts/lib/common.sh"
 )
-EXECUTABLES="tp4/launch-glm53-tp4.sh tp4/tp4ctl tp4/tp4ctl-f0-reference tp4/flusher-unconditional.sh tp4/scripts/fetch-fp8-weights.sh tp4/scripts/model_manifest.py"
+EXECUTABLES="tp4/launch-glm53-tp4.sh tp4/tp4ctl tp4/tp4ctl-f0-reference tp4/flusher-unconditional.sh tp4/scripts/fetch-fp8-weights.sh tp4/scripts/model_manifest.py tp4/sircl/runtime/entrypoint.sh"
 REFERENCE_EXECUTABLES="tp4/tp4ctl-f0-reference"
-SHELL_SCRIPTS="tp4/launch-glm53-tp4.sh tp4/tp4ctl tp4/tp4ctl-f0-reference tp4/flusher-unconditional.sh tp4/scripts/fetch-fp8-weights.sh tp4/scripts/lib/common.sh"
+SHELL_SCRIPTS="tp4/launch-glm53-tp4.sh tp4/tp4ctl tp4/tp4ctl-f0-reference tp4/flusher-unconditional.sh tp4/scripts/fetch-fp8-weights.sh tp4/scripts/lib/common.sh tp4/sircl/runtime/entrypoint.sh"
 
 # Extra remote directories to create before scp (relative to $HOME).
 REMOTE_DIRS=(tp4 patches tp4/scripts tp4/scripts/lib tp4/node/model-manifests tp4/reference)
@@ -119,10 +119,10 @@ for f in "$REPO"/scripts/node/patches/*.py; do
   patch_count=$((patch_count + 1))
 done
 
-# SparkCache recipe. The vLLM override files (Apache-2.0 derived, scripts/node/overrides/)
-# and the kv-transfer config are managed here; connector, encoder and SIRCL payloads are not
-# redistributed (CREDITS.md), so only their SHA256SUMS travel and the launcher verifies the
-# operator-placed files against them before Docker starts.
+# SparkCache recipe. The vLLM override files (Apache-2.0 derived, scripts/node/overrides/),
+# the kv-transfer config and the vendored Apache-2.0 connector, encoder and SIRCL payload
+# (third_party/, docs/third-party.md) are managed here; the launcher verifies them against
+# the deployed SHA256SUMS before Docker starts.
 override_count=0
 if [ -d "$REPO/scripts/node/overrides" ]; then
   while IFS= read -r f; do
@@ -138,7 +138,21 @@ for f in scripts/node/sparkcache/kv-transfer-config.json scripts/node/sparkcache
   [ -f "$REPO/$f" ] || continue
   FILES+=("$f:tp4/${f#scripts/node/}")
 done
-REMOTE_DIRS+=(tp4/sparkcache tp4/sircl)
+for f in "$REPO"/third_party/sparkcache/*.py; do
+  FILES+=("third_party/sparkcache/${f##*/}:tp4/sparkcache/${f##*/}")
+done
+for f in "$REPO"/third_party/sparkring-sircl/bundle/* "$REPO"/third_party/sparkring-sircl/runtime/*; do
+  rel=${f#"$REPO"/third_party/sparkring-sircl/}
+  FILES+=("third_party/sparkring-sircl/$rel:tp4/sircl/$rel")
+done
+FILES+=("scripts/sircl_gid_check.py:tp4/sircl/runtime/sircl_gid_check.py")
+# This site's generated SIRCL files (scripts/sircl-site-files.sh), when this checkout holds them.
+if [ -d "$REPO/scripts/node/sircl/site" ]; then
+  for f in rank0.env rank1.env rank2.env rank3.env SHA256SUMS; do
+    FILES+=("scripts/node/sircl/site/$f:tp4/sircl/runtime/$f")
+  done
+fi
+REMOTE_DIRS+=(tp4/sparkcache tp4/sircl tp4/sircl/bundle tp4/sircl/runtime)
 
 # Accepted E03 runtime sources retain their measured paths; historical checks and
 # preparation assets travel alongside them. The effective recipe selects each mount.

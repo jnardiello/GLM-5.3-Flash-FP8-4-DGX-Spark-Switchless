@@ -258,10 +258,10 @@ if [ "$DRY_RUN" != "1" ]; then
   if [ -n "${IMAGE_ID:-}" ] && [ "$IMAGE_ID_ACTUAL" != "$IMAGE_ID" ]; then
     echo "[launch] ERROR: image content ID mismatch: $IMAGE_ID_ACTUAL (expected $IMAGE_ID)" >&2; exit 1
   fi
-  # The SIRCL payload is not part of this repository (CREDITS.md): only its manifests are
-  # deployed, and every listed file must be present and unchanged on the node. SHA256SUMS
-  # (tracked) pins the portable bundle and runtime; SHA256SUMS.site (gitignored, deployed
-  # from the operator checkout) pins the per-rank peer/GID files generated for this site.
+  # Every file of the SIRCL payload (third_party/sparkring-sircl/, deployed by deploy.sh)
+  # must be present and unchanged on the node. SHA256SUMS (tracked) pins the portable
+  # bundle and runtime; SHA256SUMS.site (gitignored, deployed from the operator checkout)
+  # pins the per-rank peer/GID files generated for this site by sircl-site-files.sh.
   if [ -n "$SIRCL_DIR" ]; then
     for _m in SHA256SUMS SHA256SUMS.site; do
       [ -f "$SIRCL_DIR/$_m" ] \

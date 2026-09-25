@@ -115,8 +115,9 @@ and runtime, then check the native capability records from all four ranks in the
 actual image without mounting model weights when qualifying a changed payload.
 A successful jumbo ping does not prove that SIRCL selected a valid GID. Keep the
 runtime selections and their site-specific hashes consistent; never change a manifest
-merely to accept an unexpected file. See the
-[payload installation procedure](install-from-zero.md#8-place-the-sparkcache-and-sircl-payload).
+merely to accept an unexpected file. `scripts/sircl-site-files.sh` derives the per-rank
+selections from `cluster.env`; see the
+[payload preparation procedure](install-from-zero.md#8-prepare-the-sparkcache-and-sircl-payload).
 
 ## Why patched NCCL is required
 

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Reproduce the pinned cache memory fixes from operator-supplied source files.
+"""Reproduce the pinned cache memory fixes from the original connector and encoder.
 
-No SparkCache payload is distributed here. Both original and resulting hashes are
-checked before any output is written. The original connector is kept for rollback.
+The results are included in third_party/sparkcache/; this tool derives them from the
+upstream encoder and the connector with the pending-publication patch. Both original
+and resulting hashes are checked before any output is written. The original connector
+is kept for rollback.
 """
 
 import argparse
@@ -99,7 +101,7 @@ def prepare(connector: Path, encoder: Path, output: Path) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--connector", required=True, type=Path,
-                        help="original operator-supplied connector (September 18 pin)")
+                        help="original connector with the pending-publication patch (September 18 pin)")
     parser.add_argument("--encoder", required=True, type=Path,
                         help="original hybrid encoder from the pinned R10 image")
     parser.add_argument("--output-dir", required=True, type=Path,

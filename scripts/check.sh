@@ -33,6 +33,10 @@ required=(
   scripts/deploy-host.sh
   scripts/fetch-fp8-weights.sh
   scripts/render-netplan.sh
+  scripts/sircl-site-files.sh
+  third_party/sparkcache/LICENSE
+  third_party/sparkring-sircl/LICENSE
+  third_party/sparkring-sircl/NOTICE
   scripts/verify-node.sh
   scripts/node/flusher-unconditional.sh
   scripts/node/sparse_attn_indexer_kpool_sm121.py
@@ -75,6 +79,7 @@ python3 scripts/f0-reference.py --help >/dev/null
 ./scripts/verify-node.sh --help >/dev/null
 ./scripts/fetch-fp8-weights.sh --help >/dev/null
 ./scripts/render-netplan.sh --help >/dev/null
+./scripts/sircl-site-files.sh --help >/dev/null
 ./scripts/agent-preflight.sh --help >/dev/null 2>&1
 scripts/node/nccl/build.sh --help >/dev/null
 scripts/node/nccl/install-nccl.sh --help >/dev/null
@@ -87,6 +92,7 @@ python3 scripts/tests/test-check-f0.py
 python3 scripts/tests/test-verify-node.py
 python3 scripts/tests/test-prepare-sparkcache.py
 python3 scripts/tests/test-sparkcache-launcher.py
+python3 scripts/tests/test-third-party-payload.py
 python3 scripts/tests/test-kda-hybrid.py
 python3 scripts/tests/test-e03-config.py
 python3 scripts/tests/test-adaptive-draft-budget.py

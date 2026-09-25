@@ -1,0 +1,579 @@
+{
+  "abi": {
+    "adapter": "sparkring-sircl-capability/v1",
+    "native": {
+      "required_symbols": [
+        "spark_tp4_get_abi_version",
+        "spark_tp4_create",
+        "spark_tp4_create_v2",
+        "spark_tp4_all_reduce",
+        "spark_tp4_capture_all_reduce",
+        "spark_tp4_get_graph_status",
+        "spark_tp4_get_health_status",
+        "spark_tp4_destroy",
+        "spark_tp4_bidirectional_prefill_create",
+        "spark_tp4_bidirectional_prefill_all_reduce",
+        "spark_tp4_bidirectional_prefill_get_health_status",
+        "spark_tp4_bidirectional_prefill_destroy",
+        "spark_tp4_fused_prefill_create",
+        "spark_tp4_fused_prefill_all_reduce_rows",
+        "spark_tp4_fused_prefill_get_health_status",
+        "spark_tp4_fused_prefill_destroy"
+      ],
+      "version": 1
+    }
+  },
+  "artifacts": {
+    "native": {
+      "path": "libspark_transport_capi.so",
+      "sha256": "f53c88b4bf885533c4d6de60dae1a9e46cf26db0695b37265955b7cc74934119"
+    },
+    "python_overlay_manifest": {
+      "files": [
+        {
+          "path": "sitecustomize.py",
+          "sha256": "4efc3fdfe4874820064dbcb713c02271df4ca41f4f2bbcf4683a1548ca02f2b1",
+          "source": "spark_transport/integrations/vllm/sitecustomize.py"
+        },
+        {
+          "path": "spark_collective_audit.py",
+          "sha256": "8fa7aa9747845a84b40e8d3a0d72c39f8a562d6490764b777e5dcbe1cbe47721",
+          "source": "spark_transport/integrations/vllm/spark_collective_audit.py"
+        },
+        {
+          "path": "spark_cudagraph_bucket_contract.py",
+          "sha256": "e7411ff9cde9d5ed4a7ecd6e78a3158512c188c254baad10554b72229f14d272",
+          "source": "spark_transport/integrations/vllm/spark_cudagraph_bucket_contract.py"
+        },
+        {
+          "path": "spark_cudagraph_replay_timing.py",
+          "sha256": "dc3ee0fd5da52e79b097e9edc6191a880ca5a3f4e6d83add2a4acd30966b2175",
+          "source": "spark_transport/integrations/vllm/spark_cudagraph_replay_timing.py"
+        },
+        {
+          "path": "spark_dcp_collective_audit.py",
+          "sha256": "077a234e4edff8b8dd44784953aef713884b4dd7a3f7c46589b14c6bb8b40745",
+          "source": "spark_transport/integrations/vllm/spark_dcp_collective_audit.py"
+        },
+        {
+          "path": "spark_graph_status_reporter.py",
+          "sha256": "4bd50d1be42e2ac750b382825bec8a49564ce288d376852ee7c51e33a303f277",
+          "source": "spark_transport/integrations/vllm/spark_graph_status_reporter.py"
+        },
+        {
+          "path": "spark_persistent_output_ring.py",
+          "sha256": "03220c78ed87651f93c3165f1eedb843ffcad6a116126e2a9b89beab299bd2f3",
+          "source": "spark_transport/integrations/vllm/spark_persistent_output_ring.py"
+        },
+        {
+          "path": "spark_tp4_backend.py",
+          "sha256": "5999814740ddfa1c35e925ed0f3bf43edd8335b30c9b4fe9b78006c618d18cb9",
+          "source": "spark_transport/integrations/vllm/spark_tp4_backend.py"
+        },
+        {
+          "path": "spark_tp4_capability.py",
+          "sha256": "d90f6fc07ff5255b2df25b3ffc1c52c83f9eb866ca68666bc0f273db1c5e83b7",
+          "source": "spark_transport/integrations/vllm/spark_tp4_capability.py"
+        },
+        {
+          "path": "spark_tp4_health_gate.py",
+          "sha256": "7651b88e9bff40193891a0810ee8a920e3548a17de3a0dc477a30db779738930",
+          "source": "spark_transport/integrations/vllm/spark_tp4_health_gate.py"
+        },
+        {
+          "path": "spark_tp4_port_namespace.py",
+          "sha256": "c789739811def9722753bb128e69e7bd5342bab827b2cfd99cd8a4e847d18d4f",
+          "source": "spark_transport/integrations/vllm/spark_tp4_port_namespace.py"
+        },
+        {
+          "path": "spark_tp4_query_contract.py",
+          "sha256": "978df868fd83a6a780111092e99de2a3f07a5df375cf52d4b2358ccf4dcd0c31",
+          "source": "spark_transport/integrations/vllm/spark_tp4_query_contract.py"
+        },
+        {
+          "path": "spark_tp4_query_row_provider.py",
+          "sha256": "09c9e7af5d14b5c6930e15c999ada2231d639eb59609d705aadecdd7497ddec7",
+          "source": "spark_transport/integrations/vllm/spark_tp4_query_row_provider.py"
+        },
+        {
+          "path": "spark_tp4_vocab_allgather_backend.py",
+          "sha256": "fd44dea558c115b17f17bb129033345af4543702fbbdaf1fa4f186b8f242e697",
+          "source": "spark_transport/integrations/vllm/spark_tp4_vocab_allgather_backend.py"
+        }
+      ],
+      "path": "sparkring-overlay-manifest.json",
+      "sha256": "85a231e6d2a290f7d6cccbc2cc6b1ccad7a6adbefc7ce4dde05b158f249aadd4"
+    }
+  },
+  "schema": "glm53-sircl-native-bundle/v1",
+  "source": {
+    "archive_sha256": "a18873a7f698b4b190bb387ca0072e4621fa38770d369f147aaaeef12f6650dc",
+    "native_files": [
+      {
+        "path": "spark_transport/CMakeLists.txt",
+        "sha256": "fbb3a55e53e03104219e4def451a844e81b904f99e4ba742c8fb9d6602288027"
+      },
+      {
+        "path": "spark_transport/app/tp4_bidirectional_prefill_probe.cu",
+        "sha256": "0fad8c3601dca4cbc6f5fdda6c47634b8b73e376dc560a8d55f2170e43e4e038"
+      },
+      {
+        "path": "spark_transport/app/tp4_fused_prefill_probe.cu",
+        "sha256": "123b477a3976f022fe29e2af390871e1bdaa19c584c751a1db032b48866184c8"
+      },
+      {
+        "path": "spark_transport/app/tp4_fused_ring_occupancy_probe.cu",
+        "sha256": "c99408736277d4543ea5f11586f6a9bae736fe32a1ec5ffda20c5ea23130f9be"
+      },
+      {
+        "path": "spark_transport/app/tp4_fused_stream_switch_smoke.cu",
+        "sha256": "59ee2a38e7fb4050e4b8cd78918fe413d6bf3604d857e32daf1e47b547334e2d"
+      },
+      {
+        "path": "spark_transport/app/tp4_graph_q1_probe.cu",
+        "sha256": "b55625032a46bc6c12e209b7235121c95313dbee05cca571df1459f6c053ba0c"
+      },
+      {
+        "path": "spark_transport/app/tp4_probe.cpp",
+        "sha256": "16ef59f48e640f0f74433cb9641c722c67e9fcb5f6f852f13d5956c03455de62"
+      },
+      {
+        "path": "spark_transport/app/tp4_tensor_probe.cu",
+        "sha256": "0844d2c9c81232ff5a9a825563d623db77eddfe24a4eca0b7c898bee3e915b84"
+      },
+      {
+        "path": "spark_transport/app/tp4_tiled_prefill_probe.cu",
+        "sha256": "4d47c8bd2ffae7ec494b6d288b0f20599b1926121b11aa5735bf04676f974e68"
+      },
+      {
+        "path": "spark_transport/app/tp4_vocab_allgather_probe.cu",
+        "sha256": "9a14656a499bb2500f8fa142dae1c4fcb1d632cc67d23b57320ccd3fb40bf83a"
+      },
+      {
+        "path": "spark_transport/app/tp4_vocab_graph_probe.cu",
+        "sha256": "5dcae0427ea415a4869fc3be244eef8aeb52844bdabac349ba3d8c0d97d36f65"
+      },
+      {
+        "path": "spark_transport/app/transport_probe.cpp",
+        "sha256": "913b727c9dd0d6a6c72ca27f8373b2bb66ebf93ef704cae49ff83510ac253c45"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/CMakeLists.txt",
+        "sha256": "6e99650bdd65accc06168ce85eeb63891f43e6989bfb560cc4e5849d9d2ed19a"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/bidirectional_bulk_abi.hpp",
+        "sha256": "6902248c20e8aa73c1373b7021ae31e936c17eca176f03bc38bd3cba466a30f7"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/bidirectional_bulk_cuda_smoke_test.cu",
+        "sha256": "b5222ef373b248edc4166a8ecaaaee3c0532e0cf8a37317bc233910961dadbb7"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/bidirectional_bulk_kernels.cu",
+        "sha256": "010691e7e49ae402fc21e771781b6499c145d359fbf1dc966dd060c2c9d77fd8"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/bidirectional_ring_executor.cpp",
+        "sha256": "04c8db006dd02c1fd2172c6935112c0e825656384d5b34ee9ac8aa73e714796b"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/bidirectional_ring_executor.hpp",
+        "sha256": "81c3b48d43f7d5b73cc96d30b913a393a7d32e79f2c012025314bcb1ddb7cded"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/fused_prefill_abi.hpp",
+        "sha256": "4a5287c30adfd372381b56a53356446e56681961673d569593d7504312eec55a"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/fused_prefill_kernels.cu",
+        "sha256": "ef4063e3f139f4adf834e3c66fe7c20051fbfdaa75c7ce44b75866cc5d89d0bc"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/fused_prefill_proxy_smoke_test.cu",
+        "sha256": "1e15b38569b8f9f47281d330b6458f8b09e4ae942b50f0f0eb822349568a7cba"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/fused_prefill_verbs_proxy.cpp",
+        "sha256": "d3537a2badacbccce5309d610b35c277e53d0e95f97eefac5338b77ac5cba446"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/fused_prefill_verbs_proxy.hpp",
+        "sha256": "987ba18cc89883b69bf65f23520b0e24ff592e89f8b63c0ab279579a3275c654"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/tiled_bulk_abi.hpp",
+        "sha256": "3de3bcafc8ad4c903280eab182f9e4010971fe1de19b08b802b227de0e67a1fe"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/tiled_bulk_kernels.cu",
+        "sha256": "222c5531ee6932601be8cbbe881039838a912d5f6b7beba5360078e557d5c970"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/tiled_correctness_kernels.cu",
+        "sha256": "52c500f3e4e4d706df42c4084c137fa84b9ffcd5724922391553d5de692bb4e1"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/tiled_correctness_oracle.hpp",
+        "sha256": "86222e6c70bbbaa9ef390ea532dc37488f6e1cd75040567893ba1cf4a16d9859"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/tiled_correctness_oracle_test.cpp",
+        "sha256": "d5b208f5845c1eb5f023ae45b92fd3a40b6c4d470780f5c615e58201ae3a2e43"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/tiled_cuda_smoke_test.cu",
+        "sha256": "d75a8725441955375a7775fb764fa90a0ba9c3809ffd6be0c2d353f8413f6625"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/tiled_dual_rail_edge.cpp",
+        "sha256": "84ef84b4f1d5fc7b2db14e9555ff65bbb9c570b97e9923ebb7163b5bac1efe13"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/tiled_dual_rail_edge.hpp",
+        "sha256": "39f92623ff2f293aedc7eb07f4ea455ca514763aaaacb1da8fee2b01c087dc0d"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/tiled_executor.cpp",
+        "sha256": "b2411fd3c578b8d976bbc27fbcb2da7313ce62b5842234551db5082eb646fdc2"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/tiled_executor.hpp",
+        "sha256": "f612df8af37f79826b50e26c9bf80a0f9d0b2e8c446cde12ce2a0af750d9b63d"
+      },
+      {
+        "path": "spark_transport/experiments/tiled_prefill/tiled_signaled_work_gate.hpp",
+        "sha256": "f78a9dc1e0d8320094c32d9cd54bfc987c8e36bba8052a6b86b7dd856dc388af"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/control_channel.hpp",
+        "sha256": "0cf7cbb680f637a01f8325e4c5932e0f758a0e763adc7357089a23c45e68a3c0"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/eager_staging_timeout.hpp",
+        "sha256": "b8f0a58d9cf6760103c3d9c3bf04f4503039e246e373865c38d65046d77c7840"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/gpu_doorbell.hpp",
+        "sha256": "64d32951c1e5b6872e84b0b63c1efd052f26bd59f407bc8b7ba52cbfd1a1cefd"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/gpu_tp4.hpp",
+        "sha256": "850f60bb4c74fa1c8e28d12f71f795f05d2ccffb1f85acee3fb46fe5fef0b158"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/gpu_tp4_tensor.hpp",
+        "sha256": "84032306737f175c102330ef86e9ced9482029d5dd268034f4162c0eedf53c05"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/gpu_tp4_vocab_allgather.hpp",
+        "sha256": "640bbef1b8fe1434ae01bb29b5f4ba4e7b088c5934a740d3a1bdddd51e29c81d"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/graph_poll_policy.hpp",
+        "sha256": "52fb9e291b597fdd478d829b2eb1c4df06632b2eba389a00353b436776022f33"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/memory_buffer.hpp",
+        "sha256": "ed1e9a3169288d2751d27bb09f8b54216aee51d6d4add646589d6af1f0f572ea"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/statistics.hpp",
+        "sha256": "14ec0189502f16891396971f6210949dc8a2645a83550efeef6e6c7aca9c655b"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/topology.hpp",
+        "sha256": "0f5e0acad4fe6b02149d71483665eefcf12c2e74b55c9a8ac833f3d992363aa0"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_allreduce_protocol.hpp",
+        "sha256": "66d8e218c2383575ddcf85552ee375f9ce650addbab214b94f4cd35fc23c3619"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_bidirectional_prefill.hpp",
+        "sha256": "dbb6322fe20efd2d0d95f46581f3a371baf57ce3433746c3b782e2d7cc71e1c8"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_bidirectional_prefill_c_api.h",
+        "sha256": "59c4d32608da2d54a8dbf97bb11318e3827db4f1d406afa9d8d7ca0c3e8dbc36"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_bidirectional_prefill_session.hpp",
+        "sha256": "2a722ba9ab47f8a516ff10b53ba7cd3d7e8506e54921a908c451623b4d83360e"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_c_api.h",
+        "sha256": "80349b13c9709d166e7acaf60c373101691c47c773b2915024bdd89823cc15d1"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_dual_port_striped_allreduce.hpp",
+        "sha256": "26c9f95af9b2d651fb28642daefc2e1be66fa104a1cf2a2bbc4e4f1a3ccb5520"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_fused_prefill_c_api.h",
+        "sha256": "d2110e916283dc1fe19e73ebed5f22460278d2f6cc3cf05c652e8bbeeeca5dda"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_fused_prefill_session.hpp",
+        "sha256": "cf4ebcbcce452969877d8b411a5d2496fcb5e37ebcd604d96bf9fda4d662fcfd"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_fused_ring_contract.hpp",
+        "sha256": "19e362d2ac1c8c0c27699354830cb84c90155535b668cf6d01af593801d60baa"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_graph_command.hpp",
+        "sha256": "5033609e37a3e70010061b556d856fa1e77ee897cd316fa340b1c6c0fcf1fae2"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_graph_kernel_strategy.hpp",
+        "sha256": "71efd59a097bf935950ed13bf428d651f8cd81bdfc1893a783d5e535ac72d39c"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_schedule.hpp",
+        "sha256": "916fce2bee9936fc4594d95ba4e8e36b05df02d31f46f3bd0557e8bd011bc7a9"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_session.hpp",
+        "sha256": "87a5dee365029b0c85c1d02f15a1867272a8e7243b0ce87b143824278d7970e7"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_tiled_session.hpp",
+        "sha256": "c2005e503f5a905e4452b7ae9e79c6d3eeca75fc6ecd2e8378b72468e024edac"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_vocab_allgather_c_api.h",
+        "sha256": "ab084995a01d259419c077eadbb8df71103773bd61d4c9ae9f836490d904af40"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/tp4_vocab_allgather_session.hpp",
+        "sha256": "6b6e91c6602973a0e75bd668808bb3f17eea59ba3369b6c238dc529619ecc534"
+      },
+      {
+        "path": "spark_transport/include/spark_transport/verbs_endpoint.hpp",
+        "sha256": "7e01f91714f66208b0df8d2f98ef55c21443d7bb29a3a69bec3ed2a1d9d3c4f5"
+      },
+      {
+        "path": "spark_transport/src/control_channel.cpp",
+        "sha256": "e5ddc77aa13c30d5c4708ca94fe4fed25348c9cf049709f5c14cc881e9835017"
+      },
+      {
+        "path": "spark_transport/src/cuda_event_gate.hpp",
+        "sha256": "1bcfe442346aa193857430dd03977e7929bd0b186a7013903fcb9306ef63f310"
+      },
+      {
+        "path": "spark_transport/src/cuda_stream_handoff.hpp",
+        "sha256": "3b7828d29982f0e20b9416315a19094bf6fe00b88a3a25ddf3cb31db34dec37a"
+      },
+      {
+        "path": "spark_transport/src/gpu_doorbell.cu",
+        "sha256": "31f7b1ec02abccb5561cacce03fecde9d1175fc56855a82583c3955752305963"
+      },
+      {
+        "path": "spark_transport/src/gpu_tp4.cu",
+        "sha256": "24b3c911ca8371b0a9e5f68edd40123fcd5c240512644e57763368184fcba30c"
+      },
+      {
+        "path": "spark_transport/src/gpu_tp4_tensor.cu",
+        "sha256": "89dd96964d9dfd49f74d31e4792a2d1aca62620dddfcb2b0357fb3d3f1fa6cba"
+      },
+      {
+        "path": "spark_transport/src/gpu_tp4_vocab_allgather.cu",
+        "sha256": "e2b9ef122a1af39a288a130ec8455d61769745c0b9f5c775eb1b9ac84ae689bf"
+      },
+      {
+        "path": "spark_transport/src/memory_buffer.cu",
+        "sha256": "5dc10eb07c0bd55455ac495d465e67313dcaef41aa7edaa1972f079260a14852"
+      },
+      {
+        "path": "spark_transport/src/statistics.cpp",
+        "sha256": "e65391a75feb8499f4c78f0cebd14c741bb438e484fea6d14190a6fd53704698"
+      },
+      {
+        "path": "spark_transport/src/topology.cpp",
+        "sha256": "9b855488c210f90882fbca978a32fa404b4a94897bffcd28cbcabaa0c834f426"
+      },
+      {
+        "path": "spark_transport/src/tp4_bidirectional_prefill_c_api.cpp",
+        "sha256": "3dd4f9055d51e158767273ebf6a430a96a439ebf9658eb01a1fc990c77b10c56"
+      },
+      {
+        "path": "spark_transport/src/tp4_bidirectional_prefill_session.cpp",
+        "sha256": "08bcb555c4446f34dddd5a33bf869004952534c0b4c02a47494c4032eda68968"
+      },
+      {
+        "path": "spark_transport/src/tp4_c_api.cpp",
+        "sha256": "5fa01d8c21bc179157a5daf5b2b01088f8f5a349675d3b5ffb7938f684498b1a"
+      },
+      {
+        "path": "spark_transport/src/tp4_dual_port_striped_host.hpp",
+        "sha256": "05bbeb80b854b7f3fea8b8f802fb394a079865d530a0dc448938de2322c07e99"
+      },
+      {
+        "path": "spark_transport/src/tp4_fused_prefill_c_api.cpp",
+        "sha256": "10bd380773013fd7db9de0b7e50a660b9e2639c097d3427e30653e7e70ba5a2a"
+      },
+      {
+        "path": "spark_transport/src/tp4_fused_prefill_session.cpp",
+        "sha256": "bc8825e04e9763fecef646dcbd4b6e2442aa4021b6da3595135c44a11d289913"
+      },
+      {
+        "path": "spark_transport/src/tp4_graph_command.cpp",
+        "sha256": "6ce51383e74b617b173fc2df4ba542c4e80a95730a8632b2403b7a8cf1f2dfcc"
+      },
+      {
+        "path": "spark_transport/src/tp4_schedule.cpp",
+        "sha256": "25aa777f17e26d59b378c96b3e248e5addc2b66445aacf21e5905cc868dd6cdb"
+      },
+      {
+        "path": "spark_transport/src/tp4_session.cpp",
+        "sha256": "41d8415326b6997ebe0c87bbf05561c8d95ad865054e454b38479dacc1b92ee0"
+      },
+      {
+        "path": "spark_transport/src/tp4_vocab_allgather_c_api.cpp",
+        "sha256": "a3c9c480b8e98a35121cd6b74dac1149351043b5aa97775a379e1678dc6fcfb9"
+      },
+      {
+        "path": "spark_transport/src/tp4_vocab_allgather_session.cpp",
+        "sha256": "2d93eae1e04d694531a428d4cb219209aaa022c6362f188904410c0b3a08988b"
+      },
+      {
+        "path": "spark_transport/src/verbs_endpoint.cpp",
+        "sha256": "0a5a36663c9f83da2b8946350e195f7eb59ebbca5f7042f50b566641dd95dce5"
+      },
+      {
+        "path": "spark_transport/tests/cuda_event_gate_test.cu",
+        "sha256": "0764b5c9a2d487590dc6bd55fe56661880beafc96d21f18bf2fbcdec619bca49"
+      },
+      {
+        "path": "spark_transport/tests/eager_staging_timeout_test.cpp",
+        "sha256": "85e33047c83b648a275a158ce52bbd345ab6393b2a1d17e0169cfac9c4906fd3"
+      },
+      {
+        "path": "spark_transport/tests/gpu_doorbell_layout_test.cpp",
+        "sha256": "f91444b8ac8986288d4e83c8b37235fc7ea6533b26805f96ab1ee617becda177"
+      },
+      {
+        "path": "spark_transport/tests/graph_poll_policy_test.cpp",
+        "sha256": "8a03e730280d57178c2f2918528b3f45b442752340302ee75551718e85f7256c"
+      },
+      {
+        "path": "spark_transport/tests/statistics_test.cpp",
+        "sha256": "37eb63651a382c16690fd9b189bdebd5a289dca3411ac2928b30d2ee8941e445"
+      },
+      {
+        "path": "spark_transport/tests/syntax_stubs/cuda_runtime.h",
+        "sha256": "d268cd936257e91a7fe466e644e82fd0b14897a2094af3ad08695fe85ec0866b"
+      },
+      {
+        "path": "spark_transport/tests/syntax_stubs/infiniband/verbs.h",
+        "sha256": "1b8344e8cbbde30d9ad04ef439378ff7b1158b8495327d3866910899b88e2e45"
+      },
+      {
+        "path": "spark_transport/tests/topology_test.cpp",
+        "sha256": "e0e74d92b13cd6b6c36a4e9611e3cb8cd2c5915eac30ba08ad95e9e9d81f6efe"
+      },
+      {
+        "path": "spark_transport/tests/tp4_allreduce_protocol_test.cpp",
+        "sha256": "768ef95e955d1790f5dccddcbb9dfbe7c8b5ee63d8661465f083042e5a6c6824"
+      },
+      {
+        "path": "spark_transport/tests/tp4_bidirectional_prefill_c_api_layout_test.cpp",
+        "sha256": "277d038a3848a7262bb0724092d7084f0a9e5946a145bea00b18c06e46ecc24b"
+      },
+      {
+        "path": "spark_transport/tests/tp4_bidirectional_prefill_test.cpp",
+        "sha256": "7166be65892680446461acb020ecd8fb07ed4778fea11a7d3a36a476476f9679"
+      },
+      {
+        "path": "spark_transport/tests/tp4_bidirectional_ring_executor_test.cpp",
+        "sha256": "a5a3a45c4ffbed081a4d052f05c6fbfd22214ff9b477768921e30fbc865e5662"
+      },
+      {
+        "path": "spark_transport/tests/tp4_c_api_layout_test.cpp",
+        "sha256": "656f9ff4ebc3b9db4e6b920f64aff3f5a8e323e924a91b2c3e976f5922e621ae"
+      },
+      {
+        "path": "spark_transport/tests/tp4_c_api_test.cpp",
+        "sha256": "f9ef88b9a95f34f35d9573c52625babf4c52b79b3dae09c73d8c8c302321f72a"
+      },
+      {
+        "path": "spark_transport/tests/tp4_dual_port_striped_allreduce_test.cpp",
+        "sha256": "20b73a37521defdb5edffbd7788cc5e643d52f55a0d4c155da77f5c7f4f09296"
+      },
+      {
+        "path": "spark_transport/tests/tp4_dual_port_striped_host_test.cpp",
+        "sha256": "1f3dbc4db3b99ab9a93ff94327ad5ec5c69271c3023c354f132333ed322a9178"
+      },
+      {
+        "path": "spark_transport/tests/tp4_fused_prefill_c_api_layout_test.cpp",
+        "sha256": "7e01412f53a3ea9662261fbb80b9662bc12e0d656e3e29b3fcfa563c85185be2"
+      },
+      {
+        "path": "spark_transport/tests/tp4_fused_prefill_layout_test.cpp",
+        "sha256": "f77c3f12c9660b526a25b3011acc8e42486c25aba88776e2216688e75d6defbe"
+      },
+      {
+        "path": "spark_transport/tests/tp4_fused_ring_contract_test.cpp",
+        "sha256": "3699dde695a239b34d4044ad18f82afad8fb7a2b38865a6b8ea09c2f21f766d0"
+      },
+      {
+        "path": "spark_transport/tests/tp4_graph_command_test.cpp",
+        "sha256": "49f68d5f95a4a42d806074a852803cd286acf37f22b3d4d0dec2b119c56cc2a3"
+      },
+      {
+        "path": "spark_transport/tests/tp4_graph_kernel_strategy_test.cpp",
+        "sha256": "360e4f9acf419f4b93f1d4bf3afedb6736ac0d6640cb007b85fa8bf519ccc0f0"
+      },
+      {
+        "path": "spark_transport/tests/tp4_schedule_test.cpp",
+        "sha256": "14ad269b926e08654c9554220b426cd304e564c04eba5b3a87955b644c74321e"
+      },
+      {
+        "path": "spark_transport/tests/tp4_tiled_dual_rail_edge_test.cpp",
+        "sha256": "200407d65d1addc89a112111636ab1dfe226e72282d6f12879135c9197318fd9"
+      },
+      {
+        "path": "spark_transport/tests/tp4_tiled_executor_test.cpp",
+        "sha256": "54aac411c6fbf7736c0eb3ea29c061df245249c5e4517f99938e50255fae9bbb"
+      },
+      {
+        "path": "spark_transport/tests/tp4_tiled_session_test.cpp",
+        "sha256": "c43bb33ae54fdeeee37b117b751143aea7476487f2cd999fa1c9a9b75bb84486"
+      },
+      {
+        "path": "spark_transport/tests/tp4_tiled_signaled_work_gate_test.cpp",
+        "sha256": "b486056d61dced86a42aea8ef80d5134d59780090f7bcb000991fd5e5e125ea9"
+      },
+      {
+        "path": "spark_transport/tests/tp4_vocab_allgather_c_api_test.cpp",
+        "sha256": "9956e9216cf85850c2e0d03d6f0a1fceb6806d12de86cd0ff1997dddf1114f55"
+      },
+      {
+        "path": "spark_transport/tests/tp4_vocab_allgather_layout_test.cpp",
+        "sha256": "65ef457c140a76940d3ce311dd4af60db1b7f0af39d41c53a59f393e0aca0d44"
+      },
+      {
+        "path": "spark_transport/tests/verbs_completion_test.cpp",
+        "sha256": "b320a5324ba347c7d4ea61f76f26e41736a5118a6b311e891b808cd7858c8c5f"
+      },
+      {
+        "path": "spark_transport/tests/wire_protocol_test.cpp",
+        "sha256": "043f508fb6da834ff529fa2ba95f4548e57bfbc3c5439257d5a029101f2a9910"
+      }
+    ],
+    "sparkring_commit": "b358a818786d8506086aaaabb9afe464fa2ccb49"
+  },
+  "target": {
+    "cuda_architecture": 121,
+    "image_id": "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6",
+    "vllm_commit": "487ecf187d3dfe74d2cf6119a92881dba403c219",
+    "vllm_reported_commit": "g487ecf187"
+  },
+  "toolchain": {
+    "cmake": "cmake version 3.31.6",
+    "cmake_wheel_sha256": "42d9883b8958da285d53d5f69d40d9650c2d1bcf922d82b3ebdceb2b3a7d4521",
+    "cxx": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "nvcc": "nvcc: NVIDIA (R) Cuda compiler driver\nCopyright (c) 2005-2025 NVIDIA Corporation\nBuilt on Wed_Aug_20_01:57:39_PM_PDT_2025\nCuda compilation tools, release 13.0, V13.0.88\nBuild cuda_13.0.r13.0/compiler.36424714_0"
+  }
+}

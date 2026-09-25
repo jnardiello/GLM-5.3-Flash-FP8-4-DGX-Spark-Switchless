@@ -1,0 +1,23 @@
+--- a/spark_context_cache_connector.py
++++ b/spark_context_cache_connector.py
+@@ -4878,11 +4878,15 @@
+                 result.finish_ms,
+             )
+             return True
+-        payloads = decode_page_snapshot(
+-            layout,
+-            encoded_pages,
+-            tuple(len(group) for group in groups),
+-        )
++        # page_plan has already validated every extent. Keep views of the
++        # authenticated snapshot instead of copying its complete body again.
++        # The writable per-layer copy and final stream synchronization below
++        # retain their original ownership and completion semantics.
++        encoded_view = memoryview(encoded_pages).cast("B")
++        payloads = {
++            span.layer_name: encoded_view[span.source_start : span.source_end]
++            for span in page_plan.spans
++        }
+         submit_started = time.perf_counter_ns()
+         with self._load_write_context():
+             for page_group, block_ids in zip(layout.groups, groups):

@@ -7,11 +7,29 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- The checkout now includes the SparkCache and SIRCL payload the recipe mounts, so an
+  installation no longer depends on external repositories or maintainer-supplied files.
+  - `third_party/sparkcache/` holds the current and rollback connectors and the encoder,
+    the upstream Apache-2.0 license, and one complete patch per project change against
+    SparkCache `66057174`: pending-publication wait, two memory corrections and replay
+    views.
+  - `third_party/sparkring-sircl/` holds the 17 bundle files, the serving entrypoint and
+    environment, and SparkRing's LICENSE, NOTICE and third-party notices. The native library
+    was built from SparkRing `b358a818`; its manifest pins all 113 source files, which match
+    that commit. The entrypoint's only change is the added GID check.
+  - `scripts/deploy.sh` copies both to `~/tp4/sparkcache/` and `~/tp4/sircl/` with
+    `scripts/sircl_gid_check.py`. The files are byte-identical to the pins, so a deploy
+    leaves a running installation unchanged.
+- Added `scripts/sircl-site-files.sh`. It generates the private SIRCL per-rank peer, device
+  and GID files, their runtime manifest and `SHA256SUMS.site` from `cluster.env`, following
+  the ring plan of `render-netplan.sh`. It refuses to overwrite existing site files without
+  `--force`. The deploy copies them when the checkout holds them.
+- Added `scripts/tests/test-third-party-payload.py` to the offline check. It verifies every
+  included file against its pin, reverses each patch back to the upstream bytes, checks the
+  internal hashes of the SIRCL bundle and the licenses, and tests the site-file generator.
 - Added `docs/third-party.md`. It maps every pinned SparkCache and SIRCL file to its source
-  and marks it upstream, modified by this project or this project's own. It lists the
-  project's changes: pending-publication wait, memory corrections, replay views and GID
-  preflight. Files whose exact upstream bytes are not yet matched to a public commit are
-  marked provenance pending.
+  and marks it upstream, modified by this project or this project's own, and lists the
+  project's changes.
 - Published the September 25 E29 frozen baseline and its promotion record. E29 is the E28b
   recipe plus the end-drain overlay in its load B configuration.
   - The default `EXTRA_DOCKER_ENV` mounts `experiments/e03/end-drain/scheduler.py` instead of
@@ -224,6 +242,13 @@ Versions and releases are created only at the owner's explicit request.
 - CREDITS, the README prerequisites, installation step 8 and the production recipe now
   link SparkCache and SparkRing SIRCL directly and state their Apache-2.0 licenses. They
   replace the earlier "no license notice" wording, which described only the archived copies.
+  Installation step 8 is now "Prepare the SparkCache and SIRCL payload". It generates the
+  site files instead of asking the operator to obtain and place the payload. AGENTS, the
+  node README, operations, fabric, the template comments and the verification messages
+  follow.
+- The E29 promotion record now records the live apply: one owner-authorized coordinated
+  restart onto the default, `/health` 200, both functional gates, `check-f0` PASS and the
+  E29 scheduler, engine core, flags and boot lines on the running ranks.
 - The default recipe in `cluster.env.example` is now E28b. `scripts/check-f0.py` validates
   seven draft tokens, the adaptive table and high state, the CUDA graph limit
   (`--compilation-config`) and the 16 GiB KV budget by default, and requires the absence of

@@ -331,11 +331,11 @@ adaptive_k_scheduler.AdaptiveKScheduler` remains in `EXTRA_VLLM_ARGS`.
 The accepted configuration includes `scripts/node/overrides/`, the measured sources and
 config under `scripts/node/experiments/e03/` (including `bf16-residue/` and `drafter-w8a16/`), `scripts/node/sparkcache/kv-transfer-config.json`
 and payload `SHA256SUMS` manifests in the deploy set. It also stages the frozen
-September 18 model and cache config for rollback. The SparkCache connector/encoder and
-SIRCL bundle/runtime are operator payload: prepare and place the pinned versions on
-every rank at `SPARKCACHE_CONNECTOR`, `SPARKCACHE_ENCODER` and `SIRCL_DIR` (see
-[`install-from-zero.md`](install-from-zero.md#8-place-the-sparkcache-and-sircl-payload))
-and let `./scripts/verify-node.sh` confirm both payload rows before `restart`.
+September 18 model and cache config for rollback. The same deploy places the included
+SparkCache connector/encoder and SIRCL bundle/runtime from `third_party/`, and the
+generated SIRCL site files when the checkout holds them (see
+[`install-from-zero.md`](install-from-zero.md#8-prepare-the-sparkcache-and-sircl-payload)).
+Let `./scripts/verify-node.sh` confirm both payload rows before `restart`.
 
 Expected: every copied file matches its source, all ranks launch in order 3→2→1→0,
 `/health` reaches 200, and all runtime signatures return. Run the

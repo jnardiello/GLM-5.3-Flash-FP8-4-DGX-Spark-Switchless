@@ -216,88 +216,56 @@ Expected: `config.json` and `model.safetensors` exist on every node and the repo
 base model is `zai-org/GLM-5.3-Flash`. Stop if upstream terms differ from the owner's
 approved use, the revision differs, or any node is incomplete.
 
-## 8. Place the SparkCache and SIRCL payload
+## 8. Prepare the SparkCache and SIRCL payload
 
-The current configuration (`SPARKCACHE_MODE=on`, since September 19) needs two
-Apache-2.0 components that this checkout pins by hash but does not include yet:
+The current configuration (`SPARKCACHE_MODE=on`) mounts two Apache-2.0 components. This
+checkout includes the files the recipe uses, with their licenses and notices:
 
-- the [SparkCache](https://github.com/FujitsuPolycom/sparkcache) connector and encoder;
-- the [SparkRing SIRCL](https://github.com/FujitsuPolycom/sparkring) bundle and runtime.
+- the SparkCache connector and encoder in [`third_party/sparkcache/`](../third_party/sparkcache/README.md);
+- the SparkRing SIRCL bundle and runtime in [`third_party/sparkring-sircl/`](../third_party/sparkring-sircl/README.md).
 
 [Third-party payload](third-party.md) lists every file with its upstream commit, which
-bytes are upstream and what this project changed.
+bytes are upstream and what this project changed. The deploy in step 9 copies them to
+every node; nothing is downloaded.
 
-- **Encoder.** The original hybrid encoder comes from the digest-pinned R10 image and is
-  byte-identical to SparkCache commit `66057174`.
-- **Connector.** The connector input pinned in
-  [`prepare-sparkcache.py`](../scripts/prepare-sparkcache.py) already contains this
-  project's pending-publication change, so the image's connector alone does not match it.
-  Obtain that input from the maintainer until the change is published.
-- **SIRCL.** Fifteen of the SIRCL bundle files come unchanged from the public SparkRing
-  overlay. The remaining upstream files come from the SparkRing R10 runtime.
-
-On a host where that image is installed, copy the encoder out of a **stopped** temporary
-container; this does not launch inference or use the serving container:
+The SIRCL runtime also needs files that describe this site's fabric: for each rank, two
+ring-peer addresses, two RDMA devices and two GID indexes, plus the manifest the SIRCL
+entrypoint checks. Generate them from `cluster.env`:
 
 ```sh
-# Source that host's cluster.env, or set IMAGE to the digest from cluster.env.example.
-. ./cluster.env
-payload_stage=$(mktemp -d)
-chmod 700 "$payload_stage"
-payload_container=$(sudo -n docker create --entrypoint /bin/true "$IMAGE")
-sudo -n docker cp "$payload_container:/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_hybrid.py" "$payload_stage/"
-sudo -n docker rm "$payload_container"
-sudo -n chown "$(id -u):$(id -g)" "$payload_stage/spark_context_cache_hybrid.py"
+./scripts/sircl-site-files.sh
 ```
 
-Copy that encoder and the original connector to private workstation storage, then run:
+The tool writes `scripts/node/sircl/site/rank{0..3}.env` and `site/SHA256SUMS`, and pins
+them in `scripts/node/sircl/SHA256SUMS.site`. Git ignores all three; keep them private.
 
-```sh
-python3 scripts/prepare-sparkcache.py \
-  --connector <private-original-connector.py> \
-  --encoder <private-original-encoder.py> \
-  --output-dir <private-payload-directory>
-python3 scripts/node/experiments/e03/replay-views/prepare.py \
-  --connector <private-payload-directory>/spark_context_cache_connector.py \
-  --output <private-payload-directory>/spark_context_cache_connector-e03-replay-views.py
-```
+- **Peers** come from `FABRIC_TARGETS`. As in `render-netplan.sh`, the peer on an odd ring
+  link uses the first fabric port and the peer on an even link the second.
+- **Devices** come from `NCCL_IB_HCA`.
+- **GID index.** SIRCL needs an explicit index. A rank whose `NCCL_IB_GID_INDEX` is `-1`
+  uses `--gid-index`, default 3, the ASUS Ascent GX10 value. Confirm the index in the
+  preflight report and [`fabric.md`](fabric.md).
+- **Interface names.** The included entrypoint checks the fabric ports `enp1s0f0np0` and
+  `enp1s0f1np1`. If the first two fabric ports have other names, the tool stops; change
+  the entrypoint and its pin as the [SIRCL README](../third_party/sparkring-sircl/README.md)
+  describes.
 
-The tool verifies both original hashes before writing, applies the two cache memory
-corrections, and verifies the exact resulting hashes used in the September 19 benchmark.
-It retains the original connector under a dated name for September 18 rollback. Repeating
-preparation accepts identical output and refuses to overwrite different files. It does
-not redistribute the input modules or change their terms. The second command adds
-the current replay views connector with SHA-256
-`5893f8747aa093874c46a0185f93c786265d99b5a4cd8da849a7471132422d66`.
-It requires the corrected input pin and exclusive creation of a new output file;
-if that output already exists, verify its hash rather than overwrite it. Keep the
-corrected September 19 and original September 18 files for complete rollback.
+The tool refuses to replace existing site files unless `--force` is given. When the
+container starts, the entrypoint verifies every mounted file and checks each GID before
+serving.
 
-Place the prepared files and transport payload on **every** rank:
+The deploy places the payload on **every** rank:
 
 | Payload | Node path (`cluster.env` key) | Verification |
 | --- | --- | --- |
 | replay views connector | `~/tp4/sparkcache/spark_context_cache_connector-e03-replay-views.py` (`SPARKCACHE_CONNECTOR`) | `scripts/node/sparkcache/SHA256SUMS` |
-| corrected connector for September 19 rollback | `~/tp4/sparkcache/spark_context_cache_connector.py` | `scripts/node/sparkcache/SHA256SUMS` |
 | corrected hybrid encoder | `~/tp4/sparkcache/spark_context_cache_hybrid.py` (`SPARKCACHE_ENCODER`) | `scripts/node/sparkcache/SHA256SUMS` |
-| original connector for September 18 rollback | `~/tp4/sparkcache/spark_context_cache_connector-20260918.py` | pin in `scripts/node/reference/baseline-20260918.env` |
+| September 19 and September 18 rollback connectors | `~/tp4/sparkcache/spark_context_cache_connector.py` and `spark_context_cache_connector-20260918.py` | `SHA256SUMS` and the rollback recipes |
 | SIRCL bundle | `~/tp4/sircl/bundle/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS` |
-| SIRCL runtime and entrypoint | `~/tp4/sircl/runtime/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS` |
-| SIRCL per-rank peer/GID files, their runtime manifest and gate attestation | `~/tp4/sircl/runtime/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS.site` (gitignored) |
+| SIRCL runtime, entrypoint and GID check | `~/tp4/sircl/runtime/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS` |
+| SIRCL site files | `~/tp4/sircl/runtime/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS.site` |
 
-Copy node to node over the management LAN and keep the files readable by the
-deployment account only. The tracked manifests cover the portable files. The per-rank
-`rank<N>.env` files carry this site's fabric peers and GIDs, so their hashes stay out of
-the public repository: after checking those files against
-[`fabric.md`](fabric.md) and the SIRCL GID check, record them once in the ignored
-checkout file (run on one rank, copy the output into `scripts/node/sircl/SHA256SUMS.site`
-in the operator checkout):
-
-```sh
-cd ~/tp4/sircl && sha256sum runtime/gate-attestation.json runtime/rank?.env runtime/SHA256SUMS
-```
-
-After the deploy in the next step has placed the manifests, verify every rank:
+After the deploy in the next step, verify every rank:
 
 ```sh
 ./scripts/verify-node.sh
@@ -305,8 +273,13 @@ After the deploy in the next step has placed the manifests, verify every rank:
 
 Expected: the `sparkcache payload` and `sircl payload` rows are PASS on all four ranks.
 The launcher refuses to start a rank whose connector, encoder, config or SIRCL files do not
-match the manifests; never edit a manifest to match a file. Do not commit, mirror or
-publish the payload.
+match the manifests; never edit a manifest to match a file.
+
+The SparkCache files can also be rebuilt from upstream instead of taken from this checkout.
+Apply patch 01 of `third_party/sparkcache/patches/` to the upstream connector, then run
+[`prepare-sparkcache.py`](../scripts/prepare-sparkcache.py) and
+[`replay-views/prepare.py`](../scripts/node/experiments/e03/replay-views/prepare.py). Both
+check every input and output hash.
 
 ## 9. Deploy runtime and host files
 
