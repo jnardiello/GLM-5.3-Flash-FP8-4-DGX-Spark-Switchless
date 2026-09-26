@@ -1,0 +1,716 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "experiment_id": "2026-09-25-e27d-prefill-cap",
+  "title": "E27d: per-step prefill cap of 2,304 tokens while decodes are eligible",
+  "outcome": "discard",
+  "outcome_detail": "The owner judged the benefit not significant for the owner's use: the gain appears only when a long context arrives while other agents decode, and costs that arriving request 33-60% more time to first token. The E29 default is unchanged and was restored.",
+  "reference": {
+    "baseline_id": "2026-09-25-e29",
+    "baseline_sha256": "f7d7b0dfa9eec863c183ff46dbafb2f32ab8e2c140afb5e75f515322af15895e"
+  },
+  "candidate": {
+    "parent": "E29 default (cluster.env.example)",
+    "change": "E29 scheduler plus an additions-only patch: while any decode is eligible (E29 end-drain holds excluded), one step schedules at most VLLM_E27D_PREFILL_CAP prefill tokens in total, shared by running chunks and new or resumed prefills, clipped before Mamba alignment; debited after allocation and refunded on preemption. Overlay value 2304 (one KDA cache block).",
+    "scheduler_sha256": "aaeedd9d51fc8b1f6aad75c34f1b70d88bf4d8a58fe735c04fd9845d6088e783",
+    "patch_sha256": "50e311210fb79054afd85698ed4b5d5e17425616ad94feb405576cff5729380b",
+    "parent_scheduler_sha256": "f41d6e9e4363b271ad8543a5ef7063b546952d4c0bd35565cee034884a61baec",
+    "boot_line": "E27D_PREFILL_CAP_READY tokens=2304 block=2304 interval=8",
+    "iac_status": "withdrawn; not part of the tree"
+  },
+  "selection": "Chosen with an independent reviewer after the E30a adaptive-EMA retune (VLLM_ADAPTIVE_K_UP=0.80) was rejected before any service window by a replay of held-out tasks (per-task median -0.7%, 2/10 tasks improving).",
+  "coverage": {
+    "loads": 2,
+    "suites": 6,
+    "suite_requests": 324,
+    "control_suites_e29": 1,
+    "control_requests": 54,
+    "interference_executions": {
+      "e29_reference": 1,
+      "e27d": 1
+    },
+    "four_simultaneous_32k_requests": {
+      "e29_reference": 8,
+      "e27d": 8
+    }
+  },
+  "client_transport": "direct LAN HTTP to the rank-0 API; zero probe loss in every suite",
+  "runs": [
+    {
+      "run": "run-1",
+      "load": 1,
+      "receipt_sha256": "847af844ed69fd9271eb9561e8687e910d336d2e07162f321b8e0164c2a383fd",
+      "cache_salt": "fresh per suite (hash only in private receipts)"
+    },
+    {
+      "run": "run-2",
+      "load": 1,
+      "receipt_sha256": "6a1558f65c507a16f79516c11cfbaf28cd990f4dd6a71975f89f4be614dc2060",
+      "cache_salt": "fresh per suite (hash only in private receipts)"
+    },
+    {
+      "run": "run-3",
+      "load": 1,
+      "receipt_sha256": "a1b24d5ed97e3bd050f11ffd09d0418985fcbb78966cddd10bb84d4775194d73",
+      "cache_salt": "fresh per suite (hash only in private receipts)"
+    },
+    {
+      "run": "run-4",
+      "load": 2,
+      "receipt_sha256": "ff7720fd7f96192b9e5be3d5306703c58c86cee51f59cc9baafdbdfb3dbae243",
+      "cache_salt": "fresh per suite (hash only in private receipts)"
+    },
+    {
+      "run": "run-5",
+      "load": 2,
+      "receipt_sha256": "280716ca48ffc292c91b47dacd411db2351339b2068f06a1004cd81d709c1682",
+      "cache_salt": "fresh per suite (hash only in private receipts)"
+    },
+    {
+      "run": "run-6",
+      "load": 2,
+      "receipt_sha256": "e8ec88f3606a798e1772432c88f9ef8b4cbf51d44e813cce420627b24c12c34b",
+      "cache_salt": "fresh per suite (hash only in private receipts)"
+    }
+  ],
+  "control_run": {
+    "run": "control-e29-1",
+    "receipt_sha256": "dc16ac635f81576f198148960ca6dfe521bbc2c0dd210df06335e6f6ff6202d1",
+    "note": "one E29 suite on the restored default, same night, after load 1"
+  },
+  "performance_metrics": [
+    {
+      "key": "code_decode_throughput",
+      "e29_frozen_median": 62.947,
+      "e29_frozen_range": [
+        61.522,
+        62.988
+      ],
+      "per_run": {
+        "load_1": [
+          61.855,
+          60.239,
+          63.132
+        ],
+        "load_2": [
+          61.788,
+          65.123,
+          62.289
+        ]
+      },
+      "median_load_1": 61.855,
+      "median_load_2": 62.289,
+      "median_all_six": 62.072,
+      "change_vs_e29_percent": {
+        "load_1": -1.73,
+        "load_2": -1.05,
+        "all_six": -1.39
+      },
+      "e29_same_night_control": 60.542,
+      "control_vs_e29_percent": -3.82
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "e29_frozen_median": 43.917,
+      "e29_frozen_range": [
+        43.571,
+        44.394
+      ],
+      "per_run": {
+        "load_1": [
+          40.954,
+          42.106,
+          43.436
+        ],
+        "load_2": [
+          44.735,
+          42.593,
+          43.402
+        ]
+      },
+      "median_load_1": 42.106,
+      "median_load_2": 43.402,
+      "median_all_six": 42.9975,
+      "change_vs_e29_percent": {
+        "load_1": -4.12,
+        "load_2": -1.17,
+        "all_six": -2.09
+      },
+      "e29_same_night_control": 45.002,
+      "control_vs_e29_percent": 2.47
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "e29_frozen_median": 67.518,
+      "e29_frozen_range": [
+        65.69,
+        69.141
+      ],
+      "per_run": {
+        "load_1": [
+          67.839,
+          66.657,
+          66.218
+        ],
+        "load_2": [
+          65.515,
+          67.743,
+          68.74
+        ]
+      },
+      "median_load_1": 66.657,
+      "median_load_2": 67.743,
+      "median_all_six": 67.19999999999999,
+      "change_vs_e29_percent": {
+        "load_1": -1.28,
+        "load_2": 0.33,
+        "all_six": -0.47
+      },
+      "e29_same_night_control": 67.933,
+      "control_vs_e29_percent": 0.61
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "e29_frozen_median": 97.351,
+      "e29_frozen_range": [
+        96.109,
+        97.462
+      ],
+      "per_run": {
+        "load_1": [
+          96.711,
+          97.919,
+          99.354
+        ],
+        "load_2": [
+          97.46,
+          96.653,
+          96.6
+        ]
+      },
+      "median_load_1": 97.919,
+      "median_load_2": 96.653,
+      "median_all_six": 97.0855,
+      "change_vs_e29_percent": {
+        "load_1": 0.58,
+        "load_2": -0.72,
+        "all_six": -0.27
+      },
+      "e29_same_night_control": 99.154,
+      "control_vs_e29_percent": 1.85
+    },
+    {
+      "key": "prose_decode_throughput",
+      "e29_frozen_median": 34.126,
+      "e29_frozen_range": [
+        33.791,
+        34.281
+      ],
+      "per_run": {
+        "load_1": [
+          32.969,
+          33.713,
+          33.19
+        ],
+        "load_2": [
+          34.112,
+          33.578,
+          32.573
+        ]
+      },
+      "median_load_1": 33.19,
+      "median_load_2": 33.578,
+      "median_all_six": 33.384,
+      "change_vs_e29_percent": {
+        "load_1": -2.74,
+        "load_2": -1.61,
+        "all_six": -2.17
+      },
+      "e29_same_night_control": 34.383,
+      "control_vs_e29_percent": 0.75
+    },
+    {
+      "key": "code_ttft",
+      "e29_frozen_median": 0.386,
+      "e29_frozen_range": [
+        0.385,
+        0.389
+      ],
+      "per_run": {
+        "load_1": [
+          0.388,
+          0.388,
+          0.402
+        ],
+        "load_2": [
+          0.4,
+          0.402,
+          0.388
+        ]
+      },
+      "median_load_1": 0.388,
+      "median_load_2": 0.4,
+      "median_all_six": 0.394,
+      "change_vs_e29_percent": {
+        "load_1": 0.52,
+        "load_2": 3.63,
+        "all_six": 2.07
+      },
+      "e29_same_night_control": 0.385,
+      "control_vs_e29_percent": -0.26
+    },
+    {
+      "key": "prose_ttft",
+      "e29_frozen_median": 0.376,
+      "e29_frozen_range": [
+        0.375,
+        0.376
+      ],
+      "per_run": {
+        "load_1": [
+          0.377,
+          0.381,
+          0.377
+        ],
+        "load_2": [
+          0.377,
+          0.377,
+          0.378
+        ]
+      },
+      "median_load_1": 0.377,
+      "median_load_2": 0.377,
+      "median_all_six": 0.377,
+      "change_vs_e29_percent": {
+        "load_1": 0.27,
+        "load_2": 0.27,
+        "all_six": 0.27
+      },
+      "e29_same_night_control": 0.378,
+      "control_vs_e29_percent": 0.53
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "e29_frozen_median": 0.342,
+      "e29_frozen_range": [
+        0.338,
+        0.343
+      ],
+      "per_run": {
+        "load_1": [
+          0.34,
+          0.341,
+          0.344
+        ],
+        "load_2": [
+          0.342,
+          0.341,
+          0.343
+        ]
+      },
+      "median_load_1": 0.341,
+      "median_load_2": 0.342,
+      "median_all_six": 0.3415,
+      "change_vs_e29_percent": {
+        "load_1": -0.29,
+        "load_2": 0.0,
+        "all_six": -0.15
+      },
+      "e29_same_night_control": 0.34,
+      "control_vs_e29_percent": -0.58
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "e29_frozen_median": 0.394,
+      "e29_frozen_range": [
+        0.393,
+        0.394
+      ],
+      "per_run": {
+        "load_1": [
+          0.393,
+          0.394,
+          0.395
+        ],
+        "load_2": [
+          0.398,
+          0.395,
+          0.394
+        ]
+      },
+      "median_load_1": 0.394,
+      "median_load_2": 0.395,
+      "median_all_six": 0.3945,
+      "change_vs_e29_percent": {
+        "load_1": 0.0,
+        "load_2": 0.25,
+        "all_six": 0.13
+      },
+      "e29_same_night_control": 0.395,
+      "control_vs_e29_percent": 0.25
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "e29_frozen_median": 0.472,
+      "e29_frozen_range": [
+        0.472,
+        0.476
+      ],
+      "per_run": {
+        "load_1": [
+          0.476,
+          0.474,
+          0.478
+        ],
+        "load_2": [
+          0.476,
+          0.483,
+          0.472
+        ]
+      },
+      "median_load_1": 0.476,
+      "median_load_2": 0.476,
+      "median_all_six": 0.476,
+      "change_vs_e29_percent": {
+        "load_1": 0.85,
+        "load_2": 0.85,
+        "all_six": 0.85
+      },
+      "e29_same_night_control": 0.476,
+      "control_vs_e29_percent": 0.85
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "e29_frozen_median": 2615.95,
+      "e29_frozen_range": [
+        2391.311,
+        2654.884
+      ],
+      "per_run": {
+        "load_1": [
+          2556.843,
+          2336.869,
+          2427.96
+        ],
+        "load_2": [
+          2629.668,
+          2606.563,
+          2646.016
+        ]
+      },
+      "median_load_1": 2427.96,
+      "median_load_2": 2629.668,
+      "median_all_six": 2581.703,
+      "change_vs_e29_percent": {
+        "load_1": -7.19,
+        "load_2": 0.52,
+        "all_six": -1.31
+      },
+      "e29_same_night_control": 2659.884,
+      "control_vs_e29_percent": 1.68
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "e29_frozen_median": 8982.141,
+      "e29_frozen_range": [
+        8910.217,
+        9005.543
+      ],
+      "per_run": {
+        "load_1": [
+          8790.728,
+          8866.78,
+          8685.428
+        ],
+        "load_2": [
+          8828.899,
+          8873.272,
+          8820.875
+        ]
+      },
+      "median_load_1": 8790.728,
+      "median_load_2": 8828.899,
+      "median_all_six": 8824.886999999999,
+      "change_vs_e29_percent": {
+        "load_1": -2.13,
+        "load_2": -1.71,
+        "all_six": -1.75
+      },
+      "e29_same_night_control": 8805.733,
+      "control_vs_e29_percent": -1.96
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "e29_frozen_median": 2764.797,
+      "e29_frozen_range": [
+        2758.093,
+        2783.711
+      ],
+      "per_run": {
+        "load_1": [
+          2646.989,
+          2710.237,
+          2720.955
+        ],
+        "load_2": [
+          2776.671,
+          2789.191,
+          2734.826
+        ]
+      },
+      "median_load_1": 2710.237,
+      "median_load_2": 2776.671,
+      "median_all_six": 2727.8905,
+      "change_vs_e29_percent": {
+        "load_1": -1.97,
+        "load_2": 0.43,
+        "all_six": -1.33
+      },
+      "e29_same_night_control": 2780.949,
+      "control_vs_e29_percent": 0.58
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "e29_frozen_median": 34155.534,
+      "e29_frozen_range": [
+        33504.873,
+        35042.766
+      ],
+      "per_run": {
+        "load_1": [
+          34159.166,
+          33806.92,
+          33897.604
+        ],
+        "load_2": [
+          33815.922,
+          33567.924,
+          34195.669
+        ]
+      },
+      "median_load_1": 33897.604,
+      "median_load_2": 33815.922,
+      "median_all_six": 33856.763,
+      "change_vs_e29_percent": {
+        "load_1": -0.76,
+        "load_2": -0.99,
+        "all_six": -0.87
+      },
+      "e29_same_night_control": 34443.287,
+      "control_vs_e29_percent": 0.84
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "e29_frozen_median": 2681.976,
+      "e29_frozen_range": [
+        2669.894,
+        2691.591
+      ],
+      "per_run": {
+        "load_1": [
+          2649.753,
+          2703.719,
+          2667.573
+        ],
+        "load_2": [
+          2712.822,
+          2677.374,
+          2688.843
+        ]
+      },
+      "median_load_1": 2667.573,
+      "median_load_2": 2688.843,
+      "median_all_six": 2683.1085,
+      "change_vs_e29_percent": {
+        "load_1": -0.54,
+        "load_2": 0.26,
+        "all_six": 0.04
+      },
+      "e29_same_night_control": 2689.948,
+      "control_vs_e29_percent": 0.3
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "e29_frozen_median": 38880.916,
+      "e29_frozen_range": [
+        36985.952,
+        40118.907
+      ],
+      "per_run": {
+        "load_1": [
+          40257.136,
+          39708.993,
+          39437.705
+        ],
+        "load_2": [
+          39316.851,
+          39697.616,
+          39474.287
+        ]
+      },
+      "median_load_1": 39708.993,
+      "median_load_2": 39474.287,
+      "median_all_six": 39585.951499999996,
+      "change_vs_e29_percent": {
+        "load_1": 2.13,
+        "load_2": 1.53,
+        "all_six": 1.81
+      },
+      "e29_same_night_control": 39487.154,
+      "control_vs_e29_percent": 1.56
+    }
+  ],
+  "integrity": {
+    "streams": 324,
+    "transport_or_protocol_errors": 0,
+    "output_gate_length_stops": 2,
+    "output_gate_note": "two code decode answers reached the 8,192-token budget (finish_reason length) on load 2; recorded as output-budget stops, not failures",
+    "post_boot_gates": "PASS on every load and restoration",
+    "four_rank_identity": "container environment, mounts and command equal to the launcher dry-run on 4/4 ranks for every load"
+  },
+  "cap_activity": {
+    "load_2_suites_clip_log_lines": 0,
+    "note": "no E27D_PREFILL_CAP_CLIPPED line appeared during the three load-2 suites: the standard suites never engage the cap (requests arrive one at a time or with short prompts)."
+  },
+  "interference_protocol_2": {
+    "e29_reference": {
+      "native_receipt_sha256": "eae8efa71b355477e43abc689ed70b0dd5d3e020f1f9f5fa44a257a4ca4f5a9c",
+      "cells": {
+        "1K x1": {
+          "background_decode_tokens_per_second_before": 46.0,
+          "background_decode_tokens_per_second_during": 10.37,
+          "background_max_progress_gap_seconds": 0.667,
+          "interferer_ttft_seconds": 0.771
+        },
+        "1K x3": {
+          "background_decode_tokens_per_second_before": 24.5,
+          "background_decode_tokens_per_second_during": 6.949,
+          "background_max_progress_gap_seconds": 0.675,
+          "interferer_ttft_seconds": 0.863
+        },
+        "8K x1": {
+          "background_decode_tokens_per_second_before": 46.0,
+          "background_decode_tokens_per_second_during": 6.184,
+          "background_max_progress_gap_seconds": 2.667,
+          "interferer_ttft_seconds": 3.985
+        },
+        "8K x3": {
+          "background_decode_tokens_per_second_before": 24.5,
+          "background_decode_tokens_per_second_during": 6.661,
+          "background_max_progress_gap_seconds": 2.666,
+          "interferer_ttft_seconds": 4.372
+        },
+        "32K x1": {
+          "background_decode_tokens_per_second_before": 45.0,
+          "background_decode_tokens_per_second_during": 7.119,
+          "background_max_progress_gap_seconds": 2.937,
+          "interferer_ttft_seconds": 15.844
+        },
+        "32K x3": {
+          "background_decode_tokens_per_second_before": 23.5,
+          "background_decode_tokens_per_second_during": 6.679,
+          "background_max_progress_gap_seconds": 3.063,
+          "interferer_ttft_seconds": 17.968
+        }
+      }
+    },
+    "e27d": {
+      "native_receipt_sha256": "e4c75f09d975a8b693900b356267a5799b9ad0fa055db9ad1839a23b73486dab",
+      "cells": {
+        "1K x1": {
+          "background_decode_tokens_per_second_before": 46.0,
+          "background_decode_tokens_per_second_during": 11.07,
+          "background_max_progress_gap_seconds": 0.668,
+          "interferer_ttft_seconds": 0.813
+        },
+        "1K x3": {
+          "background_decode_tokens_per_second_before": 24.5,
+          "background_decode_tokens_per_second_during": 6.183,
+          "background_max_progress_gap_seconds": 0.677,
+          "interferer_ttft_seconds": 0.889
+        },
+        "8K x1": {
+          "background_decode_tokens_per_second_before": 47.5,
+          "background_decode_tokens_per_second_during": 11.722,
+          "background_max_progress_gap_seconds": 1.189,
+          "interferer_ttft_seconds": 5.283
+        },
+        "8K x3": {
+          "background_decode_tokens_per_second_before": 24.5,
+          "background_decode_tokens_per_second_during": 11.344,
+          "background_max_progress_gap_seconds": 1.255,
+          "interferer_ttft_seconds": 6.964
+        },
+        "32K x1": {
+          "background_decode_tokens_per_second_before": 46.0,
+          "background_decode_tokens_per_second_during": 19.469,
+          "background_max_progress_gap_seconds": 1.371,
+          "interferer_ttft_seconds": 21.984
+        },
+        "32K x3": {
+          "background_decode_tokens_per_second_before": 26.0,
+          "background_decode_tokens_per_second_during": 13.03,
+          "background_max_progress_gap_seconds": 1.329,
+          "interferer_ttft_seconds": 27.629
+        }
+      }
+    }
+  },
+  "four_contexts_32k": {
+    "e29_reference": {
+      "requests": 8,
+      "decode_tps_median_per_stream": 15.43,
+      "ttft_median_s": 35.62,
+      "ms_per_step_median": 459.73,
+      "acceptance_median": 0.9862,
+      "cohort_wall_seconds": [
+        60.511,
+        60.771
+      ],
+      "ttft_seconds_sorted": [
+        15.09,
+        16.21,
+        28.41,
+        29.15,
+        42.09,
+        42.34,
+        57.9,
+        58.17
+      ],
+      "receipt_sha256": "5ec7502eeb9f123cf55041897642ed7c92f24088e9af1c29b5eb8097322f73b6"
+    },
+    "e27d": {
+      "requests": 8,
+      "decode_tps_median_per_stream": 39.31,
+      "ttft_median_s": 40.183,
+      "ms_per_step_median": 204.32,
+      "acceptance_median": 0.9622,
+      "cohort_wall_seconds": [
+        59.931,
+        65.682
+      ],
+      "ttft_seconds_sorted": [
+        15.32,
+        17.65,
+        30.04,
+        34.11,
+        46.26,
+        50.69,
+        57.47,
+        62.93
+      ],
+      "receipt_sha256": "d9c2de13fc5bca90b51de42ad44ed1cba3fe9b68221b1fbaeb550681a68e7f87"
+    }
+  },
+  "excluded_series": [
+    {
+      "series": "first E29 interference reference",
+      "reason": "a client background stream received no data for 30 min (client timeout) while the server was idle and had finished every request; no engine error. Re-run with a stall watchdog, which did not trigger."
+    }
+  ],
+  "owner_decision": {
+    "date": "2026-09-26",
+    "decision": "discard",
+    "reason": "no significant benefit for the owner's use"
+  }
+}

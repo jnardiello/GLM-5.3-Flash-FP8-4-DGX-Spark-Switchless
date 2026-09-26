@@ -7,6 +7,16 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Archived the discarded E27d experiment: a per-step cap of 2,304 prefill tokens while other
+  requests decode, on the E29 default. The archive holds its report and portable numeric
+  extract, and the benchmark index has a new row for it.
+  - Protocol 2: background decode during another request's 8K–32K cold prefill rose from
+    6–7 to 11–20 tok/s and the longest gap fell from about 3.0 to 1.3 s. The arriving
+    request's first token came 33–60% later.
+  - Six suites on two loads stayed within the variation seen between loads; the cap never
+    engaged in the standard suites.
+  - The owner judged the benefit not significant. Its overlay and code are not part of the
+    tree, and the default recipe is unchanged.
 - The checkout now includes the SparkCache and SIRCL payload the recipe mounts, so an
   installation no longer depends on external repositories or maintainer-supplied files.
   - `third_party/sparkcache/` holds the current and rollback connectors and the encoder,
