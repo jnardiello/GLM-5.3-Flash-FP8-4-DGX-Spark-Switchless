@@ -1426,9 +1426,9 @@
       "type": "repeated"
     }
   },
-  "config_sha256": "cf699a7dc03e1fe6cb694fef0553f55b9d9603cd72331586610768053be465b6",
-  "elapsed_s": 354.0,
-  "generated_utc": "2026-09-27T19:09:41+00:00",
+  "config_sha256": "0d3068d082fb26bb98a3ac3e9c6f77905cb004f5e23d1160eba7f2c3d4a7b406",
+  "elapsed_s": 350.3,
+  "generated_utc": "2026-09-27T20:52:33+00:00",
   "grouping": {
     "groups": 235,
     "rules": {
@@ -1440,7 +1440,7 @@
     "windows": 424
   },
   "harness_git": {
-    "commit": "06dd98ac88b78feb87605fef1d7b77c1fd7d0a82",
+    "commit": "bb76e73f4fbde8046b7c4695f5f9e82349fdddd9",
     "dirty": true
   },
   "method": [
@@ -1449,7 +1449,7 @@
     "Masks: a contrast and its floor are evaluated on the same windows and on the same positions: a position counts only when the coarse KL and the top-1 rows are valid in both the contrast and the floor. Delta NLL is a finite-subset mean: it additionally needs a finite actual-token logprob on every side; exclusions are counted, and nonfinite actual-token scores are published per side as missing (NaN), zero_probability (-inf, i.e. infinite NLL) or other. Missing windows, invalid rows and nonfinite actual-token scores are also published per run and regime.",
     "Bootstrap: percentile bootstrap over source groups, not windows or tokens (B = 2000, seed 20260927). Means are token-weighted ratio estimators (sum over resampled groups / count). Contrast and floor share the resampled groups (paired). Each estimate carries a two-sided 95% percentile interval (2.5-97.5) and one-sided 95% bounds (5th and 95th percentiles of the replicates). With fewer than two contributing groups the point estimate is kept and bounds and SE are unavailable, so any criterion on it is unresolved.",
     "Definitions (amendment 13): mean excess = KL(ref, cand) - KL(ref, ref') on the same positions; p99 excess = p99(ref vs cand) - p99(ref vs ref'), a difference of pooled p99s, not a p99 of differences; agreement drop = agreement(ref, ref') - agreement(ref, cand) in percentage points.",
-    "Verdicts per criterion: within_margin when the one-sided 95% upper bound is below the margin; exceeds_margin when the one-sided 95% lower bound is at or above it; otherwise unresolved. A regime is within_margin when all three criteria are, exceeds_margin when any criterion is, and unresolved otherwise. Margins (PLAN section 8): mean excess 0.002 nats, p99 excess 0.02 nats, agreement drop 0.5 pp. They are pre-registered for Cm vs R0 only; other comparisons carry the same evaluation as descriptive context. A regime is unresolved when its floor is not estimable.",
+    "Verdicts per criterion: within_margin when the one-sided 95% upper bound is below the margin; exceeds_margin when the one-sided 95% lower bound is at or above it; otherwise unresolved. A regime is within_margin when all three criteria are, exceeds_margin when any criterion is, and unresolved otherwise. Margins (pre-registered): mean excess 0.002 nats, p99 excess 0.02 nats, agreement drop 0.5 pp. They are pre-registered for Cm vs R0 only; other comparisons carry the same evaluation as descriptive context. A regime is unresolved when its floor is not estimable.",
     "Sparse regime: single-execution excess over the R0 floor is reported only as additional operational disagreement, because a less variable arm can show negative excess despite systematic drift. The sparse verdict is unresolved: there is no validated estimator for the KL between population-average distributions when execution variability differs between arms. The overall verdict is the conjunction of the dense and sparse verdicts (so it can be exceeds_margin, never within_margin, while the sparse verdict is unresolved); the single-execution overall criteria are published alongside for transparency.",
     "Repeated executions (descriptive): for each position the partition is the set of tokens present in the top-K rows of every execution of both arms, plus the actual token (when outside that set and known in every execution), plus rest, so each arm's equal-weight mixture over its executions is exact on the partition (mixture logprobs by log-sum-exp) and every KL is a lower bound on its full counterpart. Reported: D = KL(mixture_ref || mixture_cand), within-arm pairwise KL W_arm (ordered pairs of distinct executions), cross-arm pairwise KL X, pairwise top-1 agreements, covered mass and shared-cell count, with group-bootstrap intervals. The variance-subtraction quantities D - (W_ref + W_cand) / (2E) and X - (W_ref + W_cand) / 2 are labelled diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while it is positive. The p99 of cross minus within pairwise KL is nonzero even for identical arms with variable executions. None of these enters a verdict. The reference arm uses R0 A, R0 B and the cross-boot R0 execution; the other arms use A, rep2 and rep3; with fewer the pair is reported as insufficient_executions.",
     "Bit identity: same-recipe repeats and ladder negative controls are checked for bitwise equality of lp_actual, topk_ids and topk_lp over rows 1..2048 (dense regime) on every shared window; the report gives windows and rows compared, rows differing and the first differing row. Ladder attribution is withheld when a strict negative control (a step that must not change target logits) fails, and is pending while the control cannot be evaluated.",

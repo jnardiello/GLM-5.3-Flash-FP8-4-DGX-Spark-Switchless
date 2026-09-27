@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the corpus's model-native windows on the reference arm (docs/fidelity/PLAN.md §4-5).
+"""Generate the corpus's model-native windows on the reference arm (docs/fidelity/REPORT.md, amendments 5 and 9).
 
 Samples one continuation per selected decode prompt (session prompts only, never public ones)
 through `/v1/completions` with token-id input: temperature 1.0, top_p 0.95, a fixed seed per

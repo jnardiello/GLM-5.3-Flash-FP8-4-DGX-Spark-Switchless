@@ -1,6 +1,6 @@
 {
   "schema": "fidelity-campaign-config/1",
-  "description": "Campaign analysis of docs/fidelity/PLAN.md sections 7-8 with amendments 12-13. Run keys are <arm>/<run> under data/fidelity/raw; subsets are relative to the corpus manifest directory. Missing runs are reported as missing_runs.",
+  "description": "Campaign analysis of docs/fidelity/REPORT.md (method, amendments 12-13). Run keys are <arm>/<run> under data/fidelity/raw; subsets are relative to the corpus manifest directory. Missing runs are reported as missing_runs.",
   "bootstrap": {"B": 2000, "seed": 20260927},
   "thresholds": {"kl_mean_excess_nats": 0.002, "kl_p99_excess_nats": 0.02, "top1_drop_pp": 0.5},
   "comparisons": [

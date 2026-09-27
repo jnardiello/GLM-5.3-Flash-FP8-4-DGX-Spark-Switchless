@@ -106,7 +106,7 @@ def sparkcache_config(base_vals, arm, measure=False):
     cfg = json.loads(local.read_text(encoding="utf-8"))
     cfg["kv_connector_extra_config"]["spark_cache_root"] = f"/cache/jit/sparkcache-fidelity-{arm}"
     if measure:
-        # PLAN amendment 11: a full scored run would store ~28 GB per rank. The connector stays
+        # Amendment 11 (docs/fidelity/REPORT.md): a full scored run would store ~28 GB per rank. The connector stays
         # loaded (same scheduling path); with fresh salts no replay is possible either way.
         cfg["kv_connector_extra_config"]["spark_cache_store"] = False
         cfg["kv_connector_extra_config"]["spark_cache_restore"] = False

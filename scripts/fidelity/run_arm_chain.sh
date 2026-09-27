@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run a chain of measurement boots, one arm at a time (docs/fidelity/PLAN.md §4, amendments 13-14).
+# Run a chain of measurement boots, one arm at a time (docs/fidelity/REPORT.md, amendments 13-14).
 # For each entry "OVERLAY_NAME:ARM:STEP,STEP,...": coordinated stop of the currently serving
 # overlay, deploy, fabric check, up, both functional gates, boot record, determinism probe,
 # then the measurement steps via run_measure_boot.sh. Any failed up or gate stops the stack with

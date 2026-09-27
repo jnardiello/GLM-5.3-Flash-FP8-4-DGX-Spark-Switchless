@@ -50,7 +50,7 @@ N_AGENTIC = 160
 N_DECODE_SESSION = 100
 DECODE_LEN = (1024, 16384)
 ITALIAN_MIN = 3072
-ITALIAN_TAIL_MIN = 2560   # overlapping second-half Italian windows (docs/fidelity/PLAN.md §5)
+ITALIAN_TAIL_MIN = 2560   # overlapping second-half Italian windows (docs/fidelity/REPORT.md, amendment 4)
 HIST_BINS = [0, 1024, 2048, 3072, 4096, 8192, 8704, 10240, 16384, 32768, 65536, 131072, 262144]
 
 

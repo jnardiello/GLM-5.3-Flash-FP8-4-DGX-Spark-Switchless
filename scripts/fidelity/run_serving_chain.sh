@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Serving-mode boots for tasks, voxel runs and probes, then the final E29 default
-# (docs/fidelity/PLAN.md §4, §9, amendments 13-14). Entries are "OVERLAY_NAME:LABEL:STEP,...";
+# (docs/fidelity/REPORT.md, amendments 13-15). Entries are "OVERLAY_NAME:LABEL:STEP,...";
 # steps: qeval3 (qeval greedy x3), qeval1 (greedy x1), hardset (greedy x1), voxel (both prompts,
 # greedy + 3 sampled), voxelg (both prompts, greedy only), corruption, replay (cold/replay decode logprobs, same salt), bridge (decode
 # no-spec subset under production scheduling). Every boot passes both gates first; a failure

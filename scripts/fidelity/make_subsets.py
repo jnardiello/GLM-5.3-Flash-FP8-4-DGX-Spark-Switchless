@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Write the pre-registered, seeded window/prompt subsets (docs/fidelity/PLAN.md §4, §6).
+"""Write the pre-registered, seeded window/prompt subsets (docs/fidelity/REPORT.md).
 
 Stratified by category, deterministic for a given manifest: every category contributes
 round(fraction x its window count), at least one window. Outputs one id per line under

@@ -1,5 +1,5 @@
 {
-  "purpose": "Public long-form prompts whose R0 continuations become the model_native corpus windows (docs/fidelity/PLAN.md, amendment 9). Written for this campaign; no private content.",
+  "purpose": "Public long-form prompts whose R0 continuations become the model_native corpus windows (docs/fidelity/REPORT.md, amendment 9). Written for this campaign; no private content.",
   "prompts": [
     "Design a rate limiter for a multi-region HTTP API that must enforce per-tenant quotas with at most 1% overshoot. Compare token bucket, sliding window log and sliding window counter, discuss clock skew and replication lag, choose one, and give pseudocode plus a failure-mode analysis. Be thorough.",
     "Prove that there are infinitely many primes of the form 4k+3, then explain step by step why the same elementary argument fails for primes of the form 4k+1 and what extra tool is needed. Show every step of your reasoning.",

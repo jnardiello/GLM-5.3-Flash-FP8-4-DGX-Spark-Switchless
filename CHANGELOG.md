@@ -7,7 +7,7 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
-- Fidelity campaign tooling (`docs/fidelity/PLAN.md`): it measures how far the E29 recipe's
+- Fidelity campaign tooling (`docs/fidelity/REPORT.md`): it measures how far the E29 recipe's
   next-token distributions and task outcomes deviate from the vendor FP8 model served
   without the local precision and runtime changes.
   - `scripts/fidelity/make_overlays.py` generates complete `TP4_ENV` overlays under
@@ -110,8 +110,9 @@ Versions and releases are created only at the owner's explicit request.
     accepts an empty `CURRENT_TP4_ENV` for the default recipe. The fidelity README warns
     that qeval grading runs model-generated Python, so it belongs in a disposable
     environment.
-  - `docs/fidelity/PLAN.md` keeps methodology and protocol deviations only; operational
-    chronology stays in the private campaign records.
+  - The campaign plan is not published. The report lists the protocol amendments that the
+    text, figure notes and overlay headers cite, and the plan stays in the private campaign
+    records.
   - The README has a "Quality vs vendor FP8" section with the summary table and two
     figures, linking the report. An "E29 vs NVFP4" subsection compares the two recipes head
     to head: distance, perplexity by regime and category, determinism, tasks, tool calls

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Corruption probe for an arm (docs/fidelity/PLAN.md §6, amendment 13): Italian and tool-call
+"""Corruption probe for an arm (docs/fidelity/REPORT.md, amendment 13): Italian and tool-call
 prompts at temperature 0, counting invalid UTF-8 byte-token runs, repetition locks and
 tool-call parse failures. Motivated by vLLM #54150 (ModelOpt NVFP4 GLM-5.3-Flash checkpoints
 emitting invalid UTF-8 byte tokens).

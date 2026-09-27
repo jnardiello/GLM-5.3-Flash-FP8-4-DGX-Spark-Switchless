@@ -281,7 +281,7 @@ if [ -n "${SPEC_EXTRA_JSON:-}" ]; then
 fi
 # SPEC_TOKENS must be an integer >= 1 (DFlash2 drafter). 0 omits --speculative-config
 # entirely; it exists only for measurement overlays that must run without speculation
-# (docs/fidelity/PLAN.md) and requires an empty SPEC_EXTRA_JSON.
+# (docs/fidelity/REPORT.md) and requires an empty SPEC_EXTRA_JSON.
 if ! [ "$SPEC_TOKENS" -ge 0 ] 2>/dev/null; then
   echo "[launch] ERROR: SPEC_TOKENS must be an integer >= 0 (cluster.env, current: $SPEC_TOKENS)" >&2
   exit 1

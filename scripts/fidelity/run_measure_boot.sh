@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Run the pre-registered measurement steps of one measurement-mode boot, in order, with the
-# rank-memory sampler and its abort file (docs/fidelity/PLAN.md §4, §6). Stops at the first
+# rank-memory sampler and its abort file (docs/fidelity/REPORT.md). Stops at the first
 # failed or aborted step; completed results stay and every collector resumes on rerun.
 #
 #   BASE_URL=http://HOST:8000 HOSTS="r0 r1 r2 r3" scripts/fidelity/run_measure_boot.sh ARM BOOT_LABEL STEP...
 #
 # Steps: prompt-a prompt-b (full corpus, K=20), prompt-k100 (k100 subset, K=100),
 # prompt-crossboot (crossboot subset, K=20), prompt-ladder (ladder subset, K=20),
-# prompt-rep2..9 (repeated executions on the crossboot subset, PLAN amendment 13),
+# prompt-rep2..9 (repeated executions on the crossboot subset, amendment 13),
 # gen-a (decode set, greedy, 1024 tokens, K=20), gen-floor (decode floor subset),
 # gen-nospec (decode no-spec subset).
 set -euo pipefail

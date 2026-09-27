@@ -130,6 +130,10 @@ class ReportTest(unittest.TestCase):
         self.assertIn("Status: **pending**", md)
         self.assertIn("lower bound", md)
         self.assertIn("bash scripts/fidelity/make_all.sh", md)
+        self.assertIn("[Amendments](#amendments)", md)
+        self.assertIn("### Amendments", md)
+        self.assertIn("6. **R0 uses FP8 KV.**", md)
+        self.assertNotIn("PLAN.md", md)
         # bucket rows follow position order, not file order
         self.assertLess(md.index("| 0-2K |"), md.index("| 2-8K |"))
 

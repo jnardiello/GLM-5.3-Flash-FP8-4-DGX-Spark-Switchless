@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fidelity campaign figures (docs/fidelity/PLAN.md, owner brief section 10).
+"""Fidelity campaign figures (docs/fidelity/REPORT.md).
 
 Reads the public aggregates in docs/fidelity/metrics-v2/, optional task and voxel
 results, the private determinism probes in data/fidelity/prelim/ and, for the

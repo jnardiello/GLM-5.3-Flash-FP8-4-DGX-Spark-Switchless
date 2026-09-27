@@ -163,7 +163,7 @@ if [ -d "$REPO/scripts/node/experiments/e03" ]; then
   done < <(cd "$REPO" && find scripts/node/experiments/e03 -type f \( -name '*.py' -o -name '*.json' -o -name SHA256SUMS \) | sort)
 fi
 
-# Fidelity campaign assets (docs/fidelity/PLAN.md): per-overlay SparkCache configurations
+# Fidelity campaign assets (docs/fidelity/REPORT.md): per-overlay SparkCache configurations
 # with their own cache namespaces, and the NVFP4 comparison launcher. They are inert unless
 # a fidelity TP4_ENV overlay selects them.
 if [ -d "$REPO/scripts/node/experiments/fidelity" ]; then

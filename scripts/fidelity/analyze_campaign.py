@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Campaign-level fidelity analysis: regimes, coverage, source-group bootstrap and verdicts.
 
-Implements docs/fidelity/PLAN.md sections 7-8 as amended (12-13). Every prompt
+Implements the campaign analysis in docs/fidelity/REPORT.md (method, amendments 12-13). Every prompt
 comparison is reported for all positions, the dense regime (conditioning on at most
 2,048 tokens) and the sparse regime (more than 2,048), with identical valid-position
 masks for a contrast and its floor. Uncertainty comes from a percentile bootstrap over
@@ -86,7 +86,7 @@ METHOD = [
     "Verdicts per criterion: within_margin when the one-sided 95% upper bound is below the margin; "
     "exceeds_margin when the one-sided 95% lower bound is at or above it; otherwise unresolved. A regime "
     "is within_margin when all three criteria are, exceeds_margin when any criterion is, and unresolved "
-    "otherwise. Margins (PLAN section 8): mean excess 0.002 nats, p99 excess 0.02 nats, agreement drop "
+    "otherwise. Margins (pre-registered): mean excess 0.002 nats, p99 excess 0.02 nats, agreement drop "
     "0.5 pp. They are pre-registered for Cm vs R0 only; other comparisons carry the same evaluation "
     "as descriptive context. A regime is unresolved when its floor is not estimable.",
     "Sparse regime: single-execution excess over the R0 floor is reported only as additional "

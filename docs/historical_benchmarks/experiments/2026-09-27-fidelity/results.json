@@ -450,7 +450,7 @@
    },
    "windows": 424
   },
-  "native_prompt_source_matches_public_file": true,
+  "native_prompt_source_matches_public_file": false,
   "positions_by_regime": {
    "all": 2514441,
    "dense": 773500,
@@ -3463,12 +3463,8 @@
  ],
  "published_files": [
   {
-   "path": "PLAN.md",
-   "sha256": "89c34e90d6770e62f4dbfc60be06d1eab6d61ddd912aebe5326142001427cb9a"
-  },
-  {
    "path": "REPORT.md",
-   "sha256": "795cc9972b7a5909f66d29f67bc877775b145eebbc0b0f113123a2ccddee6346"
+   "sha256": "e09bac0a860f9888902ef44cc4d3b6d4729ebe97d05ca9bb869dfa290cd15dd7"
   },
   {
    "path": "boots/cm-09270932.json",
@@ -3616,7 +3612,7 @@
   },
   {
    "path": "metrics-v2/summary.json",
-   "sha256": "4e9a8d192d1560e0d2e88d4376668ae70e63213402b974decc93f755418ce23a"
+   "sha256": "a8bd1be4c3eb5be35a532ae281c40194d844ec56139f537efcca4d2c87d24784"
   },
   {
    "path": "plots/01-quality-vs-fp8.png",
@@ -3744,7 +3740,7 @@
   },
   {
    "path": "report.html",
-   "sha256": "0db1a5282407bfe977f4f217136a259c7261af857ca45f6964a7c7d8cc74e058"
+   "sha256": "5f9dab6ab71e908c1f5782ad0973c8addd40a77e6c6347f23584c7716324f097"
   },
   {
    "path": "verdict.md",

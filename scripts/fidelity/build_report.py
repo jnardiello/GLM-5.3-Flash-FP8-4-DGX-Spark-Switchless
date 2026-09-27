@@ -81,6 +81,44 @@ LIMITATIONS = [
     "**Descoped work.** Decode-set generations, sampled and hardset task runs, tasktime, Cpre serving "
     "(amendment 15) and the voxel showcase (amendment 16) were not run.",
 ]
+# Protocol amendments, recorded before the measurements they affect. Report text, overlay headers and
+# figure notes cite them by number.
+AMENDMENTS = [
+    "**Return to E29 (phase 3).** A restored default is verified by the full checkpoint manifest (72 files, "
+    "SHA-256 each), deploy, the fabric check, both gates and `check-f0.py`; the fetch script finds its manifests "
+    "when run from `~/tp4`.",
+    "**Speculation stays on.** Prompt and generation logprobs are complete with DFlash2 active, so every "
+    "measurement arm keeps speculative decoding on.",
+    "**Short smoke prompts.** Rank-0 memory under E29 limits the production-recipe smoke test to short prompts; "
+    "the long-prompt cache-hit test and namespace sizing move to the first measurement boot.",
+    "**Corpus.** Each Italian conversation also gets one overlapping second-half window, and the model-native "
+    "prompts rise to 60.",
+    "**Boot order.** R0 serving comes first, because the model-native windows must exist before any scoring.",
+    "**R0 uses FP8 KV.** B12X canonicalises every KV dtype to FP8, so R0 keeps the FP8 KV of the September 18 "
+    "recipe and shares the FP8-KV error.",
+    "**No transfers on serving nodes.** Downloads, pulls and copies run only with the stack down; model-native "
+    "generation runs at concurrency 4 under a 1 GiB rank-memory abort.",
+    "**R0 serving KV pool.** `r0-s` uses a 12 GiB KV pool for rank-0 memory; pool size changes capacity, not "
+    "numerics.",
+    "**Model-native windows.** 60 public long-form prompts written for the campaign (a JSON file in "
+    "`scripts/fidelity/`) are added; the provisional corpus reaches 424 windows.",
+    "**Order.** R0 tasks run after the measurement boots.",
+    "**Cache hits.** A prefix-cache hit suppresses prompt logprobs, so every request carries a fresh cache salt, "
+    "and measurement overlays turn the SparkCache store and restore off.",
+    "**Repeatability floor.** R0 is bit-identical up to 2,048 conditioning tokens and nondeterministic beyond, so "
+    "every comparison is reported for the dense and sparse regimes separately, as excess over the floor.",
+    "**Independent review of the plan.** Sparse-regime quantities from at least three executions per arm "
+    "(descriptive), covered mass and top-K overlap with every comparison, a bootstrap over source groups, "
+    "explicit excess definitions and verdict labels, ladder negative controls, and a ±2 pp paired task "
+    "equivalence rule.",
+    "**NVFP4 fabric layer.** The published recipe's fabric variables do not fit this ring, so the NVFP4 launcher "
+    "uses this repository's fabric layer.",
+    "**Cross-boot result and descoping.** Dense-regime results are bit-identical across boots, so the recipe "
+    "ladder is kept with a strict negative control. Decode-set generations, the DFlash2 exact-match check, the "
+    "production bridge, sampled and hardset task runs, tasktime and Cpre serving are dropped; the cloud arm "
+    "waits for a spending cap.",
+    "**Voxel showcase deferred** to a possible next step.",
+]
 # Figures whose inputs were descoped (amendments 15-16): listed once instead of shown as placeholders.
 DESCOPED_FIGURES = {"09-decode-path": "decode-set generations (amendment 15)",
                     "13-voxel-showcase": "voxel showcase (amendment 16)"}
@@ -180,7 +218,7 @@ def count(x):
 
 
 # ---------------------------------------------------------------- document model
-# Blocks: ("h", level, text) ("p", text) ("ul", [items]) ("table", headers, rows)
+# Blocks: ("h", level, text) ("p", text) ("ul", [items]) ("ol", [items]) ("table", headers, rows)
 # ("code", text) ("fig", entry) ("box", title, blocks) ("verdict_md", text) ("eli5_md", text)
 
 
@@ -381,7 +419,8 @@ def build_blocks(inp) -> list:
     dirty = " with uncommitted changes" if (summary.get("harness_git") or {}).get("dirty") else ""
     B.append(("p", f"How far the E29 recipe's next-token distributions deviate from the vendor FP8 model served "
                    f"without this repository's precision and runtime changes (R0), and how a generic NVFP4 recipe "
-                   f"compares. Pre-registration and amendments: [PLAN.md](PLAN.md). Metrics generated {gen}"
+                   f"compares. Margins were pre-registered before any measurement; protocol changes are listed under "
+                   f"[Amendments](#amendments). Metrics generated {gen}"
                    + (f" from harness commit `{commit}`{dirty}." if commit else ".")))
 
     if inp.get("eli5"):
@@ -454,6 +493,11 @@ def build_blocks(inp) -> list:
         B.append(("p", f"Bootstrap: B = {bs.get('B')}, seed {bs.get('seed')}, unit {bs.get('unit')} "
                        f"({grouping.get('groups', '–')} groups over {grouping.get('windows', '–')} windows), "
                        f"{bs.get('estimator')}; {bs.get('ci')}."))
+
+    B.append(("h", 3, "Amendments"))
+    B.append(("p", "Protocol changes, each recorded before the measurements it affects. Overlay headers written "
+                   "during the campaign cite them as \"PLAN amendment N\"."))
+    B.append(("ol", AMENDMENTS))
 
     # 3. Corpus
     B.append(("h", 2, "3. Corpus"))
@@ -732,6 +776,8 @@ def render_md(blocks) -> str:
             out.append(b[1])
         elif kind == "ul":
             out.append("\n".join(f"- {item}" for item in b[1]))
+        elif kind == "ol":
+            out.append("\n".join(f"{n}. {item}" for n, item in enumerate(b[1], 1)))
         elif kind == "table":
             headers, rows = b[1], b[2]
             if not rows:
@@ -932,6 +978,8 @@ def render_html(blocks, inp) -> str:
             body.append(f"<p>{inline_html(b[1])}</p>")
         elif kind == "ul":
             body.append("<ul>" + "".join(f"<li>{inline_html(i)}</li>" for i in b[1]) + "</ul>")
+        elif kind == "ol":
+            body.append("<ol>" + "".join(f"<li>{inline_html(i)}</li>" for i in b[1]) + "</ol>")
         elif kind == "table":
             if not b[2]:
                 continue
