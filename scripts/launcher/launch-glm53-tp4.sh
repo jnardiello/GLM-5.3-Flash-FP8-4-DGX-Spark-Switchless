@@ -279,9 +279,15 @@ if [ -n "${SPEC_EXTRA_JSON:-}" ]; then
     echo "[launch] ERROR: SPEC_EXTRA_JSON is not a valid JSON fragment: $SPEC_EXTRA_JSON" >&2; exit 1
   fi
 fi
-# SPEC_TOKENS must be an integer >= 1 (DFlash2 drafter).
-if ! [ "$SPEC_TOKENS" -ge 1 ] 2>/dev/null; then
-  echo "[launch] ERROR: SPEC_TOKENS must be an integer >= 1 (cluster.env, current: $SPEC_TOKENS)" >&2
+# SPEC_TOKENS must be an integer >= 1 (DFlash2 drafter). 0 omits --speculative-config
+# entirely; it exists only for measurement overlays that must run without speculation
+# (docs/fidelity/PLAN.md) and requires an empty SPEC_EXTRA_JSON.
+if ! [ "$SPEC_TOKENS" -ge 0 ] 2>/dev/null; then
+  echo "[launch] ERROR: SPEC_TOKENS must be an integer >= 0 (cluster.env, current: $SPEC_TOKENS)" >&2
+  exit 1
+fi
+if [ "$SPEC_TOKENS" -eq 0 ] && [ -n "${SPEC_EXTRA_JSON:-}" ]; then
+  echo "[launch] ERROR: SPEC_TOKENS=0 disables speculative decoding; SPEC_EXTRA_JSON must be empty" >&2
   exit 1
 fi
 
@@ -580,8 +586,12 @@ DOCKER_CMD+=(
 )
 # shellcheck disable=SC2206
 DOCKER_CMD+=( $ASYNCFLAG )
+if [ "$SPEC_TOKENS" -gt 0 ]; then
+  DOCKER_CMD+=(
+    --speculative-config "{\"method\":\"dflash\",\"model\":\"/draft\",\"num_speculative_tokens\":$SPEC_TOKENS${SPEC_EXTRA_JSON:+,$SPEC_EXTRA_JSON}}"
+  )
+fi
 DOCKER_CMD+=(
-  --speculative-config "{\"method\":\"dflash\",\"model\":\"/draft\",\"num_speculative_tokens\":$SPEC_TOKENS${SPEC_EXTRA_JSON:+,$SPEC_EXTRA_JSON}}"
   --tool-call-parser glm47
   --enable-auto-tool-choice
   --reasoning-parser glm45

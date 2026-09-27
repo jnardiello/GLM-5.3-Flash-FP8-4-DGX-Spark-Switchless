@@ -1,0 +1,46 @@
+{
+  "label": "n-s-09271214",
+  "recorded_utc": "2026-09-27T12:36:20+00:00",
+  "overlay": "scripts/node/experiments/fidelity/n-s.env",
+  "overlay_sha256": "5c2c774b1255a7789d0e2df8d3a01e9caaad2b54d42468eb8bdd7c9dbdc3f7c1",
+  "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+  "image": "ghcr.io/tonyd2wild/vllm-glm53-flash@sha256:4def0ef644cb2e9814136dcffd5e385e21bc594f48f3b292234051904abe85a6",
+  "image_id_pinned": "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6",
+  "model_repo": "LibertAIDAI/GLM-5.3-Flash-NVFP4",
+  "model_rev": "9e0d74e3cef17f634e84fb8e2223707e02616290",
+  "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+  "kv_cache_dtype": "fp8_e4m3",
+  "spec_tokens": "7",
+  "extra_vllm_args": "--kv-cache-memory-bytes=17179869184 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --prefill-schedule-interval 8 --compilation-config={\"max_cudagraph_capture_size\":72}",
+  "k": 20,
+  "ranks": [
+    {
+      "rank": 0,
+      "container_running": true,
+      "image_id": "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6",
+      "cmd_sha256": "6f99e5f40024cd7ea3373c36424aaa1be224385fb66edd72563a819b2e388313",
+      "ready_lines": []
+    },
+    {
+      "rank": 1,
+      "container_running": true,
+      "image_id": "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6",
+      "cmd_sha256": "0f32054b7d3d68c0f1c1453aa0bc93fe3c19803e1eaa308512930e2ed4b9dceb",
+      "ready_lines": []
+    },
+    {
+      "rank": 2,
+      "container_running": true,
+      "image_id": "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6",
+      "cmd_sha256": "05b651d68d052fed1f344e9b29145405d888b9b7e5c7f72fc51cb7f3b218c4a3",
+      "ready_lines": []
+    },
+    {
+      "rank": 3,
+      "container_running": true,
+      "image_id": "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6",
+      "cmd_sha256": "e53ec4cbb168293a55102a3a54859bd48b023f3db2e3b56821c8e7d7b52cc6ff",
+      "ready_lines": []
+    }
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "figures": [
+    {
+      "caption": "Perplexity change of each arm against R0 (the vendor FP8 recipe), exp(\u0394NLL) \u2212 1, per regime and per corpus category, with 95% CIs. Lower is better; E29 (Cm) predicts real text as well as FP8 when its bar straddles zero.",
+      "group": "quality",
+      "name": "01-quality-vs-fp8",
+      "notes": [],
+      "png": "01-quality-vs-fp8.png",
+      "status": "ok",
+      "svg": "01-quality-vs-fp8.svg",
+      "title": "Quality vs FP8"
+    },
+    {
+      "caption": "Deviation from R0 (mean coarse KL, a lower bound) against perplexity change, one point per arm with 95% CI crosses, R0 against itself at the origin and N against itself as its run-to-run noise.",
+      "group": "quality",
+      "name": "02-different-vs-worse",
+      "notes": [
+        "N vs itself: 85 cross-boot windows, bootstrap over 71 source groups; N's engine is nondeterministic from the first positions."
+      ],
+      "png": "02-different-vs-worse.png",
+      "status": "ok",
+      "svg": "02-different-vs-worse.svg",
+      "title": "Different vs worse"
+    },
+    {
+      "caption": "Recipe ladder R0 \u2192 L0919 \u2192 Cpre \u2192 LE21 \u2192 LE22b \u2192 Cm in the dense regime: KL added by each step and the cumulative perplexity change against R0, with bit-identical steps marked.",
+      "group": "quality",
+      "name": "03-ladder-waterfall",
+      "notes": [
+        "Negative-control attribution: available.",
+        "Bit-identical steps: LE22b."
+      ],
+      "png": "03-ladder-waterfall.png",
+      "status": "ok",
+      "svg": "03-ladder-waterfall.svg",
+      "title": "Ladder waterfall"
+    },
+    {
+      "caption": "Cumulative distribution of per-position coarse KL against R0 for each measured arm, with the R0 run-B-vs-A floor, separately for the dense and sparse regimes.",
+      "group": "results",
+      "name": "04-kl-cdf",
+      "notes": [
+        "Values below 10\u207b\u2076 nats, including exact zeros, are counted at the left edge. The dense R0 floor is bit-identical (KL = 0 everywhere)."
+      ],
+      "png": "04-kl-cdf.png",
+      "status": "ok",
+      "svg": "04-kl-cdf.svg",
+      "title": "Per-position KL: cumulative distribution"
+    },
+    {
+      "caption": "Median and p99 of per-position coarse KL in quarter-octave position bins, per arm, with the R0 floor. The dotted line marks 2,048 conditioning tokens.",
+      "group": "results",
+      "name": "05-kl-by-position",
+      "notes": [
+        "Bins of a quarter octave; bins with fewer than 50 positions are omitted; values below 1e-06 nats (including zeros) are drawn at 1e-06.",
+        "Positions beyond 32K come from five long-context windows only."
+      ],
+      "png": "05-kl-by-position.png",
+      "status": "ok",
+      "svg": "05-kl-by-position.svg",
+      "title": "KL along the context"
+    },
+    {
+      "caption": "Tail survival P(KL > x) on log-log axes: how often large deviations occur, per regime.",
+      "group": "results",
+      "name": "06-kl-tail-survival",
+      "notes": [
+        "Curves end where no position exceeds x. The floor is R0 run B against run A on the same boot."
+      ],
+      "png": "06-kl-tail-survival.png",
+      "status": "ok",
+      "svg": "06-kl-tail-survival.svg",
+      "title": "KL tail survival"
+    },
+    {
+      "caption": "Mean coarse KL and top-1 agreement against R0 by corpus category, per regime, with 95% group-bootstrap CIs.",
+      "group": "results",
+      "name": "07-by-category",
+      "notes": [
+        "Dense \u2264 2,048 conditioning tokens, sparse > 2,048. The dense R0 floor is exactly zero (no bar). Whiskers: 95% percentile bootstrap over source groups."
+      ],
+      "png": "07-by-category.png",
+      "status": "ok",
+      "svg": "07-by-category.svg",
+      "title": "KL and top-1 agreement by category"
+    },
+    {
+      "caption": "Mean coarse KL by prefill path (Marlin W8A16 chunks under 2,048 rows vs dequantised BF16 chunks).",
+      "group": "results",
+      "name": "08-by-prefill-path",
+      "notes": [
+        "Path tag assumes 8,192-token prefill chunks from position 0 at concurrency 1; a chunk shorter than 2,048 rows took the Marlin W8A16 path.",
+        "Marlin chunks are the last chunk of a window, so the path split is confounded with position and window length; compare within a regime.",
+        "Positions per cell: dense \u00b7 Marlin 71,037, dense \u00b7 BF16 702,463, sparse \u00b7 Marlin 136,480, sparse \u00b7 BF16 1,604,461."
+      ],
+      "png": "08-by-prefill-path.png",
+      "status": "ok",
+      "svg": "08-by-prefill-path.svg",
+      "title": "KL by prefill path"
+    },
+    {
+      "caption": "Greedy decode: KL along the identical prefix and Kaplan-Meier survival of identical prefixes.",
+      "group": "results",
+      "name": "09-decode-path",
+      "notes": [
+        "Greedy decode-set generations (R0 reference and at least one arm) have not been collected yet.",
+        "Expected runs: R0/gen-a (reference), R0/gen-floor, Cm/gen-a, Cpre/gen-a, N/gen-a."
+      ],
+      "png": "09-decode-path.png",
+      "status": "pending",
+      "svg": "09-decode-path.svg",
+      "title": "Decode path"
+    },
+    {
+      "caption": "Task pass rate per arm with Wilson 95% CIs, and paired greedy discordance with exact McNemar tests.",
+      "group": "results",
+      "name": "10-task-pass-rate",
+      "notes": [
+        "Pre-registered: no significant R0 vs Cp difference and a point estimate within 2 pp; equivalence needs the paired 95% CI inside \u00b12 pp (amendment 13)."
+      ],
+      "png": "10-task-pass-rate.png",
+      "status": "ok",
+      "svg": "10-task-pass-rate.svg",
+      "title": "Task pass rates"
+    },
+    {
+      "caption": "Dense-regime attribution along the recipe ladder, cumulative from R0 and per step, on the ladder subset.",
+      "group": "results",
+      "name": "11-ladder-attribution",
+      "notes": [
+        "Subset: subsets/ladder.txt; regime: dense. Grey bar = negative control (drafter, scheduler or KV pool only; must sit on the floor)."
+      ],
+      "png": "11-ladder-attribution.png",
+      "status": "ok",
+      "svg": "11-ladder-attribution.svg",
+      "title": "Ladder attribution"
+    },
+    {
+      "caption": "Mean coarse KL of Cm vs R0 at K = 100 and truncated to K = 20 on the same rows.",
+      "group": "results",
+      "name": "12-k-sensitivity",
+      "notes": [
+        "Same K = 100 rows truncated to K = 20; a larger K refines the partition, so the gap shows how much the lower bound tightens.",
+        "Windows compared: 85 of 85."
+      ],
+      "png": "12-k-sensitivity.png",
+      "status": "ok",
+      "svg": "12-k-sensitivity.svg",
+      "title": "K sensitivity"
+    },
+    {
+      "caption": "Greedy voxel renders per arm and prompt (a visual sanity check; no precision conclusion).",
+      "group": "results",
+      "name": "13-voxel-showcase",
+      "notes": [
+        "No rendered voxel outputs in docs/fidelity/voxel/checks.json yet."
+      ],
+      "png": "13-voxel-showcase.png",
+      "status": "pending",
+      "svg": "13-voxel-showcase.svg",
+      "title": "Voxel showcase"
+    },
+    {
+      "caption": "Run-to-run repeatability: R0 against itself by position bucket, and the first non-identical position in each arm's determinism probe.",
+      "group": "results",
+      "name": "14-repeatability",
+      "notes": [
+        "R0 probe: 9 same-window pass pairs, first non-identical position 2,052\u20132,052.",
+        "Cm probe: 9 same-window pass pairs, first non-identical position 2,052\u20132,052.",
+        "N probe: 9 same-window pass pairs, first non-identical position 3\u20136."
+      ],
+      "png": "14-repeatability.png",
+      "status": "ok",
+      "svg": "14-repeatability.svg",
+      "title": "Repeatability and the 2,048 onset"
+    },
+    {
+      "caption": "Summary of Cm, Cpre and N against R0: mean coarse KL and mean \u0394NLL per regime with 95% CIs, with the floor.",
+      "group": "results",
+      "name": "15-precision-vs-r0",
+      "notes": [
+        "Sparse-regime values from a single execution measure operational disagreement, not fidelity (amendment 13); the sparse verdict needs three executions per arm."
+      ],
+      "png": "15-precision-vs-r0.png",
+      "status": "ok",
+      "svg": "15-precision-vs-r0.svg",
+      "title": "Precision vs R0"
+    }
+  ],
+  "schema": "fidelity-plots/1",
+  "stride": 1
+}

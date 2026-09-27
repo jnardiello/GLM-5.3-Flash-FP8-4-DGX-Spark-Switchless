@@ -1,0 +1,48 @@
+{
+  "schema": "fidelity-campaign-config/1",
+  "description": "Campaign analysis of docs/fidelity/PLAN.md sections 7-8 with amendments 12-13. Run keys are <arm>/<run> under data/fidelity/raw; subsets are relative to the corpus manifest directory. Missing runs are reported as missing_runs.",
+  "bootstrap": {"B": 2000, "seed": 20260927},
+  "thresholds": {"kl_mean_excess_nats": 0.002, "kl_p99_excess_nats": 0.02, "top1_drop_pp": 0.5},
+  "comparisons": [
+    {"name": "floor-r0", "type": "pair", "ref": "R0/prompt-a", "cand": "R0/prompt-b", "role": "floor"},
+    {"name": "crossboot-r0", "type": "pair", "ref": "R0/prompt-a", "cand": "R0/prompt-crossboot",
+     "subset": "subsets/crossboot.txt", "role": "reference-only"},
+    {"name": "cm-vs-r0", "type": "pair", "ref": "R0/prompt-a", "cand": "Cm/prompt-a", "floor": "floor-r0",
+     "role": "pre-registered"},
+    {"name": "cpre-vs-r0", "type": "pair", "ref": "R0/prompt-a", "cand": "Cpre/prompt-a", "floor": "floor-r0",
+     "role": "descriptive"},
+    {"name": "cm-vs-cpre", "type": "pair", "ref": "Cpre/prompt-a", "cand": "Cm/prompt-a", "floor": "floor-r0",
+     "role": "descriptive"},
+    {"name": "n-vs-r0", "type": "pair", "ref": "R0/prompt-a", "cand": "N/prompt-a", "floor": "floor-r0",
+     "role": "descriptive"},
+    {"name": "n-vs-cm", "type": "pair", "ref": "Cm/prompt-a", "cand": "N/prompt-a", "floor": "floor-r0",
+     "role": "descriptive"},
+    {"name": "k-cm-vs-r0", "type": "k_sensitivity", "ref": "R0/prompt-k100", "cand": "Cm/prompt-k100",
+     "k_low": 20, "subset": "subsets/k100.txt"},
+    {"name": "ladder", "type": "ladder", "subset": "subsets/ladder.txt", "regime": "dense", "floor": "floor-r0",
+     "chain": ["R0/prompt-a", "L0919/prompt-ladder", "Cpre/prompt-a", "LE21/prompt-ladder",
+               "LE22b/prompt-ladder", "Cm/prompt-a"],
+     "strict_negative_controls": ["LE21/prompt-ladder->LE22b/prompt-ladder"],
+     "negative_control_steps": ["LE22b/prompt-ladder->Cm/prompt-a"]},
+    {"name": "repeated-crossboot", "type": "repeated", "subset": "subsets/crossboot.txt", "executions": 3,
+     "arms": {
+       "R0": ["R0/prompt-a", "R0/prompt-b", "R0/prompt-crossboot"],
+       "Cm": ["Cm/prompt-a", "Cm/prompt-rep2", "Cm/prompt-rep3"],
+       "Cpre": ["Cpre/prompt-a", "Cpre/prompt-rep2", "Cpre/prompt-rep3"],
+       "N": ["N/prompt-a", "N/prompt-rep2", "N/prompt-rep3"]
+     },
+     "pairs": [["R0", "Cm"], ["R0", "Cpre"], ["R0", "N"], ["Cpre", "Cm"], ["Cm", "N"]]},
+    {"name": "mde", "type": "mde", "floor": "floor-r0", "subset": "subsets/crossboot.txt",
+     "null_candidates": ["R0/prompt-crossboot"]},
+    {"name": "bit-identity", "type": "bit_identity", "checks": [
+      {"name": "r0-a-vs-b", "ref": "R0/prompt-a", "cand": "R0/prompt-b"},
+      {"name": "r0-a-vs-crossboot", "ref": "R0/prompt-a", "cand": "R0/prompt-crossboot",
+       "subset": "subsets/crossboot.txt"},
+      {"name": "cm-a-vs-rep2", "ref": "Cm/prompt-a", "cand": "Cm/prompt-rep2", "subset": "subsets/crossboot.txt"},
+      {"name": "cm-rep2-vs-rep3", "ref": "Cm/prompt-rep2", "cand": "Cm/prompt-rep3",
+       "subset": "subsets/crossboot.txt"},
+      {"name": "cpre-a-vs-rep2", "ref": "Cpre/prompt-a", "cand": "Cpre/prompt-rep2",
+       "subset": "subsets/crossboot.txt"},
+      {"name": "n-a-vs-rep2", "ref": "N/prompt-a", "cand": "N/prompt-rep2", "subset": "subsets/crossboot.txt"}]}
+  ]
+}

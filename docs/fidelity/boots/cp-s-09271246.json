@@ -1,0 +1,66 @@
+{
+  "label": "cp-s-09271246",
+  "recorded_utc": "2026-09-27T13:00:40+00:00",
+  "overlay": "scripts/node/experiments/fidelity/cp-s.env",
+  "overlay_sha256": "047285b03c6dbd8dc5c351eae3225747b3a5efbdda6eca08987fba5480db1534",
+  "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+  "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+  "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+  "model_repo": "zai-org/GLM-5.3-Flash",
+  "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+  "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+  "kv_cache_dtype": "fp8_e4m3",
+  "spec_tokens": "7",
+  "extra_vllm_args": "--kv-cache-memory-bytes=17179869184 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --prefill-schedule-interval 8 --compilation-config={\"max_cudagraph_capture_size\":72}",
+  "k": 20,
+  "ranks": [
+    {
+      "rank": 0,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "a93f28b49ea1e05be705dfbf136d83e119a6bf18d01569287a4a2e82a884f5c9",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411",
+        "E22_DRAFTER_W8A16_READY {\"added_scratch_bytes\": 0, \"context_kv_w8a16\": false, \"families\": [\"down_proj\", \"gate_up_proj\", \"kernel_projection\", \"o_proj\", \"qkv_proj\"], \"group_size\": 128, \"modules\": 30, \"original_bytes\": 566231040, \"packed_bytes\": 287544960, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"family\": \"qkv_proj\", \"layer\": ",
+        "E27B_SHORT_PREFILL_READY tokens=2048 interval=8",
+        "E27C_CADENCE_WHEN_QUEUED_READY interval=8",
+        "E29_END_DRAIN_READY trace=0",
+        "E29_IDLE_COALESCE_READY ms=4 trace=0"
+      ]
+    },
+    {
+      "rank": 1,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "9de292fc41704a47f6bfaac2f8b6ab7e5c69ab39bb1abf8c719e86e14dc6cb34",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411",
+        "E22_DRAFTER_W8A16_READY {\"added_scratch_bytes\": 0, \"context_kv_w8a16\": false, \"families\": [\"down_proj\", \"gate_up_proj\", \"kernel_projection\", \"o_proj\", \"qkv_proj\"], \"group_size\": 128, \"modules\": 30, \"original_bytes\": 566231040, \"packed_bytes\": 287544960, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"family\": \"qkv_proj\", \"layer\": "
+      ]
+    },
+    {
+      "rank": 2,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "875e1cdd733a90079603a878219db4f48cc31ad6c14f594d1d62db323bd3d26d",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411",
+        "E22_DRAFTER_W8A16_READY {\"added_scratch_bytes\": 0, \"context_kv_w8a16\": false, \"families\": [\"down_proj\", \"gate_up_proj\", \"kernel_projection\", \"o_proj\", \"qkv_proj\"], \"group_size\": 128, \"modules\": 30, \"original_bytes\": 566231040, \"packed_bytes\": 287544960, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"family\": \"qkv_proj\", \"layer\": "
+      ]
+    },
+    {
+      "rank": 3,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "287980d54e9cbe14e482e30a65c8985e504fe98b34654b53fa0d33679af6faf7",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411",
+        "E22_DRAFTER_W8A16_READY {\"added_scratch_bytes\": 0, \"context_kv_w8a16\": false, \"families\": [\"down_proj\", \"gate_up_proj\", \"kernel_projection\", \"o_proj\", \"qkv_proj\"], \"group_size\": 128, \"modules\": 30, \"original_bytes\": 566231040, \"packed_bytes\": 287544960, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"family\": \"qkv_proj\", \"layer\": "
+      ]
+    }
+  ]
+}

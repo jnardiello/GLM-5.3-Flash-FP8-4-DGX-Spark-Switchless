@@ -64,6 +64,9 @@ MODEL_DIR=$(eval echo "$MODEL_DIR")
 MARKER_NAME='.glm53-fp8-synced'
 MANIFEST_TOOL="$REPO/scripts/model_manifest.py"
 MANIFEST_DIR="$REPO/scripts/node/model-manifests"
+# Run from ~/tp4 on rank 0 (docs/install-from-zero.md), the manifests are where
+# scripts/deploy.sh places them.
+[ -d "$MANIFEST_DIR" ] || MANIFEST_DIR="$REPO/node/model-manifests"
 [ -n "${MODEL_REV:-}" ] || die "MODEL_REV must be pinned: an unversioned HEAD has no verifiable release manifest"
 MANIFEST="$MANIFEST_DIR/$MODEL_REV.json"
 [ -r "$MANIFEST_TOOL" ] || die "manifest helper missing: $MANIFEST_TOOL"

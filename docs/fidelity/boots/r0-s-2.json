@@ -1,0 +1,46 @@
+{
+  "label": "r0-s-2",
+  "recorded_utc": "2026-09-27T02:44:01+00:00",
+  "overlay": "scripts/node/experiments/fidelity/r0-s.env",
+  "overlay_sha256": "ad33ae6f79418da77e831561f8e26508bea30ae9cd32cd6469406f1fe660af0b",
+  "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+  "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+  "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+  "model_repo": "zai-org/GLM-5.3-Flash",
+  "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+  "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+  "kv_cache_dtype": "auto",
+  "spec_tokens": "5",
+  "extra_vllm_args": "--kv-cache-memory-bytes=17179869184 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler",
+  "k": 20,
+  "ranks": [
+    {
+      "rank": 0,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "d32b79b4367cd17c177280a87b823f1022b09b51ffe70836eabe55a4cadb9408",
+      "ready_lines": []
+    },
+    {
+      "rank": 1,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "a8432c3380458895100da2edaa8c3a3479f7762fcf682553a81f76397e4bd071",
+      "ready_lines": []
+    },
+    {
+      "rank": 2,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "bf351b7d9577a717361459828fac4008a69e57c5afc803f03afdd4baf249ad94",
+      "ready_lines": []
+    },
+    {
+      "rank": 3,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "4c1bb8922a31633910e9e8083656de335c2c281586353dc284d6053d60171aa7",
+      "ready_lines": []
+    }
+  ]
+}

@@ -7,6 +7,78 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- Fidelity campaign tooling (`docs/fidelity/PLAN.md`): it measures how far the E29 recipe's
+  next-token distributions and task outcomes deviate from the vendor FP8 model served
+  without the local precision and runtime changes.
+  - `scripts/fidelity/make_overlays.py` generates complete `TP4_ENV` overlays under
+    `scripts/node/experiments/fidelity/` from the frozen references and the E29 default.
+    Each overlay changes only the declared measurement keys: 6 GiB KV, one sequence, a
+    139,264-token window, `--max-logprobs 100` and, for the reference, BF16 KV. Each
+    overlay has its own SparkCache namespace. `--check` detects stale files and `--diff`
+    prints any overlay's delta against its base.
+  - `scripts/deploy.sh` also deploys `scripts/node/experiments/fidelity/` (SparkCache
+    configurations and launchers) to `~/tp4/experiments/fidelity/`. These files stay inert
+    unless a fidelity overlay selects them.
+  - `data/fidelity/` is ignored: corpus text, token IDs, raw logprobs, audits and site
+    inventories stay local. `scripts/check.sh` skips it.
+  - Measurement harness in `scripts/fidelity/`:
+    - Collectors for teacher-forced prompt logprobs and greedy generations through the vLLM
+      completions API. They use a fresh cache salt per attempt, retry with backoff, resume,
+      and stop on an abort file.
+    - `mem_sampler.py` samples MemAvailable per rank and raises that abort file below a
+      rank-0 floor.
+    - `analyze.py` reports coarse top-K KL, which is a lower bound on the true KL, together
+      with top-1 agreement and ΔNLL. Breakdowns cover category, source, position bucket
+      and prefill path, with window-bootstrap CIs, noise-floor excess, MDE and
+      K-sensitivity.
+    - `smoke.py`, `gates.py` and `boot_record.py` check logprob support, run the two
+      functional gates and record each boot's identity.
+  - `scripts/fidelity/corpus/` builds the private corpus: redacted agent-session windows,
+    Italian and model-native windows, and a 150-prompt decode set. It renders with the
+    runtime chat template and the pinned tokenizer, verifies token files against their
+    manifests, and publishes only the numeric `docs/fidelity/corpus-summary.json`.
+  - `scripts/fidelity/tasks/` is the endpoint layer, for local vLLM arms and a cost-capped
+    z.ai arm, over the knapcio qeval, hardset and tasktime sets vendored unmodified in
+    `third_party/knapcio-bench/` (MIT). Its statistics are exact McNemar, Wilson intervals
+    and a paired bootstrap.
+  - `scripts/fidelity/voxel/` fetches the two public voxel-pagoda prompts verbatim and runs
+    them against each arm. It renders the outputs headlessly, checks the Pagoda Bench
+    constraints and builds an anonymised gallery.
+  - `scripts/check.sh` runs the new stdlib tests (metrics, collectors, redaction, tasks,
+    campaign analysis and report) and `make_overlays.py --check`.
+  - `scripts/node/experiments/fidelity/launch-nvfp4-tp4.sh` runs Alex Ellis's published
+    NVFP4 engine layer on this repository's fabric for the comparison arm.
+  - `scripts/fidelity/analyze_campaign.py` and `campaign.config.json` report every
+    comparison separately for dense (≤ 2,048 conditioning tokens), sparse and overall
+    regimes. They add covered probability mass and top-K overlap, a bootstrap over source
+    sessions, excess over the repeatability floor with one-sided bounds and
+    `within_margin`/`exceeds_margin`/`unresolved` verdicts. Repeated executions give the
+    averaged-distribution estimate for the nondeterministic sparse regime; the analysis also
+    covers MDE, K sensitivity and ladder attribution. KL is computed in log space, with a
+    compensated complement for the rest bucket, so near-identical distributions do not
+    round to spurious values.
+  - `scripts/fidelity/plots.py`, `build_report.py` and `make_all.sh` regenerate all metrics,
+    the task statistics and probe summaries, fifteen PNG/SVG figures,
+    `docs/fidelity/REPORT.md` and a self-contained `report.html` in one command. The report
+    opens with the verdict and the perplexity-change quality figures, and a built-in leak
+    check keeps site values out of the public outputs.
+  - `corruption_probe.py` counts invalid UTF-8, U+FFFD replacement characters, repetition
+    locks and tool-call parse failures on Italian and tool-call prompts (motivated by vLLM
+    issue 54150 for ModelOpt NVFP4 checkpoints). `run_serving_chain.sh` runs the
+    serving-mode boots for tasks, voxel runs and probes, and ends by restoring the plain
+    default with both gates and `check-f0.py`.
+  - `determinism_probe.py`, `generate_native.py`, `make_subsets.py`, `run_measure_boot.sh`
+    and `run_arm_chain.sh` drive the measurement boots: a repeatability probe, model-native
+    corpus windows, seeded subsets and resumable measurement steps under the rank-memory
+    abort.
+  - First campaign results in `docs/fidelity/`: the report, its verdict, aggregated metrics,
+    boot identities and figures. E29 differs from the vendor FP8 model in the dense regime
+    well beyond the pre-registered KL margin, but shows no detectable perplexity change
+    (all positions +0.14% [−0.32, +0.56]). The sparse regime remains unresolved because the
+    engine is not deterministic beyond 2,048 tokens. The NVFP4 comparison arm deviates
+    further and is 6.9% [4.5, 9.2] worse in perplexity than E29 overall. Voxel runs and the
+    cloud arm are deferred.
+
 - Archived the discarded E27d experiment: a per-step cap of 2,304 prefill tokens while other
   requests decode, on the E29 default. The archive holds its report and portable numeric
   extract, and the benchmark index has a new row for it.
@@ -249,6 +321,11 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- The launcher accepts `SPEC_TOKENS=0` (with an empty `SPEC_EXTRA_JSON`) and then omits
+  `--speculative-config`; measurement overlays use it when logprobs require speculation
+  off. Every value of 1 or more builds the same command as before: all four ranks of the
+  E29 default and of the eight reference overlays produce identical dry runs.
+
 - CREDITS, the README prerequisites, installation step 8 and the production recipe now
   link SparkCache and SparkRing SIRCL directly and state their Apache-2.0 licenses. They
   replace the earlier "no license notice" wording, which described only the archived copies.
@@ -364,6 +441,10 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Fixed
 
+- `scripts/fetch-fp8-weights.sh` finds the release manifests when run from `~/tp4` on
+  rank 0, as the installation guide documents. It used to look only under the checkout
+  layout, `scripts/node/model-manifests/`, which `scripts/deploy.sh` does not create
+  on a node.
 - Fixed a dead `IMAGE` assignment in the configuration template: the historical F0 rollback
   line had lost its comment marker, so it read as an active setting that the real
   digest-pinned `IMAGE` below silently overrode. Editing it had no effect. It is now marked

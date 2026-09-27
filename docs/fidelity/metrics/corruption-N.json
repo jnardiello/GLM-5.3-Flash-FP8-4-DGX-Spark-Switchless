@@ -1,0 +1,13 @@
+{
+ "label": "N",
+ "italian_prompts": 40,
+ "italian_invalid_utf8": 0,
+ "italian_with_fffd": 3,
+ "italian_fffd_total": 8,
+ "italian_repetition_flags": 0,
+ "italian_truncated": 0,
+ "tool_prompts": 10,
+ "tool_calls_made": 10,
+ "tool_parse_failures": 0,
+ "tool_no_call": 0
+}

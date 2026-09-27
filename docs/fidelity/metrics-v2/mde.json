@@ -1,0 +1,99 @@
+{
+  "basis": "2.8 x bootstrap SE (80% power, two-sided alpha 0.05) of paired reference-only contrasts",
+  "contrasts": [
+    {
+      "contrast": "KL(R0/prompt-a, R0/prompt-crossboot) - KL(R0/prompt-a, R0/prompt-b)",
+      "kind": "null_excess",
+      "regimes": {
+        "all": {
+          "groups": 71,
+          "kl_mean_excess_se": 0.0010895907515667386,
+          "mde_kl_mean_nats": 0.003050854104386868,
+          "mde_top1_pp": 0.1310624242830576,
+          "null_excess": {
+            "B": 2000,
+            "ci_high": 0.0020434391370170607,
+            "ci_low": -0.0021718492541525844,
+            "estimate": -0.00015677040276856902,
+            "lb95": -0.001835238024778256,
+            "se": 0.0010895907515667386,
+            "ub95": 0.0017876521458619911
+          },
+          "positions": 471625
+        },
+        "dense": {
+          "groups": 71,
+          "kl_mean_excess_se": 0.0,
+          "mde_kl_mean_nats": 0.0,
+          "mde_top1_pp": 0.0,
+          "null_excess": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          },
+          "positions": 155390
+        },
+        "sparse": {
+          "groups": 55,
+          "kl_mean_excess_se": 0.0015688614308521265,
+          "mde_kl_mean_nats": 0.004392812006385954,
+          "mde_top1_pp": 0.19029174173762364,
+          "null_excess": {
+            "B": 2000,
+            "ci_high": 0.0030610659764465677,
+            "ci_low": -0.003134227348739528,
+            "estimate": -0.0002338034727519811,
+            "lb95": -0.0027025438018938113,
+            "se": 0.0015688614308521265,
+            "ub95": 0.0025423328218223793
+          },
+          "positions": 316235
+        }
+      },
+      "subset": "subsets/crossboot.txt"
+    }
+  ],
+  "floor": "floor-r0",
+  "floor_mean": {
+    "contrast": "R0/prompt-b vs R0/prompt-a",
+    "kind": "floor_mean",
+    "note": "SE of the floor mean itself; context only, not used for the governing MDE",
+    "regimes": {
+      "all": {
+        "groups": 235,
+        "kl_mean_se": 0.011326583196101057,
+        "mde_kl_mean_nats": 0.03171443294908296,
+        "mde_top1_pp": 1.8669971044122855,
+        "positions": 2514441
+      },
+      "dense": {
+        "groups": 235,
+        "kl_mean_se": 0.0,
+        "mde_kl_mean_nats": 0.0,
+        "mde_top1_pp": 0.0,
+        "positions": 773500
+      },
+      "sparse": {
+        "groups": 177,
+        "kl_mean_se": 0.011414493708752266,
+        "mde_kl_mean_nats": 0.031960582384506345,
+        "mde_top1_pp": 1.7349989825302263,
+        "positions": 1740941
+      }
+    }
+  },
+  "governing_mde_kl_mean_nats": {
+    "all": 0.003050854104386868,
+    "dense": 0.0,
+    "sparse": 0.004392812006385954
+  },
+  "name": "mde",
+  "note": "a zero SE means the contrast is bit-identical in that regime; the MDE is then degenerate",
+  "schema": "fidelity-campaign-mde/1",
+  "status": "ok",
+  "type": "mde"
+}

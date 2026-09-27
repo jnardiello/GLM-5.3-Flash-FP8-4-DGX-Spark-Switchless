@@ -1,0 +1,2541 @@
+{
+  "arms": {
+    "Cm": {
+      "available": [
+        "Cm/prompt-a",
+        "Cm/prompt-rep2",
+        "Cm/prompt-rep3"
+      ],
+      "configured": [
+        "Cm/prompt-a",
+        "Cm/prompt-rep2",
+        "Cm/prompt-rep3"
+      ],
+      "used": [
+        "Cm/prompt-a",
+        "Cm/prompt-rep2",
+        "Cm/prompt-rep3"
+      ]
+    },
+    "Cpre": {
+      "available": [
+        "Cpre/prompt-a",
+        "Cpre/prompt-rep2",
+        "Cpre/prompt-rep3"
+      ],
+      "configured": [
+        "Cpre/prompt-a",
+        "Cpre/prompt-rep2",
+        "Cpre/prompt-rep3"
+      ],
+      "used": [
+        "Cpre/prompt-a",
+        "Cpre/prompt-rep2",
+        "Cpre/prompt-rep3"
+      ]
+    },
+    "N": {
+      "available": [
+        "N/prompt-a",
+        "N/prompt-rep2",
+        "N/prompt-rep3"
+      ],
+      "configured": [
+        "N/prompt-a",
+        "N/prompt-rep2",
+        "N/prompt-rep3"
+      ],
+      "used": [
+        "N/prompt-a",
+        "N/prompt-rep2",
+        "N/prompt-rep3"
+      ]
+    },
+    "R0": {
+      "available": [
+        "R0/prompt-a",
+        "R0/prompt-b",
+        "R0/prompt-crossboot"
+      ],
+      "configured": [
+        "R0/prompt-a",
+        "R0/prompt-b",
+        "R0/prompt-crossboot"
+      ],
+      "used": [
+        "R0/prompt-a",
+        "R0/prompt-b",
+        "R0/prompt-crossboot"
+      ]
+    }
+  },
+  "executions_per_arm": 3,
+  "min_executions": 3,
+  "name": "repeated-crossboot",
+  "pairs": {
+    "Cm-vs-Cpre": {
+      "groups": 71,
+      "regimes": {
+        "all": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.8876416371346385,
+            "ci_low": 0.850877463426335,
+            "estimate": 0.868460045699702,
+            "lb95": 0.853582565690912,
+            "se": 0.009389602396705396,
+            "ub95": 0.8839938673844437
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8873171412583096,
+            "ci_low": 0.850540207502449,
+            "estimate": 0.8682439448793562,
+            "lb95": 0.8533058180180313,
+            "se": 0.009385284576481226,
+            "ub95": 0.8837354320509052
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.22472134329384394,
+            "ci_low": 0.16805291591392427,
+            "estimate": 0.19843088003469572,
+            "lb95": 0.1723338521220966,
+            "se": 0.014664901755342205,
+            "ub95": 0.22016691638471028
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.08290646616876059,
+              "ci_low": 0.051273929272327705,
+              "estimate": 0.0659514972396557,
+              "lb95": 0.05345282490705514,
+              "se": 0.008357644101812344,
+              "ub95": 0.08042522423432756
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.0854860120589002,
+              "ci_low": 0.05407331322618562,
+              "estimate": 0.06848696679615238,
+              "lb95": 0.05629569634837954,
+              "se": 0.008308850744622842,
+              "ub95": 0.08280367537288032
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.05239125405054942,
+              "ci_low": 0.03315034242737277,
+              "estimate": 0.04331463774618113,
+              "lb95": 0.034722162957311835,
+              "se": 0.0050123435141700605,
+              "ub95": 0.05104737752041726
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 71,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.12626773379007872,
+            "ci_low": 0.09440583903542003,
+            "estimate": 0.10926613498583676,
+            "lb95": 0.09686607191268493,
+            "se": 0.008104347426408495,
+            "ub95": 0.12290541328239367
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 0.8882503479054138,
+            "ci_low": 0.5304693915487407,
+            "estimate": 0.6840852032809988,
+            "lb95": 0.5523005272067791,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.09426806996119082,
+            "ub95": 0.8548557335589514
+          },
+          "outcome": "unresolved",
+          "positions": 471625,
+          "positions_joint_valid": 471625,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 14.77914072517176,
+            "ci_low": 13.717043831916117,
+            "estimate": 14.19312589451365,
+            "lb95": 13.80148986811095,
+            "se": 0.26689226852134035,
+            "ub95": 14.664557683214614
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 88.91804970440108,
+              "ci_low": 84.2864650860776,
+              "estimate": 86.42622139765072,
+              "lb95": 84.65329635563882,
+              "se": 1.1833308105039397,
+              "ub95": 88.47591082447278
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 82.83494291068165,
+              "ci_low": 78.38803123185899,
+              "estimate": 80.5253703212885,
+              "lb95": 78.84448611497557,
+              "se": 1.1146026625652594,
+              "ub95": 82.47609815869761
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 88.88785614764909,
+              "ci_low": 84.21292609376142,
+              "estimate": 86.38070500927724,
+              "lb95": 84.59530871489508,
+              "se": 1.195569570244905,
+              "ub95": 88.46309651624733
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 7.141278131459489,
+            "ci_low": 4.713530976828097,
+            "estimate": 5.878092882174646,
+            "lb95": 4.868530857813746,
+            "note": "descriptive only",
+            "se": 0.6479943594403269,
+            "ub95": 7.003937578132968
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.15662816289028467,
+            "ci_low": 0.09886162920799361,
+            "estimate": 0.12943143783058966,
+            "lb95": 0.10369341536853421,
+            "se": 0.015026973105148271,
+            "ub95": 0.15249155416970728
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.15775564345124898,
+            "ci_low": 0.10002234268156872,
+            "estimate": 0.1304563886464974,
+            "lb95": 0.10460272625036067,
+            "se": 0.015051002393103514,
+            "ub95": 0.15360574669458824
+          }
+        },
+        "dense": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.929127760354751,
+            "ci_low": 0.8983110211044361,
+            "estimate": 0.9142352182910531,
+            "lb95": 0.90114219961156,
+            "se": 0.007788738707751951,
+            "ub95": 0.926345571918197
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.9286198819142667,
+            "ci_low": 0.8976935701343429,
+            "estimate": 0.9137656019180233,
+            "lb95": 0.90043343207177,
+            "se": 0.007835189015136836,
+            "ub95": 0.9259916867083089
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.20711837355811782,
+            "ci_low": 0.13578220658340365,
+            "estimate": 0.1690908118424431,
+            "lb95": 0.14024483995944823,
+            "se": 0.01830946059176307,
+            "ub95": 0.2012146821700779
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.20711837355811782,
+              "ci_low": 0.13578220658340365,
+              "estimate": 0.1690908118424431,
+              "lb95": 0.14024483995944823,
+              "se": 0.01830946059176307,
+              "ub95": 0.2012146821700779
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.20711837355811782,
+              "ci_low": 0.13578220658340365,
+              "estimate": 0.1690908118424431,
+              "lb95": 0.14024483995944823,
+              "se": 0.01830946059176307,
+              "ub95": 0.2012146821700779
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.0,
+              "ci_low": 0.0,
+              "estimate": 0.0,
+              "lb95": 0.0,
+              "se": 0.0,
+              "ub95": 0.0
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 71,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.20711837355811782,
+            "ci_low": 0.13578220658340365,
+            "estimate": 0.1690908118424431,
+            "lb95": 0.14024483995944823,
+            "se": 0.01830946059176307,
+            "ub95": 0.2012146821700779
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 3.525073005578842,
+            "ci_low": 2.413317593262026,
+            "estimate": 2.9523396404049342,
+            "lb95": 2.4773296445248696,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.28899703658909054,
+            "ub95": 3.434899267712474
+          },
+          "outcome": "unresolved",
+          "positions": 155390,
+          "positions_joint_valid": 155390,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 17.09145859214694,
+            "ci_low": 16.39707665882761,
+            "estimate": 16.760306326018405,
+            "lb95": 16.45843833965385,
+            "se": 0.1770414070010632,
+            "ub95": 17.041416650338938
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 100.0,
+              "ci_low": 100.0,
+              "estimate": 100.0,
+              "lb95": 100.0,
+              "se": 0.0,
+              "ub95": 100.0
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 86.55304663374798,
+              "ci_low": 81.9124445257815,
+              "estimate": 84.30722697728297,
+              "lb95": 82.26554723120906,
+              "se": 1.1983759318369356,
+              "ub95": 86.21347242793449
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 100.0,
+              "ci_low": 100.0,
+              "estimate": 100.0,
+              "lb95": 100.0,
+              "se": 0.0,
+              "ub95": 100.0
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 18.087555474218497,
+            "ci_low": 13.446953366252012,
+            "estimate": 15.692773022717036,
+            "lb95": 13.786527572065507,
+            "note": "descriptive only",
+            "se": 1.1983759318369354,
+            "ub95": 17.73445276879095
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          }
+        },
+        "sparse": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.8660052159530236,
+            "ci_low": 0.8255290488925466,
+            "estimate": 0.8459672663774574,
+            "lb95": 0.8287546798125904,
+            "se": 0.010555027035850373,
+            "ub95": 0.8632107663641659
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8658428702895734,
+            "ci_low": 0.8251476770968632,
+            "estimate": 0.8458757367833567,
+            "lb95": 0.8285752290505564,
+            "se": 0.010583534177924282,
+            "ub95": 0.863075313157831
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.2346150314469134,
+            "ci_low": 0.18176848846674343,
+            "estimate": 0.2128478585361082,
+            "lb95": 0.18669648415113665,
+            "se": 0.013814295711968842,
+            "ub95": 0.23174357412696198
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.0184874726774425,
+              "ci_low": 0.012420934808824932,
+              "estimate": 0.015271407761491931,
+              "lb95": 0.012818700639827386,
+              "se": 0.0015992135548945692,
+              "ub95": 0.01801449610712584
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.022585054574579395,
+              "ci_low": 0.01602289808690145,
+              "estimate": 0.01905274388678716,
+              "lb95": 0.016379162506131664,
+              "se": 0.0017272499327845123,
+              "ub95": 0.02209243770223558
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.07182399879460892,
+              "ci_low": 0.05445297440371364,
+              "estimate": 0.06459837154977364,
+              "lb95": 0.05585108953171108,
+              "se": 0.004563837405112246,
+              "ub95": 0.07089635823834088
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 55,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.08743895837167236,
+            "ci_low": 0.06951387242903624,
+            "estimate": 0.0798697793112656,
+            "lb95": 0.07145085366838796,
+            "se": 0.004635634931039014,
+            "ub95": 0.08623339294361809
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 0.2883447575567013,
+            "ci_low": 0.19081907277673343,
+            "estimate": 0.23921500162409703,
+            "lb95": 0.19724749694526578,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.02460131991408214,
+            "ub95": 0.27747365732909074
+          },
+          "outcome": "unresolved",
+          "positions": 316235,
+          "positions_joint_valid": 316235,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 13.406791553423798,
+            "ci_low": 12.553173052423,
+            "estimate": 12.93167739181305,
+            "lb95": 12.604828865251388,
+            "se": 0.22067071347351674,
+            "ub95": 13.318125883010552
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 82.13272751629856,
+              "ci_low": 77.92553564060121,
+              "estimate": 79.75640478336317,
+              "lb95": 78.2352938586657,
+              "se": 1.0509932012805137,
+              "ub95": 81.69877134683351
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 81.05625164332967,
+              "ci_low": 76.77461013178574,
+              "estimate": 78.66706018555061,
+              "lb95": 77.07158495147335,
+              "se": 1.0800804562095343,
+              "ub95": 80.64780656194388
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 82.06836440816035,
+              "ci_low": 77.87152948385693,
+              "estimate": 79.68852277578443,
+              "lb95": 78.17347369245029,
+              "se": 1.0542346614557998,
+              "ub95": 81.67309807818896
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 1.2362943866573597,
+            "ci_low": 0.9000183153646153,
+            "estimate": 1.0554035940220132,
+            "lb95": 0.9223628778847184,
+            "note": "descriptive only",
+            "se": 0.08916882513124057,
+            "ub95": 1.2120006920090636
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.21491992869252358,
+            "ci_low": 0.16267107204635045,
+            "estimate": 0.19303082159423166,
+            "lb95": 0.16665347489830795,
+            "se": 0.01369917609941759,
+            "ub95": 0.21190534549266382
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.21619248261212384,
+            "ci_low": 0.16416728708649234,
+            "estimate": 0.19455940770441077,
+            "lb95": 0.16827852776605245,
+            "se": 0.013693860175063763,
+            "ub95": 0.2133717565515612
+          }
+        }
+      },
+      "runs": {
+        "Cm": [
+          "Cm/prompt-a",
+          "Cm/prompt-rep2",
+          "Cm/prompt-rep3"
+        ],
+        "Cpre": [
+          "Cpre/prompt-a",
+          "Cpre/prompt-rep2",
+          "Cpre/prompt-rep3"
+        ]
+      },
+      "status": "ok",
+      "verdict": {
+        "all": "unresolved",
+        "dense": "unresolved",
+        "sparse": "unresolved"
+      },
+      "windows": {
+        "compared": 85,
+        "expected": 85
+      }
+    },
+    "Cm-vs-R0": {
+      "groups": 71,
+      "regimes": {
+        "all": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.8874111997944228,
+            "ci_low": 0.8504154591240671,
+            "estimate": 0.8680730283522406,
+            "lb95": 0.8531201731507251,
+            "se": 0.009428777797177098,
+            "ub95": 0.8837628168168045
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8870586179692336,
+            "ci_low": 0.8500394039775572,
+            "estimate": 0.8677928828481799,
+            "lb95": 0.8528750205775458,
+            "se": 0.009432586846538712,
+            "ub95": 0.8833495599130725
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.22428784932693688,
+            "ci_low": 0.16873333581938477,
+            "estimate": 0.19857832620490007,
+            "lb95": 0.17282787623778192,
+            "se": 0.014390955834565095,
+            "ub95": 0.22026993077391155
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.08413368366115305,
+              "ci_low": 0.05261188830537221,
+              "estimate": 0.06694783138546864,
+              "lb95": 0.05454622489973737,
+              "se": 0.008292856558450273,
+              "ub95": 0.08142349362303986
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.08712446546139191,
+              "ci_low": 0.05583746519266972,
+              "estimate": 0.07004027327221155,
+              "lb95": 0.05792798751454927,
+              "se": 0.008234545794191759,
+              "ub95": 0.08446269176002529
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.051651023077959116,
+              "ci_low": 0.032858844293940107,
+              "estimate": 0.04284601764422935,
+              "lb95": 0.034405603860078515,
+              "se": 0.0048946201249249295,
+              "ub95": 0.05030402685242598
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 71,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.12612139765630925,
+            "ci_low": 0.09489146160034963,
+            "estimate": 0.1097938490296981,
+            "lb95": 0.09758816732713871,
+            "se": 0.008021476914194211,
+            "ub95": 0.12351493870445729
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 0.9162516890173152,
+            "ci_low": 0.5464023853691192,
+            "estimate": 0.708184465679004,
+            "lb95": 0.5684919436745872,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.09741854875433599,
+            "ub95": 0.8822864352985571
+          },
+          "outcome": "unresolved",
+          "positions": 471625,
+          "positions_joint_valid": 471625,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 14.771387661075522,
+            "ci_low": 13.70123031394927,
+            "estimate": 14.182324940365756,
+            "lb95": 13.790916459264418,
+            "se": 0.26759049122814843,
+            "ub95": 14.657066784040243
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 88.91804970440108,
+              "ci_low": 84.2864650860776,
+              "estimate": 86.42622139765072,
+              "lb95": 84.65329635563882,
+              "se": 1.1833308105039397,
+              "ub95": 88.47591082447278
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 82.80830028651711,
+              "ci_low": 78.36518374538286,
+              "estimate": 80.47127838148226,
+              "lb95": 78.78921560230006,
+              "se": 1.1113318207800558,
+              "ub95": 82.4309080818921
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 88.93900332556788,
+              "ci_low": 84.27732962866948,
+              "estimate": 86.43569219895831,
+              "lb95": 84.66693334556831,
+              "se": 1.1886269868521022,
+              "ub95": 88.50694910980931
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 7.235581245955997,
+            "ci_low": 4.796041935966663,
+            "estimate": 5.95967841682139,
+            "lb95": 4.954289286027934,
+            "note": "descriptive only",
+            "se": 0.6449274863170246,
+            "ub95": 7.08438565282171
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.15608920083718403,
+            "ci_low": 0.0986930129314159,
+            "estimate": 0.12910736020597746,
+            "lb95": 0.10370259582278891,
+            "se": 0.014912009168546842,
+            "ub95": 0.15189962393427087
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.1540048384103564,
+            "ci_low": 0.09807695973498148,
+            "estimate": 0.12796874565939909,
+            "lb95": 0.10290489259472695,
+            "se": 0.01446215764332171,
+            "ub95": 0.1501219604218758
+          }
+        },
+        "dense": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.9290979004638499,
+            "ci_low": 0.8978687776237009,
+            "estimate": 0.9138987087609517,
+            "lb95": 0.9007089711579952,
+            "se": 0.007881633172279698,
+            "ub95": 0.9262410450497273
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.9289445802738011,
+            "ci_low": 0.8977347683184118,
+            "estimate": 0.9137864950479393,
+            "lb95": 0.900509294736449,
+            "se": 0.007874933792977368,
+            "ub95": 0.9260490286192352
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.2057349554084828,
+            "ci_low": 0.13604783854625208,
+            "estimate": 0.16879937039269408,
+            "lb95": 0.14041751262493335,
+            "se": 0.01794675589817779,
+            "ub95": 0.1994859829406417
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.2057349554084828,
+              "ci_low": 0.13604783854625208,
+              "estimate": 0.16879937039269408,
+              "lb95": 0.14041751262493335,
+              "se": 0.01794675589817779,
+              "ub95": 0.1994859829406417
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.2057349554084828,
+              "ci_low": 0.13604783854625208,
+              "estimate": 0.16879937039269408,
+              "lb95": 0.14041751262493335,
+              "se": 0.01794675589817779,
+              "ub95": 0.1994859829406417
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.0,
+              "ci_low": 0.0,
+              "estimate": 0.0,
+              "lb95": 0.0,
+              "se": 0.0,
+              "ub95": 0.0
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 71,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.2057349554084828,
+            "ci_low": 0.13604783854625208,
+            "estimate": 0.16879937039269408,
+            "lb95": 0.14041751262493335,
+            "se": 0.01794675589817779,
+            "ub95": 0.1994859829406417
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 3.3841165447058006,
+            "ci_low": 2.4217581170039044,
+            "estimate": 2.893998055419901,
+            "lb95": 2.5142712959529727,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.24589016135957972,
+            "ub95": 3.2908134069662776
+          },
+          "outcome": "unresolved",
+          "positions": 155390,
+          "positions_joint_valid": 155390,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 17.083014139335997,
+            "ci_low": 16.37736886184022,
+            "estimate": 16.745144475191452,
+            "lb95": 16.443447427431,
+            "se": 0.17814211102203084,
+            "ub95": 17.030339142580168
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 100.0,
+              "ci_low": 100.0,
+              "estimate": 100.0,
+              "lb95": 100.0,
+              "se": 0.0,
+              "ub95": 100.0
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 86.54255500201151,
+              "ci_low": 81.9520395908989,
+              "estimate": 84.30272218289466,
+              "lb95": 82.29645627131998,
+              "se": 1.1824970189039996,
+              "ub95": 86.20458942507503
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 100.0,
+              "ci_low": 100.0,
+              "estimate": 100.0,
+              "lb95": 100.0,
+              "se": 0.0,
+              "ub95": 100.0
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 18.0479604091011,
+            "ci_low": 13.457444997988485,
+            "estimate": 15.697277817105348,
+            "lb95": 13.795410574924963,
+            "note": "descriptive only",
+            "se": 1.1824970189039994,
+            "ub95": 17.703543728680014
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          }
+        },
+        "sparse": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.8656451777015655,
+            "ci_low": 0.8251511331476561,
+            "estimate": 0.8455554307469472,
+            "lb95": 0.8283345112356418,
+            "se": 0.010589491101620236,
+            "ub95": 0.8628774741742141
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8653010687958433,
+            "ci_low": 0.8246369963404448,
+            "estimate": 0.8451927677447904,
+            "lb95": 0.8278879076412721,
+            "se": 0.010598835879705532,
+            "ub95": 0.8625762172071321
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.234455529128035,
+            "ci_low": 0.18258558912059747,
+            "estimate": 0.21321096314786528,
+            "lb95": 0.1876278019692554,
+            "se": 0.013509530325716187,
+            "ub95": 0.23175304669208638
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.02020376050704626,
+              "ci_low": 0.013904131559474724,
+              "estimate": 0.016900522750014652,
+              "lb95": 0.014308611274940144,
+              "se": 0.0016544950069668357,
+              "ub95": 0.019762819199367204
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.025230957567037346,
+              "ci_low": 0.018269926090326113,
+              "estimate": 0.021512513531664796,
+              "lb95": 0.018734924733770454,
+              "se": 0.0018103516858897968,
+              "ub95": 0.024701366556167198
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.07099595912549049,
+              "ci_low": 0.05407810702523393,
+              "estimate": 0.06389948320539998,
+              "lb95": 0.055356779004704974,
+              "se": 0.004434872541232775,
+              "ub95": 0.06996778345704575
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 55,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.08833736161111812,
+            "ci_low": 0.0704175414244922,
+            "estimate": 0.08080000595541478,
+            "lb95": 0.0724322562384477,
+            "se": 0.004559608305274857,
+            "ub95": 0.08706286294736434
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 0.3321131526514127,
+            "ci_low": 0.22834212235168788,
+            "estimate": 0.27113312343638807,
+            "lb95": 0.23553835731631279,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.027084822356138228,
+            "ub95": 0.32320020412249384
+          },
+          "outcome": "unresolved",
+          "positions": 316235,
+          "positions_joint_valid": 316235,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 13.401366672546416,
+            "ci_low": 12.544942681213787,
+            "estimate": 12.923019273641437,
+            "lb95": 12.594766775486901,
+            "se": 0.22141285991771248,
+            "ub95": 13.31311953304042
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 82.13272751629856,
+              "ci_low": 77.92553564060121,
+              "estimate": 79.75640478336317,
+              "lb95": 78.2352938586657,
+              "se": 1.0509932012805137,
+              "ub95": 81.69877134683351
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 80.99395026635827,
+              "ci_low": 76.67144343549893,
+              "estimate": 78.58860235795053,
+              "lb95": 76.98198257071479,
+              "se": 1.0832577428426318,
+              "ub95": 80.57909862689255
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 82.14417361358333,
+              "ci_low": 77.9524538490276,
+              "estimate": 79.77052930046808,
+              "lb95": 78.24863774781333,
+              "se": 1.0509762512029357,
+              "ub95": 81.73557285580371
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 1.3622339060975648,
+            "ci_low": 1.0182269384643978,
+            "estimate": 1.1748646839639183,
+            "lb95": 1.035645654673476,
+            "note": "descriptive only",
+            "se": 0.08987274069768773,
+            "ub95": 1.3321238233081376
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.21418062739043794,
+            "ci_low": 0.1624771956186198,
+            "estimate": 0.19254750029928416,
+            "lb95": 0.16632567344828542,
+            "se": 0.01358665417649254,
+            "ub95": 0.2112357961548289
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.21140000944044668,
+            "ci_low": 0.16198560778412474,
+            "estimate": 0.1908493989331165,
+            "lb95": 0.16588683512218158,
+            "se": 0.01303876440608127,
+            "ub95": 0.20880027952415756
+          }
+        }
+      },
+      "runs": {
+        "Cm": [
+          "Cm/prompt-a",
+          "Cm/prompt-rep2",
+          "Cm/prompt-rep3"
+        ],
+        "R0": [
+          "R0/prompt-a",
+          "R0/prompt-b",
+          "R0/prompt-crossboot"
+        ]
+      },
+      "status": "ok",
+      "verdict": {
+        "all": "unresolved",
+        "dense": "unresolved",
+        "sparse": "unresolved"
+      },
+      "windows": {
+        "compared": 85,
+        "expected": 85
+      }
+    },
+    "Cpre-vs-R0": {
+      "groups": 71,
+      "regimes": {
+        "all": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.8873164984384881,
+            "ci_low": 0.8502859232300264,
+            "estimate": 0.868105761740703,
+            "lb95": 0.8532576651328073,
+            "se": 0.009401972843052537,
+            "ub95": 0.8837671202206157
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8873600999680424,
+            "ci_low": 0.8502520959109893,
+            "estimate": 0.8679324992499737,
+            "lb95": 0.853044334932887,
+            "se": 0.009390885913146227,
+            "ub95": 0.8835154292546801
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.22341092603028462,
+            "ci_low": 0.16773841319222288,
+            "estimate": 0.19782821081535354,
+            "lb95": 0.17189079988302644,
+            "se": 0.014466893293519831,
+            "ub95": 0.21979108861782112
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.08235934106254973,
+              "ci_low": 0.05178308788505095,
+              "estimate": 0.06579247998502431,
+              "lb95": 0.053641648705391676,
+              "se": 0.008177917511647537,
+              "ub95": 0.08012215483708028
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.08530252548099956,
+              "ci_low": 0.05527333911242416,
+              "estimate": 0.06888857374681738,
+              "lb95": 0.05708781051025564,
+              "se": 0.008046091934794967,
+              "ub95": 0.08303850213471402
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.05182084535492876,
+              "ci_low": 0.032990035881707985,
+              "estimate": 0.04297987902284532,
+              "lb95": 0.034559155383409555,
+              "se": 0.004883293099496569,
+              "ub95": 0.050452602936185996
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 71,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.12548531249676462,
+            "ci_low": 0.09398477818021464,
+            "estimate": 0.10877235900786988,
+            "lb95": 0.09663927903957945,
+            "se": 0.007953914049056017,
+            "ub95": 0.12235630143013342
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 0.8841185119429489,
+            "ci_low": 0.5456558917730876,
+            "estimate": 0.6923407669554646,
+            "lb95": 0.5630966498150917,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.0885780858914615,
+            "ub95": 0.851244394529601
+          },
+          "outcome": "unresolved",
+          "positions": 471625,
+          "positions_joint_valid": 471625,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 14.773337715916906,
+            "ci_low": 13.711345885245693,
+            "estimate": 14.188096474953618,
+            "lb95": 13.799963594093823,
+            "se": 0.26702428102713616,
+            "ub95": 14.659152357297529
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 88.88785614764909,
+              "ci_low": 84.21292609376142,
+              "estimate": 86.38070500927724,
+              "lb95": 84.59530871489508,
+              "se": 1.195569570244905,
+              "ub95": 88.46309651624733
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 82.87377180957441,
+              "ci_low": 78.45303948659134,
+              "estimate": 80.56080336896643,
+              "lb95": 78.89040805321248,
+              "se": 1.1125457813858342,
+              "ub95": 82.50843894100763
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 88.93900332556788,
+              "ci_low": 84.27732962866948,
+              "estimate": 86.43569219895831,
+              "lb95": 84.66693334556831,
+              "se": 1.1886269868521022,
+              "ub95": 88.50694910980931
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 7.1060171724753545,
+            "ci_low": 4.694686224893385,
+            "estimate": 5.847395235150467,
+            "lb95": 4.8447998028084225,
+            "note": "descriptive only",
+            "se": 0.6435655444206323,
+            "ub95": 6.9650145267170736
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.157115055164332,
+            "ci_low": 0.09991628956130892,
+            "estimate": 0.13015960423176973,
+            "lb95": 0.1046084068142332,
+            "se": 0.014898738830033214,
+            "ub95": 0.15290575000237136
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.15377263388778542,
+            "ci_low": 0.09808283341456657,
+            "estimate": 0.12771966990530267,
+            "lb95": 0.10286735028694084,
+            "se": 0.014408078711627808,
+            "ub95": 0.14981505344937052
+          }
+        },
+        "dense": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.9286578790876345,
+            "ci_low": 0.8971488172236319,
+            "estimate": 0.9135313216515599,
+            "lb95": 0.900148329360202,
+            "se": 0.007928793509397562,
+            "ub95": 0.9259604851614679
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.9290838892746129,
+            "ci_low": 0.8978561525563754,
+            "estimate": 0.9140177603710712,
+            "lb95": 0.9008999709821355,
+            "se": 0.007829810128273369,
+            "ub95": 0.9263090755006629
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.20526545695448756,
+            "ci_low": 0.13453046821807363,
+            "estimate": 0.16764368496673168,
+            "lb95": 0.13927837405764742,
+            "se": 0.018038912537465986,
+            "ub95": 0.19891016944115764
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.20526545695448756,
+              "ci_low": 0.13453046821807363,
+              "estimate": 0.16764368496673168,
+              "lb95": 0.13927837405764742,
+              "se": 0.018038912537465986,
+              "ub95": 0.19891016944115764
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.20526545695448756,
+              "ci_low": 0.13453046821807363,
+              "estimate": 0.16764368496673168,
+              "lb95": 0.13927837405764742,
+              "se": 0.018038912537465986,
+              "ub95": 0.19891016944115764
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.0,
+              "ci_low": 0.0,
+              "estimate": 0.0,
+              "lb95": 0.0,
+              "se": 0.0,
+              "ub95": 0.0
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 71,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.20526545695448756,
+            "ci_low": 0.13453046821807363,
+            "estimate": 0.16764368496673168,
+            "lb95": 0.13927837405764742,
+            "se": 0.018038912537465986,
+            "ub95": 0.19891016944115764
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 3.490507003202012,
+            "ci_low": 2.379413678294626,
+            "estimate": 2.932349534237816,
+            "lb95": 2.4682256981036277,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.28962860639359994,
+            "ub95": 3.4285022451359493
+          },
+          "outcome": "unresolved",
+          "positions": 155390,
+          "positions_joint_valid": 155390,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 17.086860546690318,
+            "ci_low": 16.392722962291984,
+            "estimate": 16.754733251818006,
+            "lb95": 16.45117410516164,
+            "se": 0.1773200651147485,
+            "ub95": 17.03730434978336
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 100.0,
+              "ci_low": 100.0,
+              "estimate": 100.0,
+              "lb95": 100.0,
+              "se": 0.0,
+              "ub95": 100.0
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 86.78145367992263,
+              "ci_low": 82.22922383328688,
+              "estimate": 84.5717227620825,
+              "lb95": 82.57089719258366,
+              "se": 1.1769893068360822,
+              "ub95": 86.45199530748314
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 100.0,
+              "ci_low": 100.0,
+              "estimate": 100.0,
+              "lb95": 100.0,
+              "se": 0.0,
+              "ub95": 100.0
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 17.770776166713116,
+            "ci_low": 13.218546320077376,
+            "estimate": 15.428277237917499,
+            "lb95": 13.548004692516844,
+            "note": "descriptive only",
+            "se": 1.176989306836082,
+            "ub95": 17.429102807416346
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          }
+        },
+        "sparse": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.8657972846771825,
+            "ci_low": 0.8253630066017957,
+            "estimate": 0.8457847733790474,
+            "lb95": 0.8285243203598769,
+            "se": 0.010565588495002094,
+            "ub95": 0.8631208134847004
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8652720201731604,
+            "ci_low": 0.824818948820385,
+            "estimate": 0.8452873501500748,
+            "lb95": 0.8281006677476079,
+            "se": 0.01052723307078461,
+            "ub95": 0.8625872211291509
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.23420272802413714,
+            "ci_low": 0.18180530805786407,
+            "estimate": 0.2126601347694297,
+            "lb95": 0.18702966545919922,
+            "se": 0.013702861056040709,
+            "ub95": 0.23141731847478494
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.018733436564182533,
+              "ci_low": 0.013154924311345803,
+              "estimate": 0.01574533548138775,
+              "lb95": 0.01355775460425972,
+              "se": 0.0014458467134649113,
+              "ub95": 0.01828986477730349
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.023540928337786152,
+              "ci_low": 0.01748707336177937,
+              "estimate": 0.02036277257850122,
+              "lb95": 0.017937816735623825,
+              "se": 0.0015556921544673764,
+              "ub95": 0.023077697626218453
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.07109311378806231,
+              "ci_low": 0.05422657759427727,
+              "estimate": 0.0640991207303095,
+              "lb95": 0.05563157224903581,
+              "se": 0.004413782786876416,
+              "ub95": 0.07018917372291328
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 55,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.08725962411065019,
+            "ci_low": 0.06960599819603985,
+            "estimate": 0.07984445621169754,
+            "lb95": 0.07130859964210992,
+            "se": 0.0045881212110573,
+            "ub95": 0.08615687088279439
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 0.27239680770971475,
+            "ci_low": 0.19704838814973846,
+            "estimate": 0.2358779749336204,
+            "lb95": 0.2034953240007047,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.018901948120317126,
+            "ub95": 0.26620953634796174
+          },
+          "outcome": "unresolved",
+          "positions": 316235,
+          "positions_joint_valid": 316235,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 13.404660461406182,
+            "ci_low": 12.546320938782635,
+            "estimate": 12.92691511059813,
+            "lb95": 12.597967905203308,
+            "se": 0.221740284349823,
+            "ub95": 13.314165298174046
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 82.06836440816035,
+              "ci_low": 77.87152948385693,
+              "estimate": 79.68852277578443,
+              "lb95": 78.17347369245029,
+              "se": 1.0542346614557998,
+              "ub95": 81.67309807818896
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 80.98144011162891,
+              "ci_low": 76.67518485417735,
+              "estimate": 78.58993751130875,
+              "lb95": 76.99032212152525,
+              "se": 1.0845029983227008,
+              "ub95": 80.56859265180523
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 82.14417361358333,
+              "ci_low": 77.9524538490276,
+              "estimate": 79.77052930046808,
+              "lb95": 78.24863774781333,
+              "se": 1.0509762512029357,
+              "ub95": 81.73557285580371
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 1.336121698508967,
+            "ci_low": 0.9799806134654423,
+            "estimate": 1.1395885268163681,
+            "lb95": 1.0001993789285142,
+            "note": "descriptive only",
+            "se": 0.09320013528976914,
+            "ub95": 1.305836719078434
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.21546663362720184,
+            "ci_low": 0.16365740790600508,
+            "estimate": 0.19411679082267427,
+            "lb95": 0.1682149044155488,
+            "se": 0.013529132029987104,
+            "ub95": 0.21270552743748497
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.21081215220829058,
+            "ci_low": 0.16169522824462967,
+            "estimate": 0.1904779335591834,
+            "lb95": 0.16559443768799448,
+            "se": 0.012971871929367919,
+            "ub95": 0.2083037142670045
+          }
+        }
+      },
+      "runs": {
+        "Cpre": [
+          "Cpre/prompt-a",
+          "Cpre/prompt-rep2",
+          "Cpre/prompt-rep3"
+        ],
+        "R0": [
+          "R0/prompt-a",
+          "R0/prompt-b",
+          "R0/prompt-crossboot"
+        ]
+      },
+      "status": "ok",
+      "verdict": {
+        "all": "unresolved",
+        "dense": "unresolved",
+        "sparse": "unresolved"
+      },
+      "windows": {
+        "compared": 85,
+        "expected": 85
+      }
+    },
+    "N-vs-Cm": {
+      "groups": 71,
+      "regimes": {
+        "all": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.8640086071987979,
+            "ci_low": 0.8195550158231781,
+            "estimate": 0.8405348759801117,
+            "lb95": 0.8230048257132566,
+            "se": 0.011273885415200961,
+            "ub95": 0.8595165496519366
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8560817989737561,
+            "ci_low": 0.8099615995551702,
+            "estimate": 0.8317928071013299,
+            "lb95": 0.8137362088053661,
+            "se": 0.011579617653225653,
+            "ub95": 0.8515229522492636
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.3927403886740039,
+            "ci_low": 0.29745939640421315,
+            "estimate": 0.34955387348508865,
+            "lb95": 0.3065562810118263,
+            "se": 0.024585568521676208,
+            "ub95": 0.38583930997046706
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.208337933324787,
+              "ci_low": 0.1661542989550762,
+              "estimate": 0.18914483879361496,
+              "lb95": 0.16978474436721597,
+              "se": 0.010988242589470978,
+              "ub95": 0.20531438958365186
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.23247372423716228,
+              "ci_low": 0.18413530598562167,
+              "estimate": 0.21056383756547958,
+              "lb95": 0.18835525362851369,
+              "se": 0.01265546576089189,
+              "ub95": 0.22923633961283166
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.05361281643681707,
+              "ci_low": 0.03761105782915099,
+              "estimate": 0.046330011973203244,
+              "lb95": 0.039139777352301564,
+              "se": 0.004099683414838658,
+              "ub95": 0.05251712320796753
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 71,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.26131812523556475,
+            "ci_low": 0.20432628242098466,
+            "estimate": 0.2354748507668183,
+            "lb95": 0.20883717541010297,
+            "se": 0.014873876320025854,
+            "ub95": 0.25766854720887933
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 2.1617262683742506,
+            "ci_low": 1.819016819324434,
+            "estimate": 2.027338682832497,
+            "lb95": 1.8476836901863736,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.09068159429762525,
+            "ub95": 2.142816484831097
+          },
+          "outcome": "unresolved",
+          "positions": 471625,
+          "positions_joint_valid": 471625,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 12.359132092410148,
+            "ci_low": 11.352340425383076,
+            "estimate": 11.806621786376889,
+            "lb95": 11.418106524754563,
+            "se": 0.2557416923589108,
+            "ub95": 12.265198271425575
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 83.23446467492597,
+              "ci_low": 78.6849663664811,
+              "estimate": 80.81625585299142,
+              "lb95": 79.07254777968888,
+              "se": 1.1377785217007887,
+              "ub95": 82.83462969360967
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 74.84177871520251,
+              "ci_low": 69.4160813508697,
+              "estimate": 71.9103100980653,
+              "lb95": 69.80176939949267,
+              "se": 1.3809384829373743,
+              "ub95": 74.39754448217775
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 88.91804970440108,
+              "ci_low": 84.2864650860776,
+              "estimate": 86.42622139765072,
+              "lb95": 84.65329635563882,
+              "se": 1.1833308105039397,
+              "ub95": 88.47591082447278
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 12.41697700720786,
+            "ci_low": 10.993281760601334,
+            "estimate": 11.71092852725506,
+            "lb95": 11.107818022821156,
+            "note": "descriptive only",
+            "se": 0.3641545811191275,
+            "ub95": 12.3122830169273
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.19012088721095288,
+            "ci_low": 0.14102571995688995,
+            "estimate": 0.16780006582735998,
+            "lb95": 0.14563938666665432,
+            "se": 0.012621426634512304,
+            "ub95": 0.18637448221719657
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.13306004423919973,
+            "ci_low": 0.08432729106146976,
+            "estimate": 0.11018000601185904,
+            "lb95": 0.08866481330745456,
+            "se": 0.0126462033176828,
+            "ub95": 0.1294797829997891
+          }
+        },
+        "dense": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.9061737568982009,
+            "ci_low": 0.8632004333647163,
+            "estimate": 0.8853374902009229,
+            "lb95": 0.8665460039649309,
+            "se": 0.01103154041525832,
+            "ub95": 0.9027979713073964
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8953259457614962,
+            "ci_low": 0.8484094154092261,
+            "estimate": 0.872525086689831,
+            "lb95": 0.8520350933586929,
+            "se": 0.012004156305256034,
+            "ub95": 0.8915509235676241
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.3393632246776526,
+            "ci_low": 0.25471681509150235,
+            "estimate": 0.2953830661497523,
+            "lb95": 0.2603288413619332,
+            "se": 0.022101491868398198,
+            "ub95": 0.3325644134492785
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.2373107048699423,
+              "ci_low": 0.18541843973597233,
+              "estimate": 0.2109566119739481,
+              "lb95": 0.18933532659010258,
+              "se": 0.013628846856551234,
+              "ub95": 0.23383880108479974
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.2636258843440915,
+              "ci_low": 0.2026496688514242,
+              "estimate": 0.23226212643489275,
+              "lb95": 0.2067708633055896,
+              "se": 0.015872524152559672,
+              "ub95": 0.2590883948268618
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.025451108048143323,
+              "ci_low": 0.0170970299915135,
+              "estimate": 0.021040313238286517,
+              "lb95": 0.017684766058849503,
+              "se": 0.002140506459176926,
+              "ub95": 0.024736151940255042
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 71,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.2628285919769895,
+            "ci_low": 0.20291464113621188,
+            "estimate": 0.2319969252122346,
+            "lb95": 0.2069809328568671,
+            "se": 0.01566494898157961,
+            "ub95": 0.2586514346841696
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 2.7972828541281882,
+            "ci_low": 2.2955858514814027,
+            "estimate": 2.530604084375518,
+            "lb95": 2.3363164176281033,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.12900389391486752,
+            "ub95": 2.763947857772608
+          },
+          "outcome": "unresolved",
+          "positions": 155390,
+          "positions_joint_valid": 155390,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 13.635037910546805,
+            "ci_low": 12.561395813767572,
+            "estimate": 13.1171310895167,
+            "lb95": 12.635047779968321,
+            "se": 0.27902568972835085,
+            "ub95": 13.568284608913848
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 87.32852915308902,
+              "ci_low": 82.6244402426712,
+              "estimate": 85.02499088315422,
+              "lb95": 82.98395747701144,
+              "se": 1.2044191068619572,
+              "ub95": 86.96615791396316
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 78.90756612692594,
+              "ci_low": 73.26036238798062,
+              "estimate": 76.116867237274,
+              "lb95": 73.64390041014379,
+              "se": 1.467389156146413,
+              "ub95": 78.48596731991614
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 100.0,
+              "ci_low": 100.0,
+              "estimate": 100.0,
+              "lb95": 100.0,
+              "se": 0.0,
+              "ub95": 100.0
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 18.10743483194937,
+            "ci_low": 14.696332109536597,
+            "estimate": 16.395628204303158,
+            "lb95": 14.98809218358332,
+            "note": "descriptive only",
+            "se": 0.8722340247397453,
+            "ub95": 17.8584673354715
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.15270664828885996,
+            "ci_low": 0.10258217994908096,
+            "estimate": 0.12624187942971918,
+            "lb95": 0.10610859635309701,
+            "se": 0.012843038755061589,
+            "ub95": 0.1484169116415305
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          }
+        },
+        "sparse": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.8425729426218446,
+            "ci_low": 0.797264922374175,
+            "estimate": 0.8185199876098442,
+            "lb95": 0.8001876134390397,
+            "se": 0.01163418014762274,
+            "ub95": 0.8385791147168615
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8359553010055485,
+            "ci_low": 0.7903302405154594,
+            "estimate": 0.8117779797569273,
+            "lb95": 0.7931032793964742,
+            "se": 0.011774098083836523,
+            "ub95": 0.8320765419499081
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.42174567457221573,
+            "ci_low": 0.31883869845859836,
+            "estimate": 0.3761720585431558,
+            "lb95": 0.32656818681663896,
+            "se": 0.026864236169775284,
+            "ub95": 0.4150292922891902
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.20378460298159778,
+              "ci_low": 0.1509143573845397,
+              "estimate": 0.17842707689347112,
+              "lb95": 0.15358467147054009,
+              "se": 0.014249160667636708,
+              "ub95": 0.20009584705925834
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.22865627627683172,
+              "ci_low": 0.168303224674628,
+              "estimate": 0.19990183902825817,
+              "lb95": 0.17197431639409846,
+              "se": 0.016053573645584455,
+              "ub95": 0.22419173382552413
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.06480506759561158,
+              "ci_low": 0.05003675220951209,
+              "estimate": 0.05875673983829949,
+              "lb95": 0.05129385493548656,
+              "se": 0.0039200794566015985,
+              "ub95": 0.06412766388106582
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 55,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.2682224059311493,
+            "ci_low": 0.20087655020742473,
+            "estimate": 0.23718381673177094,
+            "lb95": 0.20619326642016508,
+            "se": 0.01768303655343311,
+            "ub95": 0.26341237623188984
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 2.124382402355163,
+            "ci_low": 1.6374458210597855,
+            "estimate": 1.8861304138229888,
+            "lb95": 1.6717639180492552,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.12471278889239462,
+            "ub95": 2.087948668787741
+          },
+          "outcome": "unresolved",
+          "positions": 316235,
+          "positions_joint_valid": 316235,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 11.66185071471326,
+            "ci_low": 10.790796142628965,
+            "estimate": 11.16267016617389,
+            "lb95": 10.848736048639468,
+            "se": 0.22366639585443765,
+            "ub95": 11.573264350395652
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 81.18078854268086,
+              "ci_low": 76.93643064791796,
+              "estimate": 78.74818831986826,
+              "lb95": 77.18181174839066,
+              "se": 1.0831117093986264,
+              "ub95": 80.7547993861394
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 73.01522577998958,
+              "ci_low": 67.72610842756993,
+              "estimate": 69.84331272629525,
+              "lb95": 68.00780636158662,
+              "se": 1.3339591799408073,
+              "ub95": 72.35608514454191
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 82.13272751629856,
+              "ci_low": 77.92553564060121,
+              "estimate": 79.75640478336317,
+              "lb95": 78.2352938586657,
+              "se": 1.0509932012805137,
+              "ub95": 81.69877134683351
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 10.035707750507832,
+            "ci_low": 8.594250553365098,
+            "estimate": 9.408983825319757,
+            "lb95": 8.7042957663963,
+            "note": "descriptive only",
+            "se": 0.375301307849442,
+            "ub95": 9.937897325928354
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.20715329535217464,
+            "ci_low": 0.1603079729842622,
+            "estimate": 0.18822072320029287,
+            "lb95": 0.1649587927660295,
+            "se": 0.012238292432972524,
+            "ub95": 0.2048117075569516
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.18255368687358786,
+            "ci_low": 0.13900454341275395,
+            "estimate": 0.16431971582950344,
+            "lb95": 0.14256989864534828,
+            "se": 0.01142821336474365,
+            "ub95": 0.17991492565789505
+          }
+        }
+      },
+      "runs": {
+        "Cm": [
+          "Cm/prompt-a",
+          "Cm/prompt-rep2",
+          "Cm/prompt-rep3"
+        ],
+        "N": [
+          "N/prompt-a",
+          "N/prompt-rep2",
+          "N/prompt-rep3"
+        ]
+      },
+      "status": "ok",
+      "verdict": {
+        "all": "unresolved",
+        "dense": "unresolved",
+        "sparse": "unresolved"
+      },
+      "windows": {
+        "compared": 85,
+        "expected": 85
+      }
+    },
+    "N-vs-R0": {
+      "groups": 71,
+      "regimes": {
+        "all": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.8640966102286156,
+            "ci_low": 0.8200901251233877,
+            "estimate": 0.8409277230639016,
+            "lb95": 0.8234743442566737,
+            "se": 0.011219978250811124,
+            "ub95": 0.8597451070689927
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8561490107829912,
+            "ci_low": 0.8102128425241815,
+            "estimate": 0.8318912326788819,
+            "lb95": 0.8138853435396436,
+            "se": 0.011547451032787828,
+            "ub95": 0.8516301007653663
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.390217116967045,
+            "ci_low": 0.2956960321256149,
+            "estimate": 0.34753083973129123,
+            "lb95": 0.3050718022634338,
+            "se": 0.024267131372571218,
+            "ub95": 0.3835803828489681
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.20662736496385545,
+              "ci_low": 0.16518059322167322,
+              "estimate": 0.18778644621662732,
+              "lb95": 0.16851734290196416,
+              "se": 0.010779249707601588,
+              "ub95": 0.20357980431272657
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.23064550981476734,
+              "ci_low": 0.18239734333300472,
+              "estimate": 0.2089240292380477,
+              "lb95": 0.18638553681234318,
+              "se": 0.012566867957571646,
+              "ub95": 0.22777201622557103
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.05330152585251115,
+              "ci_low": 0.03755674567034182,
+              "estimate": 0.04620227016441428,
+              "lb95": 0.039174170558883045,
+              "se": 0.004020853001396046,
+              "ub95": 0.05219495815770109
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 71,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.2592643347343092,
+            "ci_low": 0.20309863301890413,
+            "estimate": 0.23398871638104163,
+            "lb95": 0.20793922573276744,
+            "se": 0.014590178440637288,
+            "ub95": 0.2554415346260811
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 2.179686653514528,
+            "ci_low": 1.8023318819436163,
+            "estimate": 2.013255551859795,
+            "lb95": 1.8370335840164147,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.09781658206768161,
+            "ub95": 2.1556008113096206
+          },
+          "outcome": "unresolved",
+          "positions": 471625,
+          "positions_joint_valid": 471625,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 12.36083052993446,
+            "ci_low": 11.363134119916563,
+            "estimate": 11.816667903525046,
+            "lb95": 11.430728719533475,
+            "se": 0.25457676730190976,
+            "ub95": 12.274692885541484
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 83.23446467492597,
+              "ci_low": 78.6849663664811,
+              "estimate": 80.81625585299142,
+              "lb95": 79.07254777968888,
+              "se": 1.1377785217007887,
+              "ub95": 82.83462969360967
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 74.82083996752787,
+              "ci_low": 69.40402560580178,
+              "estimate": 71.90248844126396,
+              "lb95": 69.80347277741735,
+              "se": 1.3816631873835805,
+              "ub95": 74.39572992092866
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 88.93900332556788,
+              "ci_low": 84.27732962866948,
+              "estimate": 86.43569219895831,
+              "lb95": 84.66693334556831,
+              "se": 1.1886269868521022,
+              "ub95": 88.50694910980931
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 12.455185510751457,
+            "ci_low": 10.990874799634998,
+            "estimate": 11.723485584710067,
+            "lb95": 11.11195565177816,
+            "note": "descriptive only",
+            "se": 0.3718016967133613,
+            "ub95": 12.329202569985055
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.19005727418992874,
+            "ci_low": 0.14129673043131422,
+            "estimate": 0.16796211927643862,
+            "lb95": 0.14578276106017932,
+            "se": 0.01260363546978529,
+            "ub95": 0.18664893085359288
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.13127671104114244,
+            "ci_low": 0.08435787543900022,
+            "estimate": 0.1092515017100475,
+            "lb95": 0.08822419464659713,
+            "se": 0.012154596083544595,
+            "ub95": 0.127822144115904
+          }
+        },
+        "dense": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.9067515841664089,
+            "ci_low": 0.864117780387755,
+            "estimate": 0.8861357656207645,
+            "lb95": 0.867496241522012,
+            "se": 0.010944374558601587,
+            "ub95": 0.9034438338274947
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8955787844429441,
+            "ci_low": 0.8484810753939753,
+            "estimate": 0.8728183533237613,
+            "lb95": 0.8524394987457319,
+            "se": 0.01197812871158789,
+            "ub95": 0.8919093941845554
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.3359296968714271,
+            "ci_low": 0.2509599347460366,
+            "estimate": 0.29171394150686997,
+            "lb95": 0.2559876298672679,
+            "se": 0.022248573251622387,
+            "ub95": 0.3292337655461915
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.2348009190583931,
+              "ci_low": 0.18227886206779806,
+              "estimate": 0.20787504530811265,
+              "lb95": 0.1858757810757703,
+              "se": 0.013717551469559908,
+              "ub95": 0.2311338246572846
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.26004781743577976,
+              "ci_low": 0.19844590595448275,
+              "estimate": 0.22831862176295165,
+              "lb95": 0.202272213453742,
+              "se": 0.016007219516582436,
+              "ub95": 0.2552747351825978
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.025535092639834417,
+              "ci_low": 0.017158263485594433,
+              "estimate": 0.021131773247972788,
+              "lb95": 0.017769956445517755,
+              "se": 0.0021437903323249896,
+              "ub95": 0.024833839274227297
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 71,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.2601848261099201,
+            "ci_low": 0.19998886716943268,
+            "estimate": 0.2290068185560857,
+            "lb95": 0.20357989170209778,
+            "se": 0.015758794668237024,
+            "ub95": 0.25569937301565715
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 2.7135940533874283,
+            "ci_low": 2.2191707075014397,
+            "estimate": 2.476982941913067,
+            "lb95": 2.25340221572608,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.13104693718437663,
+            "ub95": 2.683638671906642
+          },
+          "outcome": "unresolved",
+          "positions": 155390,
+          "positions_joint_valid": 155390,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 13.64615148826902,
+            "ci_low": 12.574444176135612,
+            "estimate": 13.129499967822897,
+            "lb95": 12.648527185438848,
+            "se": 0.2786408247526647,
+            "ub95": 13.582148603360134
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 87.32852915308902,
+              "ci_low": 82.6244402426712,
+              "estimate": 85.02499088315422,
+              "lb95": 82.98395747701144,
+              "se": 1.2044191068619572,
+              "ub95": 86.96615791396316
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 78.9166195881932,
+              "ci_low": 73.18550154283156,
+              "estimate": 76.07868374198254,
+              "lb95": 73.57711466357695,
+              "se": 1.4840416568319788,
+              "ub95": 78.4678332376342
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 100.0,
+              "ci_low": 100.0,
+              "estimate": 100.0,
+              "lb95": 100.0,
+              "se": 0.0,
+              "ub95": 100.0
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 18.16775453410763,
+            "ci_low": 14.708043654051632,
+            "estimate": 16.43381169959458,
+            "lb95": 14.99139167431537,
+            "note": "descriptive only",
+            "se": 0.8881150760239492,
+            "ub95": 17.92074906011886
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.15321055583900636,
+            "ci_low": 0.10294958091356664,
+            "estimate": 0.1267906394878367,
+            "lb95": 0.10661973867310649,
+            "se": 0.01286274199394993,
+            "ub95": 0.14900303564536377
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          }
+        },
+        "sparse": {
+          "covered_mass_cand_averaged": {
+            "B": 2000,
+            "ci_high": 0.8427349112099451,
+            "ci_low": 0.7972803511097253,
+            "estimate": 0.8187136173105521,
+            "lb95": 0.8004274754231125,
+            "se": 0.011616140064963015,
+            "ub95": 0.8387304504705864
+          },
+          "covered_mass_ref_averaged": {
+            "B": 2000,
+            "ci_high": 0.8361602706261195,
+            "ci_low": 0.7903198441939632,
+            "estimate": 0.8117806652938425,
+            "lb95": 0.7932160903164639,
+            "se": 0.011757764736346597,
+            "ub95": 0.832010548682139
+          },
+          "criteria": {
+            "kl_mean_excess": "unresolved",
+            "kl_p99_excess": "unresolved",
+            "top1_drop_pp": "unresolved"
+          },
+          "cross_pairwise": {
+            "B": 2000,
+            "ci_high": 0.4189704183813636,
+            "ci_low": 0.31871849508157,
+            "estimate": 0.37495787283987414,
+            "lb95": 0.3266025164359354,
+            "se": 0.0261938896144933,
+            "ub95": 0.4129207593790332
+          },
+          "diagnostics": {
+            "averaged_minus_noise": {
+              "B": 2000,
+              "ci_high": 0.20252918104004666,
+              "ci_low": 0.15114314062660117,
+              "estimate": 0.1779154091308339,
+              "lb95": 0.15405432482281706,
+              "se": 0.013761988784632568,
+              "ub95": 0.19887662730389338
+            },
+            "cross_minus_within_pairwise": {
+              "B": 2000,
+              "ci_high": 0.22745540057603875,
+              "ci_low": 0.16812782998548828,
+              "estimate": 0.1993940096878876,
+              "lb95": 0.1717861878139045,
+              "se": 0.015733570158015842,
+              "ub95": 0.2231566365129031
+            },
+            "noise_expectation_averaged": {
+              "B": 2000,
+              "ci_high": 0.06438785935962146,
+              "ci_low": 0.04990266617173239,
+              "estimate": 0.05852128771732856,
+              "lb95": 0.05125626634655123,
+              "se": 0.003813132679493609,
+              "ub95": 0.06370802568142074
+            },
+            "note": "variance-subtraction diagnostics: with unequal execution variability they do not estimate the KL between population-average distributions and can be negative while that KL is positive; never used for verdicts"
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 55,
+          "kl_averaged": {
+            "B": 2000,
+            "ci_high": 0.2661878316216253,
+            "ci_low": 0.201444426094626,
+            "estimate": 0.23643669684816182,
+            "lb95": 0.20595726650850943,
+            "se": 0.01707977925063835,
+            "ub95": 0.2615525360143263
+          },
+          "kl_p99_cross_minus_within": {
+            "B": 2000,
+            "ci_high": 2.1474821121306524,
+            "ci_low": 1.6646536580866924,
+            "estimate": 1.9317587742418598,
+            "lb95": 1.690405085978457,
+            "note": "p99 of the per-position mean cross-arm pairwise KL minus p99 of the per-position mean within-arm pairwise KL; nonzero even for identical arms with variable executions; descriptive only",
+            "se": 0.13132664109715547,
+            "ub95": 2.120870768761276
+          },
+          "outcome": "unresolved",
+          "positions": 316235,
+          "positions_joint_valid": 316235,
+          "reason": "no validated estimator for the KL between population-average distributions under unequal execution variability; repeated-execution quantities are descriptive (independent review)",
+          "shared_cells": {
+            "B": 2000,
+            "ci_high": 11.668205198737756,
+            "ci_low": 10.799364321287563,
+            "estimate": 11.171574936360617,
+            "lb95": 10.858575631840148,
+            "se": 0.22290064326353967,
+            "ub95": 11.579276658407734
+          },
+          "top1_agreement_pairwise": {
+            "cand_cand": {
+              "B": 2000,
+              "ci_high": 81.18078854268086,
+              "ci_low": 76.93643064791796,
+              "estimate": 78.74818831986826,
+              "lb95": 77.18181174839066,
+              "se": 1.0831117093986264,
+              "ub95": 80.7547993861394
+            },
+            "ref_cand": {
+              "B": 2000,
+              "ci_high": 73.02140846786813,
+              "ci_low": 67.74058253147878,
+              "estimate": 69.8504101204623,
+              "lb95": 68.01997751889652,
+              "se": 1.3316982775735977,
+              "ub95": 72.37449222397845
+            },
+            "ref_ref": {
+              "B": 2000,
+              "ci_high": 82.14417361358333,
+              "ci_low": 77.9524538490276,
+              "estimate": 79.77052930046808,
+              "lb95": 78.24863774781333,
+              "se": 1.0509762512029357,
+              "ub95": 81.73557285580371
+            }
+          },
+          "top1_drop_pairwise_pp": {
+            "B": 2000,
+            "ci_high": 10.027039154219938,
+            "ci_low": 8.599409667904316,
+            "estimate": 9.408948689705076,
+            "lb95": 8.718897984737799,
+            "note": "descriptive only",
+            "se": 0.371867991156443,
+            "ub95": 9.929875832706818
+          },
+          "within_cand_pairwise": {
+            "B": 2000,
+            "ci_high": 0.20705236502256796,
+            "ci_low": 0.16026871205447304,
+            "estimate": 0.18819275865649088,
+            "lb95": 0.16483168487385308,
+            "se": 0.01218787881908454,
+            "ub95": 0.2046552516104139
+          },
+          "within_ref_pairwise": {
+            "B": 2000,
+            "ci_high": 0.1799292453382658,
+            "ci_low": 0.13891583958795947,
+            "estimate": 0.162934967647481,
+            "lb95": 0.14236919273132984,
+            "se": 0.010821658025047694,
+            "ub95": 0.17789367144308776
+          }
+        }
+      },
+      "runs": {
+        "N": [
+          "N/prompt-a",
+          "N/prompt-rep2",
+          "N/prompt-rep3"
+        ],
+        "R0": [
+          "R0/prompt-a",
+          "R0/prompt-b",
+          "R0/prompt-crossboot"
+        ]
+      },
+      "status": "ok",
+      "verdict": {
+        "all": "unresolved",
+        "dense": "unresolved",
+        "sparse": "unresolved"
+      },
+      "windows": {
+        "compared": 85,
+        "expected": 85
+      }
+    }
+  },
+  "schema": "fidelity-campaign-repeated/1",
+  "status": "ok",
+  "subset": "subsets/crossboot.txt",
+  "type": "repeated"
+}

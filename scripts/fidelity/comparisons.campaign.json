@@ -1,0 +1,21 @@
+[
+  {"name": "prompt-floor-r0", "cand": "R0/prompt-b", "ref": "R0/prompt-a", "floor": null, "kind": "prompt"},
+  {"name": "prompt-crossboot-r0", "cand": "R0/prompt-crossboot", "ref": "R0/prompt-a", "floor": null, "kind": "prompt"},
+  {"name": "prompt-cm-vs-r0", "cand": "Cm/prompt-a", "ref": "R0/prompt-a", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-cpre-vs-r0", "cand": "Cpre/prompt-a", "ref": "R0/prompt-a", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-cm-vs-cpre", "cand": "Cm/prompt-a", "ref": "Cpre/prompt-a", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-n-vs-r0", "cand": "N/prompt-a", "ref": "R0/prompt-a", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-n-vs-cm", "cand": "N/prompt-a", "ref": "Cm/prompt-a", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-cm-vs-r0-k100", "cand": "Cm/prompt-k100", "ref": "R0/prompt-k100", "floor": null, "kind": "prompt"},
+  {"name": "prompt-l0919-vs-r0", "cand": "L0919/prompt-ladder", "ref": "R0/prompt-a", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-cpre-vs-l0919", "cand": "Cpre/prompt-a", "ref": "L0919/prompt-ladder", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-le21-vs-cpre", "cand": "LE21/prompt-ladder", "ref": "Cpre/prompt-a", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-le22b-vs-le21", "cand": "LE22b/prompt-ladder", "ref": "LE21/prompt-ladder", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-cm-vs-le22b", "cand": "Cm/prompt-a", "ref": "LE22b/prompt-ladder", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "gen-floor-r0", "cand": "R0/gen-floor", "ref": "R0/gen-a", "floor": null, "kind": "gen"},
+  {"name": "gen-cm-vs-r0", "cand": "Cm/gen-a", "ref": "R0/gen-a", "floor": "gen-floor-r0", "kind": "gen"},
+  {"name": "gen-cpre-vs-r0", "cand": "Cpre/gen-a", "ref": "R0/gen-a", "floor": "gen-floor-r0", "kind": "gen"},
+  {"name": "gen-n-vs-r0", "cand": "N/gen-a", "ref": "R0/gen-a", "floor": "gen-floor-r0", "kind": "gen"},
+  {"name": "gen-cp-vs-cm-nospec", "cand": "Cp/gen-a", "ref": "CmNoSpec/gen-nospec", "floor": null, "kind": "gen"},
+  {"name": "gen-cp-replay", "cand": "Cp/replay", "ref": "Cp/cold", "floor": null, "kind": "gen"}
+]

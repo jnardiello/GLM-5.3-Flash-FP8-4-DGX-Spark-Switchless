@@ -41,6 +41,10 @@ scripts/mirror-private-terms.txt
 /scripts/node/sircl/*
 !/scripts/node/sircl/SHA256SUMS
 
+# Fidelity campaign: corpus text, token IDs, raw logprobs, transcripts, audits and
+# site inventories stay local. Only code, aggregates, plots and reports are tracked.
+/data/fidelity/
+
 # Local mirror tooling stays outside the public repository.
 /scripts/mirror-snapshot.sh
 /scripts/mirror-allow.txt

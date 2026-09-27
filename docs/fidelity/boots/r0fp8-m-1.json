@@ -1,0 +1,46 @@
+{
+  "label": "r0fp8-m-1",
+  "recorded_utc": "2026-09-27T04:40:43+00:00",
+  "overlay": "scripts/node/experiments/fidelity/r0fp8-m.env",
+  "overlay_sha256": "f513d17c1f4f6c1732ac3d8c866c049646e3003f06ba6fe6ed3ff6cdcb892427",
+  "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+  "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+  "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+  "model_repo": "zai-org/GLM-5.3-Flash",
+  "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+  "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+  "kv_cache_dtype": "fp8_e4m3",
+  "spec_tokens": "5",
+  "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+  "k": 20,
+  "ranks": [
+    {
+      "rank": 0,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "dcadcae149636b8a1fd7367a2ecfc56729b4b73521078c73f286d224a372a50a",
+      "ready_lines": []
+    },
+    {
+      "rank": 1,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "f2b216ac76eebfe69160a553aa51e4804f25f076e2c923ef5bcf6a488b6056aa",
+      "ready_lines": []
+    },
+    {
+      "rank": 2,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "0072e5c2e78fcfdafe6fabf8aba1442b9bd41d37d576bf7b8ed0a5af2b332500",
+      "ready_lines": []
+    },
+    {
+      "rank": 3,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "f5bd255b5f8f2c03118d28bf8439a6d35871c2c438fce070d0cb52c54bbb0624",
+      "ready_lines": []
+    }
+  ]
+}

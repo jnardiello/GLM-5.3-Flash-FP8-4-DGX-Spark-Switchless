@@ -1,0 +1,222 @@
+{
+  "schema": "fidelity-corpus-summary/1",
+  "model_repo": "zai-org/GLM-5.3-Flash",
+  "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+  "tokenizer_sha256": "19e773648cb4e65de8660ea6365e10acca112d42a854923df93db4a6f333a82d",
+  "chat_template_sha256": "d8b991bdcc284e346b87a01858700f2bbf5fa3c2fe8ad879d8adbe07907bbf3e",
+  "template_kwargs": {
+    "reasoning_effort": "high"
+  },
+  "frozen": false,
+  "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+  "decode_manifest_global_sha256": "1bb77e2df1238c0fcc8a4ee104fdf316040648a63a0c901cecce3b118f62cfd6",
+  "windows": 424,
+  "total_tokens": 2514865,
+  "scored_positions": 2514441,
+  "windows_at_least_3072": 298,
+  "by_category": {
+    "agentic_code": {
+      "windows": 160,
+      "tokens": 1173909,
+      "share_of_tokens": 0.4668
+    },
+    "italian_chat": {
+      "windows": 49,
+      "tokens": 209802,
+      "share_of_tokens": 0.0834
+    },
+    "long_context": {
+      "windows": 5,
+      "tokens": 315350,
+      "share_of_tokens": 0.1254
+    },
+    "model_native": {
+      "windows": 170,
+      "tokens": 521392,
+      "share_of_tokens": 0.2073
+    },
+    "structured_json": {
+      "windows": 40,
+      "tokens": 294412,
+      "share_of_tokens": 0.1171
+    }
+  },
+  "by_source": {
+    "claude_code": {
+      "windows": 103,
+      "tokens": 1044878,
+      "share_of_tokens": 0.4155
+    },
+    "omp": {
+      "windows": 102,
+      "tokens": 738793,
+      "share_of_tokens": 0.2938
+    },
+    "r0_native": {
+      "windows": 170,
+      "tokens": 521392,
+      "share_of_tokens": 0.2073
+    },
+    "synthetic_it": {
+      "windows": 49,
+      "tokens": 209802,
+      "share_of_tokens": 0.0834
+    }
+  },
+  "length_histogram": [
+    {
+      "min": 0,
+      "max_exclusive": 1024,
+      "count": 45
+    },
+    {
+      "min": 1024,
+      "max_exclusive": 2048,
+      "count": 36
+    },
+    {
+      "min": 2048,
+      "max_exclusive": 3072,
+      "count": 45
+    },
+    {
+      "min": 3072,
+      "max_exclusive": 4096,
+      "count": 45
+    },
+    {
+      "min": 4096,
+      "max_exclusive": 8192,
+      "count": 130
+    },
+    {
+      "min": 8192,
+      "max_exclusive": 8704,
+      "count": 8
+    },
+    {
+      "min": 8704,
+      "max_exclusive": 10240,
+      "count": 103
+    },
+    {
+      "min": 10240,
+      "max_exclusive": 16384,
+      "count": 6
+    },
+    {
+      "min": 16384,
+      "max_exclusive": 32768,
+      "count": 1
+    },
+    {
+      "min": 32768,
+      "max_exclusive": 65536,
+      "count": 4
+    },
+    {
+      "min": 65536,
+      "max_exclusive": 131072,
+      "count": 1
+    },
+    {
+      "min": 131072,
+      "max_exclusive": 262144,
+      "count": 0
+    }
+  ],
+  "long_context_lengths_mod_8192": [
+    1712,
+    2925,
+    4208,
+    5174,
+    6419
+  ],
+  "decode_prompts": {
+    "count": 150,
+    "by_source": {
+      "claude_code": 44,
+      "omp": 56,
+      "public": 50
+    },
+    "length_histogram": [
+      {
+        "min": 0,
+        "max_exclusive": 1024,
+        "count": 50
+      },
+      {
+        "min": 1024,
+        "max_exclusive": 2048,
+        "count": 42
+      },
+      {
+        "min": 2048,
+        "max_exclusive": 3072,
+        "count": 21
+      },
+      {
+        "min": 3072,
+        "max_exclusive": 4096,
+        "count": 5
+      },
+      {
+        "min": 4096,
+        "max_exclusive": 8192,
+        "count": 13
+      },
+      {
+        "min": 8192,
+        "max_exclusive": 8704,
+        "count": 1
+      },
+      {
+        "min": 8704,
+        "max_exclusive": 10240,
+        "count": 7
+      },
+      {
+        "min": 10240,
+        "max_exclusive": 16384,
+        "count": 11
+      },
+      {
+        "min": 16384,
+        "max_exclusive": 32768,
+        "count": 0
+      },
+      {
+        "min": 32768,
+        "max_exclusive": 65536,
+        "count": 0
+      },
+      {
+        "min": 65536,
+        "max_exclusive": 131072,
+        "count": 0
+      },
+      {
+        "min": 131072,
+        "max_exclusive": 262144,
+        "count": 0
+      }
+    ]
+  },
+  "redaction_counts": {
+    "anthropic_key": 0,
+    "aws_access_key": 0,
+    "bearer": 0,
+    "email": 187,
+    "entropy": 1395,
+    "env_assignment": 191,
+    "github_token": 0,
+    "gitlab_token": 0,
+    "google_api_key": 1,
+    "hf_token": 0,
+    "jwt": 0,
+    "openai_key": 7,
+    "password_assignment": 115,
+    "pem_private_key": 0,
+    "slack_token": 0
+  }
+}

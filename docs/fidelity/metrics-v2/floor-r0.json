@@ -1,0 +1,3065 @@
+{
+  "K": {
+    "cand": 20,
+    "ref": 20
+  },
+  "by_position_bucket": {
+    "0-2K": {
+      "actual_token_nonfinite": {
+        "contrast": {
+          "cand": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          },
+          "ref": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          }
+        }
+      },
+      "contrast": {
+        "clamped": 33612,
+        "covered_mass_cand": {
+          "mean": 0.9412552557734309,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9464430865097418,
+            "ci_low": 0.9366838452700663,
+            "estimate": 0.9412552557734309,
+            "lb95": 0.9373339524141333,
+            "se": 0.002513912108291481,
+            "ub95": 0.9455734995337959
+          },
+          "median": 0.995926558971405,
+          "n": 773158,
+          "p10": 0.8056761085987091
+        },
+        "covered_mass_ref": {
+          "mean": 0.9412552557734309,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9464430865097418,
+            "ci_low": 0.9366838452700663,
+            "estimate": 0.9412552557734309,
+            "lb95": 0.9373339524141333,
+            "se": 0.002513912108291481,
+            "ub95": 0.9455734995337959
+          },
+          "median": 0.995926558971405,
+          "n": 773158,
+          "p10": 0.8056761085987091
+        },
+        "delta_nll": {
+          "B": 2000,
+          "ci_high": 0.0,
+          "ci_low": 0.0,
+          "estimate": 0.0,
+          "excluded_nonfinite": 0,
+          "finite_subset": true,
+          "groups": 235,
+          "lb95": 0.0,
+          "n": 773158,
+          "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+          "se": 0.0,
+          "ub95": 0.0
+        },
+        "floored": 0,
+        "kl": {
+          "max": 0.0,
+          "mean": 0.0,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          },
+          "median": 0.0,
+          "n": 773158,
+          "p90": 0.0,
+          "p99": 0.0,
+          "p99_9": 0.0
+        },
+        "top1_agreement": {
+          "B": 2000,
+          "ci_high": 1.0,
+          "ci_low": 1.0,
+          "estimate": 1.0,
+          "lb95": 1.0,
+          "n": 773158,
+          "se": 0.0,
+          "ub95": 1.0
+        },
+        "topk_overlap": {
+          "mean": 20.0,
+          "median": 20.0,
+          "n": 773158,
+          "p10": 20.0
+        }
+      },
+      "excluded_by_joint_mask": 0,
+      "groups": 235,
+      "positions": 773158,
+      "positions_joint_valid": 773158,
+      "windows": 424
+    },
+    "2-8K": {
+      "actual_token_nonfinite": {
+        "contrast": {
+          "cand": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          },
+          "ref": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          }
+        }
+      },
+      "contrast": {
+        "clamped": 53689,
+        "covered_mass_cand": {
+          "mean": 0.8989799090116521,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9078620647510425,
+            "ci_low": 0.8899334124373577,
+            "estimate": 0.8989799090116521,
+            "lb95": 0.8915845947246964,
+            "se": 0.004517485231253524,
+            "ub95": 0.9064052110783136
+          },
+          "median": 0.9945787191390991,
+          "n": 1295402,
+          "p10": 0.668428236246109
+        },
+        "covered_mass_ref": {
+          "mean": 0.8990206849271493,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9079132006848953,
+            "ci_low": 0.8900391376809775,
+            "estimate": 0.8990206849271493,
+            "lb95": 0.891573249426632,
+            "se": 0.0045134719071981255,
+            "ub95": 0.906470370690075
+          },
+          "median": 0.9945719242095947,
+          "n": 1295402,
+          "p10": 0.6668957293033599
+        },
+        "delta_nll": {
+          "B": 2000,
+          "ci_high": 0.0057095217766584645,
+          "ci_low": -0.00226879833251732,
+          "estimate": 0.0018526240974837999,
+          "excluded_nonfinite": 0,
+          "finite_subset": true,
+          "groups": 177,
+          "lb95": -0.0017209220878044225,
+          "n": 1295402,
+          "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+          "se": 0.002066950892533101,
+          "ub95": 0.005157462493213197
+        },
+        "floored": 11656,
+        "kl": {
+          "max": 28.63542464962613,
+          "mean": 0.25706323342912507,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.2822701090217173,
+            "ci_low": 0.23207444897126364,
+            "estimate": 0.25706323342912524,
+            "lb95": 0.23650475386425365,
+            "se": 0.012637824176837438,
+            "ub95": 0.27690008900063445
+          },
+          "median": 0.01449267141019763,
+          "n": 1295402,
+          "p90": 0.549136132448672,
+          "p99": 4.439252437359711,
+          "p99_9": 10.305087840620494
+        },
+        "top1_agreement": {
+          "B": 2000,
+          "ci_high": 0.823171005761036,
+          "ci_low": 0.7944877936405781,
+          "estimate": 0.8091210296108853,
+          "lb95": 0.7973042102372965,
+          "n": 1295402,
+          "se": 0.007218135851179143,
+          "ub95": 0.8209745859428272
+        },
+        "topk_overlap": {
+          "mean": 16.041140124841554,
+          "median": 18.0,
+          "n": 1295402,
+          "p10": 10.0
+        }
+      },
+      "excluded_by_joint_mask": 0,
+      "groups": 177,
+      "positions": 1295402,
+      "positions_joint_valid": 1295402,
+      "windows": 342
+    },
+    "32-64K": {
+      "actual_token_nonfinite": {
+        "contrast": {
+          "cand": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          },
+          "ref": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          }
+        }
+      },
+      "contrast": {
+        "clamped": 5361,
+        "covered_mass_cand": {
+          "mean": 0.8970783928131923,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9218848700149416,
+            "ci_low": 0.8750093745932236,
+            "estimate": 0.897078392813192,
+            "lb95": 0.8773749432047145,
+            "se": 0.013124462732580566,
+            "ub95": 0.9198584018378652
+          },
+          "median": 0.9978545010089874,
+          "n": 88992,
+          "p10": 0.6567428171634674
+        },
+        "covered_mass_ref": {
+          "mean": 0.8962304443122596,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9210160523281973,
+            "ci_low": 0.8741799923094183,
+            "estimate": 0.896230444312259,
+            "lb95": 0.876105546008928,
+            "se": 0.013312775171502644,
+            "ub95": 0.9192635047885737
+          },
+          "median": 0.9978572130203247,
+          "n": 88992,
+          "p10": 0.6473303139209747
+        },
+        "delta_nll": {
+          "B": 2000,
+          "ci_high": 0.034670956113038526,
+          "ci_low": -0.007927996441646773,
+          "estimate": 0.017466490670477862,
+          "excluded_nonfinite": 0,
+          "finite_subset": true,
+          "groups": 5,
+          "lb95": -0.004390394507442496,
+          "n": 88992,
+          "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+          "se": 0.011692953209322522,
+          "ub95": 0.03191606136082849
+        },
+        "floored": 1112,
+        "kl": {
+          "max": 24.018951005928972,
+          "mean": 0.3566584833238247,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.4256471115667248,
+            "ci_low": 0.27989744675219125,
+            "estimate": 0.3566584833238243,
+            "lb95": 0.29418159406542865,
+            "se": 0.03663432073218418,
+            "ub95": 0.41199044556835873
+          },
+          "median": 0.013704285487255628,
+          "n": 88992,
+          "p90": 0.8893192727015493,
+          "p99": 5.6703075881174465,
+          "p99_9": 12.427786186271925
+        },
+        "top1_agreement": {
+          "B": 2000,
+          "ci_high": 0.8139758298061929,
+          "ci_low": 0.7519752358490566,
+          "estimate": 0.7797105357784969,
+          "lb95": 0.7555718093523409,
+          "n": 88992,
+          "se": 0.016366366493554142,
+          "ub95": 0.8104898860313862
+        },
+        "topk_overlap": {
+          "mean": 15.290913790003597,
+          "median": 17.0,
+          "n": 88992,
+          "p10": 7.0
+        }
+      },
+      "excluded_by_joint_mask": 0,
+      "groups": 5,
+      "positions": 88992,
+      "positions_joint_valid": 88992,
+      "windows": 5
+    },
+    "64K+": {
+      "actual_token_nonfinite": {
+        "contrast": {
+          "cand": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          },
+          "ref": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          }
+        }
+      },
+      "contrast": {
+        "clamped": 2938,
+        "covered_mass_cand": {
+          "mean": 0.8925981040953211,
+          "mean_ci": {
+            "B": 0,
+            "ci_high": null,
+            "ci_low": null,
+            "estimate": 0.8925981040953217,
+            "lb95": null,
+            "note": "fewer than two independent groups: bounds unavailable",
+            "se": null,
+            "ub95": null
+          },
+          "median": 0.9966126680374146,
+          "n": 62518,
+          "p10": 0.6347903847694397
+        },
+        "covered_mass_ref": {
+          "mean": 0.8941666094164697,
+          "mean_ci": {
+            "B": 0,
+            "ci_high": null,
+            "ci_low": null,
+            "estimate": 0.8941666094164697,
+            "lb95": null,
+            "note": "fewer than two independent groups: bounds unavailable",
+            "se": null,
+            "ub95": null
+          },
+          "median": 0.996642142534256,
+          "n": 62518,
+          "p10": 0.6481120705604553
+        },
+        "delta_nll": {
+          "B": 0,
+          "ci_high": null,
+          "ci_low": null,
+          "estimate": 0.004087500374079581,
+          "excluded_nonfinite": 0,
+          "finite_subset": true,
+          "groups": 1,
+          "lb95": null,
+          "n": 62518,
+          "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+          "se": null,
+          "ub95": null
+        },
+        "floored": 684,
+        "kl": {
+          "max": 20.32246713445769,
+          "mean": 0.32267711497471235,
+          "mean_ci": {
+            "B": 0,
+            "ci_high": null,
+            "ci_low": null,
+            "estimate": 0.322677114974713,
+            "lb95": null,
+            "note": "fewer than two independent groups: bounds unavailable",
+            "se": null,
+            "ub95": null
+          },
+          "median": 0.015959926386967076,
+          "n": 62518,
+          "p90": 0.8063307594351039,
+          "p99": 5.058682601580608,
+          "p99_9": 10.959163117509373
+        },
+        "top1_agreement": {
+          "B": 0,
+          "ci_high": null,
+          "ci_low": null,
+          "estimate": 0.7813589686170382,
+          "lb95": null,
+          "n": 62518,
+          "note": "fewer than two independent groups: bounds unavailable",
+          "se": null,
+          "ub95": null
+        },
+        "topk_overlap": {
+          "mean": 15.311542275824563,
+          "median": 17.0,
+          "n": 62518,
+          "p10": 8.0
+        }
+      },
+      "excluded_by_joint_mask": 0,
+      "groups": 1,
+      "positions": 62518,
+      "positions_joint_valid": 62518,
+      "windows": 1
+    },
+    "8-32K": {
+      "actual_token_nonfinite": {
+        "contrast": {
+          "cand": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          },
+          "ref": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          }
+        }
+      },
+      "contrast": {
+        "clamped": 9535,
+        "covered_mass_cand": {
+          "mean": 0.8878508551354098,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.8999026981705156,
+            "ci_low": 0.8744741774344261,
+            "estimate": 0.8878508551354098,
+            "lb95": 0.8766535282715486,
+            "se": 0.0065679411738248554,
+            "ub95": 0.8980068372505181
+          },
+          "median": 0.9922272562980652,
+          "n": 294371,
+          "p10": 0.6254859566688538
+        },
+        "covered_mass_ref": {
+          "mean": 0.8879018154394077,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9005931305062881,
+            "ci_low": 0.8740926695399207,
+            "estimate": 0.8879018154394078,
+            "lb95": 0.8763382558441408,
+            "se": 0.006729032609979037,
+            "ub95": 0.8983373471843731
+          },
+          "median": 0.9922547936439514,
+          "n": 294371,
+          "p10": 0.626936674118042
+        },
+        "delta_nll": {
+          "B": 2000,
+          "ci_high": 0.014808527877543167,
+          "ci_low": -0.00583272616631189,
+          "estimate": 0.00402329517066965,
+          "excluded_nonfinite": 0,
+          "finite_subset": true,
+          "groups": 83,
+          "lb95": -0.004145832490198173,
+          "n": 294371,
+          "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+          "se": 0.005200033638387513,
+          "ub95": 0.013129154418477638
+        },
+        "floored": 2103,
+        "kl": {
+          "max": 25.538369546684123,
+          "mean": 0.32994295358163483,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.372132854580052,
+            "ci_low": 0.28331448041890445,
+            "estimate": 0.3299429535816349,
+            "lb95": 0.2910810831370409,
+            "se": 0.022717939521505626,
+            "ub95": 0.36590151926035297
+          },
+          "median": 0.023616842244980764,
+          "n": 294371,
+          "p90": 0.8036995868311342,
+          "p99": 5.099419758164862,
+          "p99_9": 11.164336238529708
+        },
+        "top1_agreement": {
+          "B": 2000,
+          "ci_high": 0.7964533484277847,
+          "ci_low": 0.7505901395361259,
+          "estimate": 0.77250816146971,
+          "lb95": 0.7543666239072784,
+          "n": 294371,
+          "se": 0.01165336023556303,
+          "ub95": 0.7927417137984208
+        },
+        "topk_overlap": {
+          "mean": 15.48200060467913,
+          "median": 17.0,
+          "n": 294371,
+          "p10": 8.0
+        }
+      },
+      "excluded_by_joint_mask": 0,
+      "groups": 83,
+      "positions": 294371,
+      "positions_joint_valid": 294371,
+      "windows": 123
+    }
+  },
+  "by_prefill_path": {
+    "bf16": {
+      "actual_token_nonfinite": {
+        "contrast": {
+          "cand": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          },
+          "ref": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          }
+        }
+      },
+      "contrast": {
+        "clamped": 93374,
+        "covered_mass_cand": {
+          "mean": 0.911027098592066,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9187274797182634,
+            "ci_low": 0.9043572955945195,
+            "estimate": 0.9110270985920658,
+            "lb95": 0.9054207783836007,
+            "se": 0.0035863434508751576,
+            "ub95": 0.9173171381563395
+          },
+          "median": 0.9950072765350342,
+          "n": 2307037,
+          "p10": 0.7202454090118409
+        },
+        "covered_mass_ref": {
+          "mean": 0.9110471561688066,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9187260796675354,
+            "ci_low": 0.9043683013491252,
+            "estimate": 0.9110471561688068,
+            "lb95": 0.9054239467871797,
+            "se": 0.0035920627890520048,
+            "ub95": 0.917342948740368
+          },
+          "median": 0.9950041174888611,
+          "n": 2307037,
+          "p10": 0.7202676177024842
+        },
+        "delta_nll": {
+          "B": 2000,
+          "ci_high": 0.005000477796221814,
+          "ci_low": -0.0013360288360081596,
+          "estimate": 0.0019264972544934913,
+          "excluded_nonfinite": 0,
+          "finite_subset": true,
+          "groups": 178,
+          "lb95": -0.0008240580979062957,
+          "n": 2307037,
+          "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+          "se": 0.0016289720375116895,
+          "ub95": 0.004584628007131301
+        },
+        "floored": 14520,
+        "kl": {
+          "max": 28.63542464962613,
+          "mean": 0.18962526025308385,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.2124963552674477,
+            "ci_low": 0.16515316461880386,
+            "estimate": 0.18962526025308368,
+            "lb95": 0.16889689084650197,
+            "se": 0.011963813795715542,
+            "ub95": 0.2087039088425869
+          },
+          "median": 0.0008069848885479771,
+          "n": 2307037,
+          "p90": 0.3193207833042958,
+          "p99": 3.8238498416403854,
+          "p99_9": 9.541947888413828
+        },
+        "top1_agreement": {
+          "B": 2000,
+          "ci_high": 0.8770867071729613,
+          "ci_low": 0.8495079093622988,
+          "estimate": 0.8628036741500028,
+          "lb95": 0.8514803062595193,
+          "n": 2307037,
+          "se": 0.007034151619906952,
+          "ub95": 0.8751662079251806
+        },
+        "topk_overlap": {
+          "mean": 17.162738178884865,
+          "median": 18.0,
+          "n": 2307037,
+          "p10": 12.0
+        }
+      },
+      "excluded_by_joint_mask": 0,
+      "groups": 178,
+      "positions": 2307037,
+      "positions_joint_valid": 2307037,
+      "windows": 343
+    },
+    "marlin": {
+      "actual_token_nonfinite": {
+        "contrast": {
+          "cand": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          },
+          "ref": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          }
+        }
+      },
+      "contrast": {
+        "clamped": 11761,
+        "covered_mass_cand": {
+          "mean": 0.9040325710418856,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9150919171257416,
+            "ci_low": 0.8923799220738495,
+            "estimate": 0.9040325710418855,
+            "lb95": 0.894523483020521,
+            "se": 0.0058831992157123095,
+            "ub95": 0.9136368435171092
+          },
+          "median": 0.9951364994049072,
+          "n": 207404,
+          "p10": 0.6923606395721436
+        },
+        "covered_mass_ref": {
+          "mean": 0.9042454312043531,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9152433296894965,
+            "ci_low": 0.892508117025576,
+            "estimate": 0.9042454312043527,
+            "lb95": 0.8945911659689132,
+            "se": 0.005928223817625047,
+            "ub95": 0.9139409904861175
+          },
+          "median": 0.9951608777046204,
+          "n": 207404,
+          "p10": 0.693890655040741
+        },
+        "delta_nll": {
+          "B": 2000,
+          "ci_high": 0.015027540004377603,
+          "ci_low": -0.005448812332354038,
+          "estimate": 0.004578765228408694,
+          "excluded_nonfinite": 0,
+          "finite_subset": true,
+          "groups": 140,
+          "lb95": -0.004086483109827449,
+          "n": 207404,
+          "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+          "se": 0.005263708383137854,
+          "ub95": 0.013124940554989624
+        },
+        "floored": 1035,
+        "kl": {
+          "max": 25.538369546684123,
+          "mean": 0.21487653074571383,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.25259909840567674,
+            "ci_low": 0.18019014216981058,
+            "estimate": 0.21487653074571378,
+            "lb95": 0.18578256392621703,
+            "se": 0.01850876747149862,
+            "ub95": 0.2466769746908145
+          },
+          "median": 0.0004792690087190806,
+          "n": 207404,
+          "p90": 0.39610775179523955,
+          "p99": 4.157490010602032,
+          "p99_9": 9.692844999655755
+        },
+        "top1_agreement": {
+          "B": 2000,
+          "ci_high": 0.872032552271187,
+          "ci_low": 0.8268334877591383,
+          "estimate": 0.8505911168540626,
+          "lb95": 0.8312157724071075,
+          "n": 207404,
+          "se": 0.011233337609396685,
+          "ub95": 0.8682315066248487
+        },
+        "topk_overlap": {
+          "mean": 16.98752675936819,
+          "median": 18.0,
+          "n": 207404,
+          "p10": 12.0
+        }
+      },
+      "excluded_by_joint_mask": 0,
+      "groups": 140,
+      "positions": 207404,
+      "positions_joint_valid": 207404,
+      "windows": 194
+    }
+  },
+  "cand": "R0/prompt-b",
+  "floor": null,
+  "groups": 235,
+  "missingness": {
+    "R0/prompt-a": {
+      "invalid_rows": {
+        "all": 0,
+        "dense": 0,
+        "sparse": 0
+      },
+      "missing_actual": {
+        "all": 0,
+        "dense": 0,
+        "sparse": 0
+      },
+      "other_nonfinite_actual": {
+        "all": 0,
+        "dense": 0,
+        "sparse": 0
+      },
+      "rows_in_missing_windows": {
+        "all": 0,
+        "dense": 0,
+        "sparse": 0
+      },
+      "windows_expected": 424,
+      "windows_missing": 0,
+      "windows_ok": 424,
+      "zero_probability_actual": {
+        "all": 0,
+        "dense": 0,
+        "sparse": 0
+      }
+    },
+    "R0/prompt-b": {
+      "invalid_rows": {
+        "all": 0,
+        "dense": 0,
+        "sparse": 0
+      },
+      "missing_actual": {
+        "all": 0,
+        "dense": 0,
+        "sparse": 0
+      },
+      "other_nonfinite_actual": {
+        "all": 0,
+        "dense": 0,
+        "sparse": 0
+      },
+      "rows_in_missing_windows": {
+        "all": 0,
+        "dense": 0,
+        "sparse": 0
+      },
+      "windows_expected": 424,
+      "windows_missing": 0,
+      "windows_ok": 424,
+      "zero_probability_actual": {
+        "all": 0,
+        "dense": 0,
+        "sparse": 0
+      }
+    }
+  },
+  "name": "floor-r0",
+  "ref": "R0/prompt-a",
+  "regimes": {
+    "all": {
+      "actual_token_nonfinite": {
+        "contrast": {
+          "cand": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          },
+          "ref": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          }
+        }
+      },
+      "by_category": {
+        "agentic_code": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 21799,
+            "covered_mass_cand": {
+              "mean": 0.8857070389131505,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.8933908047378594,
+                "ci_low": 0.8780709816174248,
+                "estimate": 0.8857070389131505,
+                "lb95": 0.8792902305387466,
+                "se": 0.0038515455681800777,
+                "ub95": 0.8921046734730463
+              },
+              "median": 0.987186849117279,
+              "n": 1173749,
+              "p10": 0.6245977640151977
+            },
+            "covered_mass_ref": {
+              "mean": 0.8858301819918217,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.8933949420298829,
+                "ci_low": 0.8782119258098467,
+                "estimate": 0.8858301819918218,
+                "lb95": 0.8793886395205844,
+                "se": 0.003840446981780016,
+                "ub95": 0.8921815762206696
+              },
+              "median": 0.987159788608551,
+              "n": 1173749,
+              "p10": 0.6241316199302673
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.007277497868764833,
+              "ci_low": -0.0013986663476124011,
+              "estimate": 0.0029698130220655655,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 93,
+              "lb95": -0.0006645896346227815,
+              "n": 1173749,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.002209538729669247,
+              "ub95": 0.006563225498902694
+            },
+            "floored": 3637,
+            "kl": {
+              "max": 28.63542464962613,
+              "mean": 0.2419326713505569,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.2629570271773775,
+                "ci_low": 0.2221471319013259,
+                "estimate": 0.24193267135055682,
+                "lb95": 0.22546136727987318,
+                "se": 0.010308312797757702,
+                "ub95": 0.25943227644647776
+              },
+              "median": 0.0037982383208566674,
+              "n": 1173749,
+              "p90": 0.5010559400111317,
+              "p99": 4.380650609830996,
+              "p99_9": 10.106903833159938
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 0.8404450465867813,
+              "ci_low": 0.8166744763548875,
+              "estimate": 0.8287214728191462,
+              "lb95": 0.8183107035774552,
+              "n": 1173749,
+              "se": 0.0061112722632003,
+              "ub95": 0.8387231689200766
+            },
+            "topk_overlap": {
+              "mean": 16.652954762900755,
+              "median": 18.0,
+              "n": 1173749,
+              "p10": 11.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 93,
+          "positions": 1173749,
+          "positions_joint_valid": 1173749,
+          "windows": 160
+        },
+        "italian_chat": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 8656,
+            "covered_mass_cand": {
+              "mean": 0.9830793744116093,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9840104898164463,
+                "ci_low": 0.9821542956773867,
+                "estimate": 0.9830793744116093,
+                "lb95": 0.9822989196312737,
+                "se": 0.0004615796961486021,
+                "ub95": 0.9838429395406965
+              },
+              "median": 0.9990910887718201,
+              "n": 209753,
+              "p10": 0.9555280208587646
+            },
+            "covered_mass_ref": {
+              "mean": 0.983020011407304,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9839413446865407,
+                "ci_low": 0.982075994404757,
+                "estimate": 0.983020011407304,
+                "lb95": 0.9822276370004477,
+                "se": 0.00046680400222970576,
+                "ub95": 0.9837775886126021
+              },
+              "median": 0.9990894198417664,
+              "n": 209753,
+              "p10": 0.9554447531700134
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.0018263662119145517,
+              "ci_low": -0.0006362052178291778,
+              "estimate": 0.0006225504321900269,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 30,
+              "lb95": -0.00041335202157387753,
+              "n": 209753,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.0006268963825020286,
+              "ub95": 0.001666091085626345
+            },
+            "floored": 1309,
+            "kl": {
+              "max": 8.614354491785761,
+              "mean": 0.014190315818803964,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.015031062359560088,
+                "ci_low": 0.013435933065514284,
+                "estimate": 0.014190315818803959,
+                "lb95": 0.013533724496575965,
+                "se": 0.00040857824618919223,
+                "ub95": 0.01486119490844387
+              },
+              "median": 5.789608210778739e-07,
+              "n": 209753,
+              "p90": 0.0304359884542001,
+              "p99": 0.20619604823833637,
+              "p99_9": 1.0481790043102615
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 0.9715551088363222,
+              "ci_low": 0.9685139645227127,
+              "estimate": 0.9701124656143177,
+              "lb95": 0.9687862609099702,
+              "n": 209753,
+              "se": 0.000778546537967487,
+              "ub95": 0.9713335227271107
+            },
+            "topk_overlap": {
+              "mean": 19.102544421295523,
+              "median": 20.0,
+              "n": 209753,
+              "p10": 17.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 30,
+          "positions": 209753,
+          "positions_joint_valid": 209753,
+          "windows": 49
+        },
+        "long_context": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 11323,
+            "covered_mass_cand": {
+              "mean": 0.8894512253947023,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9102853133085494,
+                "ci_low": 0.8758725716973308,
+                "estimate": 0.8894512253947021,
+                "lb95": 0.8768331912827556,
+                "se": 0.00869937449213897,
+                "ub95": 0.9077722579283704
+              },
+              "median": 0.9940771460533142,
+              "n": 315345,
+              "p10": 0.6249471902847291
+            },
+            "covered_mass_ref": {
+              "mean": 0.8893110990968082,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9100240644586028,
+                "ci_low": 0.8759211559742136,
+                "estimate": 0.8893110990968084,
+                "lb95": 0.8768350326051921,
+                "se": 0.008623953336131066,
+                "ub95": 0.9069033840781603
+              },
+              "median": 0.9940860867500305,
+              "n": 315345,
+              "p10": 0.6238203167915345
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.013333010959173547,
+              "ci_low": -0.010760842323175862,
+              "estimate": 0.004726830810968206,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 5,
+              "lb95": -0.009334729238355821,
+              "n": 315345,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.006593248073139912,
+              "ub95": 0.012470805217588423
+            },
+            "floored": 2508,
+            "kl": {
+              "max": 24.018951005928972,
+              "mean": 0.3355568771216642,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.37516917677953876,
+                "ci_low": 0.26152112321762766,
+                "estimate": 0.3355568771216643,
+                "lb95": 0.27566170359012543,
+                "se": 0.029777103857484527,
+                "ub95": 0.37422404028571454
+              },
+              "median": 0.019717356969518537,
+              "n": 315345,
+              "p90": 0.8333358825571027,
+              "p99": 5.183711360835826,
+              "p99_9": 11.312835376664767
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 0.8080302565604305,
+              "ci_low": 0.7529750877825101,
+              "estimate": 0.7747641472038561,
+              "lb95": 0.7561739675246698,
+              "n": 315345,
+              "se": 0.013963466326222371,
+              "ub95": 0.800584429387936
+            },
+            "topk_overlap": {
+              "mean": 15.452517084463048,
+              "median": 17.0,
+              "n": 315345,
+              "p10": 8.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 5,
+          "positions": 315345,
+          "positions_joint_valid": 315345,
+          "windows": 5
+        },
+        "model_native": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 50541,
+            "covered_mass_cand": {
+              "mean": 0.9513171435859867,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.965074835648792,
+                "ci_low": 0.9384099564697755,
+                "estimate": 0.9513171435859867,
+                "lb95": 0.940433549896329,
+                "se": 0.006909437368883707,
+                "ub95": 0.9629093218260658
+              },
+              "median": 0.9994730949401855,
+              "n": 521222,
+              "p10": 0.8678013265132904
+            },
+            "covered_mass_ref": {
+              "mean": 0.9512840599730138,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9649233871842862,
+                "ci_low": 0.9383282078201043,
+                "estimate": 0.9512840599730138,
+                "lb95": 0.9404130897909981,
+                "se": 0.006917233974021896,
+                "ub95": 0.9628803962280357
+              },
+              "median": 0.9994719922542572,
+              "n": 521222,
+              "p10": 0.8677019953727722
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.004756789702401253,
+              "ci_low": -0.0019432859327636568,
+              "estimate": 0.0015048148510023152,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 149,
+              "lb95": -0.001411771571306928,
+              "n": 521222,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.001722677352867572,
+              "ub95": 0.004237910682392066
+            },
+            "floored": 5805,
+            "kl": {
+              "max": 25.375713781316193,
+              "mean": 0.07591838622493675,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.1082561838837129,
+                "ci_low": 0.04392390456095875,
+                "estimate": 0.07591838622493673,
+                "lb95": 0.048605013233556545,
+                "se": 0.01634091330783673,
+                "ub95": 0.10231461136312747
+              },
+              "median": 7.362611722580125e-08,
+              "n": 521222,
+              "p90": 0.06097162228377607,
+              "p99": 1.8385395178417323,
+              "p99_9": 7.8092590898094505
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 0.9597071826283758,
+              "ci_low": 0.9199901577306776,
+              "estimate": 0.9399775911224009,
+              "lb95": 0.9238864600714046,
+              "n": 521222,
+              "se": 0.01013305849468022,
+              "ub95": 0.9567841471685022
+            },
+            "topk_overlap": {
+              "mean": 18.54800065998749,
+              "median": 20.0,
+              "n": 521222,
+              "p10": 16.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 149,
+          "positions": 521222,
+          "positions_joint_valid": 521222,
+          "windows": 170
+        },
+        "structured_json": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 12816,
+            "covered_mass_cand": {
+              "mean": 0.9074917984537183,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9143382039196258,
+                "ci_low": 0.9003575982320979,
+                "estimate": 0.9074917984537181,
+                "lb95": 0.9015454287691785,
+                "se": 0.003651351099339588,
+                "ub95": 0.9132446201247759
+              },
+              "median": 0.9942272007465363,
+              "n": 294372,
+              "p10": 0.7003239810466766
+            },
+            "covered_mass_ref": {
+              "mean": 0.9075589453220771,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9143942797309853,
+                "ci_low": 0.9003338876524635,
+                "estimate": 0.9075589453220771,
+                "lb95": 0.9015498343647909,
+                "se": 0.00367004846493887,
+                "ub95": 0.9133361540111719
+              },
+              "median": 0.9942654073238373,
+              "n": 294372,
+              "p10": 0.7005865335464477
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.005168101969399684,
+              "ci_low": -0.008975478017118113,
+              "estimate": -0.0016889081979458295,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 22,
+              "lb95": -0.007893492084560009,
+              "n": 294372,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.0036789621543493215,
+              "ub95": 0.004007951844180374
+            },
+            "floored": 2296,
+            "kl": {
+              "max": 22.606429504186643,
+              "mean": 0.1688595879411976,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.1993165276741488,
+                "ci_low": 0.14050959835945004,
+                "estimate": 0.16885958794119751,
+                "lb95": 0.1446567981825327,
+                "se": 0.015202880218767395,
+                "ub95": 0.1946034999824721
+              },
+              "median": 0.0004558313679770389,
+              "n": 294372,
+              "p90": 0.294941964015032,
+              "p99": 3.398414590995509,
+              "p99_9": 8.26973308406803
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 0.8874323276426327,
+              "ci_low": 0.8553842838651912,
+              "estimate": 0.8712989007106654,
+              "lb95": 0.8575401908894111,
+              "n": 294372,
+              "se": 0.00826290808595942,
+              "ub95": 0.8848899794173158
+            },
+            "topk_overlap": {
+              "mean": 17.069041892571306,
+              "median": 18.0,
+              "n": 294372,
+              "p10": 13.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 22,
+          "positions": 294372,
+          "positions_joint_valid": 294372,
+          "windows": 40
+        }
+      },
+      "contrast": {
+        "clamped": 105135,
+        "covered_mass_cand": {
+          "mean": 0.9104501540576673,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9177241378467584,
+            "ci_low": 0.904030776160202,
+            "estimate": 0.9104501540576673,
+            "lb95": 0.905079356176383,
+            "se": 0.003470481012482757,
+            "ub95": 0.9162935979155192
+          },
+          "median": 0.9950164556503296,
+          "n": 2514441,
+          "p10": 0.7180903553962708
+        },
+        "covered_mass_ref": {
+          "mean": 0.910486114981311,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9177685287474194,
+            "ci_low": 0.9040339013792839,
+            "estimate": 0.9104861149813112,
+            "lb95": 0.9051396002341769,
+            "se": 0.003471125620009954,
+            "ub95": 0.9163280110664135
+          },
+          "median": 0.9950155019760132,
+          "n": 2514441,
+          "p10": 0.7181179523468018
+        },
+        "delta_nll": {
+          "B": 2000,
+          "ci_high": 0.004782470863893469,
+          "ci_low": -0.0008904223956239643,
+          "estimate": 0.0021452699307511172,
+          "excluded_nonfinite": 0,
+          "finite_subset": true,
+          "groups": 235,
+          "lb95": -0.0004286218709685778,
+          "n": 2514441,
+          "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+          "se": 0.0014610968273531361,
+          "ub95": 0.004397314396700541
+        },
+        "floored": 15555,
+        "kl": {
+          "max": 28.63542464962613,
+          "mean": 0.19170811465501786,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.21232771806306625,
+            "ci_low": 0.16738765897326227,
+            "estimate": 0.19170811465501786,
+            "lb95": 0.17181808746840085,
+            "se": 0.011326583196101057,
+            "ub95": 0.20964969457650157
+          },
+          "median": 0.0007787156040458691,
+          "n": 2514441,
+          "p90": 0.3253350135981003,
+          "p99": 3.8541811621829716,
+          "p99_9": 9.556763932302909,
+          "p99_ci": {
+            "B": 2000,
+            "ci_high": 4.129887613163198,
+            "ci_low": 3.5196070266219848,
+            "estimate": 3.8541811621829716,
+            "lb95": 3.5824840844833736,
+            "se": 0.15202011223304335,
+            "ub95": 4.077050663637254
+          }
+        },
+        "top1_agreement": {
+          "B": 2000,
+          "ci_high": 0.8761538350149739,
+          "ci_low": 0.8497953206553058,
+          "estimate": 0.8617963197386616,
+          "lb95": 0.8514896279038159,
+          "n": 2514441,
+          "se": 0.006667846801472448,
+          "ub95": 0.8733655093145926
+        },
+        "topk_overlap": {
+          "mean": 17.14828584166421,
+          "median": 18.0,
+          "n": 2514441,
+          "p10": 12.0
+        }
+      },
+      "excluded_by_joint_mask": 0,
+      "groups": 235,
+      "model_native_continuation": {
+        "actual_token_nonfinite": {
+          "contrast": {
+            "cand": {
+              "infinite_nll": 0,
+              "missing": 0,
+              "other_nonfinite": 0,
+              "zero_probability": 0
+            },
+            "ref": {
+              "infinite_nll": 0,
+              "missing": 0,
+              "other_nonfinite": 0,
+              "zero_probability": 0
+            }
+          }
+        },
+        "contrast": {
+          "clamped": 45686,
+          "covered_mass_cand": {
+            "mean": 0.9958349283369036,
+            "mean_ci": {
+              "B": 2000,
+              "ci_high": 0.9964927137867315,
+              "ci_low": 0.9951353413781167,
+              "estimate": 0.9958349283369036,
+              "lb95": 0.9952492818195126,
+              "se": 0.0003419543839874898,
+              "ub95": 0.9963736141026042
+            },
+            "median": 0.9999754428863525,
+            "n": 284386,
+            "p10": 0.9922924339771271
+          },
+          "covered_mass_ref": {
+            "mean": 0.9958188087298299,
+            "mean_ci": {
+              "B": 2000,
+              "ci_high": 0.9964857489262835,
+              "ci_low": 0.9951087483124197,
+              "estimate": 0.9958188087298299,
+              "lb95": 0.995225738491703,
+              "se": 0.00034680471899666714,
+              "ub95": 0.9963615363648424
+            },
+            "median": 0.9999752342700958,
+            "n": 284386,
+            "p10": 0.9922712445259094
+          },
+          "delta_nll": {
+            "B": 2000,
+            "ci_high": 0.0005437836079534692,
+            "ci_low": -0.0005695376390650282,
+            "estimate": -1.8249985333919916e-05,
+            "excluded_nonfinite": 0,
+            "finite_subset": true,
+            "groups": 149,
+            "lb95": -0.0004759973493332902,
+            "n": 284386,
+            "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+            "se": 0.0002792536633667647,
+            "ub95": 0.00046171359353915043
+          },
+          "floored": 4936,
+          "kl": {
+            "max": 11.392895878879767,
+            "mean": 0.009058733714055477,
+            "mean_ci": {
+              "B": 2000,
+              "ci_high": 0.010553457790415114,
+              "ci_low": 0.0074508040828316045,
+              "estimate": 0.009058733714055477,
+              "lb95": 0.007726206032876695,
+              "se": 0.0007838756009894465,
+              "ub95": 0.01030506872579971
+            },
+            "median": 0.0,
+            "n": 284386,
+            "p90": 0.021611133178724325,
+            "p99": 0.15338830383953275,
+            "p99_9": 0.467674007972968
+          },
+          "top1_agreement": {
+            "B": 2000,
+            "ci_high": 0.9822692642368542,
+            "ci_low": 0.9750228074977246,
+            "estimate": 0.9785643456428939,
+            "lb95": 0.9756887927133415,
+            "n": 284386,
+            "se": 0.001798266026548052,
+            "ub95": 0.9816301796873755
+          },
+          "topk_overlap": {
+            "mean": 19.17266321126919,
+            "median": 20.0,
+            "n": 284386,
+            "p10": 18.0
+          }
+        },
+        "excluded_by_joint_mask": 0,
+        "groups": 149,
+        "positions": 284386,
+        "positions_joint_valid": 284386,
+        "windows": 170
+      },
+      "positions": 2514441,
+      "positions_joint_valid": 2514441,
+      "windows": 424
+    },
+    "dense": {
+      "actual_token_nonfinite": {
+        "contrast": {
+          "cand": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          },
+          "ref": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          }
+        }
+      },
+      "by_category": {
+        "agentic_code": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 4642,
+            "covered_mass_cand": {
+              "mean": 0.9217980668582925,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9255434617318057,
+                "ci_low": 0.9181877287331399,
+                "estimate": 0.9217980668582925,
+                "lb95": 0.9186416277652608,
+                "se": 0.0019361899208711305,
+                "ub95": 0.9250406918289397
+              },
+              "median": 0.9869245290756226,
+              "n": 327680,
+              "p10": 0.738676905632019
+            },
+            "covered_mass_ref": {
+              "mean": 0.9217980668582925,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9255434617318057,
+                "ci_low": 0.9181877287331399,
+                "estimate": 0.9217980668582925,
+                "lb95": 0.9186416277652608,
+                "se": 0.0019361899208711305,
+                "ub95": 0.9250406918289397
+              },
+              "median": 0.9869245290756226,
+              "n": 327680,
+              "p10": 0.738676905632019
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.0,
+              "ci_low": 0.0,
+              "estimate": 0.0,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 93,
+              "lb95": 0.0,
+              "n": 327680,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.0,
+              "ub95": 0.0
+            },
+            "floored": 0,
+            "kl": {
+              "max": 0.0,
+              "mean": 0.0,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.0,
+                "ci_low": 0.0,
+                "estimate": 0.0,
+                "lb95": 0.0,
+                "se": 0.0,
+                "ub95": 0.0
+              },
+              "median": 0.0,
+              "n": 327680,
+              "p90": 0.0,
+              "p99": 0.0,
+              "p99_9": 0.0
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 1.0,
+              "ci_low": 1.0,
+              "estimate": 1.0,
+              "lb95": 1.0,
+              "n": 327680,
+              "se": 0.0,
+              "ub95": 1.0
+            },
+            "topk_overlap": {
+              "mean": 20.0,
+              "median": 20.0,
+              "n": 327680,
+              "p10": 20.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 93,
+          "positions": 327680,
+          "positions_joint_valid": 327680,
+          "windows": 160
+        },
+        "italian_chat": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 3268,
+            "covered_mass_cand": {
+              "mean": 0.9804419241479768,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9814648825544766,
+                "ci_low": 0.9794340223688853,
+                "estimate": 0.9804419241479768,
+                "lb95": 0.9795600788369208,
+                "se": 0.0005154389131403816,
+                "ub95": 0.9813288204379537
+              },
+              "median": 0.9988915026187897,
+              "n": 100352,
+              "p10": 0.947576379776001
+            },
+            "covered_mass_ref": {
+              "mean": 0.9804419241479768,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9814648825544766,
+                "ci_low": 0.9794340223688853,
+                "estimate": 0.9804419241479768,
+                "lb95": 0.9795600788369208,
+                "se": 0.0005154389131403816,
+                "ub95": 0.9813288204379537
+              },
+              "median": 0.9988915026187897,
+              "n": 100352,
+              "p10": 0.947576379776001
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.0,
+              "ci_low": 0.0,
+              "estimate": 0.0,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 30,
+              "lb95": 0.0,
+              "n": 100352,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.0,
+              "ub95": 0.0
+            },
+            "floored": 0,
+            "kl": {
+              "max": 0.0,
+              "mean": 0.0,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.0,
+                "ci_low": 0.0,
+                "estimate": 0.0,
+                "lb95": 0.0,
+                "se": 0.0,
+                "ub95": 0.0
+              },
+              "median": 0.0,
+              "n": 100352,
+              "p90": 0.0,
+              "p99": 0.0,
+              "p99_9": 0.0
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 1.0,
+              "ci_low": 1.0,
+              "estimate": 1.0,
+              "lb95": 1.0,
+              "n": 100352,
+              "se": 0.0,
+              "ub95": 1.0
+            },
+            "topk_overlap": {
+              "mean": 20.0,
+              "median": 20.0,
+              "n": 100352,
+              "p10": 20.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 30,
+          "positions": 100352,
+          "positions_joint_valid": 100352,
+          "windows": 49
+        },
+        "long_context": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 113,
+            "covered_mass_cand": {
+              "mean": 0.9061502093036324,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.916812631470566,
+                "ci_low": 0.8948123161748299,
+                "estimate": 0.9061502093036324,
+                "lb95": 0.8960041516113051,
+                "se": 0.005845707511463516,
+                "ub95": 0.9154694035592911
+              },
+              "median": 0.9836256802082062,
+              "n": 10240,
+              "p10": 0.6790833652019501
+            },
+            "covered_mass_ref": {
+              "mean": 0.9061502093036324,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.916812631470566,
+                "ci_low": 0.8948123161748299,
+                "estimate": 0.9061502093036324,
+                "lb95": 0.8960041516113051,
+                "se": 0.005845707511463516,
+                "ub95": 0.9154694035592911
+              },
+              "median": 0.9836256802082062,
+              "n": 10240,
+              "p10": 0.6790833652019501
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.0,
+              "ci_low": 0.0,
+              "estimate": 0.0,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 5,
+              "lb95": 0.0,
+              "n": 10240,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.0,
+              "ub95": 0.0
+            },
+            "floored": 0,
+            "kl": {
+              "max": 0.0,
+              "mean": 0.0,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.0,
+                "ci_low": 0.0,
+                "estimate": 0.0,
+                "lb95": 0.0,
+                "se": 0.0,
+                "ub95": 0.0
+              },
+              "median": 0.0,
+              "n": 10240,
+              "p90": 0.0,
+              "p99": 0.0,
+              "p99_9": 0.0
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 1.0,
+              "ci_low": 1.0,
+              "estimate": 1.0,
+              "lb95": 1.0,
+              "n": 10240,
+              "se": 0.0,
+              "ub95": 1.0
+            },
+            "topk_overlap": {
+              "mean": 20.0,
+              "median": 20.0,
+              "n": 10240,
+              "p10": 20.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 5,
+          "positions": 10240,
+          "positions_joint_valid": 10240,
+          "windows": 5
+        },
+        "model_native": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 23592,
+            "covered_mass_cand": {
+              "mean": 0.9577489231227079,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9665074003415922,
+                "ci_low": 0.9491139851969778,
+                "estimate": 0.9577489231227079,
+                "lb95": 0.9507124307028446,
+                "se": 0.004416025924773337,
+                "ub95": 0.9650364403212729
+              },
+              "median": 0.9994491040706635,
+              "n": 253308,
+              "p10": 0.8717349946498871
+            },
+            "covered_mass_ref": {
+              "mean": 0.9577489231227079,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9665074003415922,
+                "ci_low": 0.9491139851969778,
+                "estimate": 0.9577489231227079,
+                "lb95": 0.9507124307028446,
+                "se": 0.004416025924773337,
+                "ub95": 0.9650364403212729
+              },
+              "median": 0.9994491040706635,
+              "n": 253308,
+              "p10": 0.8717349946498871
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.0,
+              "ci_low": 0.0,
+              "estimate": 0.0,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 149,
+              "lb95": 0.0,
+              "n": 253308,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.0,
+              "ub95": 0.0
+            },
+            "floored": 0,
+            "kl": {
+              "max": 0.0,
+              "mean": 0.0,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.0,
+                "ci_low": 0.0,
+                "estimate": 0.0,
+                "lb95": 0.0,
+                "se": 0.0,
+                "ub95": 0.0
+              },
+              "median": 0.0,
+              "n": 253308,
+              "p90": 0.0,
+              "p99": 0.0,
+              "p99_9": 0.0
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 1.0,
+              "ci_low": 1.0,
+              "estimate": 1.0,
+              "lb95": 1.0,
+              "n": 253308,
+              "se": 0.0,
+              "ub95": 1.0
+            },
+            "topk_overlap": {
+              "mean": 20.0,
+              "median": 20.0,
+              "n": 253308,
+              "p10": 20.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 149,
+          "positions": 253308,
+          "positions_joint_valid": 253308,
+          "windows": 170
+        },
+        "structured_json": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 2013,
+            "covered_mass_cand": {
+              "mean": 0.9245099164854309,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9295430772579505,
+                "ci_low": 0.9187202439991143,
+                "estimate": 0.9245099164854309,
+                "lb95": 0.9196224842696625,
+                "se": 0.002775870435617591,
+                "ub95": 0.928758991629133
+              },
+              "median": 0.9907072186470032,
+              "n": 81920,
+              "p10": 0.7442423582077027
+            },
+            "covered_mass_ref": {
+              "mean": 0.9245099164854309,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9295430772579505,
+                "ci_low": 0.9187202439991143,
+                "estimate": 0.9245099164854309,
+                "lb95": 0.9196224842696625,
+                "se": 0.002775870435617591,
+                "ub95": 0.928758991629133
+              },
+              "median": 0.9907072186470032,
+              "n": 81920,
+              "p10": 0.7442423582077027
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.0,
+              "ci_low": 0.0,
+              "estimate": 0.0,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 22,
+              "lb95": 0.0,
+              "n": 81920,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.0,
+              "ub95": 0.0
+            },
+            "floored": 0,
+            "kl": {
+              "max": 0.0,
+              "mean": 0.0,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.0,
+                "ci_low": 0.0,
+                "estimate": 0.0,
+                "lb95": 0.0,
+                "se": 0.0,
+                "ub95": 0.0
+              },
+              "median": 0.0,
+              "n": 81920,
+              "p90": 0.0,
+              "p99": 0.0,
+              "p99_9": 0.0
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 1.0,
+              "ci_low": 1.0,
+              "estimate": 1.0,
+              "lb95": 1.0,
+              "n": 81920,
+              "se": 0.0,
+              "ub95": 1.0
+            },
+            "topk_overlap": {
+              "mean": 20.0,
+              "median": 20.0,
+              "n": 81920,
+              "p10": 20.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 22,
+          "positions": 81920,
+          "positions_joint_valid": 81920,
+          "windows": 40
+        }
+      },
+      "contrast": {
+        "clamped": 33628,
+        "covered_mass_cand": {
+          "mean": 0.9412597197677384,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9464476351078993,
+            "ci_low": 0.936688353724382,
+            "estimate": 0.9412597197677384,
+            "lb95": 0.9373388976011584,
+            "se": 0.0025135826633168037,
+            "ub95": 0.9455735474941471
+          },
+          "median": 0.9959278702735901,
+          "n": 773500,
+          "p10": 0.8056959807872772
+        },
+        "covered_mass_ref": {
+          "mean": 0.9412597197677384,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9464476351078993,
+            "ci_low": 0.936688353724382,
+            "estimate": 0.9412597197677384,
+            "lb95": 0.9373388976011584,
+            "se": 0.0025135826633168037,
+            "ub95": 0.9455735474941471
+          },
+          "median": 0.9959278702735901,
+          "n": 773500,
+          "p10": 0.8056959807872772
+        },
+        "delta_nll": {
+          "B": 2000,
+          "ci_high": 0.0,
+          "ci_low": 0.0,
+          "estimate": 0.0,
+          "excluded_nonfinite": 0,
+          "finite_subset": true,
+          "groups": 235,
+          "lb95": 0.0,
+          "n": 773500,
+          "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+          "se": 0.0,
+          "ub95": 0.0
+        },
+        "floored": 0,
+        "kl": {
+          "max": 0.0,
+          "mean": 0.0,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          },
+          "median": 0.0,
+          "n": 773500,
+          "p90": 0.0,
+          "p99": 0.0,
+          "p99_9": 0.0,
+          "p99_ci": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "lb95": 0.0,
+            "se": 0.0,
+            "ub95": 0.0
+          }
+        },
+        "top1_agreement": {
+          "B": 2000,
+          "ci_high": 1.0,
+          "ci_low": 1.0,
+          "estimate": 1.0,
+          "lb95": 1.0,
+          "n": 773500,
+          "se": 0.0,
+          "ub95": 1.0
+        },
+        "topk_overlap": {
+          "mean": 20.0,
+          "median": 20.0,
+          "n": 773500,
+          "p10": 20.0
+        }
+      },
+      "excluded_by_joint_mask": 0,
+      "groups": 235,
+      "model_native_continuation": {
+        "actual_token_nonfinite": {
+          "contrast": {
+            "cand": {
+              "infinite_nll": 0,
+              "missing": 0,
+              "other_nonfinite": 0,
+              "zero_probability": 0
+            },
+            "ref": {
+              "infinite_nll": 0,
+              "missing": 0,
+              "other_nonfinite": 0,
+              "zero_probability": 0
+            }
+          }
+        },
+        "contrast": {
+          "clamped": 22517,
+          "covered_mass_cand": {
+            "mean": 0.9960746336228002,
+            "mean_ci": {
+              "B": 2000,
+              "ci_high": 0.996678149467729,
+              "ci_low": 0.9954219608177054,
+              "estimate": 0.9960746336228002,
+              "lb95": 0.9955202146299224,
+              "se": 0.00032928321738142556,
+              "ub95": 0.9965878200437805
+            },
+            "median": 0.9999815225601196,
+            "n": 142286,
+            "p10": 0.9930970370769501
+          },
+          "covered_mass_ref": {
+            "mean": 0.9960746336228002,
+            "mean_ci": {
+              "B": 2000,
+              "ci_high": 0.996678149467729,
+              "ci_low": 0.9954219608177054,
+              "estimate": 0.9960746336228002,
+              "lb95": 0.9955202146299224,
+              "se": 0.00032928321738142556,
+              "ub95": 0.9965878200437805
+            },
+            "median": 0.9999815225601196,
+            "n": 142286,
+            "p10": 0.9930970370769501
+          },
+          "delta_nll": {
+            "B": 2000,
+            "ci_high": 0.0,
+            "ci_low": 0.0,
+            "estimate": 0.0,
+            "excluded_nonfinite": 0,
+            "finite_subset": true,
+            "groups": 134,
+            "lb95": 0.0,
+            "n": 142286,
+            "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+            "se": 0.0,
+            "ub95": 0.0
+          },
+          "floored": 0,
+          "kl": {
+            "max": 0.0,
+            "mean": 0.0,
+            "mean_ci": {
+              "B": 2000,
+              "ci_high": 0.0,
+              "ci_low": 0.0,
+              "estimate": 0.0,
+              "lb95": 0.0,
+              "se": 0.0,
+              "ub95": 0.0
+            },
+            "median": 0.0,
+            "n": 142286,
+            "p90": 0.0,
+            "p99": 0.0,
+            "p99_9": 0.0
+          },
+          "top1_agreement": {
+            "B": 2000,
+            "ci_high": 1.0,
+            "ci_low": 1.0,
+            "estimate": 1.0,
+            "lb95": 1.0,
+            "n": 142286,
+            "se": 0.0,
+            "ub95": 1.0
+          },
+          "topk_overlap": {
+            "mean": 20.0,
+            "median": 20.0,
+            "n": 142286,
+            "p10": 20.0
+          }
+        },
+        "excluded_by_joint_mask": 0,
+        "groups": 134,
+        "positions": 142286,
+        "positions_joint_valid": 142286,
+        "windows": 139
+      },
+      "positions": 773500,
+      "positions_joint_valid": 773500,
+      "windows": 424
+    },
+    "sparse": {
+      "actual_token_nonfinite": {
+        "contrast": {
+          "cand": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          },
+          "ref": {
+            "infinite_nll": 0,
+            "missing": 0,
+            "other_nonfinite": 0,
+            "zero_probability": 0
+          }
+        }
+      },
+      "by_category": {
+        "agentic_code": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 17157,
+            "covered_mass_cand": {
+              "mean": 0.8717290914442511,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.8819755070155919,
+                "ci_low": 0.8613861110933307,
+                "estimate": 0.8717290914442514,
+                "lb95": 0.8631221653946715,
+                "se": 0.005176741173127303,
+                "ub95": 0.8802812934382334
+              },
+              "median": 0.987300455570221,
+              "n": 846069,
+              "p10": 0.5577200531959534
+            },
+            "covered_mass_ref": {
+              "mean": 0.871899927469974,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.881899563763466,
+                "ci_low": 0.8615750407845313,
+                "estimate": 0.8718999274699741,
+                "lb95": 0.8633535599970309,
+                "se": 0.005162372079071121,
+                "ub95": 0.8804219491371977
+              },
+              "median": 0.9872671961784363,
+              "n": 846069,
+              "p10": 0.5584627985954285
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.01004092627114947,
+              "ci_low": -0.0019307159996923228,
+              "estimate": 0.004120012746993963,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 93,
+              "lb95": -0.0009235382937473246,
+              "n": 846069,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.0030652853308070433,
+              "ub95": 0.00913899086537275
+            },
+            "floored": 3637,
+            "kl": {
+              "max": 28.63542464962613,
+              "mean": 0.33563247331487717,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.3634444362238043,
+                "ci_low": 0.30935788787783863,
+                "estimate": 0.33563247331487706,
+                "lb95": 0.31379020257007634,
+                "se": 0.013909254614885236,
+                "ub95": 0.35915952714429794
+              },
+              "median": 0.025550373176054925,
+              "n": 846069,
+              "p90": 0.8324392314301384,
+              "p99": 5.093822033007602,
+              "p99_9": 11.114217526469666
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 0.7782999492557683,
+              "ci_low": 0.7458650909317562,
+              "estimate": 0.7623858101407804,
+              "lb95": 0.7485005944778762,
+              "n": 846069,
+              "se": 0.008208650373439612,
+              "ub95": 0.7757851906748457
+            },
+            "topk_overlap": {
+              "mean": 15.356654126318302,
+              "median": 17.0,
+              "n": 846069,
+              "p10": 8.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 93,
+          "positions": 846069,
+          "positions_joint_valid": 846069,
+          "windows": 160
+        },
+        "italian_chat": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 5388,
+            "covered_mass_cand": {
+              "mean": 0.985498670477057,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9863955229209528,
+                "ci_low": 0.9845748000219443,
+                "estimate": 0.985498670477057,
+                "lb95": 0.984719284452553,
+                "se": 0.0004668790958380007,
+                "ub95": 0.9862518278616222
+              },
+              "median": 0.9992344379425049,
+              "n": 109401,
+              "p10": 0.9622935652732849
+            },
+            "covered_mass_ref": {
+              "mean": 0.9853848546230698,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9862842266425011,
+                "ci_low": 0.9844318725352226,
+                "estimate": 0.9853848546230698,
+                "lb95": 0.9845955554330406,
+                "se": 0.00047471951726498943,
+                "ub95": 0.9861688771831608
+              },
+              "median": 0.9992385506629944,
+              "n": 109401,
+              "p10": 0.9624325037002563
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.003447988998852175,
+              "ci_low": -0.0012159832901504325,
+              "estimate": 0.0011936071955754948,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 30,
+              "lb95": -0.0007964138497847826,
+              "n": 109401,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.0011934075533140793,
+              "ub95": 0.003159748265574117
+            },
+            "floored": 1309,
+            "kl": {
+              "max": 8.614354491785761,
+              "mean": 0.027206893117444883,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.028456640163325546,
+                "ci_low": 0.025963572110942173,
+                "estimate": 0.027206893117444876,
+                "lb95": 0.026156730998092383,
+                "se": 0.0006384428850626933,
+                "ub95": 0.02828138611470722
+              },
+              "median": 0.003406533162314989,
+              "n": 109401,
+              "p90": 0.05901403989249864,
+              "p99": 0.333100003857681,
+              "p99_9": 1.6209809144125664
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 0.9450251409802287,
+              "ci_low": 0.9403883161926083,
+              "estimate": 0.9426970503011856,
+              "lb95": 0.9407053500373541,
+              "n": 109401,
+              "se": 0.0012075342978801645,
+              "ub95": 0.9447024918130611
+            },
+            "topk_overlap": {
+              "mean": 18.279321029972305,
+              "median": 19.0,
+              "n": 109401,
+              "p10": 17.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 30,
+          "positions": 109401,
+          "positions_joint_valid": 109401,
+          "windows": 49
+        },
+        "long_context": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 11210,
+            "covered_mass_cand": {
+              "mean": 0.8888907704849911,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9100260262039573,
+                "ci_low": 0.8749396604349958,
+                "estimate": 0.8888907704849908,
+                "lb95": 0.8763354991295874,
+                "se": 0.008820395805187236,
+                "ub95": 0.9074211526566366
+              },
+              "median": 0.9943107962608337,
+              "n": 305105,
+              "p10": 0.6212051272392273
+            },
+            "covered_mass_ref": {
+              "mean": 0.8887459412379797,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.909753508184191,
+                "ci_low": 0.8750682144530335,
+                "estimate": 0.8887459412379795,
+                "lb95": 0.8764684800452813,
+                "se": 0.008740114682662819,
+                "ub95": 0.9065159016589996
+              },
+              "median": 0.9943421483039856,
+              "n": 305105,
+              "p10": 0.6204254865646364
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.013625702425657428,
+              "ci_low": -0.011264989922242834,
+              "estimate": 0.00488547372899418,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 5,
+              "lb95": -0.00978193955453497,
+              "n": 305105,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.006826119089543922,
+              "ub95": 0.012792901945264062
+            },
+            "floored": 2508,
+            "kl": {
+              "max": 24.018951005928972,
+              "mean": 0.3468189096079422,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.388698642466545,
+                "ci_low": 0.2726983591092622,
+                "estimate": 0.3468189096079423,
+                "lb95": 0.28755258292271263,
+                "se": 0.030131962859429224,
+                "ub95": 0.3845562447611172
+              },
+              "median": 0.02272041803622046,
+              "n": 305105,
+              "p90": 0.8745184674949461,
+              "p99": 5.26288746910619,
+              "p99_9": 11.3810735347399
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 0.8003856556145448,
+              "ci_low": 0.7440022212975728,
+              "estimate": 0.7672047327969059,
+              "lb95": 0.7473850267627071,
+              "n": 305105,
+              "se": 0.014267348842993126,
+              "ub95": 0.7942772600776499
+            },
+            "topk_overlap": {
+              "mean": 15.299893479294013,
+              "median": 17.0,
+              "n": 305105,
+              "p10": 8.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 5,
+          "positions": 305105,
+          "positions_joint_valid": 305105,
+          "windows": 5
+        },
+        "model_native": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 26949,
+            "covered_mass_cand": {
+              "mean": 0.9452360085542686,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9663629818500423,
+                "ci_low": 0.9253342361612129,
+                "estimate": 0.9452360085542686,
+                "lb95": 0.9287777486601037,
+                "se": 0.01037919336076736,
+                "ub95": 0.9636411965330314
+              },
+              "median": 0.9994954466819763,
+              "n": 267914,
+              "p10": 0.8629989326000214
+            },
+            "covered_mass_ref": {
+              "mean": 0.9451716449640083,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.966333103427084,
+                "ci_low": 0.9254785897182171,
+                "estimate": 0.9451716449640083,
+                "lb95": 0.9285673342168619,
+                "se": 0.01040612093954073,
+                "ub95": 0.9636901809442674
+              },
+              "median": 0.9994929134845734,
+              "n": 267914,
+              "p10": 0.8631209850311279
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.009049773259598702,
+              "ci_low": -0.003863058650077404,
+              "estimate": 0.002927590966762202,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 79,
+              "lb95": -0.0029027965869450074,
+              "n": 267914,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.003300762004764648,
+              "ub95": 0.007964258673944643
+            },
+            "floored": 5805,
+            "kl": {
+              "max": 25.375713781316193,
+              "mean": 0.14769789225249141,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.20068395464520683,
+                "ci_low": 0.09041558208087996,
+                "estimate": 0.14769789225249136,
+                "lb95": 0.09930282631964096,
+                "se": 0.02710861502634053,
+                "ub95": 0.1888551195072516
+              },
+              "median": 0.005291657283069496,
+              "n": 267914,
+              "p90": 0.17997627950893236,
+              "p99": 3.2336640563611967,
+              "p99_9": 9.973224423223792
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 0.9145269681375204,
+              "ci_low": 0.8548030622085451,
+              "estimate": 0.8832274535858522,
+              "lb95": 0.8589430619099787,
+              "n": 267914,
+              "se": 0.015409023465557848,
+              "ub95": 0.9104468478810969
+            },
+            "topk_overlap": {
+              "mean": 17.17516068589174,
+              "median": 18.0,
+              "n": 267914,
+              "p10": 14.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 79,
+          "positions": 267914,
+          "positions_joint_valid": 267914,
+          "windows": 88
+        },
+        "structured_json": {
+          "actual_token_nonfinite": {
+            "contrast": {
+              "cand": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              },
+              "ref": {
+                "infinite_nll": 0,
+                "missing": 0,
+                "other_nonfinite": 0,
+                "zero_probability": 0
+              }
+            }
+          },
+          "contrast": {
+            "clamped": 10803,
+            "covered_mass_cand": {
+              "mean": 0.9009297315908132,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9100191429013388,
+                "ci_low": 0.8914140015275225,
+                "estimate": 0.9009297315908135,
+                "lb95": 0.8927399145661592,
+                "se": 0.004950394898338044,
+                "ub95": 0.9087301599337837
+              },
+              "median": 0.9954458773136139,
+              "n": 212452,
+              "p10": 0.6730194091796875
+            },
+            "covered_mass_ref": {
+              "mean": 0.9010227698203074,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.9100475067088418,
+                "ci_low": 0.8914381973553529,
+                "estimate": 0.9010227698203076,
+                "lb95": 0.8927891011192057,
+                "se": 0.004998360827870471,
+                "ub95": 0.9089275751570216
+              },
+              "median": 0.9954582154750824,
+              "n": 212452,
+              "p10": 0.6728691637516022
+            },
+            "delta_nll": {
+              "B": 2000,
+              "ci_high": 0.007130737898326755,
+              "ci_low": -0.012351641729625893,
+              "estimate": -0.0023401393446317743,
+              "excluded_nonfinite": 0,
+              "finite_subset": true,
+              "groups": 22,
+              "lb95": -0.010848952506024188,
+              "n": 212452,
+              "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+              "se": 0.005102188331706719,
+              "ub95": 0.005617959262132666
+            },
+            "floored": 2296,
+            "kl": {
+              "max": 22.606429504186643,
+              "mean": 0.23397065982634296,
+              "mean_ci": {
+                "B": 2000,
+                "ci_high": 0.2733062561904508,
+                "ci_low": 0.19880333453862004,
+                "estimate": 0.23397065982634288,
+                "lb95": 0.20316609922633697,
+                "se": 0.019610207045155374,
+                "ub95": 0.26690902794501825
+              },
+              "median": 0.009527082972745514,
+              "n": 212452,
+              "p90": 0.5265273801056487,
+              "p99": 4.029173503087082,
+              "p99_9": 9.271747280783988
+            },
+            "top1_agreement": {
+              "B": 2000,
+              "ci_high": 0.8403794904588112,
+              "ci_low": 0.8027990480159485,
+              "estimate": 0.8216726601773577,
+              "lb95": 0.8054677375595924,
+              "n": 212452,
+              "se": 0.009812047592583084,
+              "ub95": 0.8371962204702458
+            },
+            "topk_overlap": {
+              "mean": 15.938885018733643,
+              "median": 17.0,
+              "n": 212452,
+              "p10": 10.0
+            }
+          },
+          "excluded_by_joint_mask": 0,
+          "groups": 22,
+          "positions": 212452,
+          "positions_joint_valid": 212452,
+          "windows": 40
+        }
+      },
+      "contrast": {
+        "clamped": 71507,
+        "covered_mass_cand": {
+          "mean": 0.8967614655399405,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9039291122415842,
+            "ci_low": 0.8893975202978339,
+            "estimate": 0.8967614655399406,
+            "lb95": 0.8907772868233095,
+            "se": 0.0037902035322233485,
+            "ub95": 0.9029400393412788
+          },
+          "median": 0.9945323467254639,
+          "n": 1740941,
+          "p10": 0.6600621342658997
+        },
+        "covered_mass_ref": {
+          "mean": 0.8968134039001764,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.9039592673021433,
+            "ci_low": 0.8894231142792421,
+            "estimate": 0.8968134039001767,
+            "lb95": 0.890816431045599,
+            "se": 0.003789622373788585,
+            "ub95": 0.9029790175472683
+          },
+          "median": 0.9945334196090698,
+          "n": 1740941,
+          "p10": 0.6592639088630676
+        },
+        "delta_nll": {
+          "B": 2000,
+          "ci_high": 0.006911940291349654,
+          "ci_low": -0.0011850467442587693,
+          "estimate": 0.003098413254640894,
+          "excluded_nonfinite": 0,
+          "finite_subset": true,
+          "groups": 177,
+          "lb95": -0.0005975256752919463,
+          "n": 1740941,
+          "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+          "se": 0.0021181382221323623,
+          "ub95": 0.006425107975189404
+        },
+        "floored": 15555,
+        "kl": {
+          "max": 28.63542464962613,
+          "mean": 0.2768840204930999,
+          "mean_ci": {
+            "B": 2000,
+            "ci_high": 0.2975234699164251,
+            "ci_low": 0.25430343360247193,
+            "estimate": 0.2768840204930999,
+            "lb95": 0.2578666128619749,
+            "se": 0.011414493708752266,
+            "ub95": 0.2948277292296234
+          },
+          "median": 0.015807642394542725,
+          "n": 1740941,
+          "p90": 0.6152826051192464,
+          "p99": 4.650898200422914,
+          "p99_9": 10.634805852674473,
+          "p99_ci": {
+            "B": 2000,
+            "ci_high": 4.8704592557770905,
+            "ci_low": 4.38403006158561,
+            "estimate": 4.650898200422914,
+            "lb95": 4.437964853089134,
+            "se": 0.12454380793726333,
+            "ub95": 4.8422779376047265
+          }
+        },
+        "top1_agreement": {
+          "B": 2000,
+          "ci_high": 0.8127873199117147,
+          "ci_low": 0.7889716081795589,
+          "estimate": 0.8003924314494287,
+          "lb95": 0.7907034811300215,
+          "n": 1740941,
+          "se": 0.006196424937607952,
+          "ub95": 0.8109311338927563
+        },
+        "topk_overlap": {
+          "mean": 15.881269382477637,
+          "median": 17.0,
+          "n": 1740941,
+          "p10": 10.0
+        }
+      },
+      "excluded_by_joint_mask": 0,
+      "groups": 177,
+      "model_native_continuation": {
+        "actual_token_nonfinite": {
+          "contrast": {
+            "cand": {
+              "infinite_nll": 0,
+              "missing": 0,
+              "other_nonfinite": 0,
+              "zero_probability": 0
+            },
+            "ref": {
+              "infinite_nll": 0,
+              "missing": 0,
+              "other_nonfinite": 0,
+              "zero_probability": 0
+            }
+          }
+        },
+        "contrast": {
+          "clamped": 23169,
+          "covered_mass_cand": {
+            "mean": 0.995594909291801,
+            "mean_ci": {
+              "B": 2000,
+              "ci_high": 0.9963620585587943,
+              "ci_low": 0.9946759133567208,
+              "estimate": 0.995594909291801,
+              "lb95": 0.994804955971425,
+              "se": 0.0004354465047886604,
+              "ub95": 0.9962487538563506
+            },
+            "median": 0.9999678134918213,
+            "n": 142100,
+            "p10": 0.9914526283740998
+          },
+          "covered_mass_ref": {
+            "mean": 0.9955626489780974,
+            "mean_ci": {
+              "B": 2000,
+              "ci_high": 0.9963448806767913,
+              "ci_low": 0.9946168554326413,
+              "estimate": 0.9955626489780974,
+              "lb95": 0.9947593233547293,
+              "se": 0.00044453317943241564,
+              "ub95": 0.9962331119021317
+            },
+            "median": 0.9999673962593079,
+            "n": 142100,
+            "p10": 0.9913791835308075
+          },
+          "delta_nll": {
+            "B": 2000,
+            "ci_high": 0.0010690096346941563,
+            "ci_low": -0.0010596181303750925,
+            "estimate": -3.652385875560978e-05,
+            "excluded_nonfinite": 0,
+            "finite_subset": true,
+            "groups": 79,
+            "lb95": -0.0009075221626055644,
+            "n": 142100,
+            "note": "mean over positions whose actual-token logprob is finite on every side of the contrast and its floor; nonfinite scores are counted in the block's actual_token_nonfinite",
+            "se": 0.0005439774281642076,
+            "ub95": 0.0008781300810180382
+          },
+          "floored": 4936,
+          "kl": {
+            "max": 11.392895878879767,
+            "mean": 0.0181293247431765,
+            "mean_ci": {
+              "B": 2000,
+              "ci_high": 0.02000715065089684,
+              "ci_low": 0.01622706587447889,
+              "estimate": 0.0181293247431765,
+              "lb95": 0.016520417911246296,
+              "se": 0.000976797977490609,
+              "ub95": 0.01969348325203876
+            },
+            "median": 0.0010680413765070456,
+            "n": 142100,
+            "p90": 0.04834032131741576,
+            "p99": 0.22217790704265025,
+            "p99_9": 0.6199180541906795
+          },
+          "top1_agreement": {
+            "B": 2000,
+            "ci_high": 0.9611478683447635,
+            "ci_low": 0.9530145127007336,
+            "estimate": 0.957100633356791,
+            "lb95": 0.9537110435356869,
+            "n": 142100,
+            "se": 0.0020783446849392206,
+            "ub95": 0.9604587360045238
+          },
+          "topk_overlap": {
+            "mean": 18.344243490499647,
+            "median": 19.0,
+            "n": 142100,
+            "p10": 17.0
+          }
+        },
+        "excluded_by_joint_mask": 0,
+        "groups": 79,
+        "positions": 142100,
+        "positions_joint_valid": 142100,
+        "windows": 88
+      },
+      "positions": 1740941,
+      "positions_joint_valid": 1740941,
+      "windows": 342
+    }
+  },
+  "role": "floor",
+  "schema": "fidelity-campaign-pair/1",
+  "status": "ok",
+  "subset": null,
+  "type": "pair",
+  "windows": {
+    "compared": 424,
+    "expected": 424
+  }
+}

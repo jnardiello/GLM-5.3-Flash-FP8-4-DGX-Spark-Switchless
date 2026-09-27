@@ -1,0 +1,54 @@
+{
+  "label": "cpre-m-09270828",
+  "recorded_utc": "2026-09-27T08:46:39+00:00",
+  "overlay": "scripts/node/experiments/fidelity/cpre-m.env",
+  "overlay_sha256": "d4b83ebb55177c72eef8263928bb055938e8b4aefe21c36967a475ae30b3651f",
+  "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+  "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+  "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+  "model_repo": "zai-org/GLM-5.3-Flash",
+  "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+  "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+  "kv_cache_dtype": "fp8_e4m3",
+  "spec_tokens": "5",
+  "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+  "k": 20,
+  "ranks": [
+    {
+      "rank": 0,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "4f652d502eaf25b972a35e3d83f009c37695a6e5ef516d2a864617ca8d3f5733",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \""
+      ]
+    },
+    {
+      "rank": 1,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "04b27a2ab7032dbb94a83831a52d022f6ee4a8f3c37666a22e0dc8572f3ba463",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \""
+      ]
+    },
+    {
+      "rank": 2,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "3e2a61ddb44cd5385902f324de2d79b5c6585783f1a57f79da208363138a8be0",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \""
+      ]
+    },
+    {
+      "rank": 3,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "c6da0cf64cbe3a6a737f0e6e42a1f33547dae55ea27454c714e6db0b262d84e3",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \""
+      ]
+    }
+  ]
+}

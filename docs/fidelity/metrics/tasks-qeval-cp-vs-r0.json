@@ -1,0 +1,36 @@
+{
+ "set": "qeval",
+ "arms": [
+  "R0",
+  "Cp"
+ ],
+ "greedy_discordance": {
+  "arm_a": "R0",
+  "arm_b": "Cp",
+  "n_paired": 75,
+  "both_pass": 71,
+  "both_fail": 0,
+  "R0_only_pass": 2,
+  "Cp_only_pass": 2
+ },
+ "mcnemar_exact_p": 1.0,
+ "wilson_ci": {
+  "R0": {
+   "rate": 0.9733333333333334,
+   "lo95": 0.9078851181224086,
+   "hi95": 0.9926563109938686
+  },
+  "Cp": {
+   "rate": 0.9733333333333334,
+   "lo95": 0.9078851181224086,
+   "hi95": 0.9926563109938686
+  }
+ },
+ "mde_approx": {
+  "n_items": 75,
+  "abs_pass_rate_delta": 0.1617
+ },
+ "sampled_bootstrap_diff": {
+  "note": "sampled-mode results missing for one or both arms"
+ }
+}

@@ -1,0 +1,58 @@
+{
+  "label": "le21-m-09271045",
+  "recorded_utc": "2026-09-27T10:58:42+00:00",
+  "overlay": "scripts/node/experiments/fidelity/le21-m.env",
+  "overlay_sha256": "c7e2a954708a0c8c2bd69ba42c43dc1ae906b27113f20784cb0118518cf6ca44",
+  "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+  "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+  "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+  "model_repo": "zai-org/GLM-5.3-Flash",
+  "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+  "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+  "kv_cache_dtype": "fp8_e4m3",
+  "spec_tokens": "5",
+  "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+  "k": 20,
+  "ranks": [
+    {
+      "rank": 0,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "998cf78edf57f59ba95f5f866b9bb06cb79eb1977a9588a0df72592b9257c4e6",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411"
+      ]
+    },
+    {
+      "rank": 1,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "ca01a85f9ec347c6bd5c971b19491cdf20901495d9796018d288c2b72fa9b280",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411"
+      ]
+    },
+    {
+      "rank": 2,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "e247dc249c70bcb43c544c82dad9f615318a5b0f3e18059908b040250c9bd40e",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411"
+      ]
+    },
+    {
+      "rank": 3,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "c44058f671e78cb7a0dd346edf60c8244fff095f5ac41ffef28acb94fb7f3eff",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411"
+      ]
+    }
+  ]
+}

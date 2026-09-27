@@ -163,6 +163,20 @@ if [ -d "$REPO/scripts/node/experiments/e03" ]; then
   done < <(cd "$REPO" && find scripts/node/experiments/e03 -type f \( -name '*.py' -o -name '*.json' -o -name SHA256SUMS \) | sort)
 fi
 
+# Fidelity campaign assets (docs/fidelity/PLAN.md): per-overlay SparkCache configurations
+# with their own cache namespaces, and the NVFP4 comparison launcher. They are inert unless
+# a fidelity TP4_ENV overlay selects them.
+if [ -d "$REPO/scripts/node/experiments/fidelity" ]; then
+  while IFS= read -r f; do
+    rel=${f#scripts/node/experiments/fidelity/}
+    FILES+=("$f:tp4/experiments/fidelity/$rel")
+    REMOTE_DIRS+=("tp4/experiments/fidelity/$(dirname "$rel")")
+    case "$f" in
+      *.sh) EXECUTABLES="$EXECUTABLES tp4/experiments/fidelity/$rel"
+            SHELL_SCRIPTS="$SHELL_SCRIPTS tp4/experiments/fidelity/$rel" ;;
+    esac
+  done < <(cd "$REPO" && find scripts/node/experiments/fidelity -type f \( -name '*.json' -o -name '*.sh' -o -name SHA256SUMS \) | sort)
+fi
 # The configuration overlay travels next to cluster.env, at the same relative path.
 if [ -n "${TP4_ENV:-}" ]; then
   FILES+=("$TP4_ENV:tp4/$TP4_ENV")

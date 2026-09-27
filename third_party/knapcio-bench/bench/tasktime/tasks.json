@@ -1,0 +1,8 @@
+{
+ "t1_lru": "tests/test_cache.py fails. Fix the bug in cache.py without changing the tests.",
+ "t2_dates": "tests/test_billing.py fails on month boundaries. Find and fix the bug in billing.py; keep the public function signature.",
+ "t3_ts": "npm test fails (run it with `node --test`). Fix src/slug.mjs so all tests pass; do not edit the tests.",
+ "t4_perf": "tests/test_dupes.py times out: find_duplicates is quadratic. Make it linear-time with the same results; tests must pass in under 2 seconds.",
+ "t5_cli": "Add a `--json` flag to cli.py so `python cli.py --json 3 4` prints {\"sum\": 7}; plain `python cli.py 3 4` must keep printing 7. Add a test for both in tests/test_cli.py and make the suite pass.",
+ "t6_migration": "The SQLite migration in migrate.py corrupts existing rows (tests/test_migrate.py). Fix the migration so old rows keep their data and the new column gets a sensible default."
+}

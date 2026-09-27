@@ -1,0 +1,117 @@
+{
+  "checks": {
+    "cm-a-vs-rep2": {
+      "arrays": [
+        "lp_actual",
+        "topk_ids",
+        "topk_lp"
+      ],
+      "cand": "Cm/prompt-rep2",
+      "complete": true,
+      "first_differing_row": null,
+      "ref": "Cm/prompt-a",
+      "rows": "1..2048",
+      "rows_compared": 155390,
+      "rows_differing": 0,
+      "status": "pass",
+      "windows_compared": 85,
+      "windows_expected": 85,
+      "windows_identical": 85
+    },
+    "cm-rep2-vs-rep3": {
+      "arrays": [
+        "lp_actual",
+        "topk_ids",
+        "topk_lp"
+      ],
+      "cand": "Cm/prompt-rep3",
+      "complete": true,
+      "first_differing_row": null,
+      "ref": "Cm/prompt-rep2",
+      "rows": "1..2048",
+      "rows_compared": 155390,
+      "rows_differing": 0,
+      "status": "pass",
+      "windows_compared": 85,
+      "windows_expected": 85,
+      "windows_identical": 85
+    },
+    "cpre-a-vs-rep2": {
+      "arrays": [
+        "lp_actual",
+        "topk_ids",
+        "topk_lp"
+      ],
+      "cand": "Cpre/prompt-rep2",
+      "complete": true,
+      "first_differing_row": null,
+      "ref": "Cpre/prompt-a",
+      "rows": "1..2048",
+      "rows_compared": 155390,
+      "rows_differing": 0,
+      "status": "pass",
+      "windows_compared": 85,
+      "windows_expected": 85,
+      "windows_identical": 85
+    },
+    "n-a-vs-rep2": {
+      "arrays": [
+        "lp_actual",
+        "topk_ids",
+        "topk_lp"
+      ],
+      "cand": "N/prompt-rep2",
+      "complete": true,
+      "first_differing_row": 1,
+      "ref": "N/prompt-a",
+      "rows": "1..2048",
+      "rows_compared": 155390,
+      "rows_differing": 155206,
+      "status": "fail",
+      "windows_compared": 85,
+      "windows_expected": 85,
+      "windows_identical": 0
+    },
+    "r0-a-vs-b": {
+      "arrays": [
+        "lp_actual",
+        "topk_ids",
+        "topk_lp"
+      ],
+      "cand": "R0/prompt-b",
+      "complete": true,
+      "first_differing_row": null,
+      "ref": "R0/prompt-a",
+      "rows": "1..2048",
+      "rows_compared": 773500,
+      "rows_differing": 0,
+      "status": "pass",
+      "windows_compared": 424,
+      "windows_expected": 424,
+      "windows_identical": 424
+    },
+    "r0-a-vs-crossboot": {
+      "arrays": [
+        "lp_actual",
+        "topk_ids",
+        "topk_lp"
+      ],
+      "cand": "R0/prompt-crossboot",
+      "complete": true,
+      "first_differing_row": null,
+      "ref": "R0/prompt-a",
+      "rows": "1..2048",
+      "rows_compared": 155390,
+      "rows_differing": 0,
+      "status": "pass",
+      "windows_compared": 85,
+      "windows_expected": 85,
+      "windows_identical": 85
+    }
+  },
+  "name": "bit-identity",
+  "regime": "dense (rows 1..2048)",
+  "schema": "fidelity-campaign-identity/1",
+  "status": "fail",
+  "type": "bit_identity"
+}

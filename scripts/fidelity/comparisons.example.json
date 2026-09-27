@@ -1,0 +1,11 @@
+[
+  {"name": "prompt-floor-r0", "cand": "R0/prompt-b", "ref": "R0/prompt-a", "floor": null, "kind": "prompt"},
+  {"name": "prompt-cm-vs-r0", "cand": "Cm/prompt-a", "ref": "R0/prompt-a", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-cpre-vs-r0", "cand": "Cpre/prompt-a", "ref": "R0/prompt-a", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-cm-vs-cpre", "cand": "Cm/prompt-a", "ref": "Cpre/prompt-a", "floor": null, "kind": "prompt"},
+  {"name": "prompt-n-vs-r0", "cand": "N/prompt-a", "ref": "R0/prompt-a", "floor": "prompt-floor-r0", "kind": "prompt"},
+  {"name": "prompt-cm-vs-r0-k100", "cand": "Cm/prompt-k100", "ref": "R0/prompt-k100", "floor": null, "kind": "prompt"},
+  {"name": "gen-floor-r0", "cand": "R0/gen-b", "ref": "R0/gen-a", "floor": null, "kind": "gen"},
+  {"name": "gen-cm-vs-r0", "cand": "Cm/gen-a", "ref": "R0/gen-a", "floor": "gen-floor-r0", "kind": "gen"},
+  {"name": "gen-cp-replay", "cand": "Cp/replay", "ref": "Cp/cold", "floor": null, "kind": "gen"}
+]

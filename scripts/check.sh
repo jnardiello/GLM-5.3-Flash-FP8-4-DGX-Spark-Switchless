@@ -7,7 +7,7 @@ export PYTHONDONTWRITEBYTECODE=1
 
 public_path() {
   case "$1" in
-    ./.git/*|./.claude/*|./docs/rigmark_reports/*|./scripts/mirror-snapshot.sh|\
+    ./.git/*|./.claude/*|./data/*|./docs/rigmark_reports/*|./scripts/mirror-snapshot.sh|\
     ./scripts/mirror-allow.txt|./scripts/mirror-private-terms.example)
       return 1 ;;
     *) return 0 ;;
@@ -110,6 +110,13 @@ python3 scripts/tests/test-f0-reference.py
 bash ./scripts/tests/test-controller-lifecycle.sh
 python3 scripts/tests/test-model-snapshot.py
 python3 scripts/tests/test-chat-template.py
+python3 scripts/tests/test-fidelity-metrics.py
+python3 scripts/tests/test-fidelity-collect.py
+python3 scripts/tests/test-fidelity-redact.py
+python3 scripts/tests/test-fidelity-tasks.py
+python3 scripts/tests/test-fidelity-campaign.py
+python3 scripts/tests/test-fidelity-report.py
+python3 scripts/fidelity/make_overlays.py --check
 python3 scripts/node/patches/test_adaptive_k_policy.py
 
 echo "check: PASS"

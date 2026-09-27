@@ -1,0 +1,46 @@
+{
+  "label": "r0fp8-m-2",
+  "recorded_utc": "2026-09-27T04:55:10+00:00",
+  "overlay": "scripts/node/experiments/fidelity/r0fp8-m.env",
+  "overlay_sha256": "60dde2791b554d811a76de6a0a510a7b650253577bcfca8cb4a65240b1a27dee",
+  "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+  "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+  "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+  "model_repo": "zai-org/GLM-5.3-Flash",
+  "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+  "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+  "kv_cache_dtype": "fp8_e4m3",
+  "spec_tokens": "5",
+  "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+  "k": 20,
+  "ranks": [
+    {
+      "rank": 0,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "1c97870402ca0708777b9b7fa0d2c45cac2e9788d8b30b981169e57b33cf7705",
+      "ready_lines": []
+    },
+    {
+      "rank": 1,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "4b0406c94a33a11f6763165cfbcccc00b3b12cb816b56b85ca74a1b1c40f4505",
+      "ready_lines": []
+    },
+    {
+      "rank": 2,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "2c88d7b782fab16f1c4dd7912591e88f0140726b98486b2b0c129657ff2983e3",
+      "ready_lines": []
+    },
+    {
+      "rank": 3,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "8893ab2c953c33c5208fdb3e3301996aff0f96f660742d845034b2926e565968",
+      "ready_lines": []
+    }
+  ]
+}
