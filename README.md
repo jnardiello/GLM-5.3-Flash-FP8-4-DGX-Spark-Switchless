@@ -121,6 +121,40 @@ worse overall and beyond 2K tokens.
 
 [![Quality vs FP8: perplexity change of each recipe against vendor FP8 by context regime and corpus category, with 95% intervals.](docs/fidelity/plots/01-quality-vs-fp8.png)](docs/fidelity/plots/01-quality-vs-fp8.svg)
 
+### E29 vs NVFP4
+
+The NVFP4 arm reproduces the engine layer of
+[Alex Ellis's four-node recipe](https://github.com/alexellis/glm-5.3-flash-4x-dgx-spark-switchless/tree/e2d0839a92f118a0a874abcfc1fe8012ee69978e)
+on this fabric: the `LibertAIDAI/GLM-5.3-Flash-NVFP4` checkpoint with 4-bit expert weights,
+running on its own engine build. It measures that checkpoint-plus-engine combination as
+published, not NVFP4 as a format. Measured head to head on the same corpus, **E29 is the
+more precise recipe**.
+
+| NVFP4 measured against E29 | Result |
+| --- | ---: |
+| Same next token, ≤ 2K context | 75.2% [73.7, 76.7] |
+| KL divergence, ≤ 2K context (nats) | 0.35 [0.32, 0.38] |
+| Perplexity change, ≤ 2K context | −3.36% [−5.39, −1.31] |
+| Perplexity change, > 2K context | +11.84% [+7.94, +15.45] |
+| Perplexity change, all tokens | +6.93% [+4.49, +9.22] |
+| Perplexity change, agentic code | +8.91% [+6.31, +11.73] |
+| Perplexity change, synthetic Italian chat | +10.09% [+9.35, +10.88] |
+| Repeat runs, ≤ 2K context (rows that differ) | E29 0 of 155,390 · NVFP4 155,206 of 155,390 |
+| qeval tasks, mixed | E29 73/75 · NVFP4 74/75 (McNemar p = 1.00) |
+| Italian replies with garbled characters | E29 0/40 · NVFP4 3/40 |
+| Tool calls parsed | E29 10/10 · NVFP4 10/10 |
+
+- **Short contexts:** NVFP4 predicts real text about 3% better than E29, a result that is
+  present in the data but unexplained.
+- **Beyond 2K tokens:** the difference reverses and grows to about 12%, and NVFP4 is
+  clearly worse on agentic code and Italian.
+- **Determinism:** E29 repeats itself bit for bit on short contexts, while NVFP4 differs
+  from its own previous run almost everywhere.
+- **Tasks and tool calls:** no difference at this sample size.
+- **Garbled characters:** these match a known issue with ModelOpt NVFP4 checkpoints on vLLM
+  (issue 54150). With so few prompts, 3/40 against 0/40 is a signal to watch rather than
+  a statistically significant difference.
+
 The [fidelity report](docs/fidelity/REPORT.md) opens with a
 [plain-language summary](docs/fidelity/REPORT.md#in-plain-words). It also covers the method,
 the recipe ladder that attributes the difference to individual steps, and the limitations.

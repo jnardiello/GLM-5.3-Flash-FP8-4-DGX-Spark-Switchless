@@ -100,7 +100,9 @@ Versions and releases are created only at the owner's explicit request.
     corpus text and anything derived from private sessions stay in the ignored
     `data/fidelity/`.
   - The README has a "Quality vs vendor FP8" section with the summary table and two
-    figures, linking the report. The benchmark index lists the campaign.
+    figures, linking the report. An "E29 vs NVFP4" subsection compares the two recipes head
+    to head: distance, perplexity by regime and category, determinism, tasks, tool calls
+    and garbled characters. The benchmark index lists the campaign.
 
 - Archived the discarded E27d experiment: a per-step cap of 2,304 prefill tokens while other
   requests decode, on the E29 default. The archive holds its report and portable numeric
