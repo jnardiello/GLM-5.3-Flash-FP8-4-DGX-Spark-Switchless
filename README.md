@@ -145,24 +145,22 @@ recipe as published, not the NVFP4 format in general.
 **The current recipe is more precise, especially on longer text.** Both columns are
 measured against the vendor FP8 model.
 
-| Compared with vendor FP8 | Current recipe | NVFP4 |
-| --- | ---: | ---: |
-| Same first choice, first 2K tokens | 83% | 75% |
-| Distance (KL), first 2K tokens | 0.18 | 0.35 |
-| Perplexity change, first 2K tokens | 0.0% | −3.3% |
-| Perplexity change, all text | +0.1% | +7.1% |
-| Perplexity change, beyond 2K tokens | +0.2% | +12.1% |
-| Perplexity change, agentic code | +0.4% | +9.3% |
-| Perplexity change, synthetic Italian chats | 0.0% | +10.1% |
-| Same output when run twice, first 2K tokens | always | almost never |
-| Tasks passed | 73/75 | 74/75 |
-| Italian answers with broken characters | 0 of 40 | 3 of 40 |
+| Compared with vendor FP8 | Current recipe | NVFP4 | What it means |
+| --- | ---: | ---: | --- |
+| Same first choice, first 2K tokens | 83% | 75% | NVFP4 departs more often from vendor FP8's top pick |
+| Distance (KL), first 2K tokens | 0.18 | 0.35 | NVFP4's predictions are about twice as far from vendor FP8 |
+| Perplexity change, first 2K tokens | 0.0% | −3.3% | NVFP4 is slightly better on short text (not yet explained) |
+| Perplexity change, all text | +0.1% | +7.1% | NVFP4 is clearly worse overall; the current recipe shows no measurable loss |
+| Perplexity change, beyond 2K tokens | +0.2% | +12.1% | NVFP4's loss grows on longer text |
+| Perplexity change, agentic code | +0.4% | +9.3% | NVFP4 is clearly worse on code |
+| Perplexity change, synthetic Italian chats | 0.0% | +10.1% | NVFP4 is clearly worse in Italian |
+| Same output when run twice, first 2K tokens | always | almost never | NVFP4's engine does not repeat itself |
+| Tasks passed | 73/75 | 74/75 | No difference at this sample size |
+| Italian answers with broken characters | 0 of 40 | 3 of 40 | A warning sign for NVFP4, not yet significant |
 
 Every NVFP4 perplexity difference is larger than its measuring error; none of the current
 recipe's is. The report gives the ranges.
 
-- **Short text:** NVFP4 is about 3% better on the first 2K tokens, a result we cannot yet
-  explain. Beyond 2K tokens it is about 12% worse.
 - **Tasks and tool calls:** no difference at this sample size. Both called tools
   correctly in 10 of 10 tests.
 - **Broken characters:** they match a known vLLM issue with NVFP4 checkpoints (issue

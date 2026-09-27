@@ -116,7 +116,8 @@ Versions and releases are created only at the owner's explicit request.
   - The README has a "Measured quality" section, next to "Measured performance", with
     "vs vendor FP8" and "vs NVFP4" subsections. It explains in plain language how to read
     each number (same first choice, distance, perplexity change, tasks, repeat runs,
-    broken characters) and refers to the current recipe without internal names. It shows
+    broken characters), gives both tables a "What it means" column and refers to the
+    current recipe without internal names. It shows
     two figures and links the report. The quality figures use plain labels (Vendor FP8,
     Current recipe, Earlier recipe, NVFP4); their notes no longer claim equal prediction,
     and figure 1 leaves the recipe ladder to its own figure. The benchmark index lists
