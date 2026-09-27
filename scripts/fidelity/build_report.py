@@ -469,6 +469,8 @@ def build_blocks(inp) -> list:
                    "KV pool per rank, one sequence at a time, `--max-logprobs 100`, a fresh `cache_salt` per request "
                    "and the SparkCache store/restore disabled in its own namespace. Prompt scoring sends each "
                    "corpus window teacher-forced with `prompt_logprobs` K = 20 (K = 100 on a fixed 20% subset)."))
+    B.append(("p", "The quality figures (1 and 2) use plain labels: Vendor FP8 = R0, Current recipe = Cm, Earlier "
+                   "recipe (Sep 19) = Cpre, NVFP4 = N."))
     if inp["boots"]:
         rows = []
         for b in inp["boots"]:

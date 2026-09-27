@@ -113,10 +113,14 @@ Versions and releases are created only at the owner's explicit request.
   - The campaign plan is not published. The report lists the protocol amendments that the
     text, figure notes and overlay headers cite, and the plan stays in the private campaign
     records.
-  - The README has a "Quality vs vendor FP8" section with the summary table and two
-    figures, linking the report. An "E29 vs NVFP4" subsection compares the two recipes head
-    to head: distance, perplexity by regime and category, determinism, tasks, tool calls
-    and garbled characters. The benchmark index lists the campaign.
+  - The README has a "Measured quality" section, next to "Measured performance", with
+    "vs vendor FP8" and "vs NVFP4" subsections. It explains in plain language how to read
+    each number (same first choice, distance, perplexity change, tasks, repeat runs,
+    broken characters) and refers to the current recipe without internal names. It shows
+    two figures and links the report. The quality figures use plain labels (Vendor FP8,
+    Current recipe, Earlier recipe, NVFP4); their notes no longer claim equal prediction,
+    and figure 1 leaves the recipe ladder to its own figure. The benchmark index lists
+    the campaign.
 
 - Archived the discarded E27d experiment: a per-step cap of 2,304 prefill tokens while other
   requests decode, on the E29 default. The archive holds its report and portable numeric

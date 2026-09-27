@@ -1,6 +1,6 @@
 # GLM-5.3-Flash fidelity campaign: report
 
-How far the E29 recipe's next-token distributions deviate from the vendor FP8 model served without this repository's precision and runtime changes (R0), and how a generic NVFP4 recipe compares. Margins were pre-registered before any measurement; protocol changes are listed under [Amendments](#amendments). Metrics generated 2026-09-27T20:52:33+00:00 from harness commit `bb76e73f4fbd` with uncommitted changes.
+How far the E29 recipe's next-token distributions deviate from the vendor FP8 model served without this repository's precision and runtime changes (R0), and how a generic NVFP4 recipe compares. Margins were pre-registered before any measurement; protocol changes are listed under [Amendments](#amendments). Metrics generated 2026-09-27T21:21:30+00:00 from harness commit `f5a30f1f1b4d` with uncommitted changes.
 
 ## In plain words
 
@@ -116,11 +116,11 @@ Perplexity change on the real next token, exp(ΔNLL) − 1 with 95% group-bootst
 
 ![Quality vs FP8](plots/01-quality-vs-fp8.png)
 
-*Quality vs FP8.* Perplexity change of each arm against R0 (the vendor FP8 recipe), exp(ΔNLL) − 1, per regime and per corpus category, with 95% CIs. Lower is better; a bar whose interval straddles zero shows no detectable perplexity change from FP8.
+*Quality vs FP8.* Perplexity change of each recipe against vendor FP8 (R0), exp(ΔNLL) − 1, by context length and by kind of text, with 95% CIs. Lower is better; an interval that straddles zero shows no detectable change from vendor FP8. Labels: Current recipe = Cm, Earlier recipe = Cpre.
 
 ![Different vs worse](plots/02-different-vs-worse.png)
 
-*Different vs worse.* Deviation from R0 (mean coarse KL, a lower bound) against perplexity change, one point per arm with 95% CI crosses, R0 against itself at the origin and N against itself as its run-to-run noise.
+*Different vs worse.* Distance from vendor FP8 (R0; mean coarse KL, a lower bound) against perplexity change, one point per recipe with 95% CI crosses, vendor FP8 against its own repeat run at the origin and NVFP4 (N) against its own repeat run as its run-to-run noise. Labels: Current recipe = Cm, Earlier recipe = Cpre.
 
 ![Ladder waterfall](plots/03-ladder-waterfall.png)
 
@@ -139,6 +139,8 @@ Perplexity change on the real next token, exp(ΔNLL) − 1 with 95% group-bootst
 | Ladder | `l0919-m`, `le21-m`, `le22b-m` | Frozen intermediate references between R0 and Cm | attribution | prompt scoring (ladder subset) |
 
 Every measurement arm uses the same measurement deltas, intended not to change numerics: a 6 GiB KV pool per rank, one sequence at a time, `--max-logprobs 100`, a fresh `cache_salt` per request and the SparkCache store/restore disabled in its own namespace. Prompt scoring sends each corpus window teacher-forced with `prompt_logprobs` K = 20 (K = 100 on a fixed 20% subset).
+
+The quality figures (1 and 2) use plain labels: Vendor FP8 = R0, Current recipe = Cm, Earlier recipe (Sep 19) = Cpre, NVFP4 = N.
 
 Boot identities recorded for each measurement or serving boot:
 

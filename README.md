@@ -83,88 +83,109 @@ cadence with the E27c scheduler, seven draft tokens (E28b), the E29 length-finis
 idle coalescing, SparkCache replay views and SIRCL/patched NCCL.
 The **16 GiB KV pool per rank** (E28b) and the **262,144-token context limit** apply.
 
-## Quality vs vendor FP8
+## Measured quality
 
-**Measured 27/09/2026 on 2.5M teacher-forced tokens: 424 windows of coding-agent sessions,
-synthetic Italian chats and model-written text.** The reference is the vendor FP8 weights
-served on the same four nodes with an FP8 KV cache. E29 does not match it bit for bit,
-but shows no detectable quality loss: its dense, sparse and all-position perplexity
-intervals all include zero. A public NVFP4 recipe is about twice as far from FP8 on
-short contexts (single-execution coarse KL). It is slightly better there, but clearly
-worse overall and beyond 2K tokens.
+**Measured 27/09/2026.** Does the current recipe answer as well as the official model it
+is built from? We gave the same 2.5 million tokens of text to three setups on these four
+nodes: the current recipe, the vendor's FP8 model served without this repository's
+changes, and a public NVFP4 recipe. The text is coding-agent sessions, synthetic Italian
+chats and model-written answers. At every token we recorded two things: which token each
+model would pick next, and how surprised it was by the token that actually followed.
 
-| vs vendor FP8 | E29 | NVFP4 |
+**How to read the numbers**
+
+- **Token and context.** A token is a piece of a word, and 2K tokens are roughly 1,500
+  words of conversation. "First 2K tokens" covers short conversations; "beyond 2K" covers
+  the rest of longer ones.
+- **Same first choice.** How often two models would write the same next token. Below
+  100% is not a problem in itself: often several tokens are equally good, like two good
+  writers choosing different synonyms.
+- **Distance (KL).** How different the whole list of likely next tokens is. 0 means
+  identical, and larger means more different. It measures difference, not quality, and
+  it can only underestimate the true difference.
+- **Perplexity change.** The main quality number: how much more (positive) or less
+  (negative) surprised a model is by real text than the vendor model is. 0% means
+  equally good, and lower is better. The brackets give the range where the true value
+  very likely lies (95% confidence). If that range includes 0, no difference could be
+  measured.
+- **Tasks passed.** 75 small, automatically graded exercises: code, reasoning, maths,
+  JSON, formatting and prose. With this many, only differences larger than about 7
+  points would show up.
+- **Same output when run twice.** Whether the same input produces exactly the same
+  predictions again.
+- **Broken characters.** The replacement symbol � appearing inside an answer, a sign of
+  corrupted text.
+
+### vs vendor FP8
+
+**Same quality, not a bit-for-bit copy.** The current recipe changes how the model is
+computed, so it does not always pick the same token as the vendor model. It predicts
+real text just as well.
+
+| What we measured | Current recipe | What it means |
+| --- | ---: | --- |
+| Same first choice as vendor FP8, first 2K tokens | 83% | Small numeric changes move the top pick |
+| Perplexity change, all text | +0.1% [−0.3, +0.6] | No measurable loss |
+| Perplexity change, first 2K tokens | 0.0% [−0.6, +0.6] | No measurable loss |
+| Perplexity change, beyond 2K tokens | +0.2% [−0.3, +0.7] | No measurable loss |
+| Perplexity change, agentic code | +0.4% [−0.4, +1.1] | No measurable loss |
+| Perplexity change, synthetic Italian chats | 0.0% [−0.2, +0.1] | No measurable loss |
+| Tasks passed (vendor FP8: 73/75) | 73/75 | Same result |
+
+[![Quality vs vendor FP8: perplexity change of the current recipe, the earlier recipe and NVFP4 by context length and kind of text, with 95% ranges.](docs/fidelity/plots/01-quality-vs-fp8.png)](docs/fidelity/plots/01-quality-vs-fp8.svg)
+
+### vs NVFP4
+
+NVFP4 stores the expert weights, which make up most of the model, in 4 bits instead of 8
+to save memory. We ran
+[Alex Ellis's public NVFP4 recipe](https://github.com/alexellis/glm-5.3-flash-4x-dgx-spark-switchless/tree/e2d0839a92f118a0a874abcfc1fe8012ee69978e),
+with its own checkpoint and engine, on the same four nodes. The results describe that
+recipe as published, not the NVFP4 format in general.
+
+**The current recipe is more precise, especially on longer text.** Both columns are
+measured against the vendor FP8 model.
+
+| Compared with vendor FP8 | Current recipe | NVFP4 |
 | --- | ---: | ---: |
-| Same next token, ≤ 2K context | 83.4% | 75.1% |
-| KL divergence, ≤ 2K context (nats) | 0.18 | 0.35 |
-| Perplexity change, ≤ 2K context | +0.03% [−0.56, +0.60] | −3.33% [−5.43, −1.22] |
-| Perplexity change, all tokens | +0.14% [−0.32, +0.56] | +7.07% [+4.61, +9.37] |
-| Perplexity change, > 2K context | +0.19% [−0.34, +0.73] | +12.05% [+8.30, +15.62] |
-| Perplexity change, agentic code | +0.35% [−0.39, +1.11] | +9.30% [+6.76, +12.08] |
-| Perplexity change, synthetic Italian chat | −0.04% [−0.19, +0.12] | +10.05% [+9.32, +10.82] |
-| qeval tasks, mixed (FP8: 73/75) | 73/75 | 74/75 |
-| Italian replies with garbled characters | 0/40 | 3/40 |
+| Same first choice, first 2K tokens | 83% | 75% |
+| Distance (KL), first 2K tokens | 0.18 | 0.35 |
+| Perplexity change, first 2K tokens | 0.0% | −3.3% |
+| Perplexity change, all text | +0.1% | +7.1% |
+| Perplexity change, beyond 2K tokens | +0.2% | +12.1% |
+| Perplexity change, agentic code | +0.4% | +9.3% |
+| Perplexity change, synthetic Italian chats | 0.0% | +10.1% |
+| Same output when run twice, first 2K tokens | always | almost never |
+| Tasks passed | 73/75 | 74/75 |
+| Italian answers with broken characters | 0 of 40 | 3 of 40 |
 
-- **Perplexity change** is exp(ΔNLL) − 1 on the token that actually came next, with 95%
-  bootstrap intervals over source sessions. Lower is better; an interval that contains 0
-  means no detectable change.
-- **KL divergence** covers the shared top-20 tokens, the actual token and a rest bucket,
-  so it is a lower bound. Most recipe changes measured here produce a dense KL of this
-  size; the FP8 recipe before E21 also sits at 0.18.
-- **Beyond 2,048 tokens** the engine is not deterministic, even for the FP8 reference, so
-  the fine-grained distance there remains unresolved. No quality change is detected there.
-- **Measurement mode:** the distance and perplexity results come from cold, serial prompt
-  scoring (one sequence at a time, fresh cache salts, SparkCache store and restore off).
-  The qeval tasks, tool calls and garbled-text probe ran on the production recipe; the
-  two modes were not bridged.
-- **The garbled-text probe** ran on E29 and NVFP4 only. The 75 qeval tasks mix code,
-  reasoning, maths, JSON, formatting and prose. At this size they show no difference, but
-  they cannot prove equivalence.
+Every NVFP4 perplexity difference is larger than its measuring error; none of the current
+recipe's is. The report gives the ranges.
 
-[![Different vs worse: KL distance from vendor FP8 against perplexity change for E29, the earlier recipe and NVFP4, with 95% intervals.](docs/fidelity/plots/02-different-vs-worse.png)](docs/fidelity/plots/02-different-vs-worse.svg)
+- **Short text:** NVFP4 is about 3% better on the first 2K tokens, a result we cannot yet
+  explain. Beyond 2K tokens it is about 12% worse.
+- **Tasks and tool calls:** no difference at this sample size. Both called tools
+  correctly in 10 of 10 tests.
+- **Broken characters:** they match a known vLLM issue with NVFP4 checkpoints (issue
+  54150). 3 of 40 is a warning sign, not yet a statistically significant difference.
 
-[![Quality vs FP8: perplexity change of each recipe against vendor FP8 by context regime and corpus category, with 95% intervals.](docs/fidelity/plots/01-quality-vs-fp8.png)](docs/fidelity/plots/01-quality-vs-fp8.svg)
+[![Different vs worse: how far each setup is from vendor FP8 against its perplexity change, with 95% ranges; the current recipe sits on the zero line, NVFP4 further right.](docs/fidelity/plots/02-different-vs-worse.png)](docs/fidelity/plots/02-different-vs-worse.svg)
 
-### E29 vs NVFP4
+**Good to know**
 
-The NVFP4 arm reproduces the engine layer of
-[Alex Ellis's four-node recipe](https://github.com/alexellis/glm-5.3-flash-4x-dgx-spark-switchless/tree/e2d0839a92f118a0a874abcfc1fe8012ee69978e)
-on this fabric: the `LibertAIDAI/GLM-5.3-Flash-NVFP4` checkpoint with 4-bit expert weights,
-running on its own engine build. It measures that checkpoint-plus-engine combination as
-published, not NVFP4 as a format. Measured head to head on the same corpus, **E29 is the
-more precise recipe**.
+- **Measurement mode.** The distance and perplexity numbers come from a measurement mode
+  that sends one request at a time. The tasks and the broken-character test ran on the
+  normal serving setup.
+- **Beyond 2K tokens** the serving engine gives slightly different predictions from run
+  to run, even for the vendor model, so there only overall quality is compared.
+- **Tasks.** 75 tasks are too few to prove that two setups are equivalent; they can only
+  reveal large differences.
 
-| NVFP4 measured against E29 | Result |
-| --- | ---: |
-| Same next token, ≤ 2K context | 75.2% [73.7, 76.7] |
-| KL divergence, ≤ 2K context (nats) | 0.35 [0.32, 0.38] |
-| Perplexity change, ≤ 2K context | −3.36% [−5.39, −1.31] |
-| Perplexity change, > 2K context | +11.84% [+7.94, +15.45] |
-| Perplexity change, all tokens | +6.93% [+4.49, +9.22] |
-| Perplexity change, agentic code | +8.91% [+6.31, +11.73] |
-| Perplexity change, synthetic Italian chat | +10.09% [+9.35, +10.88] |
-| Repeat runs, ≤ 2K context (rows that differ) | E29 0 of 155,390 · NVFP4 155,206 of 155,390 |
-| qeval tasks, mixed | E29 73/75 · NVFP4 74/75 (McNemar p = 1.00) |
-| Italian replies with garbled characters | E29 0/40 · NVFP4 3/40 |
-| Tool calls parsed | E29 10/10 · NVFP4 10/10 |
-
-- **Short contexts:** NVFP4 predicts real text about 3% better than E29, a result that is
-  present in the data but unexplained.
-- **Beyond 2K tokens:** the difference reverses and grows to about 12%, and NVFP4 is
-  clearly worse on agentic code and Italian.
-- **Determinism:** E29 repeats itself bit for bit on short contexts, while NVFP4 differs
-  from its own previous run almost everywhere.
-- **Tasks and tool calls:** no difference at this sample size.
-- **Garbled characters:** these match a known issue with ModelOpt NVFP4 checkpoints on vLLM
-  (issue 54150). With so few prompts, 3/40 against 0/40 is a signal to watch rather than
-  a statistically significant difference.
-
-The [fidelity report](docs/fidelity/REPORT.md) opens with a
-[plain-language summary](docs/fidelity/REPORT.md#in-plain-words). It also covers the method,
-the recipe ladder that attributes the difference to individual steps, and the limitations.
-[`report.html`](docs/fidelity/report.html) is a self-contained version with every figure.
-The [experiment archive](docs/historical_benchmarks/experiments/2026-09-27-fidelity/README.md)
-holds the portable data.
+The [full report](docs/fidelity/REPORT.md) starts with a
+[plain-language summary](docs/fidelity/REPORT.md#in-plain-words). It covers the method,
+where the differences come from and the limitations.
+[`report.html`](docs/fidelity/report.html) is a self-contained version with every figure,
+and the [experiment archive](docs/historical_benchmarks/experiments/2026-09-27-fidelity/README.md)
+holds the data.
 
 ## Install with an agent
 

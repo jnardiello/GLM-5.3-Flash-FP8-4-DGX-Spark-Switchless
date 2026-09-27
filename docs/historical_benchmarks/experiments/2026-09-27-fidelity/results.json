@@ -3464,7 +3464,7 @@
  "published_files": [
   {
    "path": "REPORT.md",
-   "sha256": "e09bac0a860f9888902ef44cc4d3b6d4729ebe97d05ca9bb869dfa290cd15dd7"
+   "sha256": "f9d64930c743bf9319c307baf782765a0f9fd8d84b9ac3405dd65ee2651f2bd7"
   },
   {
    "path": "boots/cm-09270932.json",
@@ -3612,23 +3612,23 @@
   },
   {
    "path": "metrics-v2/summary.json",
-   "sha256": "a8bd1be4c3eb5be35a532ae281c40194d844ec56139f537efcca4d2c87d24784"
+   "sha256": "0b4c1e0e8c70598cddb61df22d663a17e4d3b4edf9d5e8c8ea7651694fef6156"
   },
   {
    "path": "plots/01-quality-vs-fp8.png",
-   "sha256": "359f95c4d5318d065a226c891684cc8c630478818ea7146290cc5f5baf575524"
+   "sha256": "2b1e53653ed677f9a68b431436de883660f2b082bb51e2f39dedc196fde0e174"
   },
   {
    "path": "plots/01-quality-vs-fp8.svg",
-   "sha256": "4002f47a5c7db138013b723c3bf6140c937834ac7005dba25650c42b6f3838cd"
+   "sha256": "63a44d2961d1cc1898ff35a8c1fa4d430f0611a9c8f3321e76e5301110a5e83d"
   },
   {
    "path": "plots/02-different-vs-worse.png",
-   "sha256": "8078b3271ae8c9c3554baafcc97c56e806a4050d4e6f1ce44fadaf10262c69a3"
+   "sha256": "59512162d10f36a15763cc969b37cd6783ab3abc0434894a5ca190e4c36fc34f"
   },
   {
    "path": "plots/02-different-vs-worse.svg",
-   "sha256": "a8a2ec516a13299c4c19c847451ab89334b09bb2d729f7066dee8dbb990b755a"
+   "sha256": "64e3a5723c222937c5489ff86fb822c6644d82ca0e4cd737457a918c1b266968"
   },
   {
    "path": "plots/03-ladder-waterfall.png",
@@ -3736,11 +3736,11 @@
   },
   {
    "path": "plots/plots.json",
-   "sha256": "8c426206fc96df68c992d9cee8c95f883978bb9e61304258aec4576cc2503cef"
+   "sha256": "7d4346d55b16b7027cccc6e8446696e82e30f54ed96d10e17f32f482d454c816"
   },
   {
    "path": "report.html",
-   "sha256": "5f9dab6ab71e908c1f5782ad0973c8addd40a77e6c6347f23584c7716324f097"
+   "sha256": "934c50188da3fa8a0b88791a2fa14833a80c56f543cb0ab854cf0d0888804a6a"
   },
   {
    "path": "verdict.md",

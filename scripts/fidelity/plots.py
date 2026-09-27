@@ -919,12 +919,13 @@ def fig_precision(ctx):
 
 # ---------------------------------------------------------------- quality figures (perplexity vs R0)
 
-LADDER_ARMS = [("L0919", "#2a6fbd"), ("LE21", "#b8327a"), ("LE22b", "#8a6a12")]
 RUNG_LABEL = {"L0919": "+ hybrid KDA (L0919)", "Cpre": "+ E03 mHC (Cpre)", "LE21": "+ E21 residual W8A16 (LE21)",
               "LE22b": "+ E22b drafter (LE22b)", "Cm": "+ E27–E29 (Cm = E29)"}
-ARM_NAME = {"Cm": "Cm (E29)", "N": "N (NVFP4)", "Cpre": "Cpre (before E21)"}
-QUALITY_NOTE = ("Perplexity change = exp(ΔNLL) − 1, where ΔNLL = NLL(arm) − NLL(R0) per real next token; "
-                "lower is better, and a CI that straddles 0 means no detectable difference from R0.")
+# Plain display names for the README-facing quality figures (01, 02); R0 is the vendor FP8 reference.
+ARM_NAME = {"R0": "Vendor FP8", "Cm": "Current recipe", "N": "NVFP4", "Cpre": "Earlier recipe (Sep 19)"}
+POINT_NAME = dict(ARM_NAME, **{"R0 self": "Vendor FP8 repeat", "N self": "NVFP4 repeat"})
+QUALITY_NOTE = ("Perplexity change: how much more (positive) or less (negative) surprised a recipe is than vendor "
+                "FP8 by each real next token, exp(ΔNLL) − 1. Lower is better; 0 means equally good.")
 
 
 def ppl(ci):
@@ -956,7 +957,7 @@ def dot_whisker(ax, y, est, err, colour, hollow=False, size=60):
 
 
 def fig_quality(ctx):
-    name, title = ctx["fig"], "Quality vs FP8: perplexity change against R0 (95% CIs)"
+    name, title = ctx["fig"], "Quality vs vendor FP8: perplexity change (95% CIs)"
     comps = quality_comps(ctx)
     if not comps:
         return pending(ctx, name, title, ["No arm has been compared with R0 in docs/fidelity/metrics-v2/ yet."])
@@ -964,34 +965,23 @@ def fig_quality(ctx):
     fig, axes = plt.subplots(1, 2, figsize=(16, 7.4), facecolor="white", gridspec_kw={"width_ratios": [1, 1.25]})
     fig.subplots_adjust(left=0.1, right=0.98, top=0.76, bottom=0.25, wspace=0.28)
     header(fig, title)
-    lad = ladder_json(ctx)
-    ladder_pts = []
-    if lad:
-        for e in lad.get("cumulative_from_first") or []:
-            arm = e["cand"].split("/")[0]
-            ci = ((e.get(lad.get("regime", "dense")) or {}).get("contrast") or {}).get("delta_nll")
-            if e.get("status") in ("ok", "partial") and arm in dict(LADDER_ARMS) and ppl(ci)[0] is not None:
-                ladder_pts.append((arm, dict(LADDER_ARMS)[arm], ci, (e.get("windows") or {}).get("compared")))
     legend = [(ARM_NAME.get(label, label), colour) for label, _, colour in comps]
-    legend += [(f"{arm} (ladder subset, dense)", colour) for arm, colour, _, _ in ladder_pts]
     fig_legend(fig, legend)
     regimes = ["dense", "sparse", "all"]
     ax = axes[0]
-    n = len(comps) + len(ladder_pts)
+    n = len(comps)  # the recipe ladder has its own figure (03-ladder-waterfall)
     for i, regime in enumerate(regimes):
         rows = [(colour, ((res.get("regimes", {}).get(regime) or {}).get("contrast") or {}).get("delta_nll"))
                 for _, res, colour in comps]
-        if regime == "dense":
-            rows += [(colour, ci) for _, colour, ci, _ in ladder_pts]
         for j, (colour, ci) in enumerate(rows):
             est, err = ppl(ci)
             if est is not None:
                 dot_whisker(ax, i - 0.3 + 0.6 * (j + 0.5) / max(n, 1), est, err, colour)
     ax.axvline(0, color=INK, lw=1.2)
-    ax.set_yticks(range(3), ["Dense\n≤ 2,048 tokens", "Sparse\n> 2,048 tokens", "All positions"], fontsize=11,
+    ax.set_yticks(range(3), ["First 2,048\ntokens", "Beyond 2,048\ntokens", "All tokens"], fontsize=11,
                   color=INK)
     ax.set_ylim(2.5, -0.5)
-    style(ax, "By regime", "Perplexity change vs R0, % · lower is better")
+    style(ax, "By context length", "Perplexity change vs vendor FP8, % · lower is better")
     ax = axes[1]
     cats = sorted({c for _, res, _ in comps for c in ((res.get("regimes", {}).get("all") or {}).get("by_category") or {})})
     for i, cat in enumerate(cats):
@@ -1003,11 +993,11 @@ def fig_quality(ctx):
     ax.axvline(0, color=INK, lw=1.2)
     ax.set_yticks(range(len(cats)), [c.replace("_", " ") for c in cats], fontsize=11, color=INK)
     ax.set_ylim(len(cats) - 0.5, -0.5)
-    style(ax, "By corpus category · all positions", "Perplexity change vs R0, % · lower is better")
+    style(ax, "By kind of text · all tokens", "Perplexity change vs vendor FP8, % · lower is better")
     notes = [QUALITY_NOTE,
-             "E29 (Cm) predicts real text as well as FP8 (R0) wherever its interval straddles the zero line.",
-             "Whiskers: 95% percentile bootstrap over source groups. Sparse positions carry run-to-run noise even "
-             "for R0 against itself."] + partial_notes([(f"{label} vs R0", res, c) for label, res, c in comps]) \
+             "An interval that straddles the zero line means no detectable change from vendor FP8.",
+             "Whiskers: 95% bootstrap ranges over source sessions. Beyond 2,048 tokens the engine varies from run "
+             "to run, even for vendor FP8 against itself."] + partial_notes([(f"{label} vs R0", res, c) for label, res, c in comps]) \
         + json_missing(ctx)
     footer(fig, notes)
     ctx["out"].save(fig, name)
@@ -1072,11 +1062,12 @@ def self_pair(raw: Path, ref: str, cand: str, groups: dict, B=m.BOOT_B, seed=m.B
 
 
 LABEL_OFFSET = {"R0 self": (8, 8, "left"), "Cpre": (8, 8, "left"), "Cm": (10, -16, "left"),
-                "N": (8, 8, "left"), "N self": (10, -34, "left")}
+                "N": (-10, 8, "right"), "N self": (10, -34, "left")}
+LABEL_OFFSET_ALL = {"R0 self": (-10, 8, "right")}  # all-tokens panel: the floor sits next to the arms
 
 
 def fig_scatter(ctx):
-    name, title = ctx["fig"], "Different vs worse: deviation from R0 against perplexity change"
+    name, title = ctx["fig"], "Different vs worse: distance from vendor FP8 against perplexity change"
     comps = quality_comps(ctx)
     if not comps:
         return pending(ctx, name, title, ["No arm has been compared with R0 in docs/fidelity/metrics-v2/ yet."])
@@ -1085,8 +1076,8 @@ def fig_scatter(ctx):
     fig, axes = plt.subplots(1, 2, figsize=(16, 7.2), facecolor="white")
     fig.subplots_adjust(left=0.07, right=0.98, top=0.76, bottom=0.25, wspace=0.18)
     header(fig, title)
-    legend = [("R0 vs itself (run B vs A)", FLOOR_COLOR)] + [(ARM_NAME.get(l, l), c) for l, _, c in comps]
-    fig_legend(fig, legend + ([("N vs itself (run A vs rep2), hollow", ORANGE)] if noise else []))
+    legend = [("Vendor FP8 vs its own repeat run", FLOOR_COLOR)] + [(ARM_NAME.get(l, l), c) for l, _, c in comps]
+    fig_legend(fig, legend + ([("NVFP4 vs its own repeat run (hollow)", ORANGE)] if noise else []))
     floor = ctx["m"].get("floor-r0")
     for ax, regime in zip(axes, ("dense", "all")):
         pts = []
@@ -1109,25 +1100,28 @@ def fig_scatter(ctx):
             ax.scatter([x], [y], s=90, color="white" if hollow else colour, edgecolor=colour, linewidth=2, zorder=3)
             t1 = (c.get("top1_agreement") or {}).get("estimate")
             if t1 is not None:
-                dx, dy, ha = LABEL_OFFSET.get(label, (8, 8, "left"))
-                ax.annotate(f"{label} · top-1 {t1 * 100:.1f}%", (x, y), xytext=(dx, dy), textcoords="offset points",
+                offsets = dict(LABEL_OFFSET, **(LABEL_OFFSET_ALL if regime == "all" else {}))
+                dx, dy, ha = offsets.get(label, (8, 8, "left"))
+                ax.annotate(f"{POINT_NAME.get(label, label)} · {t1 * 100:.1f}%", (x, y),
+                            xytext=(dx, dy), textcoords="offset points",
                             fontsize=9.5, color=INK, ha=ha)
         ax.axhline(0, color=INK, lw=1.2)
         ax.set_xlim(-0.02, ax.get_xlim()[1] * 1.2)
-        style(ax, "Dense regime (≤ 2,048 conditioning tokens)" if regime == "dense" else "All positions",
-              "Mean coarse KL(R0 ‖ arm), nats · a lower bound on the full KL",
-              "Perplexity change vs R0, % · lower is better" if regime == "dense" else None)
-    notes = ["Right = different from R0; up = worse at predicting real text. Different is not necessarily worse: a "
-             "point far right on the zero line changes the distribution without a perplexity cost.",
+        style(ax, "First 2,048 tokens of context" if regime == "dense" else "All tokens",
+              "Distance from vendor FP8 (mean KL, nats; a lower bound)",
+              "Perplexity change vs vendor FP8, % · lower is better" if regime == "dense" else None)
+    notes = ["Right = more different from vendor FP8; up = worse at predicting real text. Different is not "
+             "necessarily worse: a point far right on the zero line changes the predictions without a quality cost.",
+             "The percentage next to each point is how often its first choice matches vendor FP8.",
              QUALITY_NOTE]
     if noise:
-        notes.append(f"N vs itself: {noise['windows']} cross-boot windows, bootstrap over {noise['units']} "
-                     f"{noise['unit']}s; N's engine is nondeterministic from the first positions.")
+        notes.append(f"NVFP4 vs its own repeat run: {noise['windows']} windows, bootstrap over {noise['units']} "
+                     f"{noise['unit']}s; the NVFP4 engine varies from run to run from the first tokens.")
     else:
-        notes.append("N run-to-run noise (N/prompt-rep2) not available yet.")
+        notes.append("NVFP4 run-to-run noise (N/prompt-rep2) not available yet.")
     footer(fig, notes + json_missing(ctx))
     ctx["out"].save(fig, name)
-    return {"status": "partial" if json_missing(ctx) else "ok", "notes": notes[2:] + json_missing(ctx)}
+    return {"status": "partial" if json_missing(ctx) else "ok", "notes": notes[3:] + json_missing(ctx)}
 
 
 def bit_identical_dense(raw: Path, ref: str, cand: str, windows) -> bool | None:
@@ -1229,12 +1223,13 @@ def num_fmt(x):
 
 FIGURES = [  # (name, function, needs per-position data, caption, report group)
     ("01-quality-vs-fp8", fig_quality, False,
-     "Perplexity change of each arm against R0 (the vendor FP8 recipe), exp(ΔNLL) − 1, per regime and per corpus "
-     "category, with 95% CIs. Lower is better; a bar whose interval straddles zero shows no detectable "
-     "perplexity change from FP8.", "quality"),
+     "Perplexity change of each recipe against vendor FP8 (R0), exp(ΔNLL) − 1, by context length and by kind of "
+     "text, with 95% CIs. Lower is better; an interval that straddles zero shows no detectable change from vendor "
+     "FP8. Labels: Current recipe = Cm, Earlier recipe = Cpre.", "quality"),
     ("02-different-vs-worse", fig_scatter, False,
-     "Deviation from R0 (mean coarse KL, a lower bound) against perplexity change, one point per arm with 95% CI "
-     "crosses, R0 against itself at the origin and N against itself as its run-to-run noise.", "quality"),
+     "Distance from vendor FP8 (R0; mean coarse KL, a lower bound) against perplexity change, one point per "
+     "recipe with 95% CI crosses, vendor FP8 against its own repeat run at the origin and NVFP4 (N) against its "
+     "own repeat run as its run-to-run noise. Labels: Current recipe = Cm, Earlier recipe = Cpre.", "quality"),
     ("03-ladder-waterfall", fig_waterfall, False,
      "Recipe ladder R0 → L0919 → Cpre → LE21 → LE22b → Cm in the dense regime: KL between adjacent recipes (not "
      "additive) and the "

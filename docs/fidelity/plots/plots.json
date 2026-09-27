@@ -1,7 +1,7 @@
 {
   "figures": [
     {
-      "caption": "Perplexity change of each arm against R0 (the vendor FP8 recipe), exp(\u0394NLL) \u2212 1, per regime and per corpus category, with 95% CIs. Lower is better; a bar whose interval straddles zero shows no detectable perplexity change from FP8.",
+      "caption": "Perplexity change of each recipe against vendor FP8 (R0), exp(\u0394NLL) \u2212 1, by context length and by kind of text, with 95% CIs. Lower is better; an interval that straddles zero shows no detectable change from vendor FP8. Labels: Current recipe = Cm, Earlier recipe = Cpre.",
       "group": "quality",
       "name": "01-quality-vs-fp8",
       "notes": [],
@@ -11,11 +11,11 @@
       "title": "Quality vs FP8"
     },
     {
-      "caption": "Deviation from R0 (mean coarse KL, a lower bound) against perplexity change, one point per arm with 95% CI crosses, R0 against itself at the origin and N against itself as its run-to-run noise.",
+      "caption": "Distance from vendor FP8 (R0; mean coarse KL, a lower bound) against perplexity change, one point per recipe with 95% CI crosses, vendor FP8 against its own repeat run at the origin and NVFP4 (N) against its own repeat run as its run-to-run noise. Labels: Current recipe = Cm, Earlier recipe = Cpre.",
       "group": "quality",
       "name": "02-different-vs-worse",
       "notes": [
-        "N vs itself: 85 cross-boot windows, bootstrap over 71 source groups; N's engine is nondeterministic from the first positions."
+        "NVFP4 vs its own repeat run: 85 windows, bootstrap over 71 source groups; the NVFP4 engine varies from run to run from the first tokens."
       ],
       "png": "02-different-vs-worse.png",
       "status": "ok",
