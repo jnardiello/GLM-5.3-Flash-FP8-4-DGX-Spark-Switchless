@@ -4,9 +4,8 @@
 without this repository's precision and runtime changes? A second question: how does a
 generic NVFP4 recipe compare on the same measurements?
 
-**Status.** Pre-registered on 2026-09-27, before any measurement. The owner told us to proceed
-without waiting for plan approval, so the thresholds below are the owner's suggested values,
-adopted as the pre-registered defaults. Any owner change is recorded in
+**Status.** Pre-registered on 2026-09-27, before any measurement. The thresholds below are the
+owner's suggested values, adopted as the pre-registered defaults. Any owner change is recorded in
 [the amendment log](#amendments) before the affected analysis runs. The results go in
 `docs/fidelity/REPORT.md` and the self-contained `docs/fidelity/report.html`, which open with
 the verdict and includes all plots.
@@ -250,27 +249,24 @@ under $0.50. Suggested cap: **$10**. The Z arm needs an owner-set cap before it 
 - A worker's disk could fill with SparkCache namespaces (§2).
 - Z's serving stack is unknown and may change during the campaign.
 
-## 12. Owner inputs
+## 12. Owner decisions
 
-| Input | State |
+| Decision | State |
 | --- | --- |
-| SSH targets, maintenance window, authority | ranks 0–3 given, with a campaign window; stopping the other workload, audited cleanup, production deploys and node actions explicitly authorised |
-| astra | `codex exec -m gpt-6-astra`, reasoning effort max |
-| Other workload on the ranks | found; recorded privately; stopped |
-| Hermes logs | no (synthetic Italian corpus) |
 | `reasoning_effort` for tasks | `high` (default) |
-| Corpus exclusions | **missing**: measurement runs on the provisional manifest (§5) |
-| z.ai spending cap | **missing**: Z arm deferred |
+| Italian corpus | synthetic conversations; no private chat logs |
+| Corpus exclusions | not provided: measurement runs on the provisional manifest (§5) |
+| Cloud arm (Z) | deferred: no spending cap |
+| Independent review | an external reviewer model (astra) at maximum reasoning effort, for the plan, the analysis code and the report |
 
 ## Amendments
 
 All amendments were recorded before the affected measurements ran.
 
-1. **Phase 3 result (2026-09-27).** The E29 default is serving again:
-   - The rank-0 checkpoint was restored and passes the full manifest (72 files, SHA-256 every file).
-   - Deploy passed, fabric 8/8 jumbo, both gates passed 4 s after `/health` 200, and `check-f0.py` PASS.
-   - The previous workload had disabled rank-0 `tp4-autostart`, so `check-f0.py` failed until an audited change re-enabled it, without starting it.
-   - `scripts/fetch-fp8-weights.sh` could not find its manifests when run from `~/tp4` as documented. This is fixed.
+1. **Return to E29 (phase 3).** Verifying a restored default takes:
+   - the full checkpoint manifest (72 files, SHA-256 each), deploy, the fabric check, both gates and `check-f0.py`;
+   - rank-0 `tp4-autostart` enabled, because `check-f0.py` requires it. Re-enable it, without starting it, if an earlier workload disabled it;
+   - `scripts/fetch-fp8-weights.sh`, which now finds its manifests when run from `~/tp4` as documented.
 2. **Smoke result.** With DFlash2 active, `prompt_logprobs` (K=20) and generation `logprobs` both return complete top-K data for every position. Speculative decoding therefore **stays on in every measurement arm**. The `-nospec` overlays are used only for the losslessness check: greedy decode set, spec off, on a 50-prompt subset of the E29 recipe (`cm-nospec`), compared by exact match against Cp.
 3. **Smoke on the production recipe used 256-token prompts.** Rank 0 has about 2.5 GiB MemAvailable under E29, and a long prompt with prompt logprobs materialises its full logits. The long-prompt cache-hit test (≥ 4,096 tokens, same salt twice) and the SparkCache namespace sizing move to the first measurement-mode boot (6 GiB KV).
 4. **Corpus.** The 30 Italian conversations each render to about 5.2K tokens, too short for two disjoint ≥ 3,072-token windows. Each therefore also gets one overlapping second-half window (≥ 2,560 tokens), giving 49 Italian windows. The model-native count rises from 48 to **60** prompts, so the total reaches ≥ 300 windows. Before model-native: 254 windows, 1.99M tokens, split agentic 59%, long 16%, structured 15%, Italian 11%.
@@ -279,15 +275,13 @@ All amendments were recorded before the affected measurements ran.
    - BF16 KV would need a different attention backend and therefore different kernels than the vendor recipe as served.
    - The pre-registered fallback applies: **R0 uses the FP8 KV** of the frozen September 18 recipe (`r0fp8-m` for measurement; the running `r0-s` boot is already equivalent) and shares the FP8-KV error, and the report states this.
    - The ladder's first rung is R0 itself.
-7. **Incident on the first R0 serving boot.** The NVFP4 image pull and checkpoint download ran while R0 served the concurrency-6 model-native generation.
-   - The pulls cut MemAvailable by 2–3 GiB per node, and earlyoom killed `VLLM::Worker_TP` on two ranks.
-   - No measurement was lost: the 60 model-native requests failed and are rerun.
-   - Recovery was a coordinated four-rank stop. The downloads were completed and verified with the stack down; the rule is that no download, pull or copy ever runs on a serving node.
-   - Model-native generation reruns at concurrency 4, the concurrency validated for production memory, and stops on the sampler's abort file.
-8. **R0 serving needs a smaller KV pool.**
-   - Without the hybrid-KDA INT8 projections, the September 18 recipe leaves rank 0 with only 1.98 GiB idle at a 16 GiB pool.
-   - During the concurrency-4 model-native generation, rank 0 fell to 0.91 GiB. The sampler aborted and rank 0 stayed at 0.93 GiB when idle.
-   - The stack was stopped in a coordinated way. `r0-s` now uses a 12 GiB KV pool, the value of the published NVFP4 recipe. Pool size changes capacity only, not numerics.
+7. **No transfers on serving nodes.** Image pulls and a checkpoint download during R0 serving cut MemAvailable by 2–3 GiB per node and ended the serving workers on two ranks.
+   - The affected model-native requests were rerun; no measurement was lost.
+   - Rule adopted: downloads, pulls and copies run only with the stack down.
+   - Model-native generation runs at concurrency 4, the concurrency validated for production memory, under the sampler's 1 GiB abort.
+8. **R0 serving uses a 12 GiB KV pool.**
+   - Without the hybrid-KDA INT8 projections, the September 18 recipe leaves rank 0 with about 2 GiB free at a 16 GiB pool, and generation at concurrency 4 took it below the 1 GiB abort.
+   - `r0-s` therefore uses 12 GiB, the value of the published NVFP4 recipe. Pool size changes capacity only, not numerics.
    - The 4 model-native generations completed before the abort are kept.
 9. **Model-native windows.** R0 (`r0-s`) continuations of the 60 session decode prompts and the 50 public ones were short. Most agentic contexts end in a brief tool call, and the public tasks need little reasoning: 50,425 generated tokens, median about 250.
    - 60 public long-form prompts written for the campaign (`scripts/fidelity/native_prompts.json`, rendered by `build_corpus.py native-prompts`) were therefore added: temperature 1.0, top_p 0.95, fixed seeds, up to 8,192 tokens, concurrency 4.
@@ -351,9 +345,8 @@ All amendments were recorded before the affected measurements ran.
       - The 2,048 boundary is defined by conditioning-token count, and the indexer explanation remains a hypothesis.
       - UTF-8 validity is checked on concatenated token bytes, and repetition heuristics are flags to adjudicate.
       - Contrasts use identical valid-position masks, with missingness published per arm and regime.
-14. **N launcher fabric fix and revised remaining order.**
-    - The first `n-m` boot failed at NCCL QP setup (`ibv_modify_qp` timeout) because the launcher still carried the published recipe's fabric-specific `NCCL_IB_MERGE_NICS=0` and `NCCL_SWITCHLESS_RING_ONLY=1`. The stack was stopped in a coordinated way. Both variables were removed: fabric layer ours, exactly as this repository's September 11 lane ran the same image.
-    - The second boot passed both gates.
+14. **N launcher fabric layer and revised remaining order.**
+    - The published recipe's fabric-specific `NCCL_IB_MERGE_NICS=0` and `NCCL_SWITCHLESS_RING_ONLY=1` do not fit this ring: NCCL QP setup timed out. The N launcher therefore uses this repository's fabric layer, as its September 11 lane ran the same image, and passes both gates.
     - Remaining measurement boots, each with the determinism probe and, per amendment 13, two further executions (`prompt-rep2`, `prompt-rep3`) on the `crossboot` subset:
       1. N (`prompt-a`, reps);
       2. Cpre (`prompt-a`, reps);

@@ -12,8 +12,10 @@ Versions and releases are created only at the owner's explicit request.
   without the local precision and runtime changes.
   - `scripts/fidelity/make_overlays.py` generates complete `TP4_ENV` overlays under
     `scripts/node/experiments/fidelity/` from the frozen references and the E29 default.
-    Each overlay changes only the declared measurement keys: 6 GiB KV, one sequence, a
-    139,264-token window, `--max-logprobs 100` and, for the reference, BF16 KV. Each
+    Measurement overlays change only the declared measurement keys: 6 GiB KV, one
+    sequence, a 139,264-token window, `--max-logprobs 100` and SparkCache store/restore
+    off. The reference keeps the FP8 KV of its frozen recipe, because B12X cannot use BF16
+    KV. Serving overlays keep their base recipe, with at most a smaller KV pool. Each
     overlay has its own SparkCache namespace. `--check` detects stale files and `--diff`
     prints any overlay's delta against its base.
   - `scripts/deploy.sh` also deploys `scripts/node/experiments/fidelity/` (SparkCache
@@ -97,8 +99,19 @@ Versions and releases are created only at the owner's explicit request.
     results, corruption-probe rows, functional gates and memory samples. Per-window
     metrics are included only for windows generated from public prompts. Site values
     are removed, and a built-in leak check guards the output. Raw logprobs, token IDs,
-    corpus text and anything derived from private sessions stay in the ignored
-    `data/fidelity/`.
+    corpus text, and per-window metrics and records from private sessions stay in the
+    ignored `data/fidelity/`. Private-session windows appear publicly only in aggregates
+    and in `corpus-hashes.json`, as one row each: category, token count and SHA-256.
+  - `run_serving_chain.sh` validates every overlay and step before the first boot. It
+    exits non-zero after a failed step (both voxel processes are checked), a memory
+    abort at any point or a failed final `check-f0.py`, restoring the plain default
+    first. `tasks/run_tasks.py` exits non-zero on collection errors or cost-capped
+    skips. `run_arm_chain.sh`
+    accepts an empty `CURRENT_TP4_ENV` for the default recipe. The fidelity README warns
+    that qeval grading runs model-generated Python, so it belongs in a disposable
+    environment.
+  - `docs/fidelity/PLAN.md` keeps methodology and protocol deviations only; operational
+    chronology stays in the private campaign records.
   - The README has a "Quality vs vendor FP8" section with the summary table and two
     figures, linking the report. An "E29 vs NVFP4" subsection compares the two recipes head
     to head: distance, perplexity by regime and category, determinism, tasks, tool calls

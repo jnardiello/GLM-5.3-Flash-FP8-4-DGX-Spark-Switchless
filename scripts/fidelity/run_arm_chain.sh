@@ -14,7 +14,7 @@ cd "$REPO"
 OVL=scripts/node/experiments/fidelity
 LOG=data/fidelity/logs/arm-chain.log
 say() { echo "$(date -u +%FT%TZ) $*" | tee -a "$LOG"; }
-current=${CURRENT_TP4_ENV:?set CURRENT_TP4_ENV to the overlay that is serving now (empty for the default)}
+current=${CURRENT_TP4_ENV?set CURRENT_TP4_ENV to the overlay that is serving now (empty for the default)}
 for entry in "$@"; do
   IFS=: read -r name arm steps <<<"$entry"
   label="$name-$(date -u +%m%d%H%M)"

@@ -113,6 +113,10 @@ worse overall and beyond 2K tokens.
   size; the FP8 recipe before E21 also sits at 0.18.
 - **Beyond 2,048 tokens** the engine is not deterministic, even for the FP8 reference, so
   the fine-grained distance there remains unresolved. No quality change is detected there.
+- **Measurement mode:** the distance and perplexity results come from cold, serial prompt
+  scoring (one sequence at a time, fresh cache salts, SparkCache store and restore off).
+  The qeval tasks, tool calls and garbled-text probe ran on the production recipe; the
+  two modes were not bridged.
 - **The garbled-text probe** ran on E29 and NVFP4 only. The 75 qeval tasks mix code,
   reasoning, maths, JSON, formatting and prose. At this size they show no difference, but
   they cannot prove equivalence.

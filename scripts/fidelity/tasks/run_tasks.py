@@ -27,6 +27,10 @@ recorded per request as both the override and the task's own default):
   max_tokens default 16384 for every item.
 
 Output: data/fidelity/tasks/<arm>/<set>/<mode>/run<k>/<item>.json
+
+Security: qeval checkers execute model-generated Python with the caller's permissions.
+Run qeval in a disposable container, VM or unprivileged account without credentials
+or private files.
 """
 import argparse
 import concurrent.futures as cf
@@ -415,7 +419,8 @@ def main(argv=None):
     print(f"\ndone: {counts}")
     if ledger is not None:
         print(f"zai spend: ${ledger.spent:.4f} / ${ledger.max_usd:.2f} cap -> {ledger_path}")
-    return 0
+    # Collection failures and cost-capped skips fail the run; grader failures are results.
+    return 1 if counts.get("error") or counts.get("cost-capped") else 0
 
 
 if __name__ == "__main__":

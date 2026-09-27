@@ -20,6 +20,10 @@ in the private replay-salt files described below.
   `MAX_MODEL_LEN`. Prompt logprobs materialise vocabulary-sized logits per prefill
   chunk on the head rank; leave room in the KV-cache budget.
 - Run clients from a workstation or a non-head node, never on rank 0.
+- `tasks/run_tasks.py --set qeval` grades answers with the vendored knapcio checkers,
+  which execute model-generated Python with the caller's permissions (isolated
+  interpreter flags, a temporary directory and a timeout are not a sandbox). Run it in a
+  disposable container, VM or unprivileged account without credentials or private files.
 
 ## Inputs
 
