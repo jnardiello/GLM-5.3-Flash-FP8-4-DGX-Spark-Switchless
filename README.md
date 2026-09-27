@@ -132,7 +132,7 @@ real text just as well.
 | Perplexity change, synthetic Italian chats | 0.0% [−0.2, +0.1] | No measurable loss |
 | Tasks passed (vendor FP8: 73/75) | 73/75 | Same result |
 
-[![Quality vs vendor FP8: perplexity change of the current recipe, the earlier recipe and NVFP4 by context length and kind of text, with 95% ranges.](docs/fidelity/plots/01-quality-vs-fp8.png)](docs/fidelity/plots/01-quality-vs-fp8.svg)
+[![Quality loss against vendor FP8 by kind of text: the current recipe stays at about 0% everywhere, NVFP4 loses 3% to 10%.](docs/fidelity/plots/17-quality-by-kind-of-text.png)](docs/fidelity/plots/17-quality-by-kind-of-text.svg)
 
 ### vs NVFP4
 
@@ -166,7 +166,7 @@ recipe's is. The report gives the ranges.
 - **Broken characters:** they match a known vLLM issue with NVFP4 checkpoints (issue
   54150). 3 of 40 is a warning sign, not yet a statistically significant difference.
 
-[![Different vs worse: how far each setup is from vendor FP8 against its perplexity change, with 95% ranges; the current recipe sits on the zero line, NVFP4 further right.](docs/fidelity/plots/02-different-vs-worse.png)](docs/fidelity/plots/02-different-vs-worse.svg)
+[![Quality loss against vendor FP8 by conversation length: the current recipe stays at about 0%, NVFP4 goes from −3% on short text to +12% and +16% on longer conversations.](docs/fidelity/plots/16-quality-by-context-length.png)](docs/fidelity/plots/16-quality-by-context-length.svg)
 
 **Good to know**
 

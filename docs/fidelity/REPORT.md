@@ -1,6 +1,6 @@
 # GLM-5.3-Flash fidelity campaign: report
 
-How far the E29 recipe's next-token distributions deviate from the vendor FP8 model served without this repository's precision and runtime changes (R0), and how a generic NVFP4 recipe compares. Margins were pre-registered before any measurement; protocol changes are listed under [Amendments](#amendments). Metrics generated 2026-09-27T21:21:30+00:00 from harness commit `f5a30f1f1b4d` with uncommitted changes.
+How far the E29 recipe's next-token distributions deviate from the vendor FP8 model served without this repository's precision and runtime changes (R0), and how a generic NVFP4 recipe compares. Margins were pre-registered before any measurement; protocol changes are listed under [Amendments](#amendments). Metrics generated 2026-09-27T21:56:29+00:00 from harness commit `7b4ea41d3197` with uncommitted changes.
 
 ## In plain words
 
@@ -13,6 +13,14 @@ We asked a simple question: does our tuned E29 setup of GLM-5.3-Flash predict te
 - **One detail stays open.** Beyond 2,000 tokens the serving engine gives slightly different predictions from run to run, even for the official model. There we can't measure the fine-grained distance, only the overall quality, which shows no detectable change.
 
 **Bottom line:** E29 is not a bit-for-bit copy of the official model, but we could not measure any quality loss.
+
+![Quality by conversation length](plots/16-quality-by-context-length.png)
+
+*Quality by conversation length.* Quality loss of the current recipe (Cm) and NVFP4 (N) against vendor FP8 (R0) by conversation length: perplexity change with 95% ranges for positions up to 2K, 2K–8K and 8K–32K tokens.
+
+![Quality by kind of text](plots/17-quality-by-kind-of-text.png)
+
+*Quality by kind of text.* Quality loss of the current recipe (Cm) and NVFP4 (N) against vendor FP8 (R0) by kind of text, all positions: perplexity change with 95% ranges.
 
 ## 1. Verdict
 

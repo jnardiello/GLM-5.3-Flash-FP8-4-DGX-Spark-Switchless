@@ -1217,6 +1217,146 @@ def fig_waterfall(ctx):
             "notes": notes[2:] + ([f"Bit-identical steps: {', '.join(identical)}."] if identical else [])}
 
 
+# ---------------------------------------------------------------- summary figures (README, plain language)
+
+SUMMARY_SUBTITLE = ("Quality loss = perplexity change against vendor FP8 on the real next token · "
+                    "0 = same quality · lower is better")
+SUMMARY_ARMS = [("Current recipe", "cm-vs-r0", TEAL), ("NVFP4", "n-vs-r0", ORANGE)]
+
+
+def ppl_bounds(dn):
+    """(estimate, low, high) in % from a ΔNLL CI dict; bounds are None when unavailable."""
+    if not dn or dn.get("estimate") is None:
+        return None, None, None
+    f = lambda x: None if x is None else (math.exp(x) - 1.0) * 100.0  # noqa: E731
+    return f(dn["estimate"]), f(dn.get("ci_low")), f(dn.get("ci_high"))
+
+
+def includes_zero(lo, hi):
+    return lo is not None and hi is not None and lo <= 0 <= hi
+
+
+def signed(v):
+    text = f"{v:+.1f}%"
+    return "0.0%" if text in ("+0.0%", "-0.0%") else text.replace("-", "−")
+
+
+def summary_axes(ctx, height, title):
+    plt = ctx["plt"]
+    fig = plt.figure(figsize=(12, height), facecolor="white")
+    header(fig, title, SUMMARY_SUBTITLE)
+    fig_legend(fig, [(label, colour) for label, _, colour in SUMMARY_ARMS], y=1 - 0.95 / height)
+    return fig
+
+
+def fig_summary_context(ctx):
+    name = ctx["fig"]
+    neutral = "Quality loss vs vendor FP8 by conversation length"
+    buckets = [("0-2K", "Up to 2K tokens"), ("2-8K", "2K–8K tokens"), ("8-32K", "8K–32K tokens")]
+    data = {}
+    for label, comp, colour in SUMMARY_ARMS:
+        blocks = (ctx["m"].get(comp) or {}).get("by_position_bucket") or {}
+        data[label] = [ppl_bounds(((blocks.get(b) or {}).get("contrast") or {}).get("delta_nll")) for b, _ in buckets]
+    if any(v[0] is None for rows in data.values() for v in rows):
+        return pending(ctx, name, neutral, ["Position-bucket results against R0 are not available yet."])
+    cur, nv = data["Current recipe"], data["NVFP4"]
+    supported = all(includes_zero(lo, hi) for _, lo, hi in cur) and all(
+        lo is not None and lo > 0 for _, lo, _ in nv[1:])
+    title = "Longer conversations: NVFP4 loses quality, the current recipe does not" if supported else neutral
+    fig = summary_axes(ctx, 7.4, title)
+    ax = fig.add_axes([0.09, 0.2, 0.86, 0.6])
+    width = 0.36
+    for k, (label, _, colour) in enumerate(SUMMARY_ARMS):
+        for i, (est, lo, hi) in enumerate(data[label]):
+            x = i + (k - 0.5) * (width + 0.04)
+            ax.bar(x, est, width, color=colour, zorder=3)
+            if lo is not None and hi is not None:
+                ax.plot([x, x], [lo, hi], color=INK, lw=1.2, alpha=0.55, zorder=4)
+            top = hi if (hi is not None and est >= 0) else (lo if (lo is not None and est < 0) else est)
+            ax.annotate(signed(est), (x, top), xytext=(0, 6 if est >= 0 else -6), textcoords="offset points",
+                        ha="center", va="bottom" if est >= 0 else "top", fontsize=14, fontweight="bold",
+                        color=colour, zorder=5)
+    ax.axhline(0, color=INK, lw=1.6, zorder=4)
+    ax.annotate("vendor FP8 quality", (len(buckets) - 0.45, 0), xytext=(-4, -6), textcoords="offset points",
+                ha="right", va="top", fontsize=11, color=INK)
+    ax.set_xticks(range(len(buckets)), [text for _, text in buckets], fontsize=13, color=INK)
+    ax.set_xlim(-0.6, len(buckets) - 0.4)
+    ymin = min(min(v for v in (lo, est) if v is not None) for rows in data.values() for est, lo, _ in rows)
+    ymax = max(max(v for v in (hi, est) if v is not None) for rows in data.values() for est, _, hi in rows)
+    ax.set_ylim(min(-2.0, ymin - 2.5), ymax + 3.0)
+    style(ax, None, None, "Quality loss vs vendor FP8, %  (↑ worse)")
+    ax.tick_params(axis="y", labelsize=12)
+    ax.grid(axis="x", visible=False)
+    thin = []
+    for b, text in (("32-64K", "32K–64K"), ("64K+", "above 64K")):
+        blk = ((ctx["m"].get("cm-vs-r0") or {}).get("by_position_bucket") or {}).get(b) or {}
+        if blk.get("groups") is not None:
+            thin.append(f"{blk['groups']} {text}")
+    notes = ["Bars: best estimate. Thin lines: 95% range; a range that crosses 0 means no measurable difference.",
+             "Beyond 32K tokens there are too few sessions for a reliable estimate"
+             + (f" ({', '.join(thin)})." if thin else ".")]
+    footer(fig, notes)
+    ctx["out"].save(fig, name)
+    return {"status": "ok", "notes": [] if supported else ["Takeaway title withheld: the data do not support it."]}
+
+
+SUMMARY_CATEGORIES = [("agentic_code", "Agentic code"), ("italian_chat", "Italian chats (synthetic)"),
+                      ("model_native", "Model-written text"), ("structured_json", "Structured JSON")]
+
+
+def fig_summary_category(ctx):
+    name = ctx["fig"]
+    neutral = "Quality loss vs vendor FP8 by kind of text"
+    rows = []
+    for key, text in SUMMARY_CATEGORIES + [("__all__", "All text")]:
+        vals = {}
+        for label, comp, _ in SUMMARY_ARMS:
+            res = (ctx["m"].get(comp) or {}).get("regimes", {}).get("all") or {}
+            blk = res if key == "__all__" else (res.get("by_category") or {}).get(key) or {}
+            vals[label] = ppl_bounds((blk.get("contrast") or {}).get("delta_nll"))
+        rows.append((key, text, vals))
+    if any(v[0] is None for _, _, vals in rows for v in vals.values()):
+        return pending(ctx, name, neutral, ["Per-category results against R0 are not available yet."])
+    cats = sorted(rows[:-1], key=lambda r: -r[2]["NVFP4"][0]) + [rows[-1]]
+    supported = all(includes_zero(r[2]["Current recipe"][1], r[2]["Current recipe"][2]) for r in cats) and \
+        (rows[-1][2]["NVFP4"][1] or 0) > 0
+    title = "By kind of text: the current recipe keeps vendor FP8 quality, NVFP4 does not" if supported else neutral
+    height = 7.8
+    fig = summary_axes(ctx, height, title)
+    ax = fig.add_axes([0.24, 0.17, 0.72, 0.64])
+    ys = [i + (0.6 if i == len(cats) - 1 else 0) for i in range(len(cats))]
+    bar_h = 0.34
+    xmax = max(max(v for v in (hi, est) if v is not None) for _, _, vals in cats for est, _, hi in vals.values())
+    for y, (_, text, vals) in zip(ys, cats):
+        for k, (label, _, colour) in enumerate(SUMMARY_ARMS):
+            est, lo, hi = vals[label]
+            yy = y + (k - 0.5) * (bar_h + 0.04)
+            ax.barh(yy, est, bar_h, color=colour, zorder=3)
+            if lo is not None and hi is not None:
+                ax.plot([lo, hi], [yy, yy], color=INK, lw=1.2, alpha=0.55, zorder=4)
+            end = max(v for v in (est, hi) if v is not None)
+            tag = signed(est) + (" (uncertain)" if label == "NVFP4" and includes_zero(lo, hi) else "")
+            ax.annotate(tag, (end, yy), xytext=(6, 0), textcoords="offset points", ha="left", va="center",
+                        fontsize=12.5, fontweight="bold", color=colour, zorder=5)
+    ax.axhline(ys[-1] - 0.8, color=GRID, lw=1.4, zorder=2)
+    ax.axvline(0, color=INK, lw=1.6, zorder=4)
+    ax.annotate("vendor FP8 quality", (0, -0.75), xytext=(4, 0), textcoords="offset points", ha="left",
+                va="center", fontsize=11, color=INK)
+    ax.set_yticks(ys, [text for _, text, _ in cats], fontsize=13, color=INK)
+    ax.set_ylim(ys[-1] + 0.7, -1.1)
+    ax.set_xlim(min(-2.5, min(lo for _, _, vals in cats for _, lo, _ in vals.values() if lo is not None) - 0.5),
+                xmax * 1.28)
+    style(ax, None, "Quality loss vs vendor FP8, %  (→ worse)")
+    ax.tick_params(axis="x", labelsize=12)
+    ax.tick_params(axis="y", labelcolor=INK)
+    ax.grid(axis="y", visible=False)
+    notes = ["Bars: best estimate. Thin lines: 95% range; a range that crosses 0 means no measurable difference.",
+             "\"Uncertain\": the range crosses 0, so this difference could not be confirmed."]
+    footer(fig, notes)
+    ctx["out"].save(fig, name)
+    return {"status": "ok", "notes": [] if supported else ["Takeaway title withheld: the data do not support it."]}
+
+
 def num_fmt(x):
     return "–" if x is None else f"{x:.4f}"
 
@@ -1263,7 +1403,12 @@ FIGURES = [  # (name, function, needs per-position data, caption, report group)
      "each arm's determinism probe.", "results"),
     ("15-precision-vs-r0", fig_precision, False,
      "Summary of Cm, Cpre and N against R0: mean coarse KL and mean ΔNLL per regime with 95% CIs, with the floor.",
-     "results"),
+     "results"),    ("16-quality-by-context-length", fig_summary_context, False,
+     "Quality loss of the current recipe (Cm) and NVFP4 (N) against vendor FP8 (R0) by conversation length: "
+     "perplexity change with 95% ranges for positions up to 2K, 2K–8K and 8K–32K tokens.", "summary"),
+    ("17-quality-by-kind-of-text", fig_summary_category, False,
+     "Quality loss of the current recipe (Cm) and NVFP4 (N) against vendor FP8 (R0) by kind of text, all "
+     "positions: perplexity change with 95% ranges.", "summary"),
 ]
 TITLES = {
     "01-quality-vs-fp8": "Quality vs FP8",
@@ -1281,6 +1426,8 @@ TITLES = {
     "13-voxel-showcase": "Voxel showcase",
     "14-repeatability": "Repeatability and the 2,048 onset",
     "15-precision-vs-r0": "Precision vs R0",
+    "16-quality-by-context-length": "Quality by conversation length",
+    "17-quality-by-kind-of-text": "Quality by kind of text",
 }
 
 

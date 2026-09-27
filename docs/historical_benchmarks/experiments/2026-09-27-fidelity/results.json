@@ -3464,7 +3464,7 @@
  "published_files": [
   {
    "path": "REPORT.md",
-   "sha256": "f9d64930c743bf9319c307baf782765a0f9fd8d84b9ac3405dd65ee2651f2bd7"
+   "sha256": "267984e73a840b69a5d6ad20f6ba7b50eef6847adb515e8096da8c7ee4437a23"
   },
   {
    "path": "boots/cm-09270932.json",
@@ -3612,7 +3612,7 @@
   },
   {
    "path": "metrics-v2/summary.json",
-   "sha256": "0b4c1e0e8c70598cddb61df22d663a17e4d3b4edf9d5e8c8ea7651694fef6156"
+   "sha256": "91fdc18535613eb1943f5dd3b89762105671602b12500db6e2f62125ba5c5fcd"
   },
   {
    "path": "plots/01-quality-vs-fp8.png",
@@ -3735,12 +3735,28 @@
    "sha256": "6ed2b9bd199be99b76087c1eaf885837bd814f83db42ba3491763f5888756b65"
   },
   {
+   "path": "plots/16-quality-by-context-length.png",
+   "sha256": "e33ac3741da8fbbecfb7dc064918716bbb238a54da7c02e757b45c4f7cc8911c"
+  },
+  {
+   "path": "plots/16-quality-by-context-length.svg",
+   "sha256": "df8900e8cc7f173cf8dd1739c1768e799b1a02a264b98e8b3cd729ba75aa28bb"
+  },
+  {
+   "path": "plots/17-quality-by-kind-of-text.png",
+   "sha256": "d70987dd7a200819a2fa617fe9360910cade056653cabbebbda13a111647d701"
+  },
+  {
+   "path": "plots/17-quality-by-kind-of-text.svg",
+   "sha256": "f8faf5806e3016cc9ac5b9e26f8d91cdada29f24409ef71579fc784260763977"
+  },
+  {
    "path": "plots/plots.json",
-   "sha256": "7d4346d55b16b7027cccc6e8446696e82e30f54ed96d10e17f32f482d454c816"
+   "sha256": "cfe5730e3eecb6fbab66ffcb801ba768f955e02913acff25f53ddd990bebd5c2"
   },
   {
    "path": "report.html",
-   "sha256": "934c50188da3fa8a0b88791a2fa14833a80c56f543cb0ab854cf0d0888804a6a"
+   "sha256": "f03aa284819ee8b24fb0e8a61c7389f907f39223084c42fe707e2bd4d39d4799"
   },
   {
    "path": "verdict.md",

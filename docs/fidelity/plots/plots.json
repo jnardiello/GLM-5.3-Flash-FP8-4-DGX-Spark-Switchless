@@ -185,6 +185,26 @@
       "status": "ok",
       "svg": "15-precision-vs-r0.svg",
       "title": "Precision vs R0"
+    },
+    {
+      "caption": "Quality loss of the current recipe (Cm) and NVFP4 (N) against vendor FP8 (R0) by conversation length: perplexity change with 95% ranges for positions up to 2K, 2K\u20138K and 8K\u201332K tokens.",
+      "group": "summary",
+      "name": "16-quality-by-context-length",
+      "notes": [],
+      "png": "16-quality-by-context-length.png",
+      "status": "ok",
+      "svg": "16-quality-by-context-length.svg",
+      "title": "Quality by conversation length"
+    },
+    {
+      "caption": "Quality loss of the current recipe (Cm) and NVFP4 (N) against vendor FP8 (R0) by kind of text, all positions: perplexity change with 95% ranges.",
+      "group": "summary",
+      "name": "17-quality-by-kind-of-text",
+      "notes": [],
+      "png": "17-quality-by-kind-of-text.png",
+      "status": "ok",
+      "svg": "17-quality-by-kind-of-text.svg",
+      "title": "Quality by kind of text"
     }
   ],
   "schema": "fidelity-plots/1",

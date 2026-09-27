@@ -423,9 +423,11 @@ def build_blocks(inp) -> list:
                    f"[Amendments](#amendments). Metrics generated {gen}"
                    + (f" from harness commit `{commit}`{dirty}." if commit else ".")))
 
+    summary_figs = [e for e in inp["plots"] if e.get("group") == "summary"]
     if inp.get("eli5"):
         B.append(("h", 2, "In plain words"))
         B.append(("eli5_md", inp["eli5"]))
+        B.extend(("fig", e) for e in summary_figs)
 
     # 1. Verdict
     B.append(("h", 2, "1. Verdict"))
@@ -446,6 +448,8 @@ def build_blocks(inp) -> list:
                    "better. This answers \"is it worse?\"; the KL results below answer \"is it different?\"."))
     B.append(("ul", quality_lines(inp)))
     B.append(quality_table(inp))
+    if not inp.get("eli5"):
+        B.extend(("fig", e) for e in summary_figs)
     for entry in inp["plots"]:
         if entry.get("group") == "quality":
             B.append(("fig", entry))
@@ -719,7 +723,7 @@ def build_blocks(inp) -> list:
     for entry in inp["plots"]:
         if entry.get("status") == "pending" and entry.get("name") in DESCOPED_FIGURES:
             skipped.append(f"{entry.get('title')}: {DESCOPED_FIGURES[entry['name']]}")
-        elif entry.get("group") != "quality":
+        elif entry.get("group") not in ("quality", "summary"):
             B.append(("fig", entry))
     if skipped:
         B.append(("p", "Not produced, inputs descoped: " + "; ".join(skipped) + "."))

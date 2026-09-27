@@ -172,6 +172,19 @@ class ReportTest(unittest.TestCase):
         self.assertIn('<section class="eli5"><p>E29 is <strong>as good as</strong> FP8.</p>', page)
         self.assertLess(page.index('class="eli5"'), page.index('class="verdict"'))
 
+    def test_summary_figures_follow_plain_words(self):
+        write(self.docs / "eli5.md", "Plain summary.")
+        plots = json.loads((self.docs / "plots" / "plots.json").read_text(encoding="utf-8"))
+        plots["figures"].append({"name": "16-quality-by-context-length", "title": "Quality by conversation length",
+                                 "group": "summary", "status": "ok", "caption": "c", "png": "16.png",
+                                 "svg": "16.svg"})
+        write(self.docs / "plots" / "plots.json", json.dumps(plots))
+        rc, md, _ = self.build()
+        self.assertEqual(rc, 0)
+        self.assertEqual(md.count("![Quality by conversation length]"), 1)
+        self.assertLess(md.index("Plain summary."), md.index("![Quality by conversation length]"))
+        self.assertLess(md.index("![Quality by conversation length]"), md.index("## 1. Verdict"))
+
     def test_corruption_probe_and_descoped_figures(self):
         write(self.docs / "metrics" / "corruption-N.json", json.dumps(
             {"label": "N", "italian_prompts": 40, "italian_invalid_utf8": 0, "italian_with_fffd": 3,
