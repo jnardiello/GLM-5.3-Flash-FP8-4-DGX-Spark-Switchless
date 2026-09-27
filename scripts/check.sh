@@ -116,6 +116,7 @@ python3 scripts/tests/test-fidelity-redact.py
 python3 scripts/tests/test-fidelity-tasks.py
 python3 scripts/tests/test-fidelity-campaign.py
 python3 scripts/tests/test-fidelity-report.py
+python3 scripts/tests/test-fidelity-export.py
 python3 scripts/fidelity/make_overlays.py --check
 python3 scripts/node/patches/test_adaptive_k_policy.py
 

@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_transpose",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 268
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef transpose(m):\n    if not m or not m[0]:\n        return []\n    return [list(row) for row in zip(*m)]\n```",
+  "reasoning_content": "Return only function. Handle empty input: transpose([]) should return []? Or [[]]? Sensibly: return []. Also handle [[]] -> [].",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 66,
+  "total_tokens": 131,
+  "completion_tokens": 65,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 3.759,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

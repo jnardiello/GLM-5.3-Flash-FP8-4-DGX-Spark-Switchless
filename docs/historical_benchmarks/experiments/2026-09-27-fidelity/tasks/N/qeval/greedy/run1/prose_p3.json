@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "prose_p3",
+ "category": "prose",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 104
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 460,
+ "response": {
+  "content": "Imagine your kitchen counter versus the grocery store. The store holds everything you could possibly need, but it takes time to drive there each time you want a snack. So you keep the items you use most often right on the counter, within arm's reach. A cache works the same way for computers: it's a small, fast storage spot that keeps copies of frequently used information close at hand, so the computer doesn't have to fetch it from slower, distant storage every time. When you want something again, it's already there, making everything feel quicker.",
+  "reasoning_content": "Write ~100 words, prose, one analogy. Use something like a kitchen counter vs. pantry, or a wallet vs. bank.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 38,
+  "total_tokens": 179,
+  "completion_tokens": 141,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 7.727,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

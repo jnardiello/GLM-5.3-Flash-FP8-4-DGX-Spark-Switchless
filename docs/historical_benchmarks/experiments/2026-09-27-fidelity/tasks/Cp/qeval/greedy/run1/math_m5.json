@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "math_m5",
+ "category": "math",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 82
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 640,
+ "response": {
+  "content": "**Euclidean algorithm:**\n\n1071 = 2 × 462 + 147\n462 = 3 × 147 + 21\n147 = 7 × 21 + 0\n\n21",
+  "reasoning_content": "gcd(1071, 462): 1071 = 2·462 + 147; 462 = 3·147 + 21; 147 = 7·21 + 0. gcd = 21.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 33,
+  "total_tokens": 128,
+  "completion_tokens": 95,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 50
+  }
+ },
+ "wall_s": 4.156,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

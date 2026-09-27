@@ -28,7 +28,10 @@
  },
  "mde_approx": {
   "n_items": 75,
-  "abs_pass_rate_delta": 0.1617
+  "discordant_pairs": 4,
+  "abs_pass_rate_delta": 0.0747,
+  "abs_pass_rate_delta_all_discordant": 0.3235,
+  "method": "normal approximation to McNemar, (z_a/2 + z_b) * sqrt(d / n), alpha 0.05 two-sided, power 0.80"
  },
  "sampled_bootstrap_diff": {
   "note": "sampled-mode results missing for one or both arms"

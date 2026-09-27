@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "math_m12",
+ "category": "math",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 133
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 640,
+ "response": {
+  "content": "For circular arrangements of n people, rotations are considered identical, so the count is (n−1)!.\n\nFor 8 people: (8−1)! = 7! = 5040\n\n5040",
+  "reasoning_content": "(8-1)! = 5040",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 40,
+  "total_tokens": 97,
+  "completion_tokens": 57,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 10
+  }
+ },
+ "wall_s": 2.979,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

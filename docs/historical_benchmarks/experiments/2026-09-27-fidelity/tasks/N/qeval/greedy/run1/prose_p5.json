@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "prose_p5",
+ "category": "prose",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 106
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 460,
+ "response": {
+  "content": "The paper has gone soft at the folds, yellowed along its edges, and it smells faintly of a drawer I don't remember. The ink has faded to brown in places, and the handwriting—hers, always hers—slants differently than I recalled. Forty years collapse and refuse to collapse at once. She writes about weather, about a neighbor's dog, about waiting for news that I now know never came. That's the strangest part: reading forward from a place where everything after was still unknown. Her jokes land with an ache she couldn't have intended. I hold the page carefully, as if the paper were the fragile thing, when really it's the distance between us, and it won't fold back down.",
+  "reasoning_content": "The user wants ~120 words of plain prose describing the experience of reading a forty-year-old letter. Creative writing task. Aim for roughly 120 words, evocative but plain.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 34,
+  "total_tokens": 222,
+  "completion_tokens": 188,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 8.028,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

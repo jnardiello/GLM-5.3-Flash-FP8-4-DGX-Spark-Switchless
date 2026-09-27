@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r4",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 130
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "**Setting up the equations:**\n\nLet the ball cost *x*. Then the bat costs *x* + 1.00.\n\nx + (x + 1.00) = 1.10\n\n2x + 1.00 = 1.10\n\n2x = 0.10\n\nx = 0.05\n\n**Check:** Ball = $0.05, Bat = $1.05, Total = $1.10 ✓ (Bat costs $1.00 more than the ball ✓)\n\n0.05",
+  "reasoning_content": "Ball = 0.05.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 49,
+  "total_tokens": 169,
+  "completion_tokens": 120,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 7
+  }
+ },
+ "wall_s": 6.84,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "json_count",
+ "category": "json",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 126
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 300,
+ "response": {
+  "content": "{\"vowels\": 10}",
+  "reasoning_content": "\"Encyclopaedia Britannica\"\n\nE-n-c-y-c-l-o-p-a-e-d-i-a: E, o, a, e, i, a = 6\nB-r-i-t-a-n-n-i-c-a: i, a, i, a = 4\nTotal 10.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 50,
+  "total_tokens": 124,
+  "completion_tokens": 74,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 2.453,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

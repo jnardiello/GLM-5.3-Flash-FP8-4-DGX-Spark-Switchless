@@ -1,0 +1,23 @@
+{
+ "cold": {
+  "status": 200,
+  "seconds": 6.2,
+  "prompt_logprobs_len": 8000,
+  "non_null": 7999,
+  "cached_tokens": null
+ },
+ "same_salt_repeat": {
+  "status": 200,
+  "seconds": 1.27,
+  "prompt_logprobs_len": 1088,
+  "non_null": 1087,
+  "cached_tokens": null
+ },
+ "fresh_salt": {
+  "status": 200,
+  "seconds": 6.24,
+  "prompt_logprobs_len": 8000,
+  "non_null": 7999,
+  "cached_tokens": null
+ }
+}

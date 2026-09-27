@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_two_sum",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 380
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\nfrom bisect import bisect_right\n\n\ndef two_sum(xs, target):\n    \"\"\"\n    Return the pair of indices (i, j) with i < j such that\n    xs[i] + xs[j] == target, choosing the pair with the smallest i,\n    then the smallest j. Return None if no such pair exists.\n    \"\"\"\n    if not xs:\n        return None\n\n    # Map each value to the sorted list of indices where it occurs.\n    positions = {}\n    for idx, value in enumerate(xs):\n        positions.setdefault(value, []).append(idx)\n\n    for i, value in enumerate(xs):\n        complement = target - value\n        if complement in positions:\n            idx_list = positions[complement]\n            # Find the smallest index j strictly greater than i.\n            pos = bisect_right(idx_list, i)\n            if pos < len(idx_list):\n                return (i, idx_list[pos])\n\n    return None\n```",
+  "reasoning_content": "We need to return the pair with smallest i, then smallest j. Using a hash map approach: iterate j, check if target - xs[j] seen before. But that gives smallest j first, and for that j the largest i (if we overwrite). We need smallest i then smallest j.\n\nTo get smallest i first: for each i, find if there's a j > i with xs[i]+xs[j]==target, choosing smallest such j. Brute force O(n^2) works but we can do better.\n\nApproach: iterate i from 0; for each i, we need smallest j>i with xs[j] == target - xs[i]. Precompute for each value, sorted list of indices. Then for each i in order, binary search in the list of indices for target-xs[i] for the smallest index > i. First i that yields a match gives answer. That's O(n log n).\n\nSimpler: build dict value -> sorted list of indices. Then loop i ascending, bisect for index > i. Return (i, j) at first found.\n\nHandle empty input: return None.\n\nUse bisect from standard library (allowed).",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 102,
+  "total_tokens": 538,
+  "completion_tokens": 436,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 239
+  }
+ },
+ "wall_s": 21.729,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

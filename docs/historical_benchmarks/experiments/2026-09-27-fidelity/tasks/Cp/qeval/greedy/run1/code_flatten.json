@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_flatten",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 276
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef flatten(xs):\n    result = []\n    stack = [iter(xs)]\n    while stack:\n        try:\n            item = next(stack[-1])\n        except StopIteration:\n            stack.pop()\n            continue\n        if isinstance(item, list):\n            stack.append(iter(item))\n        else:\n            result.append(item)\n    return result\n```",
+  "reasoning_content": "Simple recursive or iterative generator. Return list.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 68,
+  "total_tokens": 150,
+  "completion_tokens": 82,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 9
+  }
+ },
+ "wall_s": 4.7,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

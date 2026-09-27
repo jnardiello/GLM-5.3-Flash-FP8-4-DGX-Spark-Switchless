@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_flatten",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 276
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef flatten(xs):\n    result = []\n    for item in xs:\n        if isinstance(item, list):\n            result.extend(flatten(item))\n        else:\n            result.append(item)\n    return result\n```",
+  "reasoning_content": "Simple recursive or iterative flatten.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 68,
+  "total_tokens": 120,
+  "completion_tokens": 52,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 1.822,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

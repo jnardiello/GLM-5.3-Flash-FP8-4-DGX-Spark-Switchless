@@ -1,0 +1,1386 @@
+{
+ "experiment_id": "2026-09-27-fidelity",
+ "notes": "Rank records (host names, command lines, log lines, start times) are dropped; rank count and image ids remain. Salts appear only as SHA-256 digests in window-runs-public.csv. Window aggregates are grouped by source class (public, private, synthetic).",
+ "record_type": "fidelity_runs",
+ "runs": [
+  {
+   "K": 20,
+   "arm": "Cm",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --prefill-schedule-interval 8 --compilation-config={\"max_cudagraph_capture_size\":72} --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "cm-09270932",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/cm.env",
+    "overlay_sha256": "953578de69b5bbe6a9db96d81a33f4c7ac1b271816a7f7d2bd7502740562755e",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T09:50:56+00:00",
+    "spec_tokens": "7"
+   },
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "gen",
+   "manifest_global_sha256": "1bb77e2df1238c0fcc8a4ee104fdf316040648a63a0c901cecce3b118f62cfd6",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "logprobs": 20,
+    "max_tokens": 1024,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "gen-nospec",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": null,
+     "started_utc": "2026-09-27T10:20:44+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T10:20:44+00:00",
+   "windows": {
+    "note": "run metadata only; no per-window records in this run",
+    "records": 0
+   }
+  },
+  {
+   "K": 20,
+   "arm": "Cm",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --prefill-schedule-interval 8 --compilation-config={\"max_cudagraph_capture_size\":72} --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "cm-1",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/cm.env",
+    "overlay_sha256": "953578de69b5bbe6a9db96d81a33f4c7ac1b271816a7f7d2bd7502740562755e",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T06:34:23+00:00",
+    "spec_tokens": "7"
+   },
+   "ended_utc": "2026-09-27T07:07:43+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-a",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": null,
+     "started_utc": "2026-09-27T06:35:00+00:00"
+    },
+    {
+     "ended_utc": "2026-09-27T07:07:43+00:00",
+     "started_utc": "2026-09-27T06:35:24+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T06:35:00+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 2044029,
+      "windows": 265
+     },
+     "public": {
+      "n_tokens": 261034,
+      "windows": 110
+     },
+     "synthetic": {
+      "n_tokens": 209802,
+      "windows": 49
+     }
+    },
+    "elapsed_s": 1884.615,
+    "http_attempts": 424,
+    "missing_actual": 0,
+    "prompt_tokens": 2514865,
+    "records": 424,
+    "retried_windows": 0,
+    "status": {
+     "ok": 424
+    }
+   }
+  },
+  {
+   "K": 100,
+   "arm": "Cm",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --prefill-schedule-interval 8 --compilation-config={\"max_cudagraph_capture_size\":72} --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "cm-1",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/cm.env",
+    "overlay_sha256": "953578de69b5bbe6a9db96d81a33f4c7ac1b271816a7f7d2bd7502740562755e",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T06:34:23+00:00",
+    "spec_tokens": "7"
+   },
+   "ended_utc": "2026-09-27T10:20:43+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 100,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-k100",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": null,
+     "started_utc": "2026-09-27T07:07:43+00:00"
+    },
+    {
+     "ended_utc": "2026-09-27T10:20:43+00:00",
+     "started_utc": "2026-09-27T10:03:53+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T07:07:43+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 389374,
+      "windows": 53
+     },
+     "public": {
+      "n_tokens": 42866,
+      "windows": 22
+     },
+     "synthetic": {
+      "n_tokens": 40379,
+      "windows": 10
+     }
+    },
+    "elapsed_s": 946.583,
+    "http_attempts": 85,
+    "missing_actual": 0,
+    "prompt_tokens": 472619,
+    "records": 85,
+    "retried_windows": 0,
+    "status": {
+     "ok": 85
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "Cm",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --prefill-schedule-interval 8 --compilation-config={\"max_cudagraph_capture_size\":72} --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "cm-09270932",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/cm.env",
+    "overlay_sha256": "953578de69b5bbe6a9db96d81a33f4c7ac1b271816a7f7d2bd7502740562755e",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T09:50:56+00:00",
+    "spec_tokens": "7"
+   },
+   "ended_utc": "2026-09-27T09:57:44+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-rep2",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T09:57:44+00:00",
+     "started_utc": "2026-09-27T09:51:33+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T09:51:33+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 372909,
+      "windows": 50
+     },
+     "public": {
+      "n_tokens": 53865,
+      "windows": 25
+     },
+     "synthetic": {
+      "n_tokens": 44936,
+      "windows": 10
+     }
+    },
+    "elapsed_s": 356.916,
+    "http_attempts": 85,
+    "missing_actual": 0,
+    "prompt_tokens": 471710,
+    "records": 85,
+    "retried_windows": 0,
+    "status": {
+     "ok": 85
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "Cm",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --prefill-schedule-interval 8 --compilation-config={\"max_cudagraph_capture_size\":72} --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "cm-09270932",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/cm.env",
+    "overlay_sha256": "953578de69b5bbe6a9db96d81a33f4c7ac1b271816a7f7d2bd7502740562755e",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T09:50:56+00:00",
+    "spec_tokens": "7"
+   },
+   "ended_utc": "2026-09-27T10:03:52+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-rep3",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T10:03:52+00:00",
+     "started_utc": "2026-09-27T09:57:44+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T09:57:44+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 372909,
+      "windows": 50
+     },
+     "public": {
+      "n_tokens": 53865,
+      "windows": 25
+     },
+     "synthetic": {
+      "n_tokens": 44936,
+      "windows": 10
+     }
+    },
+    "elapsed_s": 354.538,
+    "http_attempts": 85,
+    "missing_actual": 0,
+    "prompt_tokens": 471710,
+    "records": 85,
+    "retried_windows": 0,
+    "status": {
+     "ok": 85
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "Cpre",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "cpre-m-09270828",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/cpre-m.env",
+    "overlay_sha256": "d4b83ebb55177c72eef8263928bb055938e8b4aefe21c36967a475ae30b3651f",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T08:46:39+00:00",
+    "spec_tokens": "5"
+   },
+   "ended_utc": "2026-09-27T09:19:51+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-a",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T09:19:51+00:00",
+     "started_utc": "2026-09-27T08:47:15+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T08:47:15+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 2044029,
+      "windows": 265
+     },
+     "public": {
+      "n_tokens": 261034,
+      "windows": 110
+     },
+     "synthetic": {
+      "n_tokens": 209802,
+      "windows": 49
+     }
+    },
+    "elapsed_s": 1881.859,
+    "http_attempts": 424,
+    "missing_actual": 0,
+    "prompt_tokens": 2514865,
+    "records": 424,
+    "retried_windows": 0,
+    "status": {
+     "ok": 424
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "Cpre",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "cpre-m-09270828",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/cpre-m.env",
+    "overlay_sha256": "d4b83ebb55177c72eef8263928bb055938e8b4aefe21c36967a475ae30b3651f",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T08:46:39+00:00",
+    "spec_tokens": "5"
+   },
+   "ended_utc": "2026-09-27T09:25:58+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-rep2",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T09:25:58+00:00",
+     "started_utc": "2026-09-27T09:19:51+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T09:19:51+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 372909,
+      "windows": 50
+     },
+     "public": {
+      "n_tokens": 53865,
+      "windows": 25
+     },
+     "synthetic": {
+      "n_tokens": 44936,
+      "windows": 10
+     }
+    },
+    "elapsed_s": 352.989,
+    "http_attempts": 85,
+    "missing_actual": 0,
+    "prompt_tokens": 471710,
+    "records": 85,
+    "retried_windows": 0,
+    "status": {
+     "ok": 85
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "Cpre",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "cpre-m-09270828",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/cpre-m.env",
+    "overlay_sha256": "d4b83ebb55177c72eef8263928bb055938e8b4aefe21c36967a475ae30b3651f",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T08:46:39+00:00",
+    "spec_tokens": "5"
+   },
+   "ended_utc": "2026-09-27T09:32:05+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-rep3",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T09:32:05+00:00",
+     "started_utc": "2026-09-27T09:25:58+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T09:25:58+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 372909,
+      "windows": 50
+     },
+     "public": {
+      "n_tokens": 53865,
+      "windows": 25
+     },
+     "synthetic": {
+      "n_tokens": 44936,
+      "windows": 10
+     }
+    },
+    "elapsed_s": 353.25,
+    "http_attempts": 85,
+    "missing_actual": 0,
+    "prompt_tokens": 471710,
+    "records": 85,
+    "retried_windows": 0,
+    "status": {
+     "ok": 85
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "L0919",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "l0919-m-09271020",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/l0919-m.env",
+    "overlay_sha256": "d928b084c6bdb8de3e9697be43bf2a24a644fab2daf5e842ba73c7476d8eaf8a",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T10:34:24+00:00",
+    "spec_tokens": "5"
+   },
+   "ended_utc": "2026-09-27T10:45:12+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-ladder",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T10:45:12+00:00",
+     "started_utc": "2026-09-27T10:34:59+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T10:34:59+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 635674,
+      "windows": 81
+     },
+     "public": {
+      "n_tokens": 74905,
+      "windows": 32
+     },
+     "synthetic": {
+      "n_tokens": 60565,
+      "windows": 15
+     }
+    },
+    "elapsed_s": 589.689,
+    "http_attempts": 128,
+    "missing_actual": 0,
+    "prompt_tokens": 771144,
+    "records": 128,
+    "retried_windows": 0,
+    "status": {
+     "ok": 128
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "LE21",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "le21-m-09271045",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/le21-m.env",
+    "overlay_sha256": "c7e2a954708a0c8c2bd69ba42c43dc1ae906b27113f20784cb0118518cf6ca44",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T10:58:42+00:00",
+    "spec_tokens": "5"
+   },
+   "ended_utc": "2026-09-27T11:09:20+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-ladder",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T11:09:20+00:00",
+     "started_utc": "2026-09-27T10:59:18+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T10:59:18+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 635674,
+      "windows": 81
+     },
+     "public": {
+      "n_tokens": 74905,
+      "windows": 32
+     },
+     "synthetic": {
+      "n_tokens": 60565,
+      "windows": 15
+     }
+    },
+    "elapsed_s": 578.59,
+    "http_attempts": 128,
+    "missing_actual": 0,
+    "prompt_tokens": 771144,
+    "records": 128,
+    "retried_windows": 0,
+    "status": {
+     "ok": 128
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "LE22b",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "le22b-m-09271109",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/le22b-m.env",
+    "overlay_sha256": "4dcc197e4dc29f222304220de162eb1321fe08c434756758b181d854cb161821",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T11:22:51+00:00",
+    "spec_tokens": "5"
+   },
+   "ended_utc": "2026-09-27T11:33:28+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-ladder",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T11:33:28+00:00",
+     "started_utc": "2026-09-27T11:23:27+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T11:23:27+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 635674,
+      "windows": 81
+     },
+     "public": {
+      "n_tokens": 74905,
+      "windows": 32
+     },
+     "synthetic": {
+      "n_tokens": 60565,
+      "windows": 15
+     }
+    },
+    "elapsed_s": 577.931,
+    "http_attempts": 128,
+    "missing_actual": 0,
+    "prompt_tokens": 771144,
+    "records": 128,
+    "retried_windows": 0,
+    "status": {
+     "ok": 128
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "N",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=17179869184 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --prefill-schedule-interval 8 --compilation-config={\"max_cudagraph_capture_size\":72}",
+    "image": "ghcr.io/tonyd2wild/vllm-glm53-flash@sha256:4def0ef644cb2e9814136dcffd5e385e21bc594f48f3b292234051904abe85a6",
+    "image_id_pinned": "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "n-m-2",
+    "model_repo": "LibertAIDAI/GLM-5.3-Flash-NVFP4",
+    "model_rev": "9e0d74e3cef17f634e84fb8e2223707e02616290",
+    "overlay": "scripts/node/experiments/fidelity/n-m.env",
+    "overlay_sha256": "7a139f94da998d3c357f96bf5cc76359eb4a3bbe4428c3207f66a90c41df30bc",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6"
+    ],
+    "recorded_utc": "2026-09-27T07:35:08+00:00",
+    "spec_tokens": "7"
+   },
+   "ended_utc": "2026-09-27T08:13:57+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-a",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T08:13:57+00:00",
+     "started_utc": "2026-09-27T07:36:03+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T07:36:03+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 2044029,
+      "windows": 265
+     },
+     "public": {
+      "n_tokens": 261034,
+      "windows": 110
+     },
+     "synthetic": {
+      "n_tokens": 209802,
+      "windows": 49
+     }
+    },
+    "elapsed_s": 2200.046,
+    "http_attempts": 424,
+    "missing_actual": 0,
+    "prompt_tokens": 2514865,
+    "records": 424,
+    "retried_windows": 0,
+    "status": {
+     "ok": 424
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "N",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=17179869184 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --prefill-schedule-interval 8 --compilation-config={\"max_cudagraph_capture_size\":72}",
+    "image": "ghcr.io/tonyd2wild/vllm-glm53-flash@sha256:4def0ef644cb2e9814136dcffd5e385e21bc594f48f3b292234051904abe85a6",
+    "image_id_pinned": "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "n-m-2",
+    "model_repo": "LibertAIDAI/GLM-5.3-Flash-NVFP4",
+    "model_rev": "9e0d74e3cef17f634e84fb8e2223707e02616290",
+    "overlay": "scripts/node/experiments/fidelity/n-m.env",
+    "overlay_sha256": "7a139f94da998d3c357f96bf5cc76359eb4a3bbe4428c3207f66a90c41df30bc",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6"
+    ],
+    "recorded_utc": "2026-09-27T07:35:08+00:00",
+    "spec_tokens": "7"
+   },
+   "ended_utc": "2026-09-27T08:21:03+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-rep2",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T08:21:03+00:00",
+     "started_utc": "2026-09-27T08:14:02+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T08:14:02+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 372909,
+      "windows": 50
+     },
+     "public": {
+      "n_tokens": 53865,
+      "windows": 25
+     },
+     "synthetic": {
+      "n_tokens": 44936,
+      "windows": 10
+     }
+    },
+    "elapsed_s": 406.889,
+    "http_attempts": 85,
+    "missing_actual": 0,
+    "prompt_tokens": 471710,
+    "records": 85,
+    "retried_windows": 0,
+    "status": {
+     "ok": 85
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "N",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=17179869184 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --prefill-schedule-interval 8 --compilation-config={\"max_cudagraph_capture_size\":72}",
+    "image": "ghcr.io/tonyd2wild/vllm-glm53-flash@sha256:4def0ef644cb2e9814136dcffd5e385e21bc594f48f3b292234051904abe85a6",
+    "image_id_pinned": "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "n-m-2",
+    "model_repo": "LibertAIDAI/GLM-5.3-Flash-NVFP4",
+    "model_rev": "9e0d74e3cef17f634e84fb8e2223707e02616290",
+    "overlay": "scripts/node/experiments/fidelity/n-m.env",
+    "overlay_sha256": "7a139f94da998d3c357f96bf5cc76359eb4a3bbe4428c3207f66a90c41df30bc",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:35c6f70ffcba62fd67d7b9d4b4e8300ad177201792ce9cdb1ea18fd449bc23b6"
+    ],
+    "recorded_utc": "2026-09-27T07:35:08+00:00",
+    "spec_tokens": "7"
+   },
+   "ended_utc": "2026-09-27T08:28:04+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-rep3",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T08:28:04+00:00",
+     "started_utc": "2026-09-27T08:21:03+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T08:21:03+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 372909,
+      "windows": 50
+     },
+     "public": {
+      "n_tokens": 53865,
+      "windows": 25
+     },
+     "synthetic": {
+      "n_tokens": 44936,
+      "windows": 10
+     }
+    },
+    "elapsed_s": 407.0,
+    "http_attempts": 85,
+    "missing_actual": 0,
+    "prompt_tokens": 471710,
+    "records": 85,
+    "retried_windows": 0,
+    "status": {
+     "ok": 85
+    }
+   }
+  },
+  {
+   "arm": "R0",
+   "generation": {
+    "by_class": {
+     "private": {
+      "elapsed_s": 2078.44,
+      "finish_reason": {
+       "length": 1,
+       "stop": 59
+      },
+      "gen_tokens": 30000,
+      "prompt_tokens": 230358,
+      "prompts": 60,
+      "status": {
+       "ok": 60
+      }
+     },
+     "public": {
+      "elapsed_s": 14135.11,
+      "finish_reason": {
+       "length": 6,
+       "stop": 104
+      },
+      "gen_tokens": 254386,
+      "prompt_tokens": 6648,
+      "prompts": 110,
+      "status": {
+       "ok": 110
+      }
+     }
+    },
+    "decode_prompts_without_window": {
+     "missing": 40
+    }
+   },
+   "kind": "native_generation",
+   "run": "native"
+  },
+  {
+   "K": 20,
+   "arm": "R0",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "r0fp8-m-2",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/r0fp8-m.env",
+    "overlay_sha256": "60dde2791b554d811a76de6a0a510a7b650253577bcfca8cb4a65240b1a27dee",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T04:55:10+00:00",
+    "spec_tokens": "5"
+   },
+   "ended_utc": "2026-09-27T05:28:23+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-a",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T05:28:23+00:00",
+     "started_utc": "2026-09-27T04:55:19+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T04:55:19+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 2044029,
+      "windows": 265
+     },
+     "public": {
+      "n_tokens": 261034,
+      "windows": 110
+     },
+     "synthetic": {
+      "n_tokens": 209802,
+      "windows": 49
+     }
+    },
+    "elapsed_s": 1909.216,
+    "http_attempts": 424,
+    "missing_actual": 0,
+    "prompt_tokens": 2514865,
+    "records": 424,
+    "retried_windows": 0,
+    "status": {
+     "ok": 424
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "R0",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "r0fp8-m-2",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/r0fp8-m.env",
+    "overlay_sha256": "60dde2791b554d811a76de6a0a510a7b650253577bcfca8cb4a65240b1a27dee",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T04:55:10+00:00",
+    "spec_tokens": "5"
+   },
+   "ended_utc": "2026-09-27T06:01:22+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-b",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T06:01:22+00:00",
+     "started_utc": "2026-09-27T05:28:23+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T05:28:23+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 2044029,
+      "windows": 265
+     },
+     "public": {
+      "n_tokens": 261034,
+      "windows": 110
+     },
+     "synthetic": {
+      "n_tokens": 209802,
+      "windows": 49
+     }
+    },
+    "elapsed_s": 1904.735,
+    "http_attempts": 424,
+    "missing_actual": 0,
+    "prompt_tokens": 2514865,
+    "records": 424,
+    "retried_windows": 0,
+    "status": {
+     "ok": 424
+    }
+   }
+  },
+  {
+   "K": 20,
+   "arm": "R0",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "r0fp8-m-09271133",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/r0fp8-m.env",
+    "overlay_sha256": "60dde2791b554d811a76de6a0a510a7b650253577bcfca8cb4a65240b1a27dee",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T11:46:58+00:00",
+    "spec_tokens": "5"
+   },
+   "ended_utc": "2026-09-27T11:53:49+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 20,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-crossboot",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": "2026-09-27T11:53:49+00:00",
+     "started_utc": "2026-09-27T11:47:36+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T11:47:36+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 372909,
+      "windows": 50
+     },
+     "public": {
+      "n_tokens": 53865,
+      "windows": 25
+     },
+     "synthetic": {
+      "n_tokens": 44936,
+      "windows": 10
+     }
+    },
+    "elapsed_s": 358.955,
+    "http_attempts": 85,
+    "missing_actual": 0,
+    "prompt_tokens": 471710,
+    "records": 85,
+    "retried_windows": 0,
+    "status": {
+     "ok": 85
+    }
+   }
+  },
+  {
+   "K": 100,
+   "arm": "R0",
+   "base_url": "http://<host>:8000",
+   "boot": {
+    "cluster_env_sha256": "5dadedca83e26e43c54a5973058953cb4e85468d6ce065bd017f33b9b3af82e6",
+    "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+    "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --max-logprobs 100",
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "k": 20,
+    "kv_cache_dtype": "fp8_e4m3",
+    "label": "r0fp8-m-2",
+    "model_repo": "zai-org/GLM-5.3-Flash",
+    "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "overlay": "scripts/node/experiments/fidelity/r0fp8-m.env",
+    "overlay_sha256": "60dde2791b554d811a76de6a0a510a7b650253577bcfca8cb4a65240b1a27dee",
+    "rank_count": 4,
+    "rank_image_ids": [
+     "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075"
+    ],
+    "recorded_utc": "2026-09-27T04:55:10+00:00",
+    "spec_tokens": "5"
+   },
+   "ended_utc": "2026-09-27T06:20:40+00:00",
+   "harness_git": {
+    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "dirty": true
+   },
+   "kind": "prompt",
+   "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+   "request_defaults": {
+    "cache_salt": "fresh 32-byte hex per HTTP attempt",
+    "max_tokens": 1,
+    "prompt_logprobs": 100,
+    "return_tokens_as_token_ids": true,
+    "temperature": 0
+   },
+   "request_model": "glm-5.3-flash",
+   "run": "prompt-k100",
+   "schema": "fidelity-raw/1",
+   "server_model_id": "glm-5.3-flash",
+   "sessions": [
+    {
+     "ended_utc": null,
+     "started_utc": "2026-09-27T06:01:23+00:00"
+    },
+    {
+     "ended_utc": "2026-09-27T06:20:40+00:00",
+     "started_utc": "2026-09-27T06:03:48+00:00"
+    }
+   ],
+   "started_utc": "2026-09-27T06:01:23+00:00",
+   "windows": {
+    "by_class": {
+     "private": {
+      "n_tokens": 389374,
+      "windows": 53
+     },
+     "public": {
+      "n_tokens": 42866,
+      "windows": 22
+     },
+     "synthetic": {
+      "n_tokens": 40379,
+      "windows": 10
+     }
+    },
+    "elapsed_s": 948.356,
+    "http_attempts": 85,
+    "missing_actual": 0,
+    "prompt_tokens": 472619,
+    "records": 85,
+    "retried_windows": 0,
+    "status": {
+     "ok": 85
+    }
+   }
+  }
+ ],
+ "schema": 1
+}

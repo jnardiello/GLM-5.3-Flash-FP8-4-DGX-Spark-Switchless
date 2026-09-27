@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "json_manifest",
+ "category": "json",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 287
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 320,
+ "response": {
+  "content": "{\"name\": \"forgebuild\", \"version\": \"2.4.1\", \"deps\": [\"tomlkit\", \"rich\", \"click\"], \"stable\": true, \"max_workers\": 6}",
+  "reasoning_content": "JSON only, no code fence.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 89,
+  "total_tokens": 141,
+  "completion_tokens": 52,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 7
+  }
+ },
+ "wall_s": 3.072,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

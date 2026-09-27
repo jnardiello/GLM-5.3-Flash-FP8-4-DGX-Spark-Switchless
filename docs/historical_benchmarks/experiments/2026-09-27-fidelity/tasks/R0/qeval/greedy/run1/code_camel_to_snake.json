@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_camel_to_snake",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 262
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef camel_to_snake(s):\n    if not s:\n        return s\n    result = []\n    for i, ch in enumerate(s):\n        if ch.isupper():\n            if i > 0 and (not s[i - 1].isupper() or (i + 1 < len(s) and s[i + 1].islower())):\n                result.append('_')\n            result.append(ch.lower())\n        else:\n            result.append(ch)\n    return ''.join(result)\n```",
+  "reasoning_content": "Write camel_to_snake handling acronyms: \"HTTPServer\" -> \"http_server\", \"getHTTPResponse\" -> \"get_http_response\". Use regex or manual loop. No imports beyond standard library — re is standard, but can do without.\n\nManual approach:\n\ndef camel_to_snake(s):\n    if not s:\n        return s\n    result = []\n    for i, ch in enumerate(s):\n        if ch.isupper():\n            if i > 0 and (not s[i-1].isupper() or (i+1 < len(s) and s[i+1].islower())):\n                result.append('_')\n            result.append(ch.lower())\n        else:\n            result.append(ch)\n    return ''.join(result)\n\nCheck \"HTTPServer\": H(0) upper, i=0 no underscore. T: prev upper, next T upper -> no underscore. T: prev upper, next P upper -> no. P: prev upper, next S upper -> no. S: prev upper, next 'e' lower -> underscore. -> \"http_server\". Good.\n\n\"getHTTPResponse\": g,e,t; H: prev 't' lower -> underscore. T,T,P: prev upper, next upper -> no. R: prev P upper, next 'e' lower -> underscore. -> \"get_http_response\". Good.\n\n\"camelCase\": C at 5, prev 'l' lower -> underscore -> \"camel_case\". Good.\n\n\"snake_case\" unchanged. \"A\" -> \"a\". \"_private\" -> unchanged. Good.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 67,
+  "total_tokens": 490,
+  "completion_tokens": 423,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 318
+  }
+ },
+ "wall_s": 21.078,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

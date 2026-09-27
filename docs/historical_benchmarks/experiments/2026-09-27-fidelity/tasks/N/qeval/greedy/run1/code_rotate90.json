@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_rotate90",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 267
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef rotate90(m):\n    if not m or not m[0]:\n        return []\n    n = len(m)\n    return [[m[n - 1 - j][i] for j in range(n)] for i in range(n)]\n```",
+  "reasoning_content": "Return only code block.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 67,
+  "total_tokens": 127,
+  "completion_tokens": 60,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 1.883,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "json_sort",
+ "category": "json",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 200
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 320,
+ "response": {
+  "content": "```json\n[{\"name\":\"di\",\"score\":9},{\"name\":\"al\",\"score\":7},{\"name\":\"bo\",\"score\":3},{\"name\":\"cy\",\"score\":3}]\n```",
+  "reasoning_content": "Sort by score desc: di 9, al 7, then bo and cy both 3, name ascending: bo before cy.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 67,
+  "total_tokens": 135,
+  "completion_tokens": 68,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 2.422,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

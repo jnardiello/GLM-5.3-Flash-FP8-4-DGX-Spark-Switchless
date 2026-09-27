@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r10",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 253
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "**3**\n\nSince the green house is immediately to the right of the ivory house, and the green house is in position 4, the ivory house must be in position 3.",
+  "reasoning_content": "Green immediately right of ivory; green is 4th → ivory 3rd.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 68,
+  "total_tokens": 124,
+  "completion_tokens": 56,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 17
+  }
+ },
+ "wall_s": 3.159,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

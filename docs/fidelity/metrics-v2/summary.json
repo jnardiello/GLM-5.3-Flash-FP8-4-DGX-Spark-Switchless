@@ -1427,8 +1427,8 @@
     }
   },
   "config_sha256": "cf699a7dc03e1fe6cb694fef0553f55b9d9603cd72331586610768053be465b6",
-  "elapsed_s": 350.3,
-  "generated_utc": "2026-09-27T16:49:14+00:00",
+  "elapsed_s": 354.0,
+  "generated_utc": "2026-09-27T19:09:41+00:00",
   "grouping": {
     "groups": 235,
     "rules": {
@@ -1440,7 +1440,7 @@
     "windows": 424
   },
   "harness_git": {
-    "commit": "080fe09702a40278d54b09f4679622f3617fe580",
+    "commit": "06dd98ac88b78feb87605fef1d7b77c1fd7d0a82",
     "dirty": true
   },
   "method": [

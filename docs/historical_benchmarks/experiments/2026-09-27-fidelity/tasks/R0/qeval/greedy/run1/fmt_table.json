@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "fmt_table",
+ "category": "format",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 205
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "| step | command | why |\n|------|---------|-----|\n| 1 | `ssh -L 8888:localhost:8888 user@remote-host` | Opens an SSH tunnel forwarding local port 8888 to port 8888 on the remote host where the API is running |\n| 2 | `curl http://localhost:8888/api/endpoint` | Verifies the tunnel works by sending a test request to the API through the local forwarded port |\n| 3 | `exit` | Closes the SSH session and tears down the tunnel once you are done using the API |",
+  "reasoning_content": "Produce a markdown table with columns | step | command | why | and exactly three data rows. Nothing else.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 58,
+  "total_tokens": 206,
+  "completion_tokens": 148,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 23
+  }
+ },
+ "wall_s": 8.192,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

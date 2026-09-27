@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r16",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 304
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "**17**\n\nThe optimal strategy uses the two fastest people as \"shuttles\":\n- 1 and 2 cross together: 2 min\n- 1 returns with torch: 1 min\n- 7 and 10 cross together: 10 min\n- 2 returns with torch: 2 min\n- 1 and 2 cross together: 2 min\n\nTotal: 2 + 1 + 10 + 2 + 2 = **17**",
+  "reasoning_content": "Classic: 17. 1&2 cross (2), 1 returns (1), 7&10 cross (10), 2 returns (2), 1&2 cross (2) = 17.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 83,
+  "total_tokens": 228,
+  "completion_tokens": 145,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 3.862,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

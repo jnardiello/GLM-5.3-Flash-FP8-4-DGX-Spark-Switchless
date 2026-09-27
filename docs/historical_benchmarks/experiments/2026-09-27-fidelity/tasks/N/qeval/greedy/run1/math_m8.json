@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "math_m8",
+ "category": "math",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 136
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 640,
+ "response": {
+  "content": "**Setting up the problem:**\n\nLet the original price be *P*.\n\n- After a 20% discount: price becomes 0.8·*P*\n- After a further 10% off: price becomes 0.9 × (0.8·*P*) = 0.72·*P*\n\n**Solving:**\n\n0.72·*P* = 80\n\n*P* = 80 ÷ 0.72 = 111.11...\n\n111.11",
+  "reasoning_content": "80 after 20% discount: original × 0.8 = 100. Then 10% off at till: 100 × 0.9 = 90. So original = 80 / (0.8 × 0.9) = 80/0.72 = 111.11... = 111.11 (1000/9 ≈ 111.11).\n\nHmm, \"costs 80 after a 20% discount and then a further 10% off\" — the 80 is final price. Original = 80/(0.8·0.9) = 111.11.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 48,
+  "total_tokens": 285,
+  "completion_tokens": 237,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 7.04,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

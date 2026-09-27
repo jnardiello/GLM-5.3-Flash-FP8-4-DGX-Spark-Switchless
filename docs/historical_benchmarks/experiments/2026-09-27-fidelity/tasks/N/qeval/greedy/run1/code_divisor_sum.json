@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_divisor_sum",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 265
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef divisor_sum(n):\n    \"\"\"\n    Return the sum of all positive divisors of n, including n itself.\n\n    Handles empty/invalid input sensibly:\n      - If n is None, returns 0.\n      - If n is not a positive integer, returns 0.\n    \"\"\"\n    if n is None:\n        return 0\n    if not isinstance(n, int) or isinstance(n, bool):\n        return 0\n    if n <= 0:\n        return 0\n\n    total = 0\n    i = 1\n    while i * i <= n:\n        if n % i == 0:\n            total += i\n            other = n // i\n            if other != i:\n                total += other\n        i += 1\n    return total\n```",
+  "reasoning_content": "Return only the function. Handle empty input sensibly — n could be None or non-positive? \"Empty input\" likely means n is None or missing. I'll handle None and n <= 0 by returning 0.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 68,
+  "total_tokens": 282,
+  "completion_tokens": 214,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 5.934,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

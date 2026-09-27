@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r6",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 144
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "**47**\n\nSince the patch doubles each day, it must have been half the lake's size the day before it became full. So on day 47, it covered half the lake.\n\n47",
+  "reasoning_content": "47",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 48,
+  "total_tokens": 90,
+  "completion_tokens": 42,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 1
+  }
+ },
+ "wall_s": 2.868,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

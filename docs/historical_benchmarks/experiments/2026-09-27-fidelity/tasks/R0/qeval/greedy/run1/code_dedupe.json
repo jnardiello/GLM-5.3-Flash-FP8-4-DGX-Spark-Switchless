@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_dedupe",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 267
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef dedupe(xs):\n    \"\"\"Remove duplicates from a list while preserving first-occurrence order.\"\"\"\n    if not xs:\n        return []\n    seen = set()\n    result = []\n    for item in xs:\n        if item not in seen:\n            seen.add(item)\n            result.append(item)\n    return result\n```",
+  "reasoning_content": "Simple function.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 66,
+  "total_tokens": 139,
+  "completion_tokens": 73,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 3
+  }
+ },
+ "wall_s": 4.144,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

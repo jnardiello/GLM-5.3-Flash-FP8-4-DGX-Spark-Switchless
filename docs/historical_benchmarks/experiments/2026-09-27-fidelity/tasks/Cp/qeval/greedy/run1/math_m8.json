@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "math_m8",
+ "category": "math",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 136
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 640,
+ "response": {
+  "content": "**Setting up the problem (working backwards):**\n\n- After the 20% discount, the price was 80, so the price before that discount was: 80 ÷ 0.80 = 100\n- The original price, before the further 10% off at the till, was: 100 ÷ 0.90 = 111.11...\n\n**Check:** 111.11 × 0.90 = 100, then 100 × 0.80 = 80 ✓\n\n111.11",
+  "reasoning_content": "80 after 20% discount: price = 80/0.8 = 100. Then 10% off: 100×0.9=90. So original = 90.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 48,
+  "total_tokens": 198,
+  "completion_tokens": 150,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 40
+  }
+ },
+ "wall_s": 7.019,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

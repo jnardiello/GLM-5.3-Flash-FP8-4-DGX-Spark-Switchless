@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_levenshtein",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 261
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef levenshtein(a, b):\n    if a == b:\n        return 0\n    if not a:\n        return len(b)\n    if not b:\n        return len(a)\n\n    if len(a) < len(b):\n        a, b = b, a\n\n    previous = list(range(len(b) + 1))\n    for i, ca in enumerate(a, start=1):\n        current = [i]\n        for j, cb in enumerate(b, start=1):\n            insert_cost = current[j - 1] + 1\n            delete_cost = previous[j] + 1\n            substitute_cost = previous[j - 1] + (ca != cb)\n            current.append(min(insert_cost, delete_cost, substitute_cost))\n        previous = current\n\n    return previous[-1]\n```",
+  "reasoning_content": "Simple DP implementation.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 69,
+  "total_tokens": 246,
+  "completion_tokens": 177,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 4
+  }
+ },
+ "wall_s": 6.928,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

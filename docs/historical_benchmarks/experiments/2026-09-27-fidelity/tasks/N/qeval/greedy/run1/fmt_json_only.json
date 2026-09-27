@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "fmt_json_only",
+ "category": "format",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 57
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 280,
+ "response": {
+  "content": "[1, 2, 3]",
+  "reasoning_content": "The user wants only the JSON array [1, 2, 3] with no fence or prose.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 32,
+  "total_tokens": 65,
+  "completion_tokens": 33,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 1.312,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

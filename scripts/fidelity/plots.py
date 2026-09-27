@@ -553,7 +553,7 @@ def fig_decode(ctx):
                 present.append((label, cand, colour))
     if not present:
         return pending(ctx, name, title, [
-            "Greedy decode-set generations (R0 reference and at least one arm) have not been collected yet.",
+            "No greedy decode-set generations (descoped in the 2026-09-27 campaign, amendment 15).",
             "Expected runs: R0/gen-a (reference), R0/gen-floor, Cm/gen-a, Cpre/gen-a, N/gen-a."])
     plt = ctx["plt"]
     fig, axes = plt.subplots(1, 2, figsize=(16, 6.4), facecolor="white")
@@ -783,7 +783,7 @@ def fig_voxel(ctx):
         ok = sum(bool(c.get(k)) for k in ("voxel_count_ok", "pagoda_floors_ok", "reported_fps_ok")) if c else None
         entries.append((tail[0], tail[1], shot, len(r.get("console_errors") or []), ok))
     if not entries:
-        return pending(ctx, name, title, ["No rendered voxel outputs in docs/fidelity/voxel/checks.json yet."])
+        return pending(ctx, name, title, ["No rendered voxel outputs (deferred in the 2026-09-27 campaign, amendment 16)."])
     import matplotlib.image as mpimg
     plt = ctx["plt"]
     arms = sorted({e[0] for e in entries})
@@ -909,7 +909,8 @@ def fig_precision(ctx):
         style(ax, None, xlabel)
     axes[1].set_yticklabels([])
     notes = ["Sparse-regime values from a single execution measure operational disagreement, not fidelity "
-             "(amendment 13); the sparse verdict needs three executions per arm."] + partial_notes(comps) \
+             "(amendment 13); the sparse verdict stays unresolved without a validated estimator for "
+             "population-average distributions."] + partial_notes(comps) \
         + json_missing(ctx)
     footer(fig, notes)
     ctx["out"].save(fig, name)
@@ -1229,13 +1230,14 @@ def num_fmt(x):
 FIGURES = [  # (name, function, needs per-position data, caption, report group)
     ("01-quality-vs-fp8", fig_quality, False,
      "Perplexity change of each arm against R0 (the vendor FP8 recipe), exp(ΔNLL) − 1, per regime and per corpus "
-     "category, with 95% CIs. Lower is better; E29 (Cm) predicts real text as well as FP8 when its bar straddles "
-     "zero.", "quality"),
+     "category, with 95% CIs. Lower is better; a bar whose interval straddles zero shows no detectable "
+     "perplexity change from FP8.", "quality"),
     ("02-different-vs-worse", fig_scatter, False,
      "Deviation from R0 (mean coarse KL, a lower bound) against perplexity change, one point per arm with 95% CI "
      "crosses, R0 against itself at the origin and N against itself as its run-to-run noise.", "quality"),
     ("03-ladder-waterfall", fig_waterfall, False,
-     "Recipe ladder R0 → L0919 → Cpre → LE21 → LE22b → Cm in the dense regime: KL added by each step and the "
+     "Recipe ladder R0 → L0919 → Cpre → LE21 → LE22b → Cm in the dense regime: KL between adjacent recipes (not "
+     "additive) and the "
      "cumulative perplexity change against R0, with bit-identical steps marked.", "quality"),
     ("04-kl-cdf", fig_cdf, True,
      "Cumulative distribution of per-position coarse KL against R0 for each measured arm, with the R0 run-B-vs-A "

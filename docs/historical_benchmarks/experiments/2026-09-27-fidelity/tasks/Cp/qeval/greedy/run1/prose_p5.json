@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "prose_p5",
+ "category": "prose",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 106
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 460,
+ "response": {
+  "content": "The envelope is yellowed at the edges, and the paper inside has gone soft and faintly brittle, smelling of dust and something like old cupboard. The handwriting is familiar and strange at once—the writer's younger self in every loop and slant. The ink has faded to brown in places, and the pen pressed hard enough in others to leave grooves you can feel with a fingertip. What startles most is the voice: casual, alive, mid-thought, unaware of everything that came after. The writer mentions small plans, passing worries, people now gone. Reading it feels like eavesdropping on the past, holding something meant for a moment that has long since ended.",
+  "reasoning_content": "Write ~120 words of plain prose describing the experience of reading a 40-year-old letter.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 34,
+  "total_tokens": 194,
+  "completion_tokens": 160,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 19
+  }
+ },
+ "wall_s": 7.088,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

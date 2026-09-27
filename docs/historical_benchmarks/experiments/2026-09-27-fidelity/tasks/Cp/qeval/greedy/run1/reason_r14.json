@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r14",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 177
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "**0.107**\n\nThe probability is (3/8) × (2/7) = 6/56 = 3/28 ≈ 0.107",
+  "reasoning_content": "3/8 × 2/7 = 6/56 = 3/28 ≈ 0.107142857 → 0.107",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 54,
+  "total_tokens": 123,
+  "completion_tokens": 69,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 32
+  }
+ },
+ "wall_s": 3.284,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

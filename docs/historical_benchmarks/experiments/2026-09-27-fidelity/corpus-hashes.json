@@ -1,0 +1,3091 @@
+{
+ "chat_template_sha256": "d8b991bdcc284e346b87a01858700f2bbf5fa3c2fe8ad879d8adbe07907bbf3e",
+ "experiment_id": "2026-09-27-fidelity",
+ "key_rule": "public windows: public prompt id (suffix -N if one prompt produced several windows); other windows: 'h' + first 12 hex digits of the window sha256",
+ "manifest_global_sha256": "5e962c36ebfe43804241602cab18ea0102b387e216dd52078cc38f64723abceb",
+ "model_repo": "zai-org/GLM-5.3-Flash",
+ "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+ "record_type": "fidelity_corpus_hashes",
+ "schema": 1,
+ "tokenizer_sha256": "19e773648cb4e65de8660ea6365e10acca112d42a854923df93db4a6f333a82d",
+ "windows": [
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d101",
+   "n_tokens": 236,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "0308fb4c7d243261ac1a97598654e51461b95d5ae4da7af36bc9d9ba80b369ae"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d102",
+   "n_tokens": 262,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "d7573435b400d8f3bdacd75428b2fd10a30cc0277034eca0333d138653e77990"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d103",
+   "n_tokens": 437,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "cf27d7c56977c47451121659f5ec61b6b2487029aeaba0ff08b0197237c23906"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d104",
+   "n_tokens": 515,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "a23e0c07bb7af50e19a7e2133971e9fab7f8298b62f014551d62ba0caa4214c7"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d105",
+   "n_tokens": 1197,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "772e99e1c0058ef153cca0200469fa8eb0ec614356b744a5e24d3ec83e80842a"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d106",
+   "n_tokens": 1628,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "83bac24ecb502d3b60c5713900367b57a9462117980627a027ab5301d39ebe9a"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d107",
+   "n_tokens": 279,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "ddb1223a58b93931219c7bb9ed4b52a55fe876db8246fabd5b174148989e34db"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d108",
+   "n_tokens": 580,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "6a052f19a7bd39bc66fa022465830798ba714fdcc75307a665419da130ff425e"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d109",
+   "n_tokens": 281,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "eca42d7cfaf3d052886242bfd4fecee0df67b4ef743193b58ed7efdc0623573b"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d110",
+   "n_tokens": 515,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "d0c532a96b93b5f10bc07b5b034abdde1bf0e2163f221735d054a935ce6a2cc4"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d111",
+   "n_tokens": 407,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "b7c9e2412dadd69d78b95411e273e2319d963a1585af3ecb3417f4e708eb6164"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d112",
+   "n_tokens": 485,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "8d5c7aabc6a603dfe4e7052637b01b2886485a4d98b4704304efc7f3d5fdc4b4"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d113",
+   "n_tokens": 502,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "c9ee5f5d9e3db84e49769f314b282e1239ea6bea4607521651f75f34182e0bcc"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d114",
+   "n_tokens": 573,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "6e3336ec625e06606cfbbd55d44c87bbcd7c211a01e425c779fad2b6c6a31b9f"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d115",
+   "n_tokens": 680,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "2c402be3a8e72643ae3f4db7f8aea68f87578cf32bcc258d6198d4e8885e67aa"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d116",
+   "n_tokens": 941,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "d1f901c6216c63954c7e85fcd5f2d14e69f4af469c1bf208712f5b47bac8c267"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d117",
+   "n_tokens": 430,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "e8a7f7150dbe09e83923d43bb5aec268acde6b3d99328e51db84631982c87913"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d118",
+   "n_tokens": 509,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "74f3ba26c2e04cd3f5e94bb14a479f7dd6c2c686788a027e18e6ded3b1f42f8d"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d119",
+   "n_tokens": 1307,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "0f1e2d47faa5a9af05231627d8162bbdea3de0316ddfb03555e39ee967371807"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d120",
+   "n_tokens": 2708,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "ecbbb75ea5331adee73820d734a9e9167736028743e53b374dddf636779802cc"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d121",
+   "n_tokens": 904,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "e86d3e5293df314ea5625d21bd2906fcd93df15940704e0ddc6fe5f26b0fb954"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d122",
+   "n_tokens": 383,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "c75517d61d7415774df2a9d2d9fa92aa74f5e7cc067cc7fb99a4a443d6833094"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d123",
+   "n_tokens": 416,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "c8941f94df5474e29a27e13e9c607919866c7765d1360ecbf7470ad605e727c3"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d124",
+   "n_tokens": 387,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "d1111c748386d9acf05419fb7ef153eb117bc332df7338a2d6b81b59beb34962"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d125",
+   "n_tokens": 277,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "e98691c5cd0b4ccfc7be02f61f7ed34672542f8d3730ce6b977cbd27cbd9d75a"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d126",
+   "n_tokens": 214,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "ffed2dbf258070fa4fa8ca871a34614f51891317285f6d6281cc38f5af29eadb"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d127",
+   "n_tokens": 258,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "5052aabfe0b8aed8efdbcd9b71951e59e70d0e902febd970ea0ab60995f57418"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d128",
+   "n_tokens": 273,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "331bc50fbb71e3cbff9782274ca9d134fa387599c8803d70b2c292e264c45bef"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d129",
+   "n_tokens": 258,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "edfee9f9fddd2ee50320712d5feab6ca5b321e1667b82e579a7d5c5f6821a04e"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d130",
+   "n_tokens": 320,
+   "prompt_set": "knapcio-bench/hardset",
+   "sha256": "3228fc8a380f780b132cd14f5a3037a52a23fa8bcb049a68d4a8b7bb45d7c095"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d131",
+   "n_tokens": 287,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "6327a49f38bf7487813ac5e51dcc48ee8d69986afb051402f3f8235be6ea8e16"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d132",
+   "n_tokens": 518,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "e7b485e512fbcd3615a4a8a50c3a09bcef91e70a6d3cadba9158646bddf3c88a"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d133",
+   "n_tokens": 190,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "a089cb45159c1838f66bccea5e88cc985f3a8f96c83d136ea9e6ecf3a13cecbf"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d134",
+   "n_tokens": 198,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "bf02147722d5e3fd296aa79ff7f32537925e8a57645c8e77bc843dc17d909058"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d135",
+   "n_tokens": 272,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "a1565845df90f3a3624a1e7708dca507d3366e8cd85c54c8f7b8ab53e933d2b5"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d136",
+   "n_tokens": 671,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "fb9b67287eac39134f57b0ddf7be4f44f031a7d0bde913c009af5fab351b3fc7"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d137",
+   "n_tokens": 250,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "fc954caf3ee72c57764a606b6557e3ef5a7fd7d70e5c02a8ae7a0f429d72f9f8"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d138",
+   "n_tokens": 31,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "cdba2cfb5d0f82719a8e76487d241366281467044fd759401cb81ba135ac70c3"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d139",
+   "n_tokens": 184,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "cdc46d3ad47c44eddc192c1f69dd96b3b9c0d1070f1af5aa4ac861daffeece8c"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d140",
+   "n_tokens": 1134,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "964afbc4fda12a4f4b7e26d194950ba39a236198d01d815b852d6e11777c8242"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d141",
+   "n_tokens": 135,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "88db7188a77da7f7d1e478ddefb4ec12a3cee495147baa502c24407f5816e5e6"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d142",
+   "n_tokens": 227,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "ffa5da787ed458ca71d38eea4218755e3e30e91d70c5f9e3304e1df46447cb9d"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d143",
+   "n_tokens": 127,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "421be253cc27996af73398ded830d6c99ec9ecfb0454f59073dd46b56d1c25fe"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d144",
+   "n_tokens": 203,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "6935078940a05da287debc619ce3ece35b3f090837826a746e292c76647bee53"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d145",
+   "n_tokens": 245,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "3cb14178b31bf29c8f85d5db4414b582b4311a77aabebe3ebada1b877814a7ff"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d146",
+   "n_tokens": 175,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "56d6d4c46d2b20fe7adc2c4fe0b0814c562b9816508cbb46e7b009188ff6a86f"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d147",
+   "n_tokens": 78,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "7b57dfd059aa697df24540961094c5e66299d1e9c3167ab9284ddb3b1217a913"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d148",
+   "n_tokens": 84,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "973dd34d4795dd051ca7e8ce533cb1ee36f66ca182974d5c4104fa33af506551"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d149",
+   "n_tokens": 85,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "823c46798219020bbdeb2e4c8728c4655f72e539103a49816d9450ee7d3e18d4"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "d150",
+   "n_tokens": 349,
+   "prompt_set": "knapcio-bench/qeval",
+   "sha256": "36fe330fafaa8392d1630c109c4ae4d6eb439f47a6828815e59945f9fb16ac21"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h00bad3432d10",
+   "n_tokens": 10106,
+   "sha256": "00bad3432d108d9932b2d6a5f790869cbb977aca16a105726a50142224e0d12e"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h00e25c0fe5cb",
+   "n_tokens": 15394,
+   "sha256": "00e25c0fe5cb3c6c822c09fb227a88d228a039a104f683c3139fbe7794d08503"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h0121df25b7ff",
+   "n_tokens": 1800,
+   "sha256": "0121df25b7ff4e81b92b1106801425a275921e4627bbbf5bcc9bc720d2ba5bfb"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h022c7b16eab0",
+   "n_tokens": 8945,
+   "sha256": "022c7b16eab060593f6dc84b1d9078a15cff9067d5485f518053c91b5835eede"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h04c1c8704d11",
+   "n_tokens": 10027,
+   "sha256": "04c1c8704d114823d2d94d8300acc17aafeb26dbd154c988549c6621a4c4a503"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h04d37790cc11",
+   "n_tokens": 9169,
+   "sha256": "04d37790cc11b12dd93cc2d02e7ec103b6d65d5d9540f1a747c6556fb954179e"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h051c92a768f5",
+   "n_tokens": 5110,
+   "sha256": "051c92a768f511e69fed4f2b7b1dfb115445529d9a48f15b852d05d8bfe8707f"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h053616751219",
+   "n_tokens": 5040,
+   "sha256": "05361675121957c93640782faf02789033eed44a69a6f3048a3ec15dc48c2b61"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h06dffe40f496",
+   "n_tokens": 10188,
+   "sha256": "06dffe40f496dbe342e6026c73c796991655f5243118f1e5e9091a004945e446"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h07366a12ca5e",
+   "n_tokens": 5486,
+   "sha256": "07366a12ca5efa1abb1b0b03214b31b4f87e33bb92313517b90a8a46757574a3"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h07771bf5e0de",
+   "n_tokens": 5319,
+   "sha256": "07771bf5e0de8c40ad603cbe0862970021ccbb14efa0cef138ebba6bad280498"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h07ea2098370b",
+   "n_tokens": 3456,
+   "sha256": "07ea2098370bee3f8d18779f3a4de20e0a31d14f0f39a55182a3fecf1d4c0b20"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h090d3e4dfabc",
+   "n_tokens": 10009,
+   "sha256": "090d3e4dfabc2a2c19b2abb6723faaa2fd0efdd329500d4ba7e0869a73268bb8"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h0939fdeb6032",
+   "n_tokens": 2655,
+   "sha256": "0939fdeb60323b7582aa400eb42e7fc2512630a7b41e65cd73d2252b5b89b0a1"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h094cf27e51af",
+   "n_tokens": 3604,
+   "sha256": "094cf27e51af8d7c67c61c82d0c43350d3d6f1ee9dadb2cac66324cfed7e3d9c"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h099305a8429a",
+   "n_tokens": 8914,
+   "sha256": "099305a8429abfbb6119d5dc012d9bd0c717b16ed6c2c5cf77a6ef52ee804ed0"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h0a9a58e186ae",
+   "n_tokens": 9922,
+   "sha256": "0a9a58e186ae7900e3162465de51674d9ba347f6575085e588e96b8391ff19ab"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h0b6c2154e502",
+   "n_tokens": 10114,
+   "sha256": "0b6c2154e5028ed992f64b62feb48795a574812d54e827dc1f7126a66a799b04"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h0da29a67a3f8",
+   "n_tokens": 9754,
+   "sha256": "0da29a67a3f8ade1f04eb45ce9af070e33220f95e0602b9668b341f829187929"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h0deb6bb446f1",
+   "n_tokens": 6567,
+   "sha256": "0deb6bb446f18ba6eb5b97ca237244ee71c77241f40c4a2b5ad817f1497750a8"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h0f830019610e",
+   "n_tokens": 1115,
+   "sha256": "0f830019610e8292d1f78b528569cb2e66487a2faa1c60bc22b28765aea84812"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h1103ed117486",
+   "n_tokens": 1393,
+   "sha256": "1103ed117486e8127844725879acb8a3b01e13e9ef75bf40a8a72e5210429ee6"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h11422c6c6f5e",
+   "n_tokens": 9483,
+   "sha256": "11422c6c6f5e9a900fde4457a6488219c87592bc2bbc6cdf5ae8fe7dead54576"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h122218a3d693",
+   "n_tokens": 8880,
+   "sha256": "122218a3d693798c47d278da3ea71932bc909ed23c3a0befc319eb0276f6e5d5"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h154846d6cc01",
+   "n_tokens": 5850,
+   "sha256": "154846d6cc01914bca54f048038ffb3661297251c2e4a3a78173940b8ca7a4f2"
+  },
+  {
+   "category": "long_context",
+   "class": "private",
+   "key": "h16622c543184",
+   "n_tokens": 53360,
+   "sha256": "16622c5431842e4db5fbe0ad7501e4d5b92674e7db29caa3d67c5a23feb3963a"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h178270b9b748",
+   "n_tokens": 6536,
+   "sha256": "178270b9b7480d9e3353dcf660f13b8e31a9acbb8d9b9252c5b0d62c1d37e1e7"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h179175755dba",
+   "n_tokens": 8256,
+   "sha256": "179175755dba59b5662494dfc81555efdc8e06f065602ddc2ba5d0fdf8be52c9"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h17b6443a5f90",
+   "n_tokens": 5110,
+   "sha256": "17b6443a5f90a82242981672ee0d3ea1714729435321604cc77f1cbe5216ed88"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h17c7d1bbc7f4",
+   "n_tokens": 9660,
+   "sha256": "17c7d1bbc7f43f33ee166327b9dc279d5080bdf70e220223955200fe9eed33c9"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h190132bf2fb4",
+   "n_tokens": 6379,
+   "sha256": "190132bf2fb4e326b82ff75e87f2a19ec2d05b66485d3bbada7a546387cde262"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h19509550233d",
+   "n_tokens": 15601,
+   "sha256": "19509550233d48b0e9de526629a9469d5b61eda315c26ac59a958b3a9851557b"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h19804efd1141",
+   "n_tokens": 9367,
+   "sha256": "19804efd1141b200048ef6c1df2e9c81e67d4995e716e32dd38f16cdfdfccd2f"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h1b08412d4f5f",
+   "n_tokens": 2724,
+   "sha256": "1b08412d4f5ff3db8a599a3bb821f2b7b6ecf2e07951d36f91fc7d2bf5a1b924"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h1b86044b7c0f",
+   "n_tokens": 6118,
+   "sha256": "1b86044b7c0f00b5ae7a33b460febf7da2a9a5eb11cebe3a9fb2c2a00494a9d6"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h1bc6963493f5",
+   "n_tokens": 2037,
+   "sha256": "1bc6963493f53c847f78506e9d273c99d4cb160d0bbefc2f1771bdc929a1af42"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h1d0a8383378d",
+   "n_tokens": 4940,
+   "sha256": "1d0a8383378dcf58f261377eb279d27c36e775c027fb908731dfd67ec9adf1ae"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h1da749e12554",
+   "n_tokens": 1579,
+   "sha256": "1da749e125548688f1030a4cc4c4254890e28ed8b37a8e5968be19e70095fdaa"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h1e08a5e4b622",
+   "n_tokens": 1605,
+   "sha256": "1e08a5e4b622ebd152b0fbcb11bc8928b24949ae576c7cb3a30bd3da6210b62a"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h1e9ec1a19a1e",
+   "n_tokens": 1202,
+   "sha256": "1e9ec1a19a1e748b5836c68a6f7bd741e3d25f8c8f1a74e711467d0df6a138ea"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h1eb7c04104b8",
+   "n_tokens": 2091,
+   "sha256": "1eb7c04104b8b86d3a8c38b55fbeb85941023548e9ded9e511e4a10a3c961a0a"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h20930298c8be",
+   "n_tokens": 4128,
+   "sha256": "20930298c8be6db9c6434e681ff01c7d7ffc5c96082ad0ea367984bb79108943"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h21aa6f4ff7ca",
+   "n_tokens": 3085,
+   "sha256": "21aa6f4ff7ca36ff1943666883fc576658315dd160a74218f88e68ebfed00058"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h21df1e10c8da",
+   "n_tokens": 3078,
+   "sha256": "21df1e10c8da6b8746679d040e8bfb8b29782de1ad78ba77dc2ec602f93aba7d"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h21fa83e80fc5",
+   "n_tokens": 2620,
+   "sha256": "21fa83e80fc5ebeb760c3bd553227e91b31ea6c6a469aed436f6cda3b758f793"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h2302006197af",
+   "n_tokens": 4623,
+   "sha256": "2302006197af8c33d7eb3b3cf365fee0820cb15c28d508d20efd415f75cef564"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h2328766c5b22",
+   "n_tokens": 9653,
+   "sha256": "2328766c5b22d2e56634dd89ef2bb8733ead9314495421a6318820d964e0fea6"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h2578da1ccf97",
+   "n_tokens": 10967,
+   "sha256": "2578da1ccf97d0f26f24fff04844576596038e678c4723737d7e4a0c9268e5d4"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h2705bb317358",
+   "n_tokens": 9131,
+   "sha256": "2705bb317358b4643a7891b74a46a27c562035bf7f5bbfa25481ac0810fef29f"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h27a3ca66aa6f",
+   "n_tokens": 6920,
+   "sha256": "27a3ca66aa6fbd90b39b7c7cd6821b26ac03b32a636bddc43441cc86def8cf00"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h28946c7f9738",
+   "n_tokens": 2772,
+   "sha256": "28946c7f973813b8024912651ddfd495d9d7e430ad14d4dc26dbcd12c93964b3"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h2a3100477570",
+   "n_tokens": 4201,
+   "sha256": "2a31004775705f6158a05edab08601138128b4d172f49b7e051b892b88a48f96"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h2a633a1914d2",
+   "n_tokens": 9002,
+   "sha256": "2a633a1914d2505ec6cdbda47bd4621347cb1c497ab339086f6e22b12bcb12e0"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h2aa18a1668cd",
+   "n_tokens": 3570,
+   "sha256": "2aa18a1668cd52be836cee6b37c3ba1aa91a1264457d80b92894c50696d6279d"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h2b5cd51ab765",
+   "n_tokens": 8887,
+   "sha256": "2b5cd51ab765608f40412098fa688353cc503c16ecc3291e11dd42adf857e40c"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h2b9852368cb8",
+   "n_tokens": 5502,
+   "sha256": "2b9852368cb8376474cd956130a30e40a46ea392edb2f656bbae92a897398a92"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h2cf9515ab8be",
+   "n_tokens": 2948,
+   "sha256": "2cf9515ab8be38423ff34c8d5cadb04423ba0698b63643aee5d4e560920e963b"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h2ed43aff8764",
+   "n_tokens": 5045,
+   "sha256": "2ed43aff87644df4887614ef0e17d23ad26b0bc2a655c2fe8df6f5a1e601dc7d"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h2f17b33e6bad",
+   "n_tokens": 10219,
+   "sha256": "2f17b33e6bada753416ad3f283f48fcef4e5b1397e7428e6df0136f4b5ac88a0"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h2f6729c07c47",
+   "n_tokens": 9661,
+   "sha256": "2f6729c07c4732a4373c578fceca0d544c790f9cb6fecd93d5b7c9f5773e3638"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h310b557a8edf",
+   "n_tokens": 5057,
+   "sha256": "310b557a8edf571f92c29e1698cd786e15dcfa9ff9080ef5642d2200425ab8eb"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h31fc08649449",
+   "n_tokens": 10150,
+   "sha256": "31fc08649449a5797d9699e18acf185bd5575992519ac36eb1b398bb07cc0af9"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h33a02515b018",
+   "n_tokens": 6629,
+   "sha256": "33a02515b0189135715be7136a55d2d629b5375bba7597a92459881cb5996b3d"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h33e2ec4f510e",
+   "n_tokens": 4887,
+   "sha256": "33e2ec4f510e506bed7f0645c3c8f8311d48e58fd9a7409bd37d4a16ac83cf8a"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h347d2e7289a6",
+   "n_tokens": 5135,
+   "sha256": "347d2e7289a63f8da45d26d3cb5a1c1872e98a750dd4afca3058195b9333d0d7"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h34bd2ac03a71",
+   "n_tokens": 6642,
+   "sha256": "34bd2ac03a711991d0ff72e7be2b5c5bddee295ca79524af031d88293b61c47b"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h34c32d6682f1",
+   "n_tokens": 2429,
+   "sha256": "34c32d6682f1fe6a62339b781319ad76421ee98dec94a39b3ec86a72e6d849d6"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h3506398a1791",
+   "n_tokens": 5267,
+   "sha256": "3506398a1791c15d9c97185ac94e018c7226661efe39cc36f77ce62f9af32be1"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h35a2385378ef",
+   "n_tokens": 9063,
+   "sha256": "35a2385378ef65427775bd15f693c3a727e1aa82ec80fe152db4ea4a47db21d2"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h3634afbcdd23",
+   "n_tokens": 9627,
+   "sha256": "3634afbcdd23c5718ded4eb04a4a9fd127c0be7761780a216a483cb45b9c4ad2"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h367babd432e7",
+   "n_tokens": 10192,
+   "sha256": "367babd432e76dc50c4f88f699f0e6d50938954cffb0dd75d32b61bdce24bd2b"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h36e85c694d7c",
+   "n_tokens": 9726,
+   "sha256": "36e85c694d7ccf2e28b50c7a03ffeebf543790e8f1512a07d8e48f4ef55c2b63"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h37553456b309",
+   "n_tokens": 2967,
+   "sha256": "37553456b3095baf63a57b00d413aea757a340709252b9c94569c39a996a9b84"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h38699dee9b04",
+   "n_tokens": 6178,
+   "sha256": "38699dee9b0454cc10b20495a539665242f671f9cb804fcd69b221487cc5240c"
+  },
+  {
+   "category": "long_context",
+   "class": "private",
+   "key": "h3afbd10c6f1d",
+   "n_tokens": 39187,
+   "sha256": "3afbd10c6f1d922a5a143d9b21fe01bcff820aabde81d5c425d6d60d2b167e0e"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h3b8b36406e57",
+   "n_tokens": 6941,
+   "sha256": "3b8b36406e57d244c1afbe0c646c9fde191e0ec7f7a175550ce3ca0670d80f88"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h3be77940b0b8",
+   "n_tokens": 4265,
+   "sha256": "3be77940b0b86ab6b81af79e7affbeea8068d648838afcb5d2ca1fc237ce0c13"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h3c1f9eff0c10",
+   "n_tokens": 12128,
+   "sha256": "3c1f9eff0c10b68c99177801fb7696a3f894a30dc5c7a8e438c09c6e1d8d114a"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h3c4d90295433",
+   "n_tokens": 4054,
+   "sha256": "3c4d902954335c4d79ee10f2e47734dbeaa7a0bc53bd6de1b9e84cc8adc4fd4f"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h3cdcac063211",
+   "n_tokens": 9561,
+   "sha256": "3cdcac063211046461f5ee32a264d09feef03d3db44e683084f7831522d7cc93"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h3d851d564dc6",
+   "n_tokens": 9683,
+   "sha256": "3d851d564dc6fc0c9901f56afbaa13dd4ee72781d2aeeca5044770d5991515a0"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h3edd4ff9edc4",
+   "n_tokens": 10101,
+   "sha256": "3edd4ff9edc40d752937e38790b2246bbd669e51aa0c00b23a3bd6b98c42c354"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h41b42c43e3b2",
+   "n_tokens": 4604,
+   "sha256": "41b42c43e3b2b4be521b6775f8509c661a0e3f17a56bf3ca2b6c4406bbcd98f3"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h422bddac40a4",
+   "n_tokens": 8895,
+   "sha256": "422bddac40a4a7e8de812695db6ac8df984724b2bf1ebfdc09dd383e6f02e151"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h44e9bc0960eb",
+   "n_tokens": 9484,
+   "sha256": "44e9bc0960eb723fdd9536b171eabf0aece5cd14ec4e16a3ff33e2025840f918"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h4557cfd0c64c",
+   "n_tokens": 4768,
+   "sha256": "4557cfd0c64c72bd5ad3062daebf3899c0ca868b30d8933d8d1a9e6dc5b52a9c"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h464aa0d73ce7",
+   "n_tokens": 5362,
+   "sha256": "464aa0d73ce708691a8d431d3674929ad045d9a5bb6e9bf36c15ed84c6e56c31"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h46e4ab6b3f70",
+   "n_tokens": 7021,
+   "sha256": "46e4ab6b3f70578cb00c7cdedb7afbaa2bf1b060b09ed14aa4991cf81dabb78f"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h46e585422bf7",
+   "n_tokens": 10146,
+   "sha256": "46e585422bf714f6d8f6875d79ca7490d77585875ca5cc6a19135700cfe65b87"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h493af8658a62",
+   "n_tokens": 5043,
+   "sha256": "493af8658a62e44bc7a877fefef2e4b5ded4f7d0b2a505594fb06500be5d79d5"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h4a88e4904287",
+   "n_tokens": 10058,
+   "sha256": "4a88e4904287e141b69baae3be5e58b19cff7ca071159606051d29660e369c3e"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h4bd52180fc71",
+   "n_tokens": 1594,
+   "sha256": "4bd52180fc711f2c63849f0f582ef13c17544a2866256b49bb58ae32eb71530d"
+  },
+  {
+   "category": "long_context",
+   "class": "private",
+   "key": "h4cf69b9b5725",
+   "n_tokens": 128054,
+   "sha256": "4cf69b9b57258b6ab5a69374f0341f0ce2700ed4d7b9f91c48d391f8a120b598"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h4d28733a2ada",
+   "n_tokens": 8776,
+   "sha256": "4d28733a2ada820c6ddd6bfe03feb6720c8e59b7d774c17d9c8ba8569bb4d761"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h4d5076608749",
+   "n_tokens": 2304,
+   "sha256": "4d5076608749194ea915b4ed112e831f0acd32c8b30a5cd36d78f3ff0a802ec5"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h4d873a40c426",
+   "n_tokens": 5179,
+   "sha256": "4d873a40c426c006b91a9bfa74c1fc53792b442864bc4a21ba23d541f6d9df7c"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h4da3cd453ae3",
+   "n_tokens": 9605,
+   "sha256": "4da3cd453ae346c69c266e8e08707448175b7542e35ad786f6d32258c01a5a75"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h4ddab264ac88",
+   "n_tokens": 4412,
+   "sha256": "4ddab264ac88b1f68b63de7461be5f11ad567c29fd6ba356275e11a3e48d0d8b"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h4e19cd68ddfb",
+   "n_tokens": 5526,
+   "sha256": "4e19cd68ddfb296ee0d67aa98bbfb463a52cd24505353472f062648ac4c3fbdb"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h4f6d3463862c",
+   "n_tokens": 6811,
+   "sha256": "4f6d3463862ca85a1708e5bc1b1b1415c2fda7b6ae2fef44f9eb14e67e860c6b"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h4fa18999291c",
+   "n_tokens": 6191,
+   "sha256": "4fa18999291cd78a31305eda9c723df03d84e8b7ba45088489833ed23489ccbf"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h51447c12d55f",
+   "n_tokens": 8841,
+   "sha256": "51447c12d55f6be8127a06c5463456380fbadd982cc7f1c464ed91e5232fdce8"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h52d69f6aebdc",
+   "n_tokens": 10228,
+   "sha256": "52d69f6aebdc89834314941e0604dc0b8f81b0ad165237864d8a692312cf7ff8"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h530a08b81f0a",
+   "n_tokens": 3733,
+   "sha256": "530a08b81f0a1ec293606907e40580ebae44e2f9537a17bc4fd7b2d93549e0b0"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h54731a945a80",
+   "n_tokens": 10031,
+   "sha256": "54731a945a801981dcd731ee27961f47f4910b225fe4a52d21f381460fb4ef6f"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h547ead2bc605",
+   "n_tokens": 1805,
+   "sha256": "547ead2bc605da8056a2ab7c6615e0606baea3a3e7d7950ca4456552ce66c782"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h54e1212d003e",
+   "n_tokens": 4467,
+   "sha256": "54e1212d003e86b7d4c2e1032c73e5522c55f399c4c445a86598f4017e1181d6"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h55f7767b1529",
+   "n_tokens": 4939,
+   "sha256": "55f7767b1529e92e9730bc44695cb4776564e1829257d9a4d49a481493a1e3f9"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h564931c0ee7e",
+   "n_tokens": 3228,
+   "sha256": "564931c0ee7e08e57341c5a518aca0cf51108d334005ae7c1d7b28f5528b245b"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h564c54c629ce",
+   "n_tokens": 5854,
+   "sha256": "564c54c629ce6d7ce9e8418d7ffefb4a65df6bac63ee69773499a8ba5196f3b1"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h5783b70040a4",
+   "n_tokens": 5908,
+   "sha256": "5783b70040a469802582298331b1aa0e0ffb8cedf86844d394ce4734eb597e42"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h585b705f65d3",
+   "n_tokens": 3244,
+   "sha256": "585b705f65d3b7173cc3961f7ee2db7bde30fecac9cf7c586b845ecd81373192"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h5cc86a487a0d",
+   "n_tokens": 5128,
+   "sha256": "5cc86a487a0d49c84dd3886feeb594a9e5b8f43d7b786886c959b72041e77b63"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h5d22c9730508",
+   "n_tokens": 9255,
+   "sha256": "5d22c9730508beb65664ed4b5e3f074f557b25865c24aea2dcb9093bf3b1479a"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h5ec6d82241d0",
+   "n_tokens": 9314,
+   "sha256": "5ec6d82241d0d85f47b6c9eaa279473af5bbc907f13c420609d151eaf5aa0ac2"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h60d081098368",
+   "n_tokens": 6447,
+   "sha256": "60d0810983685a11b32a854eb89d3c65d1445f5d07dd99ec5c26c13880c0362a"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h6353a8cafc8c",
+   "n_tokens": 9757,
+   "sha256": "6353a8cafc8c16ba00e1a041b197d45852067885ddbd4c5cdc5436a43632fe00"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h6408af518fb6",
+   "n_tokens": 9330,
+   "sha256": "6408af518fb6b905e530f68900a81addd791816bcace4e20e54fe242c0c2ef4d"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h6423194e5c4c",
+   "n_tokens": 3141,
+   "sha256": "6423194e5c4c07a55dced6c47045792b1218ff5c1e8c6520c069eb63cd10e75d"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h642820070db1",
+   "n_tokens": 6765,
+   "sha256": "642820070db1429d452ff8ad88594e17ac50810c271d3292d639239d89b14553"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h64d4c40c1fe1",
+   "n_tokens": 3911,
+   "sha256": "64d4c40c1fe1332a8d781055375cca434554c20628cb2cc7e914f5989f22c038"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h654d692e7ef5",
+   "n_tokens": 1759,
+   "sha256": "654d692e7ef5691cdb1fc0f8992914cf9f5e05bdd607a0347ec567f8765a63b2"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h65fc89751f4a",
+   "n_tokens": 10195,
+   "sha256": "65fc89751f4a43485382be357a3403bff5d9effe092f3d42c35edaa8a9063b17"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h660a9d329e49",
+   "n_tokens": 7156,
+   "sha256": "660a9d329e492aca917dde8fb37dcf74795a73dc4f96f56600db616f0cce8c23"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h660e78be97d4",
+   "n_tokens": 1696,
+   "sha256": "660e78be97d40169734cabe09089f9f38c25cd9842cb854d011af93ca5c544d6"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h66bda09298cc",
+   "n_tokens": 9168,
+   "sha256": "66bda09298cc910dc812ca490795fa437285034bf6189cf49585b1d78974a17d"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h67a6b7e468fd",
+   "n_tokens": 4515,
+   "sha256": "67a6b7e468fdbb93199b7bc478fba5c59826c3f0900ef3819ff2af2fa7603eff"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h67c94c20af04",
+   "n_tokens": 1705,
+   "sha256": "67c94c20af04fde4ea446e7db46cd4eb7e21a893b79f1a1fe7177a8468522371"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h687f101e569f",
+   "n_tokens": 10070,
+   "sha256": "687f101e569f6e2be2e7a53c8ca1207c6e68d7aad11245ecf9f640c829124751"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h690ce9337c95",
+   "n_tokens": 5261,
+   "sha256": "690ce9337c95cd3b9767cd70512b7054295b5a79cf09a05490a2a7a0293dd47f"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h6a12addbfd6a",
+   "n_tokens": 8824,
+   "sha256": "6a12addbfd6a4104f68f1f42da3e4b7df4ea97b19bf5f8cd1e477b15f79315a3"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h6b8b3a89bdcd",
+   "n_tokens": 2610,
+   "sha256": "6b8b3a89bdcd84dc79ec33a8858572b5d2e8240d1e37eaf4d3de2187bea91937"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h6ba3f69f34b9",
+   "n_tokens": 8823,
+   "sha256": "6ba3f69f34b9f11778e32fb785c0e265a7d0f40c439cf566cb3a805914a7c3e1"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h6bc650ab3614",
+   "n_tokens": 2251,
+   "sha256": "6bc650ab3614035f9680f9f021af840971ccfe823facde5e77444a2b371d0bb8"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h6fe821f94d0c",
+   "n_tokens": 9543,
+   "sha256": "6fe821f94d0c6eee78dc6650b18a28c5cc9a6bb069df21891767c6cb122040b5"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h70c95c066f1d",
+   "n_tokens": 9039,
+   "sha256": "70c95c066f1d6d9dfcea10ddf657a7df029d941a8fe8a4a459d42bf766afca0a"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h71c56ab72005",
+   "n_tokens": 9386,
+   "sha256": "71c56ab720058c3044b181045f53b46e7444cbc372e824b763861a7ee72ad721"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h7292d301436a",
+   "n_tokens": 9964,
+   "sha256": "7292d301436adf8bc0b94211b12e89ef38ea6aad7f4aa3a7426a3e61491113d4"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h7358a75c3da4",
+   "n_tokens": 6861,
+   "sha256": "7358a75c3da41e64d2f5c246d41bf0396b20924303b20e56b8ba4c4b116be25e"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h7681224ce479",
+   "n_tokens": 7657,
+   "sha256": "7681224ce4790303fa0816d692e28970e25e76aedb2715c9446496854098d264"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h7917e33af258",
+   "n_tokens": 9862,
+   "sha256": "7917e33af258c581d3d7003b15324fbdabe9b9b5b371176b7d8a1074dd30e98b"
+  },
+  {
+   "category": "long_context",
+   "class": "private",
+   "key": "h79de47763d41",
+   "n_tokens": 50864,
+   "sha256": "79de47763d4189c16d4639fb769f289c86cb526a8454b33625cda66ad43d641a"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h7aa34ccafaa6",
+   "n_tokens": 11053,
+   "sha256": "7aa34ccafaa69671c8689d2389f27434c4949cb0bb870695d28ef4367004c5f1"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h7b2b78a252b4",
+   "n_tokens": 9946,
+   "sha256": "7b2b78a252b46ee9972eaf88e8fde598afa90c0726f65b68c8e58927dcb434c0"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h7b5780d5a6f2",
+   "n_tokens": 9684,
+   "sha256": "7b5780d5a6f26f31d95076f30bb40c1f8e22d94d205148da7d355da69aed941a"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h7c26f5ae3574",
+   "n_tokens": 3359,
+   "sha256": "7c26f5ae3574944ddbf19e21bc7d6ad810af48ff2772b1abfd5a806189faf0b0"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h7c35ef32802c",
+   "n_tokens": 3077,
+   "sha256": "7c35ef32802c372841544ec02d4f5782c5787cc30e0bd1933d2933f5075f7bdc"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h7d24d0e4ed57",
+   "n_tokens": 5569,
+   "sha256": "7d24d0e4ed5724ea8eebdc4581de8b167209959f14ab33e8aeb4239e0b40ed30"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h7d2eb0f7b7ec",
+   "n_tokens": 5027,
+   "sha256": "7d2eb0f7b7ec1bdbb2b4b96ed92bd9d368da4ae14320ea5ff6c8024ee1b992c9"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h80e5b65c7ce3",
+   "n_tokens": 4908,
+   "sha256": "80e5b65c7ce3793b0398566dcb3755199fdddc18e77fbd2be34308382749da2c"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h8170f973877d",
+   "n_tokens": 3585,
+   "sha256": "8170f973877d8a6cac78285c58878265de75d3452614a1985770a16c98dab9ce"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h82217b26e4b7",
+   "n_tokens": 5435,
+   "sha256": "82217b26e4b7fe020b0643dffdc60d53eed710a4f1775e6557591c7540986dac"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h825c2a2d6a31",
+   "n_tokens": 6595,
+   "sha256": "825c2a2d6a3107f38563817084b37d67107895c9b1b77457343add148ba1db56"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h83118c34c35b",
+   "n_tokens": 9950,
+   "sha256": "83118c34c35b169913087c0b4e145fbccf67efbc612f7f3e756dcec3b9335895"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h84c2b8d8ab90",
+   "n_tokens": 1332,
+   "sha256": "84c2b8d8ab900e0c515af605727bf33890c47354dbb31155dd3bd9fbd453e62f"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h8603a9433186",
+   "n_tokens": 6756,
+   "sha256": "8603a943318614e35319bd77e8dbf3dd026ead49953b5928c08691af6d206572"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h86cc1dd5e9d9",
+   "n_tokens": 9056,
+   "sha256": "86cc1dd5e9d98f2d5776fb2b79f02294f912ab70f23cd8f8e87aef596a9bfba1"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h870693d5cce8",
+   "n_tokens": 9886,
+   "sha256": "870693d5cce8ac62fd6b3b41bdf8b1a75d17742393137e207fbda72309f1bc8c"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h8a20bfbf54e9",
+   "n_tokens": 7494,
+   "sha256": "8a20bfbf54e926dc2b492e2366c782f4c3fa5a0e5a1a3174a81f196ba28a27f8"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h8a3dc2d9a5d5",
+   "n_tokens": 5269,
+   "sha256": "8a3dc2d9a5d58606ff947e03fb7d2eb5c109a2f915c36f7a6cabf54343eb7d2d"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h8ada25c32580",
+   "n_tokens": 6017,
+   "sha256": "8ada25c3258017a90a0d4223915f11b2a10780aa81f703dd4afb1bb992ba3e35"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h8bf65a18aecd",
+   "n_tokens": 7184,
+   "sha256": "8bf65a18aecdaef9103d6f2971dbb8572a17635a5b0e458bc3a796640558834a"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h8e740d7ee8e0",
+   "n_tokens": 4247,
+   "sha256": "8e740d7ee8e0445dc3e4f54cb08ed8f49be216d709b310fcc67f303199b81f74"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h9084552853a3",
+   "n_tokens": 5308,
+   "sha256": "9084552853a3428d1fcc88cca6c12fdef82fd7b8c0571cb3ea07add63ca6d615"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h91b9a52ffd98",
+   "n_tokens": 9273,
+   "sha256": "91b9a52ffd982b7f5929ea499e8e6604a333b082cf0c6e712c35b3ed6d9a946f"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h925442cc4c07",
+   "n_tokens": 5321,
+   "sha256": "925442cc4c0734e089077c1e0b2c7085695a5c56e23b9da49c0b1ffc5ccc16c7"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h9353ed63774b",
+   "n_tokens": 9049,
+   "sha256": "9353ed63774b41c7a9806d08fe9e6b8f109dc03e41e4ebeca57cded3bd8b3f94"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h9357fc75ab45",
+   "n_tokens": 9061,
+   "sha256": "9357fc75ab4555add72400313f0e75ebf1d3cb239e93c032089fcf621168e7b9"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h93cd7e158ece",
+   "n_tokens": 8737,
+   "sha256": "93cd7e158ece7ab14752dcbeac520e994884a7a7a307a898d92606c30129ea31"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h93fcfc1f062b",
+   "n_tokens": 5108,
+   "sha256": "93fcfc1f062bb2c3435ad89da6d15507a0892ae516aa640700a4a452e0214c61"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h946bc71c1e36",
+   "n_tokens": 8911,
+   "sha256": "946bc71c1e3657f2af1296b76c07a65c0251d82f34a0c85650ec31277b2a8f6b"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h94b592c6eac3",
+   "n_tokens": 5233,
+   "sha256": "94b592c6eac3fccfc22ff4b794f84f1767fdb79aebb58cfa0cdb8f09c51760f9"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h958bd79fb27f",
+   "n_tokens": 6084,
+   "sha256": "958bd79fb27fdb72f77b2f9f1b640580ff32a3aebd9d9ca01c59b82cb483ea97"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h97e65fa7a4c8",
+   "n_tokens": 8896,
+   "sha256": "97e65fa7a4c8bb1608af714f5e13c22bb556b442aac914e3179979744115f5b9"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h996acf34eb89",
+   "n_tokens": 2515,
+   "sha256": "996acf34eb8961590cff1e059d0b7925ca4b6808cbff9302c4bc9983be21126e"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h9997c354cf11",
+   "n_tokens": 5317,
+   "sha256": "9997c354cf11be6d3fd075ffaac44afaad749642936e4d7ae13b2018e8cb4235"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h9997fb51a2c0",
+   "n_tokens": 4316,
+   "sha256": "9997fb51a2c0e3bd3c5394fbc68ea663ba8f6a296abf0f4954013ee0c3880f3c"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h9a21dca5a4d3",
+   "n_tokens": 2308,
+   "sha256": "9a21dca5a4d3b33de31e5359e885c6eea16ae9b7701bc8c7bf7cb778851daf56"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h9a2af6d57141",
+   "n_tokens": 3434,
+   "sha256": "9a2af6d57141b8dcc298ee21b88ec2a7a682792ca713615b094c7ff94e196270"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "h9b4340543eae",
+   "n_tokens": 5529,
+   "sha256": "9b4340543eaee98fcb219e50d0db28b14e5438d616a5b7746e2963b2252f612a"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h9cfcaf36b88b",
+   "n_tokens": 4626,
+   "sha256": "9cfcaf36b88b5142f4957dfaa8ae2bcb8b724aaaa1f54c2dad62d9e0552b1a17"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h9db43e7821f1",
+   "n_tokens": 5153,
+   "sha256": "9db43e7821f189c36e0d4af3bb0105b3db94a5f33ab664035c63c2c54ddbb0de"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h9dc8aa45f09a",
+   "n_tokens": 1554,
+   "sha256": "9dc8aa45f09a5006825be406a7d6ae7955f6bc5d8b8d037e65f1b6fbba191f8a"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h9e31030c0e08",
+   "n_tokens": 8988,
+   "sha256": "9e31030c0e0835c8965c93bde7c767a7672b26f5a1d1489c7081abb393147344"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "h9eab7bf0cb00",
+   "n_tokens": 1237,
+   "sha256": "9eab7bf0cb009bbfa270c05a54ad4cd66375306025100825acb8d1a9e824351d"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h9f0b8775ada4",
+   "n_tokens": 4836,
+   "sha256": "9f0b8775ada4a94818663e418a417314f4993a7c288d8fb333377ba057c50706"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "h9f23b297affd",
+   "n_tokens": 2901,
+   "sha256": "9f23b297affd51ef16c92c9a5b8871eb3343d7728c685958f3ebd38eb85422da"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "h9fd21aafd57e",
+   "n_tokens": 9312,
+   "sha256": "9fd21aafd57e7fc54f860c18f88a7cf7aa3f8a2ff12df9d63309987c8c49a3f4"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "ha025166f9e88",
+   "n_tokens": 4781,
+   "sha256": "a025166f9e889c0a55ca53a4565526db264ae8b5cdd0bbc2720b364551400c18"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "ha04313de4a9a",
+   "n_tokens": 3999,
+   "sha256": "a04313de4a9a77c2b016f9db48a73d1c17907a0eecfde6f8725f44be26bf7907"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "ha0ec6a2716c9",
+   "n_tokens": 8586,
+   "sha256": "a0ec6a2716c907b8449a4449dabe998196e24ad035f3a6289f47de5246ce366c"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "ha14f44e47515",
+   "n_tokens": 2635,
+   "sha256": "a14f44e4751547ec0049f7e85a33558226a5b431757b8122121fc4872d36618e"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "ha1690dc89aa4",
+   "n_tokens": 2629,
+   "sha256": "a1690dc89aa401c06a71744fe95a59264cf624f0bbcb5637e6514e6b0f54427f"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "ha2190b5044bf",
+   "n_tokens": 7634,
+   "sha256": "a2190b5044bf101f99d5e5c4f13726c7fe2a8c3e7382b997d61fcab9c9b34fdb"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "ha2b2722dddb9",
+   "n_tokens": 2723,
+   "sha256": "a2b2722dddb9336632cb0aca0049175fec223fbcc5680a2b777d8b565f7e8d5a"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "ha41416d1b89c",
+   "n_tokens": 9231,
+   "sha256": "a41416d1b89c66df2a1867dbd6eb90a3ad9f61db1f8112e392663ee7e3fe783f"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "ha416f2796653",
+   "n_tokens": 1986,
+   "sha256": "a416f279665312c598328dfcbf52355980e1787a09c3d0eb6f6ee053f6ef6bf1"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "ha4a1f81086ba",
+   "n_tokens": 6329,
+   "sha256": "a4a1f81086ba4ce390182d24ed4e176c43b662757e3d4298a5a29d44574714c3"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "ha58549b6196e",
+   "n_tokens": 10014,
+   "sha256": "a58549b6196e6b937a15ed7c26674c39fb06977e5e0cc1cf2b4ad1092bf86a2c"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "ha5f7074cbb7d",
+   "n_tokens": 9454,
+   "sha256": "a5f7074cbb7d4599963c8e8fb8748ff8fcd0cd3ba59aa401290bbc075c3a94dd"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "ha63c936d2dcd",
+   "n_tokens": 4653,
+   "sha256": "a63c936d2dcd3cd2430372b5253b51b6daedbe5e7b9992bc0cd491c137769569"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "ha911cdd5b759",
+   "n_tokens": 5328,
+   "sha256": "a911cdd5b759ef9615a7db0c66613b4251d87cdcc9d8a4fa52c7680a1dc77aa8"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "ha96039455aa9",
+   "n_tokens": 2592,
+   "sha256": "a96039455aa908e29d502b6a7e9a739540c8932cbb571d251837ccf69f2e02e8"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "ha98086a18072",
+   "n_tokens": 16575,
+   "sha256": "a98086a1807209baaee8efbb4b8f89b5f8c7cbf9ed06d4282598c3e663fd39bd"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "ha9df486a89bb",
+   "n_tokens": 12540,
+   "sha256": "a9df486a89bb712a186363c442ecbe0f9265453e88a66bb7b1e1e3e150487b4e"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "haafcf27b6ff3",
+   "n_tokens": 10231,
+   "sha256": "aafcf27b6ff38c7546f8b9b6ff08414a352563f6225b11f687c27e937e6c8d43"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hab68d7b237c8",
+   "n_tokens": 9038,
+   "sha256": "ab68d7b237c8044247c8b6ca10f7f9ea0e85ae9067b1e35ff16dd9db8820aef9"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hac036736db4a",
+   "n_tokens": 4378,
+   "sha256": "ac036736db4ab61f9f3e3dfe7faee6365920c84b2bce1e0165f9d4557ce5b65c"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hac230a9e3853",
+   "n_tokens": 4968,
+   "sha256": "ac230a9e3853a944b15f1d10824a810193f27978a9cc73e6e23e5483cbf4f5c7"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "had5b34e38630",
+   "n_tokens": 9376,
+   "sha256": "ad5b34e38630fd9b8ea62305951eb6bf6270a66fd204ced0e826228003d8e3db"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hadcfda43e644",
+   "n_tokens": 2759,
+   "sha256": "adcfda43e64436a426a4b100938c2730a49973f3c81dce941690fea576d3d5a0"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hb01fb1d20c06",
+   "n_tokens": 5140,
+   "sha256": "b01fb1d20c062c8ea6c3b068286a32eb65685dc9e99bc3eeb06f479ed75d4c8c"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hb19687643b32",
+   "n_tokens": 10143,
+   "sha256": "b19687643b321b82f9e623b3bb5cb1cef7b3bfaf23c7c339c4c00c9224ba02e3"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hb1cdad134a5f",
+   "n_tokens": 3111,
+   "sha256": "b1cdad134a5faf09620f2b739d224ed75b84d0ec284b8ca86aa7a7846fe6da62"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hb1d595137837",
+   "n_tokens": 10090,
+   "sha256": "b1d5951378374a0752c52a386df8f5974ce23398f804ab5032b50d4588f7af29"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hb2a9cd730b3c",
+   "n_tokens": 1581,
+   "sha256": "b2a9cd730b3c852a76aca619d44904daa6000561df6ae2ca8abafc3eea3e2486"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hb2e8912082e0",
+   "n_tokens": 5728,
+   "sha256": "b2e8912082e0d775479fe25cae53f03ce31cc7133547906092b3f25f47415e64"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hb3333adf264c",
+   "n_tokens": 3252,
+   "sha256": "b3333adf264c8ca5f5c47d61ea2bc3a8b742e4ce64feb30825ee39716360f24f"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hb37f0d2e5817",
+   "n_tokens": 5065,
+   "sha256": "b37f0d2e5817b7460d2edffec49d753c6f608427b14035a8ace83c3a3d3b2b4f"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hb3c8c5b5a7bb",
+   "n_tokens": 2906,
+   "sha256": "b3c8c5b5a7bb288ec30abbe745b3bfaf25d1cfa3f67eacc4118037fcecaf102b"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hb403b3091126",
+   "n_tokens": 4830,
+   "sha256": "b403b30911262c7cdf0b4373ddf4c66bd5b8a9019ab59013bc41d30f9f7925b1"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hb6851384a83c",
+   "n_tokens": 3412,
+   "sha256": "b6851384a83cd6498ba57ef4e20fdd668b48f2502191a7eba63d36be09c583b9"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hb89f0c951626",
+   "n_tokens": 1284,
+   "sha256": "b89f0c951626e3a55bba60f3fa85c96223e38f39d0b59e01f862dee9b67c6e5e"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hb961abdc7111",
+   "n_tokens": 1262,
+   "sha256": "b961abdc71116c0ce087b01afda3b20d086d0b3a797df81c4073206bfaef1047"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hb9c6dca6c218",
+   "n_tokens": 3067,
+   "sha256": "b9c6dca6c218b90781504a9ad382d2172912845d0c2c9080b0a9508f1cb9da36"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hb9d6f14091a5",
+   "n_tokens": 1226,
+   "sha256": "b9d6f14091a5021dffde3323a95ba7adc8f1e27972d85f1fba542fbc3e05c524"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hb9d880f13a92",
+   "n_tokens": 6214,
+   "sha256": "b9d880f13a9243ebcb1cd71e8b27df35bba4ec163ee2452a8a92f1cd76b9db9b"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hbb546412cd51",
+   "n_tokens": 9601,
+   "sha256": "bb546412cd51ddf892bfab1b92e8e8e8ee4f52ba981c4e4a378761f9cd1bb910"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hbd8511561091",
+   "n_tokens": 5512,
+   "sha256": "bd851156109170cafa7111fbfcd2d91c6971bca493ada5b496a6b1521ed16625"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hbdb364dee28a",
+   "n_tokens": 9376,
+   "sha256": "bdb364dee28a2006a6e54f236c0b6dadfc6d14dafad7fc764f685ca729e66a78"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hbe598205de57",
+   "n_tokens": 9097,
+   "sha256": "be598205de57dde3fbba1beeb2a1651bd743e4c705d805b25a8c67d36dc7c030"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hbee843fa7d8b",
+   "n_tokens": 6348,
+   "sha256": "bee843fa7d8b9bc4243b00c0ed955da9c5a3684f191f74662c15a6f4acfef015"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hc0fde7e6b5a8",
+   "n_tokens": 4307,
+   "sha256": "c0fde7e6b5a8a6564d1b9c3ce5646a6ca4c2908f4bbcd6286a55b4486c9a56a7"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hc232844a75fc",
+   "n_tokens": 9807,
+   "sha256": "c232844a75fc3a5684935734f4f6d3c2e9ef1c217c89ec9faa802e4834d405da"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hc2ebb9fc8d9d",
+   "n_tokens": 1302,
+   "sha256": "c2ebb9fc8d9d52b7fdfa60cc82cc6bb447cef0246590f48aea3ba21c1bf65d85"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hc370265b4930",
+   "n_tokens": 4577,
+   "sha256": "c370265b49303d03e3d7bf1c27e4611a6f4ea0c8b7dd0d6415e2a63229aa5404"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hc51a3ff5ed24",
+   "n_tokens": 10001,
+   "sha256": "c51a3ff5ed24b17908add7d042f0d2ffc7b6e02e6f2cc3f16a1b457cc096ff6e"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hc673c1c8fe4b",
+   "n_tokens": 2644,
+   "sha256": "c673c1c8fe4b6abfdc8ae44ce3579f960ad1985b2e26161ee0526d3b40516932"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hc6c06ba33ed6",
+   "n_tokens": 8929,
+   "sha256": "c6c06ba33ed6f6e96aeb1a32a50dade78b09c39b250bb891d941cbaf05151eaf"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hc6fa6f0b3e1c",
+   "n_tokens": 9166,
+   "sha256": "c6fa6f0b3e1c4b749ddf8697417cdf9ccc32f3dceecd48bef0cc9fb2adb5e7a1"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hc6fddcd2e0f7",
+   "n_tokens": 1441,
+   "sha256": "c6fddcd2e0f7e0d587470d0654d1cdc957685bae453b905117d97f74513b26b9"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hc7191502c1ae",
+   "n_tokens": 8927,
+   "sha256": "c7191502c1ae4d8589569c5fec41526b760c3fbb243e3b5f5e76ef1cb340fec8"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hc9717782c16d",
+   "n_tokens": 3666,
+   "sha256": "c9717782c16d4ac94b91d8394e92846b5e56ba3fbc7bb40c6a675391f6888830"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hc9ae88a0745c",
+   "n_tokens": 4520,
+   "sha256": "c9ae88a0745c6e4856a9fc9ae854d17a87c65ef898d2d759543c81cdc2bcf4bc"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hc9aeac8a3d15",
+   "n_tokens": 9489,
+   "sha256": "c9aeac8a3d15cbb79540fe79452c663354e053c7832d5eab6403176eee854646"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hca60f3dd4fbe",
+   "n_tokens": 10228,
+   "sha256": "ca60f3dd4fbed94b31c02c3b29260f6c4539ee8184fb2db5d87b1adf4d8e4989"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hcc36c7718cec",
+   "n_tokens": 3148,
+   "sha256": "cc36c7718cec82de53b813c44c62e7bd671053d8b1535b72b29ce01c3b6f5374"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hcd116aec67a4",
+   "n_tokens": 6533,
+   "sha256": "cd116aec67a4138975c94ba34cccfbbfae9019d7aad23cae22274cb3d3f94a7b"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hce5a641dd2d2",
+   "n_tokens": 4343,
+   "sha256": "ce5a641dd2d213d1a1e2c3e983d0e0d7f4bdfdece09c0751df0f21e50982a0f8"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hcecdb5e497d3",
+   "n_tokens": 6901,
+   "sha256": "cecdb5e497d3ad6c2faaa26680e6681a668d7da03240ffd02ff9735364a404e4"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hcef0df56ccb1",
+   "n_tokens": 5112,
+   "sha256": "cef0df56ccb153ed54313e51b7d56bce54f3edc5d154065a32d7b11adfc51159"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hcf73ee4f39a4",
+   "n_tokens": 4189,
+   "sha256": "cf73ee4f39a4a37f4d84bc7aac0b0821c0af350e82681baa7dae4531bd290768"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hd0570e4009d5",
+   "n_tokens": 9912,
+   "sha256": "d0570e4009d5795678025c2452eb099a2d2d63c53fb36b93a80c3b4de12b3fa5"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hd0d5aab55fbc",
+   "n_tokens": 4983,
+   "sha256": "d0d5aab55fbc733b64e9300e0b76652d7fd40882be7710fe133656cc86350aee"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hd162f22f4542",
+   "n_tokens": 9983,
+   "sha256": "d162f22f45425436ae385c9c2c15fa75f3ecafc5d46b7629683da8f86790cf00"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hd1957ee8a1f4",
+   "n_tokens": 5210,
+   "sha256": "d1957ee8a1f478283dcf3846a4dbb9eb5f3b3bd28dacd8b111c8a4fdfb378a3a"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hd22cafe8ae18",
+   "n_tokens": 9030,
+   "sha256": "d22cafe8ae186b0dfade7fc4e4cfd263134b5aba2b10d4a00bb57c455a3443f8"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hd44d086596b9",
+   "n_tokens": 5474,
+   "sha256": "d44d086596b9cfe7526a17c874110ae17c4d8db5d32c526dc6902c45a6d0d5c5"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hd4f52d9cbbb6",
+   "n_tokens": 4255,
+   "sha256": "d4f52d9cbbb641fd843ed68f7152875f7ac6f46cd8015ebe1e7a81e466994171"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hd562c69c32af",
+   "n_tokens": 8764,
+   "sha256": "d562c69c32afe3211f2b027f99d19f04e604b8ac49afa8e445a7625b1360b7e5"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hd5806ed22a93",
+   "n_tokens": 8858,
+   "sha256": "d5806ed22a93ede98444a3fef33a2180248d6bf683c73f4c3bdab8f3ee464b58"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hd63d4c1db01a",
+   "n_tokens": 2704,
+   "sha256": "d63d4c1db01a87ec27162df70249b6291853d62dc80aa30f39cc9dc6eb25f0f1"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hd695af630d91",
+   "n_tokens": 3452,
+   "sha256": "d695af630d919867ebd75eeeec6d50b7c1f0493c2df4af2feeb42b273c387bf7"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hd8460b66bef9",
+   "n_tokens": 2647,
+   "sha256": "d8460b66bef9c550edf86c7dcad31356cacf24016640b6b2c11c2b7d5016a2a3"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hd8a4a6e6f10b",
+   "n_tokens": 9848,
+   "sha256": "d8a4a6e6f10b7b646d1fe35b9c676afed608e763003051157cbee74ab81b38ce"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hd98689d108c9",
+   "n_tokens": 3775,
+   "sha256": "d98689d108c9360a9b5aabf23c3fb5f55e87010ba71b5e0bc678a8e69fe3844d"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hd9c00895c341",
+   "n_tokens": 9875,
+   "sha256": "d9c00895c341c470e1d3eb76fab2c106ed8e868777d9afa1f2f4f7e41636ae6e"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hdae91afc453c",
+   "n_tokens": 3307,
+   "sha256": "dae91afc453c1e5ab5a0b78c983d4811d1b34ebbd82b3333876a67281226acab"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hdbd9e1cf5a43",
+   "n_tokens": 9122,
+   "sha256": "dbd9e1cf5a435e41c2a703cfbb45f269410dcebcd8ce8bb338e5b8e2de12cd79"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hdc13e962c9fb",
+   "n_tokens": 7196,
+   "sha256": "dc13e962c9fbfa9d3e5968acc1480f615008b4bb317c5d2ea50eee15d2b88af0"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hddc7c7f6898b",
+   "n_tokens": 8751,
+   "sha256": "ddc7c7f6898b973c0a0f2fb1a5e33cf03c4aeb4c145a25c2db06631b5956bf07"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hdea272eeabf7",
+   "n_tokens": 9890,
+   "sha256": "dea272eeabf7c383d0e362a7f2d99beccc53c1495163929108d2ad3e1bb074ce"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "he0959fb17160",
+   "n_tokens": 7436,
+   "sha256": "e0959fb17160ff17a664f945eb6e19274f43e0e231c885894facd8a80e7d5e67"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "he1b2878aa8c8",
+   "n_tokens": 2981,
+   "sha256": "e1b2878aa8c8c14826bfed53a4f5cfba5b2767dabe1c6254e7291378da0e3c32"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "he2ac692e2136",
+   "n_tokens": 2001,
+   "sha256": "e2ac692e2136bed8652a3e3ea438f644012886655c6659557112e4d35ff6d1fa"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "he35c72ef5e84",
+   "n_tokens": 3654,
+   "sha256": "e35c72ef5e84a0efc0010a2a25335c71f1ae88ccd447cfadfb4c8bb59759e413"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "he3d3adb43678",
+   "n_tokens": 4336,
+   "sha256": "e3d3adb43678255483389398bbe20447db0b250ad7c34ce469bd51717e448d7f"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "he4a7c40d8a28",
+   "n_tokens": 4130,
+   "sha256": "e4a7c40d8a2889b78aaf2e8aa964d2c53171f2b51e4dbb07f19d5e507a8e3956"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "he4bdf42408ad",
+   "n_tokens": 3072,
+   "sha256": "e4bdf42408adf8f246c7e65d674cbc16c43b6e0936ce1e0ba2e2bd2e9521b019"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "he63a387d9176",
+   "n_tokens": 3592,
+   "sha256": "e63a387d9176651eb284f8212cf597b4b098e64c5ade777005e5734830b52145"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "he640241add76",
+   "n_tokens": 5223,
+   "sha256": "e640241add76840728baeef01d9b43a94e8538a1cec0dbb2de76e9633491bb50"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "he822c39e3387",
+   "n_tokens": 3070,
+   "sha256": "e822c39e338775aff34d1daa3701bcf34460ed208ac652e908f7a120582e8575"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hecb4f5dc6166",
+   "n_tokens": 8990,
+   "sha256": "ecb4f5dc616674c3bdecc33ebb733d5749601dbee5b97759eb1e3d9e0067f95f"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hecd740ecb691",
+   "n_tokens": 6137,
+   "sha256": "ecd740ecb691c9d829fc8c7e88540dd7034ae9b46709575c269e0275c05fbcb0"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hed62f96a8abd",
+   "n_tokens": 2777,
+   "sha256": "ed62f96a8abd102c509e2301426f3c424b0acdbdafa85d59b945ad2ca93087b5"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hed781bd9d7f2",
+   "n_tokens": 5279,
+   "sha256": "ed781bd9d7f2c6d839cc6e79bf6f82662dfd9b1ef5db48fde78c017ab0980304"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hedcb74c45fd0",
+   "n_tokens": 1509,
+   "sha256": "edcb74c45fd0e7e7e70df8d268610a1fba073ce06be32753abe1824c933d7448"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hee8eb47176d3",
+   "n_tokens": 5960,
+   "sha256": "ee8eb47176d3f890cca2aea4270f36e33b23fc63cce9c005a78fbb7fe64910d3"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "heedab7f35991",
+   "n_tokens": 4007,
+   "sha256": "eedab7f35991934d7f6eec86d65c526115ef3e0858e69d43ce5e37e1f8f0ea68"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "heee01428971f",
+   "n_tokens": 9967,
+   "sha256": "eee01428971f6bbfbf5f5e415e737a560a7bc23541322612e4c9a900d5b0390f"
+  },
+  {
+   "category": "long_context",
+   "class": "private",
+   "key": "hef5272e8cedf",
+   "n_tokens": 43885,
+   "sha256": "ef5272e8cedfa5efe740d8cb9e3067ea4f60a8ae0b361f04cdbf17240d9f9592"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hefa3519b1daa",
+   "n_tokens": 1460,
+   "sha256": "efa3519b1daa7bd93c9aff0f31e7e22fd9a98c1900b558a5345a6336e9495aea"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hf1a20dbe8fd1",
+   "n_tokens": 9099,
+   "sha256": "f1a20dbe8fd11d70b242ab7dd91d278ba9e13c4f95ebf78e7e12a99812c97f4c"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hf1b5ebcbbd7f",
+   "n_tokens": 9093,
+   "sha256": "f1b5ebcbbd7f9f45146bcb3589792eba50b3c336ba9840ff0fb63f1f5e0f4ee4"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hf2e1fe0682a4",
+   "n_tokens": 6499,
+   "sha256": "f2e1fe0682a45726f155cea2bda1ad5ea61546c49834bbb390abaec1ca072996"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hf3a4e416a5d4",
+   "n_tokens": 9777,
+   "sha256": "f3a4e416a5d4a6f38a431d6ea30761cb13f74564faa0d21d5ad3e54bebaee3de"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hf426c1db5a78",
+   "n_tokens": 2535,
+   "sha256": "f426c1db5a78e30ccb12e32dfa975d30321d5fe9ab0ad66e7481872ec6df82ea"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hf49465462c43",
+   "n_tokens": 6757,
+   "sha256": "f49465462c4357c10d9c2c1dd1e1ae3e38cc1192068aca239fc4380bf1edde0d"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hf5434691efd0",
+   "n_tokens": 9004,
+   "sha256": "f5434691efd0871fcb9f2fd1bec12d8628034eba9cc689ba2c03f428edadd8f1"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hf5d7c296b78e",
+   "n_tokens": 4111,
+   "sha256": "f5d7c296b78e9d8b6289f89c0c6c4e562866971cd570914127f2fb01d70c7e17"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hf5e45fab2518",
+   "n_tokens": 6760,
+   "sha256": "f5e45fab2518e595412837044c1d23678304aed24d2936d8fd086c1a0d10cb06"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hf5ff7bcf3435",
+   "n_tokens": 5096,
+   "sha256": "f5ff7bcf3435e775863f57070ebbf7121274361dc52a212f2abf5ba68ed9e0ad"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hf63401a57118",
+   "n_tokens": 9752,
+   "sha256": "f63401a57118fc539b29cab0a31f2956c535c67addedd180a7e18e33a3c58db5"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hf64f78b90141",
+   "n_tokens": 2726,
+   "sha256": "f64f78b90141bc5d7ceed358317a495aa3b081d549540361f29b3f1c29138eba"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hf67d854e579b",
+   "n_tokens": 7696,
+   "sha256": "f67d854e579b0ae0a92b0348c0fd8b6b084e4a426ac43825b3e36a99ecb53c18"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hf6fb7f92c9ba",
+   "n_tokens": 4455,
+   "sha256": "f6fb7f92c9bafa0746e8c7106ae99b6da4faec2546ede28cc1393b25c34fb9c3"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hf7402030e22e",
+   "n_tokens": 9227,
+   "sha256": "f7402030e22e52b395e9b2e2585e5c84c93fa50f7ca411cd65f90dbf19697523"
+  },
+  {
+   "category": "model_native",
+   "class": "private",
+   "key": "hf78ad2ecbdfd",
+   "n_tokens": 3284,
+   "sha256": "f78ad2ecbdfd24269dc4991b8fb51752c7998f065de85510e3dd1633d71d78d7"
+  },
+  {
+   "category": "italian_chat",
+   "class": "synthetic",
+   "key": "hf97358483203",
+   "n_tokens": 4958,
+   "sha256": "f97358483203b5fea45042c7a0fa57ae915bed4887223d0e10ffbbcde46ecccb"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hfa386f43aa47",
+   "n_tokens": 7234,
+   "sha256": "fa386f43aa47d1c38257785539fc0d7f8a8ae48e83986f27b0e6c790852fb829"
+  },
+  {
+   "category": "structured_json",
+   "class": "private",
+   "key": "hfb1be2af1738",
+   "n_tokens": 5933,
+   "sha256": "fb1be2af1738c2c08ef05cdca237d0a188eae2f1740d1732c57f196fdecd7df5"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hfb9a0083088a",
+   "n_tokens": 10010,
+   "sha256": "fb9a0083088a61b3a14001faf9e1b6384d0af1cd9691ae1337609bee1ff3b77e"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hfc666e677dae",
+   "n_tokens": 8868,
+   "sha256": "fc666e677dae855ea36259bb7db6fc22efa366a194cca01ee0be9ad9e1e56afc"
+  },
+  {
+   "category": "agentic_code",
+   "class": "private",
+   "key": "hfe9875abc1ae",
+   "n_tokens": 8991,
+   "sha256": "fe9875abc1aee6be5a990fad95dd6dd61e98fb42df890b4d32a61c09542c169c"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n001",
+   "n_tokens": 8266,
+   "prompt_set": "native_prompts",
+   "sha256": "e8a58040d99e56d2b25a15bc9991847300c5c3db62241dea937ec6103bf1a25f"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n002",
+   "n_tokens": 5227,
+   "prompt_set": "native_prompts",
+   "sha256": "ee29de5c810ac1e341d89203941a39663491f9faa984d0c2b2c22c2ee99ee31f"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n003",
+   "n_tokens": 8253,
+   "prompt_set": "native_prompts",
+   "sha256": "a043cbe32851b07ba5a3db4aac2d884f1b3c80485902247f62b24618b64236c4"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n004",
+   "n_tokens": 3370,
+   "prompt_set": "native_prompts",
+   "sha256": "d3ac7b096ae8e16e161ee1d8f32602acb2297c06df60bb766badd5dcd10a2b54"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n005",
+   "n_tokens": 3703,
+   "prompt_set": "native_prompts",
+   "sha256": "e9d3f3d831889c897ef0a0ed6c410c9e8c9b964dac05daf79d1f3514f838dd86"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n006",
+   "n_tokens": 2061,
+   "prompt_set": "native_prompts",
+   "sha256": "23b1b808c0fe036fb400a247bfdfd1322f180cad96f0242191de5b52900b51be"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n007",
+   "n_tokens": 8249,
+   "prompt_set": "native_prompts",
+   "sha256": "136c82b6f22d9b700c6df5a3278758a4d398046b3f4f4e78785e363a0c51f46b"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n008",
+   "n_tokens": 3407,
+   "prompt_set": "native_prompts",
+   "sha256": "7b796e52bc89d9667555c525367ea4641892933aa17b7244b55d0ab0684dea72"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n009",
+   "n_tokens": 7050,
+   "prompt_set": "native_prompts",
+   "sha256": "ac632961537b7e995cbc93417c02c6ab45dd620325f504a194074763a6f0da67"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n010",
+   "n_tokens": 1128,
+   "prompt_set": "native_prompts",
+   "sha256": "984e2516e43d87782529b99b1533854385a1405f4e92ebcafc8ac5151a8c5e48"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n011",
+   "n_tokens": 2510,
+   "prompt_set": "native_prompts",
+   "sha256": "4cab9bde1b5e6521c77192cee2ed0773e19dc075f80a004cfe7b12bd2921ab5f"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n012",
+   "n_tokens": 4655,
+   "prompt_set": "native_prompts",
+   "sha256": "408e2821b93fdc8b4d01d223124f00a5c98319e5494a9d6b774285928ea5e73d"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n013",
+   "n_tokens": 3211,
+   "prompt_set": "native_prompts",
+   "sha256": "a822e220fc8f40c9b87d060ea74b96dcc8811576308f2aed2599ad5657441ae8"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n014",
+   "n_tokens": 2381,
+   "prompt_set": "native_prompts",
+   "sha256": "1308643b1bc4b51145c1f8c5e08a1b54173608a08d77636a4fb9f98a5c6f0a35"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n015",
+   "n_tokens": 7837,
+   "prompt_set": "native_prompts",
+   "sha256": "db733754f085e4f2641859a7870d243e58d2e1435198c3d390cef66f904e6b80"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n016",
+   "n_tokens": 3483,
+   "prompt_set": "native_prompts",
+   "sha256": "18423d0696796f34f303019bed205cc755c18a90fe5656c6c17d15f3913dc178"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n017",
+   "n_tokens": 3141,
+   "prompt_set": "native_prompts",
+   "sha256": "28aeaa998d8a12b1bfe438a4fbe4d4c680b4e3e46d62a74535fd7643118afcf9"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n018",
+   "n_tokens": 8236,
+   "prompt_set": "native_prompts",
+   "sha256": "9a3a066bf7126bb1d2fd0f41446100348f991820a36080d5fcbdbbc1d988844d"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n019",
+   "n_tokens": 4672,
+   "prompt_set": "native_prompts",
+   "sha256": "7375943424d38e090e373ca691459da2cf138fa1d95967f8b7bc55cb5cf30177"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n020",
+   "n_tokens": 2452,
+   "prompt_set": "native_prompts",
+   "sha256": "5a0a23b474dfc39ad86198b16a67d08bbf3dad5f2b78dc83a5f1d1509b555773"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n021",
+   "n_tokens": 2956,
+   "prompt_set": "native_prompts",
+   "sha256": "cf7727c3f6242143449a4be0b0b2a956b699857ec53741a044c740a3f440df82"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n022",
+   "n_tokens": 3970,
+   "prompt_set": "native_prompts",
+   "sha256": "4ac6713d027b0b8276dc2427f168843783e3f63197da003e54516c45c832b3b5"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n023",
+   "n_tokens": 6441,
+   "prompt_set": "native_prompts",
+   "sha256": "111fc8596f562f2c2e319ae9b383a307bef8a8600e630501ac9ed64e579c0e11"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n024",
+   "n_tokens": 2048,
+   "prompt_set": "native_prompts",
+   "sha256": "3991c2555990d293579825cffcc420af6185e2c7c6866336682ba700b6024eca"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n025",
+   "n_tokens": 3745,
+   "prompt_set": "native_prompts",
+   "sha256": "1c17b08462f5e69ea7aa9dd747073af47709138e0b2e6a2ccb6a0dda5ac32c0a"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n026",
+   "n_tokens": 8241,
+   "prompt_set": "native_prompts",
+   "sha256": "2c4ab0bb7ed3f095170f3aad09f43bf203ca7038d703f21f6f9e6282c3e66c4b"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n027",
+   "n_tokens": 4444,
+   "prompt_set": "native_prompts",
+   "sha256": "acb94fe271a9d8abbbad639d8ed12537b8f119493fbc9d5a55658ee84085ab20"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n028",
+   "n_tokens": 4981,
+   "prompt_set": "native_prompts",
+   "sha256": "2c343bc73233394014f7de8409bfae2f3d072aebec2942a367826bf3b49f6a8e"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n029",
+   "n_tokens": 3138,
+   "prompt_set": "native_prompts",
+   "sha256": "6e661bf861a6426549179c07d4ce45d7b2f5b32efdd56b09a236ad0503c3f752"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n030",
+   "n_tokens": 2011,
+   "prompt_set": "native_prompts",
+   "sha256": "30d09e7a29c781abb7d63040889841ad25f4577d2e68d89aa73d0b3c7d9feb3e"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n031",
+   "n_tokens": 4967,
+   "prompt_set": "native_prompts",
+   "sha256": "ec1275b0764f20aed79ed17aaaf94afe471f1a74f487eea31d44a69e5661a99a"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n032",
+   "n_tokens": 2024,
+   "prompt_set": "native_prompts",
+   "sha256": "ec6d17e25c0f97cc7f49dc358636a854b790431208e8691f0846a8c569841852"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n033",
+   "n_tokens": 8256,
+   "prompt_set": "native_prompts",
+   "sha256": "bc0cfdbdf54512416cae0de68d716cd95b19f3297b4af80b57840fa5d5e52152"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n034",
+   "n_tokens": 1533,
+   "prompt_set": "native_prompts",
+   "sha256": "fcae439bc246ef1c284cdc6204acaa2b9a8645bf5638cb478622d95e534037a5"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n035",
+   "n_tokens": 2840,
+   "prompt_set": "native_prompts",
+   "sha256": "9a8141721f2b7544a950091da6109ef77d6374e20c71c4e29f4623d9bed89850"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n036",
+   "n_tokens": 1704,
+   "prompt_set": "native_prompts",
+   "sha256": "c8f1fa1657a9450f56800823e9774b1472e878de6ed079afbbd2659745432c8c"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n037",
+   "n_tokens": 2781,
+   "prompt_set": "native_prompts",
+   "sha256": "6bbe65f33385d3d36a700e4b224eb6d9722ced6b1d101e3be0f8eb40a2df6945"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n038",
+   "n_tokens": 3874,
+   "prompt_set": "native_prompts",
+   "sha256": "96e14c8f11b7b5fa5df8c0dc267ffebeaf65250b0658f8bec996ffe269a48090"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n039",
+   "n_tokens": 2705,
+   "prompt_set": "native_prompts",
+   "sha256": "4183094e12bc54a5b1daf1fff90679f338c393d1420e5fb709cbcfd1dc40b3aa"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n040",
+   "n_tokens": 4648,
+   "prompt_set": "native_prompts",
+   "sha256": "6aac514e6996ae65efc78e2c404c3060c8e66f1945837a142ce046486875722d"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n041",
+   "n_tokens": 3239,
+   "prompt_set": "native_prompts",
+   "sha256": "9e37b0102a99e2f1c271f6a41ec5f5979a52137be781af59cfbab60aeee50f3c"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n042",
+   "n_tokens": 4277,
+   "prompt_set": "native_prompts",
+   "sha256": "1bec2537261b4277daf715b4c69f203fa0cf6e737b8eebdb708499acd75e274e"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n043",
+   "n_tokens": 2469,
+   "prompt_set": "native_prompts",
+   "sha256": "17e3e2a86dd81446a00477ce22c7015bda69ff2d6ae0d4e29ee120661de047fe"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n044",
+   "n_tokens": 3349,
+   "prompt_set": "native_prompts",
+   "sha256": "707d5410d2e1cf568ffbb66512944fe8d261a37a71a6ec9a60e20454031d0913"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n045",
+   "n_tokens": 4802,
+   "prompt_set": "native_prompts",
+   "sha256": "1b5673da6018341f40e2dedd6f29e3bf3ee1c3513fb84606eb322da080d8da87"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n046",
+   "n_tokens": 2339,
+   "prompt_set": "native_prompts",
+   "sha256": "3527c12e1b3162dc9b4095f5109ddc2f388a408b2e90f8e0a5a7b306e091fb0f"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n047",
+   "n_tokens": 2056,
+   "prompt_set": "native_prompts",
+   "sha256": "e7088317c080b61f8e7374ff3f539a20a2b651c8a905c3ee9207e10439cbc080"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n048",
+   "n_tokens": 3182,
+   "prompt_set": "native_prompts",
+   "sha256": "68350af7b434ec965646707fdb49c16d1001012f7da11ba6b88bf6a7dbbab1a0"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n049",
+   "n_tokens": 4939,
+   "prompt_set": "native_prompts",
+   "sha256": "d658d737c67f9cdc1490beab7364b471f5ab0b56008e8cb0178c59f4234a01cc"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n050",
+   "n_tokens": 3309,
+   "prompt_set": "native_prompts",
+   "sha256": "a7503d0c65c8c8d99ce3208f1df15ef7f40db4a0f3db8ee57c777e9d1459f32d"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n051",
+   "n_tokens": 2063,
+   "prompt_set": "native_prompts",
+   "sha256": "cf29e431a24eef2ab4c6c2dd408361af1d3cae1f71e2d0dbd2d82943f19ddbad"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n052",
+   "n_tokens": 5336,
+   "prompt_set": "native_prompts",
+   "sha256": "83f959fd1a212b96c55db7af5a4235738b4c97fe3b787e34aeead9add872a74a"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n053",
+   "n_tokens": 1763,
+   "prompt_set": "native_prompts",
+   "sha256": "8df6c97e61938a8c46279010239347342ed8e6761e3616999466fb65044450dc"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n054",
+   "n_tokens": 3475,
+   "prompt_set": "native_prompts",
+   "sha256": "a7c261b26c161fb3573d29bf8e2452b2af828d66b38383c4dc45b998608eac26"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n055",
+   "n_tokens": 1593,
+   "prompt_set": "native_prompts",
+   "sha256": "ef3d558dc7473f3ca8c57004235e10112ded6015142ed9db3823c293fd22f1bb"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n056",
+   "n_tokens": 4372,
+   "prompt_set": "native_prompts",
+   "sha256": "da5de8f131231c9d9a854076bbf8bf08006cbab45e3c667114e309a300846934"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n057",
+   "n_tokens": 2237,
+   "prompt_set": "native_prompts",
+   "sha256": "b452a3f44dcb5b2fc61e66cf37fe046f2d83c0f3f90b01a87c950fef2ba3982f"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n058",
+   "n_tokens": 6642,
+   "prompt_set": "native_prompts",
+   "sha256": "b4f0974772d1cddaf85775f782243fc9aa7503d53e7dc1bb4de2949e5d27d8c2"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n059",
+   "n_tokens": 2216,
+   "prompt_set": "native_prompts",
+   "sha256": "349052c83885bed72325f8b66bfe7f88459488aa9efb074b908ee4464ebf6d31"
+  },
+  {
+   "category": "model_native",
+   "class": "public",
+   "key": "n060",
+   "n_tokens": 3172,
+   "prompt_set": "native_prompts",
+   "sha256": "4bc59397320e221d5e1655e55a2a8425f1d42eb8a5dd2094a5d92af56fa1bb8b"
+  }
+ ]
+}

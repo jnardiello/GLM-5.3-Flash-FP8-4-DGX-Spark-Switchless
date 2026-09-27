@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "json_escape",
+ "category": "json",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 223
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 280,
+ "response": {
+  "content": "```json\n{\"text\": \"She said \\\"hi\\\\there\\\" — twice.\", \"len\": 23}\n```",
+  "reasoning_content": "I need to output a JSON object with key \"text\" whose value is exactly: She said \"hi\\there\" — twice.\n\nThe string contains double quotes and a backslash, so in JSON I must escape them: `She said \\\"hi\\\\there\\\" — twice.`\n\nNow count characters in the actual string (unescaped):\n\"She said \"hi\\there\" — twice.\"\n\nLet me count:\nS(1)h(2)e(3) (4)\"(5)h(6)i(7)\\(8)t(9)h(10)e(11)r(12)e(13)\"(14) (15)—(16) (17)t(18)w(19)i(20)c(21)e(22).(23)\n\n23 characters. The em dash counts as one character.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 63,
+  "total_tokens": 255,
+  "completion_tokens": 192,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 166
+  }
+ },
+ "wall_s": 8.678,
+ "grader": {
+  "pass": false,
+  "why": "len does not match text length"
+ }
+}

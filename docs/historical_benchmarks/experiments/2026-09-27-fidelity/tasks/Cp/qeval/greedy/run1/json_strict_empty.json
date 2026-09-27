@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "json_strict_empty",
+ "category": "json",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 120
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 260,
+ "response": {
+  "content": "```json\n{\"alpha\": 5, \"beta\": 4, \"gamma\": 5}\n```",
+  "reasoning_content": "Return JSON: {\"alpha\":5,\"beta\":4,\"gamma\":5}",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 42,
+  "total_tokens": 82,
+  "completion_tokens": 40,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 16
+  }
+ },
+ "wall_s": 2.157,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "prose_p1",
+ "category": "prose",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 93
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 460,
+ "response": {
+  "content": "The harbour wakes slowly beneath a sky the colour of bruised plums fading to rose. Fishing boats rock gently against the quay, their hulls creaking as the tide turns, and the first gulls circle overhead with thin, plaintive cries. Mist hovers low over the water, softening the outlines of moored yachts and the craggy breakwater beyond. A single lamp on the pier still burns, its pale glow swallowed by the strengthening light. Somewhere a door bangs; a fisherman in rubber boots crosses the wet cobbles, his breath ghosting in the cold air. The smell of salt and diesel mingles with the faint sweetness of bread from a bakery just opening. Slowly, the sun crests the headland, gilding the water gold.",
+  "reasoning_content": "Write ~120 words, one paragraph, prose, evocative description of a harbour at dawn.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 33,
+  "total_tokens": 217,
+  "completion_tokens": 184,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 20
+  }
+ },
+ "wall_s": 10.598,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

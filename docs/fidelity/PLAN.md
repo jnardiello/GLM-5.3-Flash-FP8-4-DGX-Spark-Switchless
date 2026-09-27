@@ -367,6 +367,7 @@ All amendments were recorded before the affected measurements ran.
       - sparse regime KL 0.321 and top-1 77.3%, the known nondeterminism.
     - **Consequence.** The dense-regime distances between recipes are recipe effects, not boot effects: Cm/R0 0.184, Cpre/R0 0.182, Cm/Cpre 0.182, top-1 about 83.5%. The ladder is therefore kept, and `le22b-m` versus `le21-m` is a strict negative control that must be exactly zero in the dense regime.
     - The near-equal pairwise distances indicate that any numerical change is amplified to a similar deviation. Quality differences are therefore read from ΔNLL.
+    - *Note added after the analysis:* the full ladder qualifies this reading. Cm/R0, Cpre/R0 and Cm/Cpre (0.18) and two of the five adjacent ladder steps, L0919/R0 and LE21/Cpre (0.17), land near the same dense KL. The E03 mHC step alone gives 0.075 and the two runtime-only steps after E22b are near zero, so the amplification is common but not universal.
     - **Descoped to shorten the campaign from about 16 to about 6 cluster hours**, with the owner's approval:
       - Decode-set generations (`gen-a`, `gen-floor`) and the DFlash2 exact-match check (`cm-nospec`, `gen-nospec`) are dropped. With every numerical change amplified, greedy continuations diverge within a few tokens, so prefix and exact-match statistics add little beyond the prompt-logprob results.
       - R0 cross-boot is reduced to `prompt-crossboot`, its third execution for the sparse estimator.

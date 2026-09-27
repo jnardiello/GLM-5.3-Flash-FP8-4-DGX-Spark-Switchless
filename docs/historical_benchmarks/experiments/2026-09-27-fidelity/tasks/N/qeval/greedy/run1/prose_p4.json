@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "prose_p4",
+ "category": "prose",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 106
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 460,
+ "response": {
+  "content": "Maps are never neutral records of the world; they are always political artefacts. Every map involves choices: what to include, what to omit, where to centre the image, and how to project a curved planet onto a flat surface. The Mercator projection, for instance, inflates Europe and North America while shrinking Africa and South America, subtly reinforcing hierarchies of global power. Borders themselves are contested claims, and drawing a line on a map can legitimise one nation's sovereignty while erasing another people's existence. Even the naming of places—whether we say Myanmar or Burma, Persia or Iran—asserts a particular political stance. Because mapmakers must select, simplify, and symbolise, they inevitably embed assumptions about what matters and who belongs. Maps do not merely represent the world; they help construct it.",
+  "reasoning_content": "Write ~130 words continuous prose arguing maps are always political.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 33,
+  "total_tokens": 213,
+  "completion_tokens": 180,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 9.146,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

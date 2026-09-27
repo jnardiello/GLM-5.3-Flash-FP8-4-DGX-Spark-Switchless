@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_word_wrap",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 338
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef word_wrap(text, width):\n    if width <= 0:\n        raise ValueError(\"width must be a positive integer\")\n    words = text.split()\n    if not words:\n        return []\n    lines = []\n    current = words[0]\n    for word in words[1:]:\n        if len(current) + 1 + len(word) <= width:\n            current += \" \" + word\n        else:\n            lines.append(current)\n            current = word\n    lines.append(current)\n    return lines\n```",
+  "reasoning_content": "Simple greedy word wrap. Handle empty input -> return empty list or ['']? \"Handle empty input sensibly\" — return [] for empty/whitespace-only text. Also handle words longer than width: place them on their own line (can't split).",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 81,
+  "total_tokens": 242,
+  "completion_tokens": 161,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 52
+  }
+ },
+ "wall_s": 6.859,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

@@ -83,6 +83,51 @@ cadence with the E27c scheduler, seven draft tokens (E28b), the E29 length-finis
 idle coalescing, SparkCache replay views and SIRCL/patched NCCL.
 The **16 GiB KV pool per rank** (E28b) and the **262,144-token context limit** apply.
 
+## Quality vs vendor FP8
+
+**Measured 27/09/2026 on 2.5M teacher-forced tokens: 424 windows of coding-agent sessions,
+synthetic Italian chats and model-written text.** The reference is the vendor FP8 weights
+served on the same four nodes with an FP8 KV cache. E29 does not match it bit for bit,
+but shows no detectable quality loss: its dense, sparse and all-position perplexity
+intervals all include zero. A public NVFP4 recipe is about twice as far from FP8 on
+short contexts (single-execution coarse KL). It is slightly better there, but clearly
+worse overall and beyond 2K tokens.
+
+| vs vendor FP8 | E29 | NVFP4 |
+| --- | ---: | ---: |
+| Same next token, ≤ 2K context | 83.4% | 75.1% |
+| KL divergence, ≤ 2K context (nats) | 0.18 | 0.35 |
+| Perplexity change, ≤ 2K context | +0.03% [−0.56, +0.60] | −3.33% [−5.43, −1.22] |
+| Perplexity change, all tokens | +0.14% [−0.32, +0.56] | +7.07% [+4.61, +9.37] |
+| Perplexity change, > 2K context | +0.19% [−0.34, +0.73] | +12.05% [+8.30, +15.62] |
+| Perplexity change, agentic code | +0.35% [−0.39, +1.11] | +9.30% [+6.76, +12.08] |
+| Perplexity change, synthetic Italian chat | −0.04% [−0.19, +0.12] | +10.05% [+9.32, +10.82] |
+| qeval tasks, mixed (FP8: 73/75) | 73/75 | 74/75 |
+| Italian replies with garbled characters | 0/40 | 3/40 |
+
+- **Perplexity change** is exp(ΔNLL) − 1 on the token that actually came next, with 95%
+  bootstrap intervals over source sessions. Lower is better; an interval that contains 0
+  means no detectable change.
+- **KL divergence** covers the shared top-20 tokens, the actual token and a rest bucket,
+  so it is a lower bound. Most recipe changes measured here produce a dense KL of this
+  size; the FP8 recipe before E21 also sits at 0.18.
+- **Beyond 2,048 tokens** the engine is not deterministic, even for the FP8 reference, so
+  the fine-grained distance there remains unresolved. No quality change is detected there.
+- **The garbled-text probe** ran on E29 and NVFP4 only. The 75 qeval tasks mix code,
+  reasoning, maths, JSON, formatting and prose. At this size they show no difference, but
+  they cannot prove equivalence.
+
+[![Different vs worse: KL distance from vendor FP8 against perplexity change for E29, the earlier recipe and NVFP4, with 95% intervals.](docs/fidelity/plots/02-different-vs-worse.png)](docs/fidelity/plots/02-different-vs-worse.svg)
+
+[![Quality vs FP8: perplexity change of each recipe against vendor FP8 by context regime and corpus category, with 95% intervals.](docs/fidelity/plots/01-quality-vs-fp8.png)](docs/fidelity/plots/01-quality-vs-fp8.svg)
+
+The [fidelity report](docs/fidelity/REPORT.md) opens with a
+[plain-language summary](docs/fidelity/REPORT.md#in-plain-words). It also covers the method,
+the recipe ladder that attributes the difference to individual steps, and the limitations.
+[`report.html`](docs/fidelity/report.html) is a self-contained version with every figure.
+The [experiment archive](docs/historical_benchmarks/experiments/2026-09-27-fidelity/README.md)
+holds the portable data.
+
 ## Install with an agent
 
 Start with a local checkout and an agent that can read its files and use SSH. The
@@ -148,6 +193,7 @@ short execution checklist. The guides below own the complete procedures.
 | Build and install patched NCCL | [NCCL guide](scripts/node/nccl/README.md) |
 | Maintain workstation scripts | [Shared shell helpers](scripts/lib/README.md) |
 | Review benchmark results and history | [Benchmark reports](docs/benchmarks/README.md), [native report storage](docs/rigmark_reports/README.md) |
+| Check output quality against vendor FP8 | [Fidelity report](docs/fidelity/REPORT.md), [fidelity tooling](scripts/fidelity/README.md) |
 | Review changes and third-party terms | [Changelog](CHANGELOG.md), [credits](CREDITS.md), [license](LICENSE) |
 
 ## Use the endpoint

@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "math_m8",
+ "category": "math",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 136
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 640,
+ "response": {
+  "content": "**Setting up the problem:**\n\nLet the original price be P.\n\n- After 20% discount: P × 0.80\n- After further 10% off: P × 0.80 × 0.90 = P × 0.72\n\n**Solving:**\n\nP × 0.72 = 80\n\nP = 80 ÷ 0.72 = 111.11...\n\n100",
+  "reasoning_content": "80 after 20% discount: price = 80/0.8 = 100. Then 10% off at till: 100 × 0.9 = 90. So original price 100.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 48,
+  "total_tokens": 181,
+  "completion_tokens": 133,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 44
+  }
+ },
+ "wall_s": 6.759,
+ "grader": {
+  "pass": false,
+  "why": "got 100.0, want 111.1111111111111"
+ }
+}

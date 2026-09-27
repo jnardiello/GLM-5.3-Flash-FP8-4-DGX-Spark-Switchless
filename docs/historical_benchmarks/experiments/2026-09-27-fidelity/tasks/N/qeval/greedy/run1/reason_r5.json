@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r5",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 107
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "2\n\nIf you overtake the runner in second place, you take their position — you're now in second place, not first.",
+  "reasoning_content": "Classic riddle: you're in second place.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 38,
+  "total_tokens": 77,
+  "completion_tokens": 39,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 1.595,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

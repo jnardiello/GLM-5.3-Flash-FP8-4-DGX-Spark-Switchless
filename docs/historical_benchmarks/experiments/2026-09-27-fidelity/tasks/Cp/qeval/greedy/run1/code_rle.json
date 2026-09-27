@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_rle",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 253
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef rle(s):\n    if not s:\n        return []\n    result = []\n    current = s[0]\n    count = 1\n    for ch in s[1:]:\n        if ch == current:\n            count += 1\n        else:\n            result.append((current, count))\n            current = ch\n            count = 1\n    result.append((current, count))\n    return result\n```",
+  "reasoning_content": "Simple task.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 70,
+  "total_tokens": 163,
+  "completion_tokens": 93,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 3
+  }
+ },
+ "wall_s": 4.186,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

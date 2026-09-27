@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "math_m2",
+ "category": "math",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 157
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 640,
+ "response": {
+  "content": "**Setting up the problem:**\n\nAverage speed = Total distance ÷ Total time\n\n**Total distance:**\n315 km + 210 km = 525 km\n\n**Total time:**\n3.5 hours + 2 hours = 5.5 hours\n\n**Average speed:**\n525 ÷ 5.5 = 95.4545... km/h\n\n**95.45 km/h** (approximately)",
+  "reasoning_content": "Total distance 525 km, total time 5.5 h → 95.4545... ≈ 95.45 km/h.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 56,
+  "total_tokens": 177,
+  "completion_tokens": 121,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 31
+  }
+ },
+ "wall_s": 6.45,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

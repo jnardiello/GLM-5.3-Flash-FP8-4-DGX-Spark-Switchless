@@ -1,0 +1,527 @@
+{
+ "summary": {
+  "label": "Cp",
+  "italian_prompts": 40,
+  "italian_invalid_utf8": 0,
+  "italian_with_fffd": 0,
+  "italian_fffd_total": 0,
+  "italian_repetition_flags": 0,
+  "italian_truncated": 0,
+  "tool_prompts": 10,
+  "tool_calls_made": 10,
+  "tool_parse_failures": 0,
+  "tool_no_call": 0
+ },
+ "rows": [
+  {
+   "kind": "italian",
+   "i": 0,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 241,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 6.63
+  },
+  {
+   "kind": "italian",
+   "i": 1,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 239,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 6.11
+  },
+  {
+   "kind": "italian",
+   "i": 2,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 896,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 20.07
+  },
+  {
+   "kind": "italian",
+   "i": 3,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 361,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 10.1
+  },
+  {
+   "kind": "italian",
+   "i": 4,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 615,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 14.99
+  },
+  {
+   "kind": "italian",
+   "i": 5,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 365,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 10.83
+  },
+  {
+   "kind": "italian",
+   "i": 6,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 464,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 11.17
+  },
+  {
+   "kind": "italian",
+   "i": 7,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 741,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 20.6
+  },
+  {
+   "kind": "italian",
+   "i": 8,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 502,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 11.74
+  },
+  {
+   "kind": "italian",
+   "i": 9,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 132,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 4.6
+  },
+  {
+   "kind": "italian",
+   "i": 10,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 672,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 15.19
+  },
+  {
+   "kind": "italian",
+   "i": 11,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 179,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 4.75
+  },
+  {
+   "kind": "italian",
+   "i": 12,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 379,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 8.36
+  },
+  {
+   "kind": "italian",
+   "i": 13,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 286,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 7.83
+  },
+  {
+   "kind": "italian",
+   "i": 14,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 362,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 10.04
+  },
+  {
+   "kind": "italian",
+   "i": 15,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 462,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 11.37
+  },
+  {
+   "kind": "italian",
+   "i": 16,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 570,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 12.55
+  },
+  {
+   "kind": "italian",
+   "i": 17,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 564,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 15.4
+  },
+  {
+   "kind": "italian",
+   "i": 18,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 497,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 11.61
+  },
+  {
+   "kind": "italian",
+   "i": 19,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 457,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 13.23
+  },
+  {
+   "kind": "italian",
+   "i": 20,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 122,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 2.92
+  },
+  {
+   "kind": "italian",
+   "i": 21,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 740,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 17.08
+  },
+  {
+   "kind": "italian",
+   "i": 22,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 354,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 6.01
+  },
+  {
+   "kind": "italian",
+   "i": 23,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 378,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 9.36
+  },
+  {
+   "kind": "italian",
+   "i": 24,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 734,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 18.13
+  },
+  {
+   "kind": "italian",
+   "i": 25,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 380,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 10.94
+  },
+  {
+   "kind": "italian",
+   "i": 26,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 597,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 13.57
+  },
+  {
+   "kind": "italian",
+   "i": 27,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 79,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 2.6
+  },
+  {
+   "kind": "italian",
+   "i": 28,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 552,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 13.81
+  },
+  {
+   "kind": "italian",
+   "i": 29,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 146,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 4.14
+  },
+  {
+   "kind": "italian",
+   "i": 30,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 496,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 11.72
+  },
+  {
+   "kind": "italian",
+   "i": 31,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 388,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 10.46
+  },
+  {
+   "kind": "italian",
+   "i": 32,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 327,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 8.57
+  },
+  {
+   "kind": "italian",
+   "i": 33,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 420,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 9.69
+  },
+  {
+   "kind": "italian",
+   "i": 34,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 434,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 12.9
+  },
+  {
+   "kind": "italian",
+   "i": 35,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 609,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 15.08
+  },
+  {
+   "kind": "italian",
+   "i": 36,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 364,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 9.57
+  },
+  {
+   "kind": "italian",
+   "i": 37,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 603,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 13.48
+  },
+  {
+   "kind": "italian",
+   "i": 38,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 188,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 5.84
+  },
+  {
+   "kind": "italian",
+   "i": 39,
+   "utf8_valid": true,
+   "fffd": 0,
+   "tokens": 500,
+   "finish": "stop",
+   "repetition_flag": false,
+   "seconds": 13.3
+  },
+  {
+   "kind": "tool",
+   "i": 0,
+   "tool_call": true,
+   "args_parse_ok": true,
+   "tool_names": [
+    "get_weather"
+   ],
+   "fffd": 0,
+   "seconds": 1.47
+  },
+  {
+   "kind": "tool",
+   "i": 1,
+   "tool_call": true,
+   "args_parse_ok": true,
+   "tool_names": [
+    "get_weather"
+   ],
+   "fffd": 0,
+   "seconds": 1.1
+  },
+  {
+   "kind": "tool",
+   "i": 2,
+   "tool_call": true,
+   "args_parse_ok": true,
+   "tool_names": [
+    "create_event"
+   ],
+   "fffd": 0,
+   "seconds": 3.88
+  },
+  {
+   "kind": "tool",
+   "i": 3,
+   "tool_call": true,
+   "args_parse_ok": true,
+   "tool_names": [
+    "create_event"
+   ],
+   "fffd": 0,
+   "seconds": 1.43
+  },
+  {
+   "kind": "tool",
+   "i": 4,
+   "tool_call": true,
+   "args_parse_ok": true,
+   "tool_names": [
+    "get_weather"
+   ],
+   "fffd": 0,
+   "seconds": 1.48
+  },
+  {
+   "kind": "tool",
+   "i": 5,
+   "tool_call": true,
+   "args_parse_ok": true,
+   "tool_names": [
+    "create_event"
+   ],
+   "fffd": 0,
+   "seconds": 6.95
+  },
+  {
+   "kind": "tool",
+   "i": 6,
+   "tool_call": true,
+   "args_parse_ok": true,
+   "tool_names": [
+    "get_weather"
+   ],
+   "fffd": 0,
+   "seconds": 1.1
+  },
+  {
+   "kind": "tool",
+   "i": 7,
+   "tool_call": true,
+   "args_parse_ok": true,
+   "tool_names": [
+    "get_weather"
+   ],
+   "fffd": 0,
+   "seconds": 1.49
+  },
+  {
+   "kind": "tool",
+   "i": 8,
+   "tool_call": true,
+   "args_parse_ok": true,
+   "tool_names": [
+    "create_event"
+   ],
+   "fffd": 0,
+   "seconds": 3.74
+  },
+  {
+   "kind": "tool",
+   "i": 9,
+   "tool_call": true,
+   "args_parse_ok": true,
+   "tool_names": [
+    "get_weather"
+   ],
+   "fffd": 0,
+   "seconds": 1.02
+  }
+ ]
+}

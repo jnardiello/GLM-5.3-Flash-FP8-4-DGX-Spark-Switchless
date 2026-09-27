@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "json_toolcall",
+ "category": "json",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 245
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 280,
+ "response": {
+  "content": "```json\n{\"name\": \"book_restaurant_table\", \"arguments\": {\"restaurant\": \"Kappa\", \"party_size\": 4, \"time\": \"tomorrow 19:00\"}}\n```",
+  "reasoning_content": "The user wants a JSON object for a tool call. Restaurant \"Kappa\", party size 4, time 7pm tomorrow. Time as string — I don't know the date, so \"tomorrow 7pm\" or \"19:00 tomorrow\". I'll use \"tomorrow at 19:00\" or keep it simple.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 73,
+  "total_tokens": 186,
+  "completion_tokens": 113,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 4.722,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_bisect_left",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 300
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef bisect_left(xs, v):\n    \"\"\"Return the leftmost index at which v can be inserted into the\n    sorted list xs so that xs remains sorted.\n\n    If v is already present in xs, the returned index points at the\n    first (leftmost) occurrence of v.\n\n    An empty list returns 0.\n    \"\"\"\n    lo, hi = 0, len(xs)\n    while lo < hi:\n        mid = (lo + hi) // 2\n        if xs[mid] < v:\n            lo = mid + 1\n        else:\n            hi = mid\n    return lo\n```",
+  "reasoning_content": "Write bisect_left implementation.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 76,
+  "total_tokens": 215,
+  "completion_tokens": 139,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 6
+  }
+ },
+ "wall_s": 7.699,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

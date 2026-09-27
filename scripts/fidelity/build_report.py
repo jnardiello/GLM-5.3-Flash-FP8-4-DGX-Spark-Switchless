@@ -2,9 +2,11 @@
 """Build the fidelity campaign report: docs/fidelity/REPORT.md and report.html.
 
 Reads the public aggregates only: docs/fidelity/metrics-v2/*.json, corpus-summary.json,
-boots/*.json, optional task results (metrics/tasks-*.json), voxel checks
+boots/*.json, optional task results (metrics/tasks-*.json) and corruption-probe summaries
+(metrics/corruption-*.json), voxel checks
 (voxel/checks.json), the figure index plots/plots.json with its SVG files, and an
-optional hand-written verdict (verdict.md; absent means the verdict is "pending").
+optional hand-written verdict (verdict.md; absent means the verdict is "pending"), and an optional
+plain-language summary (eli5.md) shown above it.
 The HTML file is self-contained: inline CSS, figures as inline SVG, no scripts and no
 external requests, light and dark themes, readable at phone width.
 
@@ -42,11 +44,11 @@ ARMS = [
     ("R0", "`r0fp8-m` (serving: `r0-s`)", "September 18 recipe: vendor FP8 weights as served, FP8 KV, no hybrid KDA, "
      "no mHC, no E21/E22b", "reference"),
     ("Cm", "`cm`", "E29 default in measurement mode", "pre-registered candidate"),
-    ("Cp", "`cp-s` / default", "E29 default in production (tasks, voxel, speculation and cache checks)", "candidate"),
+    ("Cp", "`cp-s` / default", "E29 default in production (qeval tasks and corruption probe)", "candidate"),
     ("Cpre", "`cpre-m`, `cpre-s`", "September 19 E03 recipe (hybrid KDA + E03 mHC), before E21", "descriptive"),
     ("N", "`n-m`, `n-s`", "Published NVFP4 recipe (NVFP4 expert weights, its own engine build) on this fabric",
      "descriptive"),
-    ("Z", "none", "Cloud `glm-5.3-flash` (behavioural context for tasks and voxel only)", "context"),
+    ("Z", "none", "Cloud `glm-5.3-flash` (behavioural context for tasks only)", "context"),
     ("Ladder", "`l0919-m`, `le21-m`, `le22b-m`", "Frozen intermediate references between R0 and Cm", "attribution"),
 ]
 LIMITATIONS = [
@@ -64,20 +66,29 @@ LIMITATIONS = [
     "exclusions, when listed, drop whole windows without re-measurement.",
     "**Engine nondeterminism beyond 2,048 tokens.** On this engine build, positions conditioned on more than "
     "2,048 tokens differ from run to run even for the same arm (amendment 12); single-execution sparse-regime "
-    "differences are operational disagreement, and the sparse verdict needs at least three executions per arm "
-    "(amendment 13). The indexer explanation remains a hypothesis. The NVFP4 engine build is nondeterministic "
+    "differences are operational disagreement. Three executions per arm were collected (amendment 13), but no "
+    "validated estimator exists for fidelity between population-average distributions under unequal execution "
+    "variability, so the sparse verdict stays unresolved. The indexer explanation remains a hypothesis. The NVFP4 engine build is nondeterministic "
     "from the first positions.",
-    "**Z is unknown and may change.** The cloud model's serving stack is not disclosed and may change during "
-    "the campaign; it provides behavioural context only.",
-    "**Tasks cannot show 2 pp equivalence.** With 75 qeval items the paired MDE is about 7 pp; a non-significant "
-    "difference is not equivalence.",
-    "**Measurement mode.** Prompt scoring runs cold and serially (one sequence, fresh cache salts). Without the "
-    "production-bridge controls the distribution verdict is scoped to that mode.",
+    "**No cloud reference.** The cloud arm (Z) was deferred for lack of a spending cap, so the tasks have no "
+    "hosted-model comparison.",
+    "**Tasks cannot show 2 pp equivalence.** {tasks}; a non-significant difference is not equivalence.",
+    "**Measurement mode.** Prompt scoring runs cold and serially (one sequence, fresh cache salts). The "
+    "production-bridge controls and the DFlash2 exact-match check were not run (amendment 15 limits the "
+    "serving phase to tasks and the probe), so the "
+    "distribution verdict is scoped to that mode; the tasks and the corruption probe ran on the production "
+    "recipe (Cp), speculative decoding included.",
+    "**Descoped work.** Decode-set generations, sampled and hardset task runs, tasktime, Cpre serving "
+    "(amendment 15) and the voxel showcase (amendment 16) were not run.",
 ]
+# Figures whose inputs were descoped (amendments 15-16): listed once instead of shown as placeholders.
+DESCOPED_FIGURES = {"09-decode-path": "decode-set generations (amendment 15)",
+                    "13-voxel-showcase": "voxel showcase (amendment 16)"}
 HOW_TO_READ = [
     "**KL divergence (nats)** measures how much the arm's next-token probabilities differ from R0's at one "
-    "position. 0 means identical; larger means more different. Here it is computed on the top-20 tokens plus "
-    "one \"everything else\" bucket, so it can only under-estimate the true difference.",
+    "position; larger means more different. It is computed on a partition: the tokens in both top-20 lists, "
+    "the actual next token and one \"everything else\" bucket. 0 means agreement on that partition, and the "
+    "value can only under-estimate the full difference.",
     "**Top-1 agreement** is how often both put the same token first: the token greedy decoding would pick.",
     "**ΔNLL** is the change in surprise (negative log-probability) for the token that actually came next. "
     "Positive means the arm found real text less likely than R0 did.",
@@ -117,10 +128,15 @@ def load_inputs(docs: Path) -> dict:
     tasks.sort(key=lambda t: t.get("set") != "qeval")
     verdict_path = docs / "verdict.md"
     verdict = verdict_path.read_text(encoding="utf-8").strip() if verdict_path.exists() else None
+    eli5_path = docs / "eli5.md"
+    eli5 = eli5_path.read_text(encoding="utf-8").strip() if eli5_path.exists() else None
+    probes = [p for p in (read_json(q) for q in sorted((docs / "metrics").glob("corruption-*.json")))
+              if isinstance(p, dict)]
     plots = (read_json(docs / "plots" / "plots.json") or {}).get("figures", [])
     return {"docs": docs, "metrics": metrics, "summary": metrics.pop("summary", None),
             "corpus": read_json(docs / "corpus-summary.json"), "boots": boots, "tasks": tasks,
-            "voxel": read_json(docs / "voxel" / "checks.json"), "verdict": verdict, "plots": plots}
+            "voxel": read_json(docs / "voxel" / "checks.json"), "verdict": verdict, "eli5": eli5,
+            "probes": probes, "plots": plots}
 
 
 # ---------------------------------------------------------------- formatting
@@ -165,7 +181,7 @@ def count(x):
 
 # ---------------------------------------------------------------- document model
 # Blocks: ("h", level, text) ("p", text) ("ul", [items]) ("table", headers, rows)
-# ("code", text) ("fig", entry) ("box", title, blocks) ("verdict_md", text)
+# ("code", text) ("fig", entry) ("box", title, blocks) ("verdict_md", text) ("eli5_md", text)
 
 
 def pair_status(inp, name):
@@ -176,6 +192,17 @@ def pair_status(inp, name):
         missing = ", ".join(res.get("missing_runs", [])) or res.get("status")
         return None, f"missing runs: {missing}"
     return res, None
+
+
+def task_mde_text(m):
+    """Approximate paired MDE of a qeval comparison (stats.py mde_approx fields)."""
+    if m.get("abs_pass_rate_delta") is None:
+        return "approximate MDE unavailable"
+    text = (f"approximate paired MDE {num(m['abs_pass_rate_delta'] * 100, 3)} pp from "
+            f"{m.get('discordant_pairs', '–')} discordant pairs")
+    if m.get("abs_pass_rate_delta_all_discordant") is not None:
+        text += f" ({num(m['abs_pass_rate_delta_all_discordant'] * 100, 3)} pp if every item were discordant)"
+    return text
 
 
 def verdict_lines(inp):
@@ -234,7 +261,8 @@ def nvfp4_line(inp):
         parts.append(f"for comparison Cm dense {ci(c.get('kl', {}).get('mean_ci'))} nats")
     w = n.get("windows") or {}
     return (f"NVFP4 (N, descriptive, no pre-registered threshold; {w.get('compared')} of {w.get('expected')} "
-            f"windows): " + "; ".join(parts) + ". Its sparse regime stays unresolved without repeated executions.")
+            f"windows): " + "; ".join(parts) + ". Its sparse regime is unresolved: repeated executions are descriptive, "
+            "with no validated estimator for fidelity between population-average distributions.")
 
 
 def ppl_ci(c):
@@ -282,7 +310,7 @@ def quality_lines(inp):
         nr, _ = pair_status(inp, "n-vs-r0")
         vs_r0 = f"; NVFP4 against R0: all positions {ppl_ci(dnll_of(nr, 'all'))}" if nr else ""
         lines.append("**E29 vs NVFP4:** perplexity change of NVFP4 (N) against E29 (Cm): " + "; ".join(parts)
-                     + vs_r0 + " (positive: NVFP4 predicts real text worse than E29).")
+                     + vs_r0 + " (positive: NVFP4 predicts real text worse than the stated reference).")
     return lines
 
 
@@ -356,6 +384,10 @@ def build_blocks(inp) -> list:
                    f"compares. Pre-registration and amendments: [PLAN.md](PLAN.md). Metrics generated {gen}"
                    + (f" from harness commit `{commit}`{dirty}." if commit else ".")))
 
+    if inp.get("eli5"):
+        B.append(("h", 2, "In plain words"))
+        B.append(("eli5_md", inp["eli5"]))
+
     # 1. Verdict
     B.append(("h", 2, "1. Verdict"))
     if inp["verdict"]:
@@ -383,9 +415,18 @@ def build_blocks(inp) -> list:
     B.append(("h", 2, "2. Method, arms and overlays"))
     runs = summary.get("runs") or {}
     measured = {k.split("/")[0] for k, v in runs.items() if v.get("windows_ok")}
+    task_arms = {arm for t in inp["tasks"] for arm in (t.get("arms") or [])}
+    probe_arms = {p.get("label") for p in inp["probes"]}
+
+    def scored(arm):
+        if arm == "Ladder":
+            return "prompt scoring (ladder subset)" if measured & {"L0919", "LE21", "LE22b"} else "no"
+        parts = [label for label, arms in (("prompt scoring", measured), ("tasks", task_arms),
+                                           ("corruption probe", probe_arms)) if arm in arms]
+        return ", ".join(parts) or ("not run (deferred)" if arm == "Z" else "no")
     B.append(("table", ["Arm", "Overlay", "Recipe", "Role", "Scored in this report"],
-              [[a, o, r, role, "yes" if a in measured else "not yet"] for a, o, r, role in ARMS]))
-    B.append(("p", "Every measurement arm uses the same measurement deltas, which do not change numerics: a 6 GiB "
+              [[a, o, r, role, scored(a)] for a, o, r, role in ARMS]))
+    B.append(("p", "Every measurement arm uses the same measurement deltas, intended not to change numerics: a 6 GiB "
                    "KV pool per rank, one sequence at a time, `--max-logprobs 100`, a fresh `cache_salt` per request "
                    "and the SparkCache store/restore disabled in its own namespace. Prompt scoring sends each "
                    "corpus window teacher-forced with `prompt_logprobs` K = 20 (K = 100 on a fixed 20% subset)."))
@@ -512,6 +553,15 @@ def build_blocks(inp) -> list:
                     f"{c.get('windows_identical', '–')} / {c.get('windows_compared', '–')}",
                     f"{count(c.get('rows_differing'))} / {count(c.get('rows_compared'))}"]
                    for name, c in bits["checks"].items()]))
+        controls = (inp["metrics"].get("ladder") or {}).get("negative_controls") or {}
+        if controls:
+            B.append(("p", "Ladder negative controls (steps that must not change target logits; a strict control "
+                           "must be bit-identical):"))
+            B.append(("table", ["Step", "Strict", "Status", "Windows identical", "Rows differing / compared"],
+                      [[f"{c.get('ref')} → {c.get('cand')}", "yes" if c.get("strict") else "no", c.get("status", "–"),
+                        f"{c.get('windows_identical', '–')} / {c.get('windows_compared', '–')}",
+                        f"{count(c.get('rows_differing'))} / {count(c.get('rows_compared'))}"]
+                       for c in controls.values()]))
 
     mde = inp["metrics"].get("mde")
     B.append(("h", 3, "Minimum detectable effect"))
@@ -565,8 +615,9 @@ def build_blocks(inp) -> list:
             B.append(("p", f"qeval, {a} vs {b}: {d.get('n_paired')} paired items; exact McNemar p = "
                            f"{num(t.get('mcnemar_exact_p'), 3)}; sampled pass-rate difference "
                            + (f"{num(diff['diff'] * 100, 3)} pp [{num(diff['ci95'][0] * 100, 3)}, "
-                              f"{num(diff['ci95'][1] * 100, 3)}]" if diff.get("diff") is not None else "pending")
-                           + f"; approximate MDE {num((t.get('mde_approx') or {}).get('abs_pass_rate_delta', 0) * 100, 3)} pp."))
+                              f"{num(diff['ci95'][1] * 100, 3)}]" if diff.get("diff") is not None
+                              else "not measured (sampled runs descoped, amendment 15)")
+                           + "; " + task_mde_text(t.get("mde_approx") or {}) + "."))
             B.append(("table", ["", f"{b} pass", f"{b} fail"],
                       [[f"{a} pass", str(d.get("both_pass")), str(d.get(f"{a}_only_pass"))],
                        [f"{a} fail", str(d.get(f"{b}_only_pass")), str(d.get("both_fail"))]]))
@@ -580,10 +631,24 @@ def build_blocks(inp) -> list:
                         ", ".join(f"{k} {n}" for k, n in (v.get("finish_reasons") or {}).items())]
                        for arm, v in arms.items()]))
 
+    if inp["probes"]:
+        B.append(("h", 3, "Corruption probe"))
+        B.append(("p", "40 Italian prompts and 10 tool-call prompts at temperature 0 on the serving recipes "
+                       "(motivated by vLLM issue 54150 on ModelOpt NVFP4 checkpoints). UTF-8 validity is checked on "
+                       "the concatenated token bytes; U+FFFD counts replacement characters in the returned text; "
+                       "repetition flags are heuristic. The probe did not run on R0."))
+        B.append(("table", ["Arm", "Italian replies", "Invalid UTF-8", "With U+FFFD (characters)", "Repetition flags",
+                            "Truncated", "Tool calls made", "Tool-call parse failures"],
+                  [[p.get("label", "–"), str(p.get("italian_prompts", "–")), str(p.get("italian_invalid_utf8", "–")),
+                    f"{p.get('italian_with_fffd', '–')} ({p.get('italian_fffd_total', '–')})",
+                    str(p.get("italian_repetition_flags", "–")), str(p.get("italian_truncated", "–")),
+                    f"{p.get('tool_calls_made', '–')} / {p.get('tool_prompts', '–')}",
+                    str(p.get("tool_parse_failures", "–"))] for p in inp["probes"]]))
+
     B.append(("h", 3, "Voxel showcase"))
     vox = (inp["voxel"] or {}).get("results") or []
     if not vox:
-        B.append(("p", "Pending: no rendered outputs yet. A visual sanity check only; no precision conclusion."))
+        B.append(("p", "Deferred to a possible next step (amendment 16); no rendered outputs in this campaign."))
     else:
         B.append(("p", f"{len(vox)} rendered outputs; "
                        f"{sum(1 for r in vox if not r.get('console_errors') and not r.get('load_error'))} without console "
@@ -604,15 +669,25 @@ def build_blocks(inp) -> list:
     B.append(("h", 3, "Figures"))
     if not inp["plots"]:
         B.append(("p", "Pending: run `scripts/fidelity/plots.py`."))
+    skipped = []
     for entry in inp["plots"]:
-        if entry.get("group") != "quality":
+        if entry.get("status") == "pending" and entry.get("name") in DESCOPED_FIGURES:
+            skipped.append(f"{entry.get('title')}: {DESCOPED_FIGURES[entry['name']]}")
+        elif entry.get("group") != "quality":
             B.append(("fig", entry))
+    if skipped:
+        B.append(("p", "Not produced, inputs descoped: " + "; ".join(skipped) + "."))
 
     # 5. Limitations
     B.append(("h", 2, "5. Limitations"))
     corpus = (f"{count(cs.get('windows'))} {'frozen' if cs.get('frozen') else 'provisional'} windows "
               f"({count(cs.get('scored_positions'))} scored positions)" if cs else "The corpus")
-    B.append(("ul", [item.replace("{corpus}", corpus) for item in LIMITATIONS]))
+    mdes = [(t.get("mde_approx") or {}).get("abs_pass_rate_delta") for t in inp["tasks"] if t.get("set") == "qeval"]
+    mdes = [m for m in mdes if m is not None]
+    tasks_line = (f"With 75 qeval items and the observed discordance, the approximate paired MDE is "
+                  f"{num(min(mdes) * 100, 2)}–{num(max(mdes) * 100, 2)} pp" if mdes
+                  else "With 75 qeval items the paired MDE is far above 2 pp")
+    B.append(("ul", [item.replace("{corpus}", corpus).replace("{tasks}", tasks_line) for item in LIMITATIONS]))
 
     # 6. Reproduction
     B.append(("h", 2, "6. Reproduction"))
@@ -667,7 +742,7 @@ def render_md(blocks) -> str:
             out.append("\n".join(lines))
         elif kind == "code":
             out.append("```sh\n" + b[1] + "\n```")
-        elif kind == "verdict_md":
+        elif kind in ("verdict_md", "eli5_md"):
             out.append(b[1])
         elif kind == "box":
             out.append(f"**{b[1]}**\n\n" + render_md(b[2]).strip())
@@ -709,6 +784,8 @@ table{border-collapse:collapse;width:100%;font-size:.88em}
 th,td{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:nowrap}
 th{color:var(--muted);font-weight:600}
 tr:last-child td{border-bottom:none}
+.eli5{background:var(--code);border-radius:10px;padding:6px 18px;margin:1em 0;font-size:1.03em}
+.eli5 li{margin:.35em 0}
 .verdict{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:10px;
 padding:14px 18px;margin:1em 0}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:.6em 0}
@@ -865,6 +942,8 @@ def render_html(blocks, inp) -> str:
             body.append(f"<pre><code>{html.escape(b[1])}</code></pre>")
         elif kind == "verdict_md":
             body.append(md_to_html(b[1]))
+        elif kind == "eli5_md":
+            body.append('<section class="eli5">' + md_to_html(b[1]) + "</section>")
         elif kind == "box":
             inner = render_html_fragment(b[2])
             body.append(f'<aside class="box"><h3>{html.escape(b[1])}</h3>{inner}</aside>')

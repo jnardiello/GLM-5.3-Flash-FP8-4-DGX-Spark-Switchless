@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "math_m12",
+ "category": "math",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 133
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 640,
+ "response": {
+  "content": "**Setting up the problem**\n\nFor circular arrangements of *n* people where rotations are considered identical, the number of arrangements is (n − 1)!.\n\n**Why:** Fix one person's seat to eliminate rotational duplicates, then arrange the remaining people in the remaining seats.\n\n**Calculation**\n\n$$\n(8-1)! = 7! = 7 \\times 6 \\times 5 \\times 4 \\times 3 \\times 2 \\times 1 = 5040\n$$\n\n5040",
+  "reasoning_content": "(8-1)! = 5040",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 40,
+  "total_tokens": 160,
+  "completion_tokens": 120,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 10
+  }
+ },
+ "wall_s": 5.96,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

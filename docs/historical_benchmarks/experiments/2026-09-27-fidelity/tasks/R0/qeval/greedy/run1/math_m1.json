@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "math_m1",
+ "category": "math",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 92
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 640,
+ "response": {
+  "content": "**Step 1:** Compute 17 × 243\n- 17 × 243 = 17 × 200 + 17 × 43 = 3400 + 731 = 4131\n\n**Step 2:** Compute 5⁴\n- 5⁴ = 5 × 5 × 5 × 5 = 25 × 25 = 625\n\n**Step 3:** Add the results\n- 4131 + 625 = 4756\n\n**Step 4:** Subtract 1000\n- 4756 − 1000 = 3756\n\n3756",
+  "reasoning_content": "17 * 243 = 4131. 5^4 = 625. 4131 + 625 = 4756. 4756 - 1000 = 3756.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 43,
+  "total_tokens": 230,
+  "completion_tokens": 187,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 48
+  }
+ },
+ "wall_s": 8.65,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r5",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 107
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "2",
+  "reasoning_content": "Classic riddle: overtaking second place means you take second place.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 38,
+  "total_tokens": 55,
+  "completion_tokens": 17,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 14
+  }
+ },
+ "wall_s": 1.814,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

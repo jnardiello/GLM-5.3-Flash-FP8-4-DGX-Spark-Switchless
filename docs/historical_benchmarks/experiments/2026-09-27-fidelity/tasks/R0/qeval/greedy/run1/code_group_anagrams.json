@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_group_anagrams",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 358
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\nfrom collections import defaultdict\n\ndef group_anagrams(words):\n    \"\"\"\n    Group words that are anagrams of each other.\n\n    Returns a list of groups; each group is sorted alphabetically,\n    and the groups themselves are sorted by their first element.\n    An empty input yields an empty list.\n    \"\"\"\n    if not words:\n        return []\n\n    groups = defaultdict(list)\n    for word in words:\n        key = ''.join(sorted(word))\n        groups[key].append(word)\n\n    result = [sorted(group) for group in groups.values()]\n    result.sort(key=lambda group: group[0])\n    return result\n```",
+  "reasoning_content": "Return function only. Use defaultdict from collections (standard library allowed).",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 85,
+  "total_tokens": 228,
+  "completion_tokens": 143,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 13
+  }
+ },
+ "wall_s": 6.811,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

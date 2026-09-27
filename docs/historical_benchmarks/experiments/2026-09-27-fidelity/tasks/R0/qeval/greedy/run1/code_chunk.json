@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_chunk",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 277
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef chunk(xs, k):\n    \"\"\"Split xs into consecutive chunks of size k; the last chunk may be shorter.\n\n    Returns a list of lists. For empty input, returns an empty list.\n    Raises ValueError if k is not a positive integer.\n    \"\"\"\n    if not isinstance(k, int) or isinstance(k, bool) or k <= 0:\n        raise ValueError(\"k must be a positive integer\")\n    if not xs:\n        return []\n    return [xs[i:i + k] for i in range(0, len(xs), k)]\n```",
+  "reasoning_content": "Simple function.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 70,
+  "total_tokens": 192,
+  "completion_tokens": 122,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 3
+  }
+ },
+ "wall_s": 6.465,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

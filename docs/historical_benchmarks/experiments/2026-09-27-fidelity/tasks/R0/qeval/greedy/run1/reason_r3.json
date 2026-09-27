@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r3",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 140
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "**5 minutes**\n\nEach machine takes 5 minutes to make one widget. So 100 machines working simultaneously each make one widget in 5 minutes, producing 100 widgets total.\n\n5",
+  "reasoning_content": "Classic: 5 minutes.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 47,
+  "total_tokens": 92,
+  "completion_tokens": 45,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 6
+  }
+ },
+ "wall_s": 3.287,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

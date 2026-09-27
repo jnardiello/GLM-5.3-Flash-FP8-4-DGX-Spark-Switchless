@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_camel_to_snake",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 262
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef camel_to_snake(s):\n    if not s:\n        return s\n    result = []\n    for i, ch in enumerate(s):\n        if ch.isupper():\n            if i > 0 and (not s[i - 1].isupper() or (i + 1 < len(s) and s[i + 1].islower())):\n                result.append('_')\n            result.append(ch.lower())\n        else:\n            result.append(ch)\n    return ''.join(result)\n```",
+  "reasoning_content": "Write camel_to_snake handling acronyms: \"HTTPServer\" -> \"http_server\", \"getHTTPResponse\" -> \"get_http_response\". Use regex or manual loop. No imports beyond standard library — re is standard, but can do without.\n\nManual approach:\n\ndef camel_to_snake(s):\n    if not s:\n        return s\n    result = []\n    for i, ch in enumerate(s):\n        if ch.isupper():\n            if i > 0 and (not s[i-1].isupper() or (i+1 < len(s) and s[i+1].islower())):\n                result.append('_')\n            result.append(ch.lower())\n        else:\n            result.append(ch)\n    return ''.join(result)\n\nCheck \"HTTPServer\": H(0) upper, i=0 no underscore. T i=1, prev H upper, next T not lower -> no underscore. T i=2 similar. P i=3 prev upper, next S upper -> no underscore. S i=4 prev P upper, next e lower -> underscore. \"http_server\". Good.\n\n\"getHTTPResponse\": g,e,t; H i=3 prev t lower -> underscore. T,P prev upper next upper no. R i=6 prev P upper, next e lower -> underscore. \"get_http_response\". Good.\n\n\"camelCase\" -> \"camel_case\". \"snake_case\" stays. Digits: \"version2Update\" -> v,e,r,s,i,o,n,2,u... \"2\" not upper, fine. \"parseJSONData\" -> parse_json_data. Good.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 67,
+  "total_tokens": 499,
+  "completion_tokens": 432,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 327
+  }
+ },
+ "wall_s": 20.255,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

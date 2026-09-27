@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "fmt_bullets",
+ "category": "format",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 132
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 360,
+ "response": {
+  "content": "- TCP is connection-oriented, requiring a handshake before data transfer, while UDP is connectionless and sends data without establishing a connection.\n- TCP guarantees reliable delivery through acknowledgments, retransmissions, and sequencing, whereas UDP provides no guarantee that packets will arrive.\n- TCP ensures packets arrive in order, while UDP packets may arrive out of order, duplicated, or not at all.\n- TCP has higher overhead due to its larger header (20 bytes minimum) and connection management, while UDP has a smaller fixed header (8 bytes) and lower latency.\n- TCP supports flow control and congestion control mechanisms, while UDP has neither, making it faster but potentially prone to network congestion.",
+  "reasoning_content": "",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 37,
+  "total_tokens": 174,
+  "completion_tokens": 137,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 6.536,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

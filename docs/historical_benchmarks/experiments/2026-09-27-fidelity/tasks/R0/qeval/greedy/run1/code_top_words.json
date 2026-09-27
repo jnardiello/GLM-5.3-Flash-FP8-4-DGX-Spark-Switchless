@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_top_words",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 314
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\nimport re\nfrom collections import Counter\n\ndef top_words(text, n):\n    if not text or n <= 0:\n        return []\n    words = re.findall(r'[a-z]+', text.lower())\n    if not words:\n        return []\n    counts = Counter(words)\n    return sorted(counts.items(), key=lambda item: (-item[1], item[0]))[:n]\n```",
+  "reasoning_content": "Simple: use re to find words, Counter, sort by (-count, word).",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 78,
+  "total_tokens": 180,
+  "completion_tokens": 102,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 17
+  }
+ },
+ "wall_s": 6.109,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

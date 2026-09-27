@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "json_types",
+ "category": "json",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 154
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 260,
+ "response": {
+  "content": "{\"a\": 0, \"b\": false, \"c\": null, \"d\": [], \"e\": \"\"}",
+  "reasoning_content": "The user wants a JSON object with specific keys and values. Output only JSON.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 61,
+  "total_tokens": 104,
+  "completion_tokens": 43,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 1.606,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

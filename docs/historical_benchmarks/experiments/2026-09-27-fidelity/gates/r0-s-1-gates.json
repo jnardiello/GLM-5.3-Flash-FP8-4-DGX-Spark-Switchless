@@ -1,0 +1,20 @@
+{
+  "started": 1790473398.0476139,
+  "health": 200,
+  "gate1": {
+    "pass": true,
+    "content": "The capital of Italy is Rome.",
+    "finish_reason": "stop"
+  },
+  "gate2": {
+    "pass": true,
+    "tool": "get_weather",
+    "arguments": {
+      "city": "Milan"
+    }
+  },
+  "elapsed_s": 7.8,
+  "since_health_s": 8.8,
+  "within_two_minutes": true,
+  "pass": true
+}

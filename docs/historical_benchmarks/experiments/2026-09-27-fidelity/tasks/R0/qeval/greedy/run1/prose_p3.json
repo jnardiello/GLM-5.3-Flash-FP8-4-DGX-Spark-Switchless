@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "prose_p3",
+ "category": "prose",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 104
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 460,
+ "response": {
+  "content": "Think of a cache like the notepad you keep by the phone. When a friend tells you their new number, you jot it down so you don't have to look it up in the big phone book every time you call. The phone book is reliable but slow to search, while your notepad is small, quick, and right at hand. Computers do the same thing: they keep copies of frequently used information in a small, fast storage area so they don't have to fetch it from slower storage each time. The only catch is that if the friend changes their number, your notepad becomes outdated—caches need updating too.",
+  "reasoning_content": "Write ~100 words, prose only, one everyday analogy.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 38,
+  "total_tokens": 180,
+  "completion_tokens": 142,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 12
+  }
+ },
+ "wall_s": 8.736,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

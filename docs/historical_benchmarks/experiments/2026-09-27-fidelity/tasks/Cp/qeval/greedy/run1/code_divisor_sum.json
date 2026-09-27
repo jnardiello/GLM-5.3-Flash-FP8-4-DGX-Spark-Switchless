@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_divisor_sum",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 265
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef divisor_sum(n):\n    \"\"\"Return the sum of all positive divisors of n, including n itself.\n\n    Returns 0 for non-positive or non-integer input.\n    \"\"\"\n    if n is None:\n        return 0\n    if isinstance(n, float) and n.is_integer():\n        n = int(n)\n    if not isinstance(n, int) or n <= 0:\n        return 0\n\n    total = 0\n    i = 1\n    while i * i <= n:\n        if n % i == 0:\n            total += i\n            if i != n // i:\n                total += n // i\n        i += 1\n    return total\n```",
+  "reasoning_content": "Simple function. Handle n <= 0 or None sensibly. Use sqrt loop.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 68,
+  "total_tokens": 235,
+  "completion_tokens": 167,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 17
+  }
+ },
+ "wall_s": 6.654,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

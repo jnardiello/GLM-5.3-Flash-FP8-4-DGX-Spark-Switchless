@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_dedupe",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 267
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef dedupe(xs):\n    \"\"\"Remove duplicates from a list while preserving first-occurrence order.\n\n    Works with any hashable elements. If elements are unhashable,\n    falls back to an O(n^2) comparison-based approach.\n    \"\"\"\n    if not xs:\n        return []\n\n    seen = set()\n    result = []\n    try:\n        for x in xs:\n            if x not in seen:\n                seen.add(x)\n                result.append(x)\n    except TypeError:\n        # Fallback for unhashable elements\n        result = []\n        for x in xs:\n            if x not in result:\n                result.append(x)\n    return result\n```",
+  "reasoning_content": "Simple function.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 66,
+  "total_tokens": 209,
+  "completion_tokens": 143,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 3
+  }
+ },
+ "wall_s": 6.326,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

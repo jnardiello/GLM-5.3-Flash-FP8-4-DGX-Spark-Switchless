@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "prose_p2",
+ "category": "prose",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 88
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 460,
+ "response": {
+  "content": "The clockmaker's shop had emptied over the years, its shelves bare except for one clock—a small brass pendulum piece her father finished the week before he died. Collectors came with envelopes of cash. She refused them all, polishing the glass each morning and winding it at dusk.\n\n\"You could retire on that,\" a dealer told her, tapping the counter.\n\n\"It's not for sale.\"\n\nHe frowned. \"A clock is meant to keep time for someone.\"\n\n\"It keeps time for me,\" she said.\n\nAfter he left, she sat beneath its steady tick and remembered her father's hands guiding hers over tiny gears, the smell of oil and cedar shavings. The clock had never lost a minute in forty years. Neither, in a sense, had she.\n\nWhen she died, the town found her will: the clock was to remain in the shop, wound weekly, forever. The neighbors took turns. It still ticks there today.",
+  "reasoning_content": "Write a ~150-word story, prose only, no headers.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 34,
+  "total_tokens": 236,
+  "completion_tokens": 202,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 12.504,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

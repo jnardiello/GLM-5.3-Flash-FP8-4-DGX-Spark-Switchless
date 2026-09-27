@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_interval_intersect",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 292
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef interval_intersect(a, b):\n    \"\"\"\n    Compute the intersection of two lists of disjoint, sorted, closed\n    integer intervals.\n\n    Each interval is a pair [start, end] with start <= end. The input\n    lists must contain disjoint intervals sorted by start (standard\n    normalized form). Either list may be empty, in which case the\n    result is empty.\n\n    Returns a list of intervals representing the intersection, in\n    sorted order, disjoint and normalized (touching intervals merged,\n    empty intervals omitted).\n    \"\"\"\n    result = []\n    i, j = 0, 0\n    while i < len(a) and j < len(b):\n        a_start, a_end = a[i]\n        b_start, b_end = b[j]\n\n        # Compute the overlap of a[i] and b[j], if any.\n        lo = max(a_start, b_start)\n        hi = min(a_end, b_end)\n\n        if lo <= hi:\n            if result and result[-1][1] == lo - 1:\n                # Merge with the previous interval if they touch.\n                result[-1][1] = hi\n            else:\n                result.append([lo, hi])\n\n        # Advance the pointer whose interval ends first.\n        if a_end < b_end:\n            i += 1\n        else:\n            j += 1\n\n    return result\n```",
+  "reasoning_content": "Return intersection of two lists of disjoint sorted intervals. Standard two-pointer approach.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 68,
+  "total_tokens": 374,
+  "completion_tokens": 306,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 9.5,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

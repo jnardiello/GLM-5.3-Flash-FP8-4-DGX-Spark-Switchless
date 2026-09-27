@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r16",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 304
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "**17**\n\nThe optimal strategy:\n1. Persons 1 and 2 cross together: **2 min**\n2. Person 1 returns with the torch: **1 min**\n3. Persons 7 and 10 cross together: **10 min**\n4. Person 2 returns with the torch: **2 min**\n5. Persons 1 and 2 cross together: **2 min**\n\nTotal: 2 + 1 + 10 + 2 + 2 = **17 minutes**\n\n17",
+  "reasoning_content": "Classic: 17. 1&2 cross (2), 1 returns (1), 7&10 cross (10), 2 returns (2), 1&2 cross (2) = 17.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 83,
+  "total_tokens": 232,
+  "completion_tokens": 149,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 45
+  }
+ },
+ "wall_s": 6.639,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r8",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 125
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "**Setting up the problem:**\n\nLet Ben's current age = B.\n\n- Anna is now 24.\n- \"When Anna was as old as Ben is now\" — that was (24 − B) years ago.\n- At that time, Ben's age was: B − (24 − B) = 2B − 24.\n\n**Applying the condition:**\n\nAnna's age now is twice what Ben's age was then:\n\n$$24 = 2(2B - 24)$$\n$$24 = 4B - 48$$\n$$4B = 72$$\n$$B = 18$$\n\n**Check:** When Anna was 18 (6 years ago), Ben was 12. Anna now (24) is twice 12. ✓\n\n18",
+  "reasoning_content": "Classic puzzle. Anna is 24. Let Ben's current age = B. \"When Anna was as old as Ben is now\" — that was 24 - B years ago. At that time, Ben was B - (24 - B) = 2B - 24. Anna is twice that: 24 = 2(2B - 24) → 24 = 4B - 48 → 4B = 72 → B = 18.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 47,
+  "total_tokens": 308,
+  "completion_tokens": 261,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 7.344,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

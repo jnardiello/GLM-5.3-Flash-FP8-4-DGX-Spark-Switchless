@@ -1,7 +1,7 @@
 {
   "figures": [
     {
-      "caption": "Perplexity change of each arm against R0 (the vendor FP8 recipe), exp(\u0394NLL) \u2212 1, per regime and per corpus category, with 95% CIs. Lower is better; E29 (Cm) predicts real text as well as FP8 when its bar straddles zero.",
+      "caption": "Perplexity change of each arm against R0 (the vendor FP8 recipe), exp(\u0394NLL) \u2212 1, per regime and per corpus category, with 95% CIs. Lower is better; a bar whose interval straddles zero shows no detectable perplexity change from FP8.",
       "group": "quality",
       "name": "01-quality-vs-fp8",
       "notes": [],
@@ -23,7 +23,7 @@
       "title": "Different vs worse"
     },
     {
-      "caption": "Recipe ladder R0 \u2192 L0919 \u2192 Cpre \u2192 LE21 \u2192 LE22b \u2192 Cm in the dense regime: KL added by each step and the cumulative perplexity change against R0, with bit-identical steps marked.",
+      "caption": "Recipe ladder R0 \u2192 L0919 \u2192 Cpre \u2192 LE21 \u2192 LE22b \u2192 Cm in the dense regime: KL between adjacent recipes (not additive) and the cumulative perplexity change against R0, with bit-identical steps marked.",
       "group": "quality",
       "name": "03-ladder-waterfall",
       "notes": [
@@ -103,7 +103,7 @@
       "group": "results",
       "name": "09-decode-path",
       "notes": [
-        "Greedy decode-set generations (R0 reference and at least one arm) have not been collected yet.",
+        "No greedy decode-set generations (descoped in the 2026-09-27 campaign, amendment 15).",
         "Expected runs: R0/gen-a (reference), R0/gen-floor, Cm/gen-a, Cpre/gen-a, N/gen-a."
       ],
       "png": "09-decode-path.png",
@@ -153,7 +153,7 @@
       "group": "results",
       "name": "13-voxel-showcase",
       "notes": [
-        "No rendered voxel outputs in docs/fidelity/voxel/checks.json yet."
+        "No rendered voxel outputs (deferred in the 2026-09-27 campaign, amendment 16)."
       ],
       "png": "13-voxel-showcase.png",
       "status": "pending",
@@ -179,7 +179,7 @@
       "group": "results",
       "name": "15-precision-vs-r0",
       "notes": [
-        "Sparse-regime values from a single execution measure operational disagreement, not fidelity (amendment 13); the sparse verdict needs three executions per arm."
+        "Sparse-regime values from a single execution measure operational disagreement, not fidelity (amendment 13); the sparse verdict stays unresolved without a validated estimator for population-average distributions."
       ],
       "png": "15-precision-vs-r0.png",
       "status": "ok",

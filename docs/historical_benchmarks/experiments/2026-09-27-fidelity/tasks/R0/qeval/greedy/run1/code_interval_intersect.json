@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_interval_intersect",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 292
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef interval_intersect(a, b):\n    result = []\n    i, j = 0, 0\n    while i < len(a) and j < len(b):\n        start = max(a[i][0], b[j][0])\n        end = min(a[i][1], b[j][1])\n        if start <= end:\n            result.append([start, end])\n        if a[i][1] < b[j][1]:\n            i += 1\n        else:\n            j += 1\n    return result\n```",
+  "reasoning_content": "Two lists of disjoint sorted intervals, e.g., a = [[0,2],[5,10]], b = [[1,5],[7,8]]. Standard two-pointer intersection. Handle empty inputs.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 68,
+  "total_tokens": 224,
+  "completion_tokens": 156,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 41
+  }
+ },
+ "wall_s": 8.521,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "prose_p1",
+ "category": "prose",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 93
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 460,
+ "response": {
+  "content": "The harbour lies hushed beneath the first pale light, its water still as poured glass, holding the fading colours of night in its depths. Fishing boats rock gently at their moorings, their masts etched like ink strokes against a sky turning from grey to rose. Mist drifts low over the quays, softening the outlines of crates and coiled ropes, while gulls begin their restless circling overhead. The air smells of salt and diesel and cold stone. Somewhere a door clangs; a lone fisherman crosses the wet cobbles, his boots ringing in the silence. Slowly the sun crests the headland, spilling gold across the water, waking the harbour in increments—the slap of a halyard, an engine coughing, the day beginning.",
+  "reasoning_content": "Write one paragraph, ~120 words, describing a harbour at dawn. Prose only.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 33,
+  "total_tokens": 214,
+  "completion_tokens": 181,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 18
+  }
+ },
+ "wall_s": 12.503,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

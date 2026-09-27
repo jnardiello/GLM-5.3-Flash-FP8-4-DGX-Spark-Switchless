@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "math_m7",
+ "category": "math",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 52
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 640,
+ "response": {
+  "content": "**Calculation:**\n- 2²⁰ = 1,048,576\n- 3¹⁰ = 59,049\n- 1,048,576 − 59,049 = 989,527\n\n989527",
+  "reasoning_content": "2^20 = 1,048,576. 3^10 = 59,049. Difference = 989,527.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 31,
+  "total_tokens": 127,
+  "completion_tokens": 96,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 2.126,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

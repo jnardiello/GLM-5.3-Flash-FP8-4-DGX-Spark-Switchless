@@ -1,39 +1,60 @@
 # GLM-5.3-Flash fidelity campaign: report
 
-How far the E29 recipe's next-token distributions deviate from the vendor FP8 model served without this repository's precision and runtime changes (R0), and how a generic NVFP4 recipe compares. Pre-registration and amendments: [PLAN.md](PLAN.md). Metrics generated 2026-09-27T16:49:14+00:00 from harness commit `080fe09702a4` with uncommitted changes.
+How far the E29 recipe's next-token distributions deviate from the vendor FP8 model served without this repository's precision and runtime changes (R0), and how a generic NVFP4 recipe compares. Pre-registration and amendments: [PLAN.md](PLAN.md). Metrics generated 2026-09-27T19:09:41+00:00 from harness commit `06dd98ac88b7` with uncommitted changes.
+
+## In plain words
+
+We asked a simple question: does our tuned E29 setup of GLM-5.3-Flash predict text as well as the official FP8 model it is built from? Both run on the same four machines with the same 8-bit memory cache.
+
+- **How we checked.** We gave both models the same 2.5 million tokens of text: coding-agent sessions, synthetic Italian chats and model-written answers. At every token we asked each model what it expected next, and how surprised it was by the token that actually came next.
+- **They don't always pick the same favourite token.** On short contexts, E29's first choice matches the official model 83% of the time. Several other recipe changes we measured shift it about as much, the way two equally strong chess engines can pick different good moves.
+- **We found no quality loss.** E29's surprise (perplexity) differs by +0.1%. The 95% range (−0.3% to +0.6%) includes zero, and so do the ranges for code, Italian and long contexts. On 75 mixed tasks both models pass 73. That shows no measurable loss on this test set, not proof that every answer is as good.
+- **A public 4-bit version (NVFP4) loses quality on longer text.** It is about 7% more surprised by real text overall, 12% beyond 2,000 tokens of context and 10% in Italian, although about 3% less surprised on short contexts. It wrote broken characters in 3 of 40 Italian answers; E29 wrote none.
+- **One detail stays open.** Beyond 2,000 tokens the serving engine gives slightly different predictions from run to run, even for the official model. There we can't measure the fine-grained distance, only the overall quality, which shows no detectable change.
+
+**Bottom line:** E29 is not a bit-for-bit copy of the official model, but we could not measure any quality loss.
 
 ## 1. Verdict
 
-**Verdict: E29 is different from the vendor FP8 model, but not worse.** Its next-token distributions do not match R0, so it fails the pre-registered "negligible deviation" test by a wide margin. On real text it predicts the actual next token as well as R0, with no detectable perplexity change at any context length. NVFP4 deviates further from R0 than E29 does. It is measurably worse beyond 2,048 tokens, on agentic code and on Italian.
+**Verdict: E29 differs from the vendor FP8 model, but shows no detectable quality loss on this corpus.** R0 is the vendor FP8 weights served on the same four nodes with an FP8 KV cache. E29's next-token distributions do not match R0, so it fails the pre-registered "negligible deviation" test by a wide margin. On the actual next token, E29's perplexity change against R0 is indistinguishable from zero in the dense, sparse and all-position aggregates. It is also indistinguishable from zero in every corpus category over all positions. This is not proof of equivalent answer quality: the task comparison is underpowered, and the long-context evidence rests on few sources. NVFP4 deviates from R0 more than E29 does and is worse overall, beyond 2,048 tokens, on agentic code and on Italian. On short contexts it scores slightly better.
 
-1. **Different: yes (pre-registered test: exceeds).** In the dense regime (at most 2,048 conditioning tokens), Cm against R0 gives a mean coarse KL of 0.184 [0.165, 0.204] nats and 83.4% top-1 agreement. The margins were a 0.002-nat mean excess and a top-1 drop below 0.5 pp. Those margins assumed that small numeric changes produce small deviations. On this model and engine, any change that is not bit-identical produces about the same dense KL:
-   - Cpre against R0: 0.182.
-   - Cm against Cpre: 0.182.
-   - The single E03 mHC ladder step: 0.075.
-   - R0 against itself beyond 2,048 tokens: 0.277.
+1. **Different: yes (pre-registered test: exceeds).**
+   - In the dense regime (at most 2,048 conditioning tokens), Cm against R0 gives a mean coarse KL of 0.184 [0.165, 0.204] nats and 83.4% top-1 agreement.
+   - The margins were a mean excess below 0.002 nats, a p99 excess below 0.02 nats and a top-1 drop below 0.5 pp. They assumed that small numeric changes produce small deviations.
+   - The dense-regime recipe comparisons measured here mostly land near the same value:
+     - Cpre against R0: 0.182.
+     - Cm against Cpre: 0.182.
+     - The September 19 base recipe against R0: 0.173.
+     - The E21 step: 0.172.
+     - The E03 mHC step alone is smaller, at 0.075. The runtime-only steps after E22b are near zero.
 
-   KL measures disagreement here, not loss of quality.
-2. **Worse: no.** E29's perplexity change against R0 on the actual next token:
+   For scale, R0 against itself beyond 2,048 tokens gives 0.277 (sparse regime, from engine nondeterminism). A dense KL of this size reflects disagreement between numerically different recipes; on its own it does not show a quality loss.
+2. **Worse: not detected.** E29's perplexity change against R0 on the actual next token:
    - dense: +0.03% [−0.56, +0.60];
    - sparse: +0.19% [−0.34, +0.73];
    - all positions: +0.14% [−0.32, +0.56].
 
-   Every interval includes zero. R0 against a second run of itself gives +0.21% [−0.09, +0.48]. Every corpus category also includes zero, for example agentic code +0.35% [−0.39, +1.11] and Italian chat −0.04% [−0.19, +0.12].
-3. **Sparse regime (beyond 2,048 tokens): unresolved.** The engine is not deterministic there: R0 against itself gives 0.277 nats and 80.0% top-1 agreement. No validated estimator exists for an arm's excess over that floor. Descriptively, Cm (0.294) sits close to the floor: its single-execution excess is 0.017 nats with a UB95 of 0.019. The pre-registered verdict nevertheless stays unresolved.
-4. **Where the difference comes from (ladder, 128 dense windows).** Perplexity changes against R0:
-   - R0 → September 19 base recipe (hybrid KDA): +1.74% [+0.94, +2.65].
-   - E03 mHC: KL 0.075, +0.09% [−0.54, +0.62].
-   - E21 residual projections: −1.82% [−2.80, −0.96]. This returns the cumulative change to −0.02% [−1.16, +0.96].
+   R0 against a second run of itself gives +0.21% [−0.09, +0.48] over all positions. Every corpus category over all positions also includes zero, for example agentic code +0.35% [−0.39, +1.11] and Italian chat −0.04% [−0.19, +0.12].
 
-   The runtime steps from E22b to E29 (drafter, scheduler and KV pool) do not change the output:
+   Two dense-regime category intervals exclude zero, both in E29's favour: synthetic Italian chat −0.31% [−0.57, −0.02] and long context −2.86% [−4.99, −0.22]. The long-context category has only five windows.
+3. **Sparse regime (beyond 2,048 tokens): unresolved.** The engine is not deterministic there: R0 against itself gives 0.277 nats and 80.0% top-1 agreement. Three executions per arm were collected, but no validated estimator exists for fidelity between population-average distributions when execution variability differs between arms. Descriptively, Cm (0.294) sits close to that floor: its single-execution excess is 0.017 nats, with a UB95 of 0.019.
+4. **Where the difference comes from (ladder, 128 dense windows).** Each step's perplexity change is measured against the previous rung:
+   - R0 → September 19 base recipe (hybrid KDA): +1.74% [+0.94, +2.65].
+   - September 19 base → Cpre (E03 mHC): KL 0.075, +0.09% [−0.54, +0.62]. Cumulative against R0: +1.83% [+0.72, +2.78].
+   - Cpre → LE21 (E21 projections): −1.82% [−2.80, −0.96]. Cumulative against R0: −0.02% [−1.16, +0.96].
+
+   The runtime steps from E22b to E29 (drafter, scheduler and KV pool) leave the measured dense-regime logprobs bit-identical or nearly so, in measurement mode:
    - LE21 → LE22b is bit-identical (0 of 231,195 rows differ).
    - LE22b → E29 differs in 5 rows of one window: mean KL 8 × 10⁻⁸ nats, one top-1 flip.
-5. **Tasks: no detected difference, but the tasks cannot establish equivalence.** On qeval greedy (75 deterministic tasks), R0 passes 73/75 and E29 73/75, with 2 discordant tasks in each direction (McNemar p = 1.00). NVFP4 passes 74/75. The ±2 pp equivalence criterion needs far more tasks, since the approximate MDE at n = 75 is 16 pp. The cloud (Z) arm was not run, so the task criterion remains unresolved.
+5. **Tasks: no detected difference, but the tasks cannot establish equivalence.**
+   - On qeval greedy (75 mixed tasks: 25 code, 16 reasoning, 14 maths, 8 JSON, 7 formatting, 5 prose), R0 passes 73/75 and E29 73/75, with 2 discordant tasks in each direction (McNemar p = 1.00). NVFP4 passes 74/75.
+   - The ±2 pp equivalence criterion needs far more tasks. The observed discordance (4 of 75 pairs) gives an approximate paired MDE of 7.5 pp (normal approximation to McNemar).
+   - The cloud (Z) arm was not run, so the task criterion remains unresolved.
 
 **Is E29 more or less precise than NVFP4? More precise.**
 
-- **Distance from R0 (dense):**
-  - NVFP4: 0.346 [0.319, 0.373] nats, 75.1% top-1 agreement.
+- **Distance from R0 (dense, one execution):**
+  - NVFP4: 0.346 [0.319, 0.373] nats, 75.1% top-1 agreement, about 1.9 times E29's coarse KL.
   - E29: 0.184 nats, 83.4%.
 
   NVFP4 is not deterministic even in the dense regime: 155,206 of 155,390 rows differ between two runs. On the three-execution subset, the KL between run-averaged distributions is 0.229 for NVFP4 against R0 and 0.169 for E29 (descriptive).
@@ -41,19 +62,20 @@ How far the E29 recipe's next-token distributions deviate from the vendor FP8 mo
   - sparse: +11.8% [+7.9, +15.5];
   - all positions: +6.9% [+4.5, +9.2];
   - agentic code: +8.9% [+6.3, +11.7];
-  - Italian chat: +10.1% [+9.4, +10.9].
+  - synthetic Italian chat: +10.1% [+9.3, +10.9].
 
-  In the dense regime alone NVFP4 scores −3.4% [−5.4, −1.3]. That short-context advantage is real in this data but unexplained, and it does not carry over to longer contexts.
-- **Corruption probe:**
+  In the dense regime alone, NVFP4 scores −3.4% [−5.4, −1.3] against E29 and −3.3% [−5.4, −1.2] against R0. That short-context advantage is present in this data but unexplained, and it does not carry over to longer contexts.
+- **Corruption probe** (not run on R0):
   - Italian replies containing U+FFFD replacement characters: NVFP4 3 of 40 (8 characters in total), E29 0 of 40.
   - Tool calls parsed correctly: 10 of 10 on both.
 - **Tasks:** 74/75 against 73/75, no detectable difference at this power.
 
 **Limitations.** These limitations apply to the results above:
-- Coarse KL is a lower bound: the K = 100 subset gives 0.273 nats against 0.194 at K = 20.
-- R0 uses the FP8 KV cache, because BF16 KV is not available on B12X, so it shares the FP8-KV error.
-- The corpus is a single provisional manifest that the owner has not frozen.
-- The voxel showcase and the cloud arm are deferred as next steps.
+- **Coarse KL is a lower bound.** On the dense rows of the 85-window K = 100 subset, Cm against R0 gives 0.273 nats at K = 100 and 0.194 for the same rows truncated to K = 20.
+- **R0 shares the FP8-KV error.** It uses the FP8 KV cache, because BF16 KV is not available on B12X.
+- **Scope of the distribution results.** They come from cold, serial measurement mode; the production bridge was not measured.
+- **Corpus coverage.** The corpus is a single provisional manifest that the owner has not frozen. The Italian conversations are synthetic, and long context rests on five windows.
+- **Deferred work.** The voxel showcase and the cloud arm are deferred as next steps.
 
 **Pre-registered outcome, Cm vs R0:** dense exceeds · sparse unresolved · overall exceeds.
 
@@ -63,11 +85,11 @@ How far the E29 recipe's next-token distributions deviate from the vendor FP8 mo
 - Tasks: N vs Cp: McNemar p = 1.00; R0 vs Cp: McNemar p = 1.00. Equivalence requires the paired 95% CI within ±2 pp.
 - Data completeness: 12 of 12 configured analyses have data.
 
-**NVFP4 answer (separate).** NVFP4 (N, descriptive, no pre-registered threshold; 424 of 424 windows): dense mean KL vs R0 0.3459 [0.3186, 0.3727] nats, top-1 agreement 75.1 [73.6, 76.7]%; sparse mean KL vs R0 0.4534 [0.4231, 0.4808] nats, top-1 agreement 70.8 [69.4, 72.3]%; for comparison Cm dense 0.1842 [0.1653, 0.2042] nats. Its sparse regime stays unresolved without repeated executions.
+**NVFP4 answer (separate).** NVFP4 (N, descriptive, no pre-registered threshold; 424 of 424 windows): dense mean KL vs R0 0.3459 [0.3186, 0.3727] nats, top-1 agreement 75.1 [73.6, 76.7]%; sparse mean KL vs R0 0.4534 [0.4231, 0.4808] nats, top-1 agreement 70.8 [69.4, 72.3]%; for comparison Cm dense 0.1842 [0.1653, 0.2042] nats. Its sparse regime is unresolved: repeated executions are descriptive, with no validated estimator for fidelity between population-average distributions.
 
 **How to read this**
 
-- **KL divergence (nats)** measures how much the arm's next-token probabilities differ from R0's at one position. 0 means identical; larger means more different. Here it is computed on the top-20 tokens plus one "everything else" bucket, so it can only under-estimate the true difference.
+- **KL divergence (nats)** measures how much the arm's next-token probabilities differ from R0's at one position; larger means more different. It is computed on a partition: the tokens in both top-20 lists, the actual next token and one "everything else" bucket. 0 means agreement on that partition, and the value can only under-estimate the full difference.
 - **Top-1 agreement** is how often both put the same token first: the token greedy decoding would pick.
 - **ΔNLL** is the change in surprise (negative log-probability) for the token that actually came next. Positive means the arm found real text less likely than R0 did.
 - **Perplexity change** translates ΔNLL into a percentage: exp(ΔNLL) − 1, so +0.01 nats per token is about +1% perplexity (worse) and −0.01 nats about −1% (better); an interval that includes 0 means no detectable quality difference from R0.
@@ -79,7 +101,7 @@ How far the E29 recipe's next-token distributions deviate from the vendor FP8 mo
 Perplexity change on the real next token, exp(ΔNLL) − 1 with 95% group-bootstrap CIs; lower is better. This answers "is it worse?"; the KL results below answer "is it different?".
 
 - **E29 vs FP8:** perplexity change of E29 (Cm) against R0: dense +0.03% [-0.56, +0.60] (no detectable change); sparse +0.19% [-0.34, +0.73] (no detectable change); all +0.14% [-0.32, +0.56] (no detectable change); R0 against itself: all positions +0.21% [-0.09, +0.48].
-- **E29 vs NVFP4:** perplexity change of NVFP4 (N) against E29 (Cm): dense -3.36% [-5.39, -1.31]; sparse +11.84% [+7.94, +15.45]; all +6.93% [+4.49, +9.22]; NVFP4 against R0: all positions +7.07% [+4.61, +9.37] (positive: NVFP4 predicts real text worse than E29).
+- **E29 vs NVFP4:** perplexity change of NVFP4 (N) against E29 (Cm): dense -3.36% [-5.39, -1.31]; sparse +11.84% [+7.94, +15.45]; all +6.93% [+4.49, +9.22]; NVFP4 against R0: all positions +7.07% [+4.61, +9.37] (positive: NVFP4 predicts real text worse than the stated reference).
 
 | Comparison | Dense (≤ 2,048) | Sparse (> 2,048) | All positions |
 | --- | --- | --- | --- |
@@ -94,7 +116,7 @@ Perplexity change on the real next token, exp(ΔNLL) − 1 with 95% group-bootst
 
 ![Quality vs FP8](plots/01-quality-vs-fp8.png)
 
-*Quality vs FP8.* Perplexity change of each arm against R0 (the vendor FP8 recipe), exp(ΔNLL) − 1, per regime and per corpus category, with 95% CIs. Lower is better; E29 (Cm) predicts real text as well as FP8 when its bar straddles zero.
+*Quality vs FP8.* Perplexity change of each arm against R0 (the vendor FP8 recipe), exp(ΔNLL) − 1, per regime and per corpus category, with 95% CIs. Lower is better; a bar whose interval straddles zero shows no detectable perplexity change from FP8.
 
 ![Different vs worse](plots/02-different-vs-worse.png)
 
@@ -102,21 +124,21 @@ Perplexity change on the real next token, exp(ΔNLL) − 1 with 95% group-bootst
 
 ![Ladder waterfall](plots/03-ladder-waterfall.png)
 
-*Ladder waterfall.* Recipe ladder R0 → L0919 → Cpre → LE21 → LE22b → Cm in the dense regime: KL added by each step and the cumulative perplexity change against R0, with bit-identical steps marked.
+*Ladder waterfall.* Recipe ladder R0 → L0919 → Cpre → LE21 → LE22b → Cm in the dense regime: KL between adjacent recipes (not additive) and the cumulative perplexity change against R0, with bit-identical steps marked.
 
 ## 2. Method, arms and overlays
 
 | Arm | Overlay | Recipe | Role | Scored in this report |
 | --- | --- | --- | --- | --- |
-| R0 | `r0fp8-m` (serving: `r0-s`) | September 18 recipe: vendor FP8 weights as served, FP8 KV, no hybrid KDA, no mHC, no E21/E22b | reference | yes |
-| Cm | `cm` | E29 default in measurement mode | pre-registered candidate | yes |
-| Cp | `cp-s` / default | E29 default in production (tasks, voxel, speculation and cache checks) | candidate | not yet |
-| Cpre | `cpre-m`, `cpre-s` | September 19 E03 recipe (hybrid KDA + E03 mHC), before E21 | descriptive | yes |
-| N | `n-m`, `n-s` | Published NVFP4 recipe (NVFP4 expert weights, its own engine build) on this fabric | descriptive | yes |
-| Z | none | Cloud `glm-5.3-flash` (behavioural context for tasks and voxel only) | context | not yet |
-| Ladder | `l0919-m`, `le21-m`, `le22b-m` | Frozen intermediate references between R0 and Cm | attribution | not yet |
+| R0 | `r0fp8-m` (serving: `r0-s`) | September 18 recipe: vendor FP8 weights as served, FP8 KV, no hybrid KDA, no mHC, no E21/E22b | reference | prompt scoring, tasks |
+| Cm | `cm` | E29 default in measurement mode | pre-registered candidate | prompt scoring |
+| Cp | `cp-s` / default | E29 default in production (qeval tasks and corruption probe) | candidate | tasks, corruption probe |
+| Cpre | `cpre-m`, `cpre-s` | September 19 E03 recipe (hybrid KDA + E03 mHC), before E21 | descriptive | prompt scoring |
+| N | `n-m`, `n-s` | Published NVFP4 recipe (NVFP4 expert weights, its own engine build) on this fabric | descriptive | prompt scoring, tasks, corruption probe |
+| Z | none | Cloud `glm-5.3-flash` (behavioural context for tasks only) | context | not run (deferred) |
+| Ladder | `l0919-m`, `le21-m`, `le22b-m` | Frozen intermediate references between R0 and Cm | attribution | prompt scoring (ladder subset) |
 
-Every measurement arm uses the same measurement deltas, which do not change numerics: a 6 GiB KV pool per rank, one sequence at a time, `--max-logprobs 100`, a fresh `cache_salt` per request and the SparkCache store/restore disabled in its own namespace. Prompt scoring sends each corpus window teacher-forced with `prompt_logprobs` K = 20 (K = 100 on a fixed 20% subset).
+Every measurement arm uses the same measurement deltas, intended not to change numerics: a 6 GiB KV pool per rank, one sequence at a time, `--max-logprobs 100`, a fresh `cache_salt` per request and the SparkCache store/restore disabled in its own namespace. Prompt scoring sends each corpus window teacher-forced with `prompt_logprobs` K = 20 (K = 100 on a fixed 20% subset).
 
 Boot identities recorded for each measurement or serving boot:
 
@@ -324,6 +346,13 @@ Rows 1–2,048 of the actual-token logprob and top-K arrays compared bit for bit
 | r0-a-vs-b | R0/prompt-a vs R0/prompt-b | pass | 424 / 424 | 0 / 773,500 |
 | r0-a-vs-crossboot | R0/prompt-a vs R0/prompt-crossboot | pass | 85 / 85 | 0 / 155,390 |
 
+Ladder negative controls (steps that must not change target logits; a strict control must be bit-identical):
+
+| Step | Strict | Status | Windows identical | Rows differing / compared |
+| --- | --- | --- | --- | --- |
+| LE21/prompt-ladder → LE22b/prompt-ladder | yes | pass | 128 / 128 | 0 / 231,195 |
+| LE22b/prompt-ladder → Cm/prompt-a | no | fail | 127 / 128 | 5 / 231,195 |
+
 ### Minimum detectable effect
 
 MDE of the mean excess KL (2.8 × bootstrap SE of reference-only contrasts): dense 0 nats, sparse 0.004393 nats, all 0.003051 nats. A zero MDE means the contrast is bit-identical in that regime.
@@ -353,7 +382,7 @@ MDE of the mean excess KL (2.8 × bootstrap SE of reference-only contrasts): den
 
 ### Tasks
 
-qeval, N vs Cp: 75 paired items; exact McNemar p = 1.00; sampled pass-rate difference pending; approximate MDE 16.2 pp.
+qeval, N vs Cp: 75 paired items; exact McNemar p = 1.00; sampled pass-rate difference not measured (sampled runs descoped, amendment 15); approximate paired MDE 6.47 pp from 3 discordant pairs (32.4 pp if every item were discordant).
 
 |  | Cp pass | Cp fail |
 | --- | --- | --- |
@@ -365,7 +394,7 @@ qeval, N vs Cp: 75 paired items; exact McNemar p = 1.00; sampled pass-rate diffe
 | N | 98.7% [92.8, 99.8] |
 | Cp | 97.3% [90.8, 99.3] |
 
-qeval, R0 vs Cp: 75 paired items; exact McNemar p = 1.00; sampled pass-rate difference pending; approximate MDE 16.2 pp.
+qeval, R0 vs Cp: 75 paired items; exact McNemar p = 1.00; sampled pass-rate difference not measured (sampled runs descoped, amendment 15); approximate paired MDE 7.47 pp from 4 discordant pairs (32.4 pp if every item were discordant).
 
 |  | Cp pass | Cp fail |
 | --- | --- | --- |
@@ -377,9 +406,18 @@ qeval, R0 vs Cp: 75 paired items; exact McNemar p = 1.00; sampled pass-rate diff
 | R0 | 97.3% [90.8, 99.3] |
 | Cp | 97.3% [90.8, 99.3] |
 
+### Corruption probe
+
+40 Italian prompts and 10 tool-call prompts at temperature 0 on the serving recipes (motivated by vLLM issue 54150 on ModelOpt NVFP4 checkpoints). UTF-8 validity is checked on the concatenated token bytes; U+FFFD counts replacement characters in the returned text; repetition flags are heuristic. The probe did not run on R0.
+
+| Arm | Italian replies | Invalid UTF-8 | With U+FFFD (characters) | Repetition flags | Truncated | Tool calls made | Tool-call parse failures |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Cp | 40 | 0 | 0 (0) | 0 | 0 | 10 / 10 | 0 |
+| N | 40 | 0 | 3 (8) | 0 | 0 | 10 / 10 | 0 |
+
 ### Voxel showcase
 
-Pending: no rendered outputs yet. A visual sanity check only; no precision conclusion.
+Deferred to a possible next step (amendment 16); no rendered outputs in this campaign.
 
 ### Run inventory
 
@@ -425,10 +463,6 @@ Pending: no rendered outputs yet. A visual sanity check only; no precision concl
 
 *KL by prefill path.* Mean coarse KL by prefill path (Marlin W8A16 chunks under 2,048 rows vs dequantised BF16 chunks).
 
-![Decode path](plots/09-decode-path.png)
-
-*Decode path.* Greedy decode: KL along the identical prefix and Kaplan-Meier survival of identical prefixes. Status: **pending**. Greedy decode-set generations (R0 reference and at least one arm) have not been collected yet. Expected runs: R0/gen-a (reference), R0/gen-floor, Cm/gen-a, Cpre/gen-a, N/gen-a.
-
 ![Task pass rates](plots/10-task-pass-rate.png)
 
 *Task pass rates.* Task pass rate per arm with Wilson 95% CIs, and paired greedy discordance with exact McNemar tests.
@@ -441,10 +475,6 @@ Pending: no rendered outputs yet. A visual sanity check only; no precision concl
 
 *K sensitivity.* Mean coarse KL of Cm vs R0 at K = 100 and truncated to K = 20 on the same rows.
 
-![Voxel showcase](plots/13-voxel-showcase.png)
-
-*Voxel showcase.* Greedy voxel renders per arm and prompt (a visual sanity check; no precision conclusion). Status: **pending**. No rendered voxel outputs in docs/fidelity/voxel/checks.json yet.
-
 ![Repeatability and the 2,048 onset](plots/14-repeatability.png)
 
 *Repeatability and the 2,048 onset.* Run-to-run repeatability: R0 against itself by position bucket, and the first non-identical position in each arm's determinism probe.
@@ -453,15 +483,18 @@ Pending: no rendered outputs yet. A visual sanity check only; no precision concl
 
 *Precision vs R0.* Summary of Cm, Cpre and N against R0: mean coarse KL and mean ΔNLL per regime with 95% CIs, with the floor.
 
+Not produced, inputs descoped: Decode path: decode-set generations (amendment 15); Voxel showcase: voxel showcase (amendment 16).
+
 ## 5. Limitations
 
 - **Coarse KL is a lower bound.** Tokens outside both top-K rows are merged into one cell, so by the data-processing inequality every KL here is a lower bound on the full-vocabulary KL. A small value does not certify a small full KL; the covered probability mass and top-K overlap are reported with each comparison, and any within-margin verdict is scoped to these coarse metrics.
 - **R0 is not a BF16 reference.** R0 is the vendor FP8 checkpoint served by the September 18 recipe on this stack, with an FP8 KV cache (BF16 KV would need a different attention backend than the recipe as served, amendment 6). Every arm shares that FP8-KV error. The numbers are therefore not comparable with published full-vocabulary KL figures measured against a BF16 model (for example values around 0.021 nats).
 - **Finite corpus.** 424 provisional windows (2,514,441 scored positions) from coding-agent sessions, synthetic Italian conversations and model-generated continuations. Other workloads may differ. Owner exclusions, when listed, drop whole windows without re-measurement.
-- **Engine nondeterminism beyond 2,048 tokens.** On this engine build, positions conditioned on more than 2,048 tokens differ from run to run even for the same arm (amendment 12); single-execution sparse-regime differences are operational disagreement, and the sparse verdict needs at least three executions per arm (amendment 13). The indexer explanation remains a hypothesis. The NVFP4 engine build is nondeterministic from the first positions.
-- **Z is unknown and may change.** The cloud model's serving stack is not disclosed and may change during the campaign; it provides behavioural context only.
-- **Tasks cannot show 2 pp equivalence.** With 75 qeval items the paired MDE is about 7 pp; a non-significant difference is not equivalence.
-- **Measurement mode.** Prompt scoring runs cold and serially (one sequence, fresh cache salts). Without the production-bridge controls the distribution verdict is scoped to that mode.
+- **Engine nondeterminism beyond 2,048 tokens.** On this engine build, positions conditioned on more than 2,048 tokens differ from run to run even for the same arm (amendment 12); single-execution sparse-regime differences are operational disagreement. Three executions per arm were collected (amendment 13), but no validated estimator exists for fidelity between population-average distributions under unequal execution variability, so the sparse verdict stays unresolved. The indexer explanation remains a hypothesis. The NVFP4 engine build is nondeterministic from the first positions.
+- **No cloud reference.** The cloud arm (Z) was deferred for lack of a spending cap, so the tasks have no hosted-model comparison.
+- **Tasks cannot show 2 pp equivalence.** With 75 qeval items and the observed discordance, the approximate paired MDE is 6.5–7.5 pp; a non-significant difference is not equivalence.
+- **Measurement mode.** Prompt scoring runs cold and serially (one sequence, fresh cache salts). The production-bridge controls and the DFlash2 exact-match check were not run (amendment 15 limits the serving phase to tasks and the probe), so the distribution verdict is scoped to that mode; the tasks and the corruption probe ran on the production recipe (Cp), speculative decoding included.
+- **Descoped work.** Decode-set generations, sampled and hardset task runs, tasktime, Cpre serving (amendment 15) and the voxel showcase (amendment 16) were not run.
 
 ## 6. Reproduction
 

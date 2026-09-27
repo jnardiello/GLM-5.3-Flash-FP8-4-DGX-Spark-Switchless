@@ -13,8 +13,8 @@ qeval:
     seed 20260927) for the difference of per-item pass rates, where an
     item's pass rate is averaged over its sampled-mode runs.
   - Wilson 95% CI per arm on the pooled greedy pass rate.
-  - minimum detectable effect (MDE) for the item count: an approximation
-    from the normal approximation to the binomial (see mde_approx doc).
+  - minimum detectable effect (MDE) on the paired pass-rate difference, from
+    the observed discordance and for the all-discordant worst case (see mde_approx).
   - z.ai repeat agreement: of the 3 greedy repeats, the fraction of items
     where all 3 agree on pass/fail and on the extracted final answer text.
 
@@ -92,27 +92,23 @@ def wilson_ci(successes, n, z=1.959963984540054):
     return (p, max(0.0, lo), min(1.0, hi))
 
 
-def mde_approx(n_items, alpha=0.05, power=0.80, p0=0.5):
-    """Minimum detectable effect (absolute difference in paired pass rate)
-    for n_items paired observations, using the normal approximation to the
-    binomial sign test on discordant pairs (McNemar under the alternative
-    that discordant pairs favour one arm with probability p0+delta).
+def mde_approx(n_items, discordant=None, alpha=0.05, power=0.80):
+    """Approximate minimum detectable effect on the paired pass-rate difference.
 
-    This is an APPROXIMATION: it assumes every item is discordant (an upper
-    bound on power / lower bound on detectable effect) and uses a normal
-    approximation rather than the exact binomial tail used by
-    mcnemar_exact_p above. It is a planning heuristic, not a substitute for
-    computing the exact p-value on the actual discordance count.
+    Normal approximation to McNemar's test: the paired difference (b - c) / n has
+    variance about d / n under the null, where d is the discordant fraction, so
+    MDE = (z_alpha/2 + z_beta) * sqrt(d / n). d is the observed discordant fraction
+    when `discordant` is given, otherwise 1 (every item discordant, the worst case).
+    A planning heuristic, not a substitute for the exact McNemar p-value.
     """
     if n_items <= 0:
         return None
     z_alpha = 1.959963984540054  # two-sided alpha=0.05
     z_beta = {0.80: 0.8416212335729143, 0.90: 1.2815515655446004}.get(round(power, 2), 0.8416212335729143)
-    # Solve for delta in: z_alpha*sqrt(p0(1-p0)/n) + z_beta*sqrt((p0+delta)(1-p0-delta)/n) = delta
-    # approximate by using p0's variance for both terms (standard sample-size heuristic).
-    se = math.sqrt(p0 * (1 - p0) / n_items)
-    delta = (z_alpha + z_beta) * se
-    return round(delta, 4)
+    d = 1.0 if discordant is None else discordant / n_items
+    if d <= 0:
+        return None
+    return round((z_alpha + z_beta) * math.sqrt(d / n_items), 4)
 
 
 def bootstrap_diff_ci(item_pass_rates_a, item_pass_rates_b, item_ids, B=BOOTSTRAP_B, seed=BOOTSTRAP_SEED):
@@ -178,7 +174,11 @@ def qeval_analysis(arm_a, arm_b):
         arm_a: dict(zip(("rate", "lo95", "hi95"), wilson_ci(sum(pa.values()), len(pa)))) if pa else None,
         arm_b: dict(zip(("rate", "lo95", "hi95"), wilson_ci(sum(pb.values()), len(pb)))) if pb else None,
     }
-    out["mde_approx"] = {"n_items": len(ids), "abs_pass_rate_delta": mde_approx(len(ids))}
+    out["mde_approx"] = {"n_items": len(ids), "discordant_pairs": a_only + b_only,
+                         "abs_pass_rate_delta": mde_approx(len(ids), a_only + b_only),
+                         "abs_pass_rate_delta_all_discordant": mde_approx(len(ids)),
+                         "method": "normal approximation to McNemar, (z_a/2 + z_b) * sqrt(d / n), "
+                                   "alpha 0.05 two-sided, power 0.80"}
 
     n_runs_a = count_runs(arm_a, "qeval", "sampled")
     n_runs_b = count_runs(arm_b, "qeval", "sampled")

@@ -78,6 +78,29 @@ Versions and releases are created only at the owner's explicit request.
     engine is not deterministic beyond 2,048 tokens. The NVFP4 comparison arm deviates
     further and is 6.9% [4.5, 9.2] worse in perplexity than E29 overall. Voxel runs and the
     cloud arm are deferred.
+  - The report opens with a plain-language summary (`docs/fidelity/eli5.md`, "In plain
+    words"). It shows the corruption-probe results and the ladder negative controls, and
+    says which arm was scored by prompt scoring, tasks or the probe. Descoped work
+    (decode-set generations, sampled task runs, the voxel showcase, the cloud arm) is
+    named as descoped instead of pending. The task limitation gives both MDE
+    approximations: 6.5–7.5 pp from the observed discordance, about 32 pp if every item
+    were discordant. `tasks/stats.py` now computes the paired pass-rate MDE; it
+    previously reported the sign-test shift (16.2 pp) under that name.
+  - After an independent review, the verdict, the plain-language summary and the README
+    state "no detectable quality loss on this corpus" rather than equivalence. They label
+    ladder steps against the previous rung, and describe qeval as 75 mixed tasks. They
+    also report NVFP4's short-context perplexity advantage and name the Italian corpus
+    as synthetic.
+  - `scripts/fidelity/export_public.py` writes the campaign's portable data to
+    `docs/historical_benchmarks/experiments/2026-09-27-fidelity/`: identity, coverage,
+    headline results and hashes of the private originals, run metadata, qeval per-item
+    results, corruption-probe rows, functional gates and memory samples. Per-window
+    metrics are included only for windows generated from public prompts. Site values
+    are removed, and a built-in leak check guards the output. Raw logprobs, token IDs,
+    corpus text and anything derived from private sessions stay in the ignored
+    `data/fidelity/`.
+  - The README has a "Quality vs vendor FP8" section with the summary table and two
+    figures, linking the report. The benchmark index lists the campaign.
 
 - Archived the discarded E27d experiment: a per-step cap of 2,304 prefill tokens while other
   requests decode, on the E29 default. The archive holds its report and portable numeric

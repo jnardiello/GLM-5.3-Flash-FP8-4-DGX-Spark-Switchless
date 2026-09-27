@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "json_toolcall",
+ "category": "json",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 245
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 280,
+ "response": {
+  "content": "```json\n{\"name\": \"book_restaurant\", \"arguments\": {\"restaurant\": \"Kappa\", \"party_size\": 4, \"time\": \"19:00\", \"date\": \"tomorrow\"}}\n```",
+  "reasoning_content": "Tool name likely \"book_restaurant\" or \"book_table\". Provide JSON.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 73,
+  "total_tokens": 135,
+  "completion_tokens": 62,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 16
+  }
+ },
+ "wall_s": 3.472,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

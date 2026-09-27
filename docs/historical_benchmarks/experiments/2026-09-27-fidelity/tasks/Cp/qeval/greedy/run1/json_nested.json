@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "json_nested",
+ "category": "json",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 281
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 360,
+ "response": {
+  "content": "```json\n{\n  \"host\": \"0.0.0.0\",\n  \"port\": 8443,\n  \"tls\": {\n    \"enabled\": true,\n    \"min_version\": \"TLSv1.2\"\n  },\n  \"routes\": [\n    {\n      \"path\": \"/api/health\",\n      \"methods\": [\"GET\"]\n    },\n    {\n      \"path\": \"/api/users\",\n      \"methods\": [\"GET\", \"POST\"]\n    }\n  ]\n}\n```",
+  "reasoning_content": "The user wants only a JSON object. Provide valid JSON.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 93,
+  "total_tokens": 209,
+  "completion_tokens": 116,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 12
+  }
+ },
+ "wall_s": 5.297,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

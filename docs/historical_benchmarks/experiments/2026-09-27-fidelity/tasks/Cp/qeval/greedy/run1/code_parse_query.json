@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_parse_query",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 327
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef parse_query(qs):\n    result = {}\n    if not qs:\n        return result\n    for pair in qs.split('&'):\n        if not pair:\n            continue\n        if '=' in pair:\n            key, value = pair.split('=', 1)\n        else:\n            key, value = pair, ''\n        key = urllib.parse.unquote_plus(key)\n        value = urllib.parse.unquote_plus(value)\n        if key in result:\n            if isinstance(result[key], list):\n                result[key].append(value)\n            else:\n                result[key] = [result[key], value]\n        else:\n            result[key] = value\n    return result\n```",
+  "reasoning_content": "Parse query string without urllib? Standard library allowed, but writing manually is fine. Handle '+' as space? Typically yes. Use urllib.parse.parse_qsl? That handles repeated keys but not \"key with no '=' maps to empty string\" — actually parse_qsl with keep_blank_values=False drops blank; with keep_blank_values=True, \"key\" without '=' gives ('key', ''). So could use urllib.parse.parse_qsl(qs, keep_blank_values=True). But edge: parse_qsl treats ';' as separator in older versions. Simpler to write manually.\n\nManual: split on '&', skip empty segments, split on '=' once (maxsplit=1), unquote_plus both, collect dict.\n\nEdge: key with no '=' → empty string. Empty input → {}.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 83,
+  "total_tokens": 376,
+  "completion_tokens": 293,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 154
+  }
+ },
+ "wall_s": 13.977,
+ "grader": {
+  "pass": false,
+  "why": "NameError: name 'urllib' is not defined. Did you forget to import 'urllib'?"
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "prose_p2",
+ "category": "prose",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 88
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 460,
+ "response": {
+  "content": "The clockmaker's shop had emptied over the years, its shelves surrendering one timepiece after another to collectors and tourists. Only the grandfather clock remained, standing in the corner like a patient sentinel, its brass pendulum swinging with the steadiness of a heartbeat.\n\nBuyers came with envelopes of cash. One offered triple its worth. Another promised it a place of honor in a museum. Marta shook her head each time, polishing the walnut case with a cloth gone soft from decades of use.\n\n\"It's not for sale,\" she'd say, and that was the end of it.\n\nHer granddaughter finally asked why, one winter evening as the clock chimed six.\n\nMarta pressed her palm against the cool wood. \"Your grandfather built this the week we married. Every tick since has been his heart, still going.\" She wound the mechanism gently. \"Some things keep more than time.\"",
+  "reasoning_content": "Write a ~150-word prose story, no headers, no lists.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 34,
+  "total_tokens": 229,
+  "completion_tokens": 195,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 14
+  }
+ },
+ "wall_s": 12.51,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

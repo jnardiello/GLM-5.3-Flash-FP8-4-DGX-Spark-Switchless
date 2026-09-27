@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r11",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 319
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "**Solution: 7 crossings**\n\nHere's the sequence:\n1. Take the goat across (wolf and cabbage are safe together)\n2. Return empty\n3. Take the wolf across\n4. Bring the goat back\n5. Take the cabbage across (wolf and cabbage are safe together)\n6. Return empty\n7. Take the goat across\n\nThe key insight is the \"bring back\" move in step 4 — you can't just ferry items over one at a time, since the goat can't be left with either the wolf or the cabbage. The goat serves as the \"neutral\" item that can safely travel in either direction.\n\n**7**",
+  "reasoning_content": "Classic puzzle: 7 crossings.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 87,
+  "total_tokens": 229,
+  "completion_tokens": 142,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 7
+  }
+ },
+ "wall_s": 8.321,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

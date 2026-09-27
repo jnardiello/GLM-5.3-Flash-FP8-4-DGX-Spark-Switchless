@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "math_m14",
+ "category": "math",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 176
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 640,
+ "response": {
+  "content": "**Setting up the rates:**\n- Pipe 1 fills at 1/12 tank per minute\n- Pipe 2 fills at 1/18 tank per minute\n- Drain empties at 1/36 tank per minute\n\n**Combined rate:**\n\n1/12 + 1/18 − 1/36 = 3/36 + 2/36 − 1/36 = 4/36 = 1/9 tank per minute\n\n**Time to fill:** 1 ÷ (1/9) = 9 minutes\n\n9",
+  "reasoning_content": "Rates: 1/12 + 1/18 - 1/36 = 3/36 + 2/36 - 1/36 = 4/36 = 1/9. 9 minutes.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 56,
+  "total_tokens": 219,
+  "completion_tokens": 163,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 46
+  }
+ },
+ "wall_s": 7.684,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_merge_intervals",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 327
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef merge_intervals(intervals):\n    if not intervals:\n        return []\n    sorted_intervals = sorted(intervals, key=lambda x: (x[0], x[1]))\n    merged = [list(sorted_intervals[0])]\n    for start, end in sorted_intervals[1:]:\n        if start <= merged[-1][1]:\n            merged[-1][1] = max(merged[-1][1], end)\n        else:\n            merged.append([start, end])\n    return merged\n```",
+  "reasoning_content": "Simple task.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 77,
+  "total_tokens": 185,
+  "completion_tokens": 108,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 3
+  }
+ },
+ "wall_s": 5.222,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

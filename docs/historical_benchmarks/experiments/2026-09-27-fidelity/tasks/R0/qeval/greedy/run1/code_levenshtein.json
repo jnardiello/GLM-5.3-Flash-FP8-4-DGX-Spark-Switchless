@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_levenshtein",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 261
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef levenshtein(a, b):\n    if a is None or b is None:\n        raise TypeError(\"levenshtein() expects two strings, got None\")\n    a, b = str(a), str(b)\n    if a == b:\n        return 0\n    if not a:\n        return len(b)\n    if not b:\n        return len(a)\n    if len(a) < len(b):\n        a, b = b, a\n    previous = list(range(len(b) + 1))\n    for i, ca in enumerate(a, start=1):\n        current = [i]\n        for j, cb in enumerate(b, start=1):\n            cost = 0 if ca == cb else 1\n            current.append(min(\n                previous[j] + 1,\n                current[j - 1] + 1,\n                previous[j - 1] + cost,\n            ))\n        previous = current\n    return previous[-1]\n```",
+  "reasoning_content": "Write standard DP implementation.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 69,
+  "total_tokens": 279,
+  "completion_tokens": 210,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 5
+  }
+ },
+ "wall_s": 10.133,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

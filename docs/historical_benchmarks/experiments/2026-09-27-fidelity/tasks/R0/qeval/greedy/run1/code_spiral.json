@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_spiral",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 293
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef spiral(m):\n    if not m or not m[0]:\n        return []\n    result = []\n    top, bottom = 0, len(m) - 1\n    left, right = 0, len(m[0]) - 1\n    while top <= bottom and left <= right:\n        for col in range(left, right + 1):\n            result.append(m[top][col])\n        top += 1\n        for row in range(top, bottom + 1):\n            result.append(m[row][right])\n        right -= 1\n        if top <= bottom:\n            for col in range(right, left - 1, -1):\n                result.append(m[bottom][col])\n            bottom -= 1\n        if left <= right:\n            for row in range(bottom, top - 1, -1):\n                result.append(m[row][left])\n            left += 1\n    return result\n```",
+  "reasoning_content": "Write spiral traversal function.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 70,
+  "total_tokens": 271,
+  "completion_tokens": 201,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 5
+  }
+ },
+ "wall_s": 7.999,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

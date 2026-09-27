@@ -1,0 +1,64 @@
+{
+  "model": "glm-5.3-flash",
+  "prompt_tokens": 256,
+  "k": 20,
+  "prompt_logprobs": {
+    "status": 200,
+    "seconds": 0.799,
+    "present": true,
+    "len": 256,
+    "first_is_null": true,
+    "missing_actual": 0,
+    "min_entries": 21,
+    "max_entries": 21,
+    "k": 20,
+    "mean_actual_lp": -14.181966860154096,
+    "usage": {
+      "prompt_tokens": 256,
+      "total_tokens": 257,
+      "completion_tokens": 1,
+      "prompt_tokens_details": null,
+      "completion_tokens_details": null
+    }
+  },
+  "repeat_same_salt": {
+    "status": 200,
+    "seconds": 0.439,
+    "present": true,
+    "len": 256,
+    "first_is_null": true,
+    "missing_actual": 0,
+    "min_entries": 21,
+    "max_entries": 21,
+    "k": 20,
+    "mean_actual_lp": -14.181966860154096,
+    "usage": {
+      "prompt_tokens": 256,
+      "total_tokens": 257,
+      "completion_tokens": 1,
+      "prompt_tokens_details": null,
+      "completion_tokens_details": null
+    },
+    "vs_first": {
+      "max_abs_diff_actual_lp": 0.0,
+      "compared": 255
+    }
+  },
+  "generation_logprobs": {
+    "status": 200,
+    "seconds": 1.235,
+    "tokens": 64,
+    "token_logprobs": 64,
+    "top_min": 20,
+    "ids_form": true,
+    "nan": 0,
+    "finish_reason": "length",
+    "usage": {
+      "prompt_tokens": 256,
+      "total_tokens": 320,
+      "completion_tokens": 64,
+      "prompt_tokens_details": null,
+      "completion_tokens_details": null
+    }
+  }
+}

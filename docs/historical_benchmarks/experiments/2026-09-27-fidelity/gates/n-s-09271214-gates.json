@@ -1,0 +1,20 @@
+{
+  "started": 1790512571.7973812,
+  "health": 200,
+  "gate1": {
+    "pass": true,
+    "content": "The user is asking a simple factual question: the capital of Italy. They want a one-sentence reply. This is straightforward - the capital of Italy is Rome. I should just answer in one sentence as requ",
+    "finish_reason": "stop"
+  },
+  "gate2": {
+    "pass": true,
+    "tool": "get_weather",
+    "arguments": {
+      "city": "Milan"
+    }
+  },
+  "elapsed_s": 8.7,
+  "since_health_s": 9.5,
+  "within_two_minutes": true,
+  "pass": true
+}

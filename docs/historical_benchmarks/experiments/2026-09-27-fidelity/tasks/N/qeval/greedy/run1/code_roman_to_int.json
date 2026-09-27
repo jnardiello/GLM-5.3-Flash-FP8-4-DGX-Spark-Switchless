@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_roman_to_int",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 243
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef roman_to_int(s):\n    values = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}\n    if not s:\n        return 0\n    s = s.upper().strip()\n    total = 0\n    prev = 0\n    for ch in reversed(s):\n        if ch not in values:\n            raise ValueError(f\"Invalid Roman numeral character: {ch!r}\")\n        curr = values[ch]\n        if curr < prev:\n            total -= curr\n        else:\n            total += curr\n        prev = curr\n    return total\n```",
+  "reasoning_content": "Simple function.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 63,
+  "total_tokens": 217,
+  "completion_tokens": 154,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 9.391,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

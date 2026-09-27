@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_word_wrap",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 338
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef word_wrap(text, width):\n    if not text or not text.strip():\n        return []\n    if width <= 0:\n        raise ValueError(\"width must be a positive integer\")\n    lines = []\n    current = []\n    current_len = 0\n    for word in text.split():\n        word_len = len(word)\n        if not current:\n            current = [word]\n            current_len = word_len\n        elif current_len + 1 + word_len <= width:\n            current.append(word)\n            current_len += 1 + word_len\n        else:\n            lines.append(\" \".join(current))\n            current = [word]\n            current_len = word_len\n    if current:\n        lines.append(\" \".join(current))\n    return lines\n```",
+  "reasoning_content": "Simple greedy word wrap. Handle empty input: return empty list? \"Handle empty input sensibly\" — return [] for empty/whitespace-only text. Also handle words longer than width: place them on their own line (can't split).",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 81,
+  "total_tokens": 288,
+  "completion_tokens": 207,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 6.218,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

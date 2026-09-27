@@ -158,6 +158,33 @@ class ReportTest(unittest.TestCase):
         self.assertIn("<strong>within</strong>", page)
         self.assertIn("<li>line two</li>", page)
 
+    def test_eli5_file_above_verdict(self):
+        write(self.docs / "eli5.md", "E29 is **as good as** FP8.\n\n- NVFP4 is worse.")
+        rc, md, page = self.build()
+        self.assertEqual(rc, 0)
+        heads = [line for line in md.splitlines() if line.startswith("## ")]
+        self.assertEqual(heads[:2], ["## In plain words", "## 1. Verdict"])
+        self.assertLess(md.index("E29 is **as good as** FP8."), md.index("## 1. Verdict"))
+        self.assertIn('<section class="eli5"><p>E29 is <strong>as good as</strong> FP8.</p>', page)
+        self.assertLess(page.index('class="eli5"'), page.index('class="verdict"'))
+
+    def test_corruption_probe_and_descoped_figures(self):
+        write(self.docs / "metrics" / "corruption-N.json", json.dumps(
+            {"label": "N", "italian_prompts": 40, "italian_invalid_utf8": 0, "italian_with_fffd": 3,
+             "italian_fffd_total": 8, "italian_repetition_flags": 0, "italian_truncated": 0,
+             "tool_prompts": 10, "tool_calls_made": 10, "tool_parse_failures": 0}))
+        plots = json.loads((self.docs / "plots" / "plots.json").read_text(encoding="utf-8"))
+        plots["figures"].append({"name": "13-voxel-showcase", "title": "Voxel showcase", "group": "results",
+                                 "status": "pending", "caption": "c", "png": "13.png", "svg": "13.svg"})
+        write(self.docs / "plots" / "plots.json", json.dumps(plots))
+        rc, md, _ = self.build()
+        self.assertEqual(rc, 0)
+        self.assertIn("### Corruption probe", md)
+        self.assertIn("| N | 40 | 0 | 3 (8) | 0 | 0 | 10 / 10 | 0 |", md)
+        self.assertIn("Not produced, inputs descoped: Voxel showcase: voxel showcase (amendment 16).", md)
+        self.assertNotIn("![Voxel showcase]", md)
+        self.assertIn("| descriptive | corruption probe |", md)
+
     def test_verdict_nested_lists(self):
         html = br.md_to_html("Intro.\n\n1. **First** point.\n   - sub a;\n   - sub b\n     continued.\n\n"
                              "   Closing paragraph.\n2. Second.\n\n- plain\n\nAfter.")

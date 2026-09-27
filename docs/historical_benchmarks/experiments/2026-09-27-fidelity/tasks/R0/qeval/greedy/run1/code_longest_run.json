@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_longest_run",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 288
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef longest_run(xs):\n    if not xs:\n        return 0\n    longest = 1\n    current = 1\n    for i in range(1, len(xs)):\n        if xs[i] > xs[i - 1]:\n            current += 1\n            if current > longest:\n                longest = current\n        else:\n            current = 1\n    return longest\n```",
+  "reasoning_content": "Simple function.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 70,
+  "total_tokens": 159,
+  "completion_tokens": 89,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 3
+  }
+ },
+ "wall_s": 4.967,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

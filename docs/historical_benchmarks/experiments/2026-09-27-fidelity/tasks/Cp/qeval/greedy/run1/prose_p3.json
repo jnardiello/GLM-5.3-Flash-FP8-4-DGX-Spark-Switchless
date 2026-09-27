@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "prose_p3",
+ "category": "prose",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 104
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 460,
+ "response": {
+  "content": "Imagine you keep a small pantry in your kitchen stocked with the snacks and ingredients you use most often, while the rest of your food sits in a big freezer in the garage. Fetching something from the pantry takes two seconds; trekking to the garage takes a minute. A cache works the same way for computers: it's a small, fast storage space that keeps copies of frequently used information close at hand, so the computer doesn't have to make the slow trip to its main storage every time. The result is that everything you use often simply arrives faster.",
+  "reasoning_content": "Write ~100 words, prose only, one analogy. Use pantry/kitchen analogy.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 38,
+  "total_tokens": 169,
+  "completion_tokens": 131,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 17
+  }
+ },
+ "wall_s": 8.021,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

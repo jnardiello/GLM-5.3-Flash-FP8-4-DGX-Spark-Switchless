@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_valid_ipv4",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 309
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef valid_ipv4(s):\n    if not isinstance(s, str) or not s:\n        return False\n    parts = s.split('.')\n    if len(parts) != 4:\n        return False\n    for part in parts:\n        if not part.isdigit():\n            return False\n        if len(part) > 1 and part[0] == '0':\n            return False\n        if int(part) > 255:\n            return False\n    return True\n```",
+  "reasoning_content": "Simple function, no imports needed.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 82,
+  "total_tokens": 190,
+  "completion_tokens": 108,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 7
+  }
+ },
+ "wall_s": 4.376,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

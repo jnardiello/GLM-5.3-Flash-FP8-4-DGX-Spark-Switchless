@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "reason_r1",
+ "category": "reason",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 161
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "high",
+ "task_default_max_tokens": 1400,
+ "response": {
+  "content": "**Step by step:**\n\n1. All but 9 run away → **9 sheep remain**\n2. He buys twice as many as remain → 9 × 2 = **18 sheep bought**\n3. He sells 4 → 9 + 18 − 4 = **23**\n\n23",
+  "reasoning_content": "All but 9 run away → 9 remain. Buys twice as many as remain: 18. Sells 4: 9+18-4=23.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 56,
+  "total_tokens": 155,
+  "completion_tokens": 99,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 36
+  }
+ },
+ "wall_s": 5.572,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

@@ -1,0 +1,39 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_two_sum",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 380
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\nfrom bisect import bisect_right\n\n\ndef two_sum(xs, target):\n    if not xs:\n        return None\n    positions = {}\n    for idx, val in enumerate(xs):\n        positions.setdefault(val, []).append(idx)\n    for i, val in enumerate(xs):\n        comp = target - val\n        if comp in positions:\n            idx_list = positions[comp]\n            j = bisect_right(idx_list, i)\n            if j < len(idx_list):\n                return (i, idx_list[j])\n    return None\n```",
+  "reasoning_content": "We need to return the pair with smallest i, then smallest j. Using a hash map approach: iterate j, check if target - xs[j] seen before. But that gives smallest j, not smallest i. Need to be careful.\n\nTo get smallest i then smallest j: iterate i from 0, for each i iterate j from i+1 — O(n²) but correct. Alternatively, we can do smarter: for each i in order, check if there's a complement in the rest. To find smallest j for given i, we need the first j > i with xs[j] == target - xs[i]. We could precompute positions of each value. Build dict value -> sorted list of indices. For i in order: complement = target - xs[i]; look up indices of complement, find first index > i. That's O(n) overall with bisect. But simpler: O(n²) is fine? The problem doesn't specify performance. But a clean O(n) approach:\n\nBuild dict from value to list of indices. For i in range(n): comp = target - xs[i]; if comp in dict: for j in dict[comp] (sorted): if j > i: return (i, j). Since we iterate i ascending, first found is smallest i; within, smallest j. This is O(n) amortized if we skip... actually worst case O(n²) (e.g., all zeros, target 0 — but then first i=0, j=1 returns immediately). Worst case: many duplicates of complement but all indices ≤ i... e.g., xs = [1,1,1,...,1,2], target=3: for i=0, dict[2] = [n-1], j=n-1>0, return. Fine. Bad case: complement appears many times all before i? Then we'd scan them each time. E.g., xs = [2,2,2,...,2,1,1,...], target=4: i=0, dict[2] indices start at 0, first >0 is 1, return. Fine. Case where scanning is long: complement's indices all ≤ i for many i. E.g., xs = [1]*k + [2]*k, target=3: i=0, comp=2, first index of 2 is k > 0, return. Hmm. To have all complement indices ≤ i, complement value must appear before i, but then earlier i would have matched... Actually if comp appears at index j ≤ i, then for i'=j, comp = target - xs[j] = xs[i]... it gets complicated. Simplest safe: use bisect on the index list to find first index > i. That's O(n log n). Use bisect module (standard library, allowed).\n\nActually simpler: just do the O(n²) double loop — clear and correct. But let me write the efficient one with bisect; it's clean.\n\ndef two_sum(xs, target):\n    from bisect import bisect_right — imports inside function or at top? \"no imports beyond the standard library\" — bisect is stdlib, fine. Put import at top of code block.\n\nCode:\n\n```python\nfrom bisect import bisect_right\n\ndef two_sum(xs, target):\n    if not xs:\n        return None\n    positions = {}\n    for idx, val in enumerate(xs):\n        positions.setdefault(val, []).append(idx)\n    for i, val in enumerate(xs):\n        comp = target - val\n        if comp in positions:\n            idx_list = positions[comp]\n            j = bisect_right(idx_list, i)\n            if j < len(idx_list):\n                return (i, idx_list[j])\n    return None\n```\n\nCheck: smallest i then smallest j — yes, since i ascending and bisect gives first j > i. Empty input returns None. Good.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 102,
+  "total_tokens": 1027,
+  "completion_tokens": 925,
+  "prompt_tokens_details": null
+ },
+ "wall_s": 35.798,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

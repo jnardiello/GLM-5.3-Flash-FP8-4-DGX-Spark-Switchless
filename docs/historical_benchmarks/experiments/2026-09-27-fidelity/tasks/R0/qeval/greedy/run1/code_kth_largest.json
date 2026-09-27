@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "code_kth_largest",
+ "category": "code",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 339
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 420,
+ "response": {
+  "content": "```python\ndef kth_largest(xs, k):\n    if not xs or k < 1 or k > len(xs):\n        return None\n    return sorted(xs, reverse=True)[k - 1]\n```",
+  "reasoning_content": "Simple: sort or use heapq. Return None if k < 1 or k > len(xs).",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 86,
+  "total_tokens": 153,
+  "completion_tokens": 67,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 20
+  }
+ },
+ "wall_s": 3.493,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}

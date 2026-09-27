@@ -1,0 +1,42 @@
+{
+ "ok": true,
+ "arm": "local",
+ "set": "qeval",
+ "mode": "greedy",
+ "run": 1,
+ "item": "fmt_nocode",
+ "category": "format",
+ "request": {
+  "model": "glm-5.3-flash",
+  "max_tokens": 16384,
+  "stream": false,
+  "chat_template_kwargs": {
+   "reasoning_effort": "high"
+  },
+  "temperature": 0,
+  "prompt_chars": 115
+ },
+ "reasoning_effort_used": "high",
+ "max_tokens_used": 16384,
+ "task_default_effort": "low",
+ "task_default_max_tokens": 300,
+ "response": {
+  "content": "A mutex is a synchronization mechanism that ensures only one thread can access a shared resource at a time, preventing race conditions and data corruption. When a thread acquires the mutex, all other threads attempting to acquire it must wait until it is released, thereby guaranteeing exclusive access to the protected resource.",
+  "reasoning_content": "Two sentences, no code, no markdown, no word \"lock\". Careful: \"lock\" as substring — avoid \"block\"? \"block\" contains \"lock\" but the instruction says don't use the word 'lock' — \"block\" is a different word, but safer to avoid it. Avoid \"locking\", \"deadlock\" too.",
+  "finish_reason": "stop"
+ },
+ "usage": {
+  "prompt_tokens": 39,
+  "total_tokens": 171,
+  "completion_tokens": 132,
+  "prompt_tokens_details": null,
+  "completion_tokens_details": {
+   "reasoning_tokens": 71
+  }
+ },
+ "wall_s": 7.305,
+ "grader": {
+  "pass": true,
+  "why": ""
+ }
+}
