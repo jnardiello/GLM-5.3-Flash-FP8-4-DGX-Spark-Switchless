@@ -28,11 +28,10 @@ comparison ID per suite. A candidate is compared with a reference arm measured o
 load. The frozen E29-and-earlier records used a local fork, 8,192 decode tokens and thinking
 off, so they are not comparable with E31.
 
-The README table shows the E31 values against the same-load E29-equivalent arm. The comparison
-figures still show the earlier E29 versus E28b medians: the plotter
-(`scripts/plot-baseline-comparison.py`) compares two frozen records, while E31's comparison
-arm lives inside the E31 record. All earlier comparisons remain archived unchanged under
-`docs/plots/`.
+The README table and figures show the E31 values against the same-load E29-equivalent arm,
+both read from the E31 record by `scripts/plot-baseline-comparison.py`. Its
+`--comparison e29-vs-e28b` mode reproduces the earlier E29 versus E28b figures byte for byte.
+All earlier comparisons remain archived unchanged under `docs/plots/`.
 
 ## Experiment outcomes
 

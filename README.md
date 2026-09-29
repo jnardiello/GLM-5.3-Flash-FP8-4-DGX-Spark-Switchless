@@ -82,13 +82,12 @@ that pool was completed from rejected-draft keys.
 The [current benchmark report](docs/benchmarks/baselines/2026-09-28-e31.md) lists all three
 arms, the leaf tests, the excluded series and limitations.
 
-The graphs below still compare the earlier **E29 and E28b** medians under the old protocol.
-The plotting script compares two frozen records, while E31's comparison arm lives inside
-its own record, so no E31 figure was generated. Click an image for its SVG version.
+The graphs compare E31 with the E29-equivalent arm measured on the same load with the same
+flags, the values of the table above. Click an image for its SVG version.
 
-[![Earlier E29 versus E28b baseline (old protocol): generation throughput, time to first token and percentage changes.](docs/plots/comparisons/2026-09-25-e29-vs-2026-09-25-e28b/generation.png)](docs/plots/comparisons/2026-09-25-e29-vs-2026-09-25-e28b/generation.svg)
+[![E31 versus the same-load E29-equivalent arm, upstream Rigmark with Alex Ellis's reference flags: generation throughput, time to first token and percentage changes.](docs/plots/comparisons/2026-09-28-e31-vs-e29-same-load/generation.png)](docs/plots/comparisons/2026-09-28-e31-vs-e29-same-load/generation.svg)
 
-[![Earlier E29 versus E28b baseline (old protocol): cold prefill, immediate replay and percentage changes at 8K, 32K and 64K.](docs/plots/comparisons/2026-09-25-e29-vs-2026-09-25-e28b/prefill.png)](docs/plots/comparisons/2026-09-25-e29-vs-2026-09-25-e28b/prefill.svg)
+[![E31 versus the same-load E29-equivalent arm, upstream Rigmark with Alex Ellis's reference flags: cold prefill, immediate replay and percentage changes at 8K, 32K and 64K.](docs/plots/comparisons/2026-09-28-e31-vs-e29-same-load/prefill.png)](docs/plots/comparisons/2026-09-28-e31-vs-e29-same-load/prefill.svg)
 
 The [benchmark archive](docs/benchmarks/README.md) retains earlier baselines, experiments
 and separate reproduction results. See [local Rigmark reports](docs/rigmark_reports/README.md)

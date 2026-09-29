@@ -544,6 +544,11 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
+- The README performance figures now compare E31 with its same-load E29-equivalent arm,
+  both measured with upstream Rigmark and Alex Ellis's reference flags, instead of the
+  old-protocol E29 versus E28b medians. `scripts/plot-baseline-comparison.py` reads that
+  arm from the E31 record by default and keeps `--comparison e29-vs-e28b` for the archived
+  figures. Figure labels round like the README table.
 - The README's memory-resilience summary is now a short "Measured resilience" section
   after "Measured quality", with the free-memory figure and a link to the campaign report.
 - Made the memory-bounded operational recipe the default while retaining the frozen
