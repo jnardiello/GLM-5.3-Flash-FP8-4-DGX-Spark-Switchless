@@ -7,10 +7,10 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
-- `scripts/plot-resilience-memory.py` renders one figure of the lowest sampled available
-  memory in each of the eight KV14 resilience test checkpoints, from the campaign's portable
-  results: rank 0 as a point, ranks 1–3 as the range of their minima, and the 768 MiB test
-  stop guard.
+- `scripts/plot-resilience-memory.py` renders one plain-language bar chart of the free
+  memory left on the busiest node (rank 0) in each of the eight KV14 resilience tests, from
+  the campaign's portable results, with the 0.75 GiB safety stop marked and the other three
+  nodes' lowest value in a note.
 - A reproducible requests-versus-memory figure, portable CSV and summary of the
   98m59s mixed-load run: 756 complete responses, 84 intentional cancellations and
   fresh four-rank drains. The operator ended the stable run early; the original
