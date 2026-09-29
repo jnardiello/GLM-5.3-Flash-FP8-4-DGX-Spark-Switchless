@@ -5,26 +5,55 @@ one-step rollback comments live in [`cluster.env.example`](../cluster.env.exampl
 host/software pins live in `scripts/node/bootstrap/versions.env`, model file manifests
 in `scripts/node/model-manifests/`, and NCCL pins in `scripts/node/nccl/`.
 
-The **Current** recipe is the [accepted September 25 E29 reference](historical_benchmarks/baselines/2026-09-25-e29/baseline.json):
+The **current operational recipe** uses the engine configuration from the
+[accepted September 28 E31 performance reference](historical_benchmarks/baselines/2026-09-28-e31/baseline.json):
 R10, SIRCL, hybrid KDA, E03 mHC prefill sharding, SparkCache replay views,
 batch-uniform adaptive verification capped by the effective draft budget, E21
 8-bit residual attention projections, E22b 8-bit DFlash2 drafter linears, the E27
 prefill cadence (`--prefill-schedule-interval 8`), the E27c scheduler, E28b (seven draft
-tokens for a single request with a 16 GiB KV pool per rank) and E29 (no speculative step
-past a possible length finish, 4 ms idle coalescing). It retains the 262,144-token
-context limit. `cluster.env.example` encodes these values directly,
-without an experiment overlay.
+tokens for a single request), E29 (no speculative step
+past a possible length finish, 4 ms idle coalescing) and E31 (a speculative-safe C4 tail
+ring in the pooled indexer, head-gate switch off). It retains the 262,144-token
+context limit. It also selects the protected SparkCache connector: disk transfers use
+8 MiB pieces, stores and restores share a 1 GiB transient reservation budget per rank,
+and admission preserves 1 GiB of `MemAvailable`. `cluster.env.example` encodes all of
+these values directly, without an experiment overlay. The cache protection is an
+operational default; it was not part of the E31 Rigmark measurement.
+The operational memory layer uses a 14 GiB KV pool, allocator trim before eligible eager
+prefills, a 6,912-token per-step scheduler cap, and finite rank-0 API admission (six active
+slots, 128 queued). The measured E31 pool was 16 GiB. The operational pool reports 1,194,033
+KV tokens, or 4.55 maximum-length contexts, so five complete 262,144-token contexts cannot
+be resident together. In the five-client functional checks, all five clients overlapped,
+while engine scheduling used waiting and preemption rather than five resident full contexts.
+Those checks used an instrumented connector, an isolated cache namespace, and 3 GiB/2 GiB
+eviction limits. Production uses the protected connector, its normal namespace, and the 0/0
+disk-capacity policy, so the checks do not establish arbitrary production-cache growth or
+new performance results.
 
-The performance reference contains three complete native Rigmark suites / 162 requests
-measured on one candidate load. By owner decision the promotion used
-four-rank launcher-command parity with that measured candidate instead of a separate
-reproduction run; the [promotion record](historical_benchmarks/baselines/2026-09-25-e29/promotion.json)
-records the parity and live identity checks.
+The versioned [operational identity](operational-identities/2026-09-29-memory-bounded.json)
+pins the frozen E31 record by hash and records the memory and protected-cache deltas. The
+complete [protected 16 GiB rollback](../scripts/node/reference/operational-20260929-sparkcache-protected.env)
+is the immediate operational predecessor: it preserves the bounded SparkCache connector but
+restores the 16 GiB pool and removes admission, trim and step-cap selections. It does not
+retain the complete memory-bounded protection. The historical
+[E31 rollback](../scripts/node/reference/baseline-20260928-e31.env) restores the previous
+connector, transfer config and cache namespace while retaining the measured E31 engine
+recipe. It therefore restores cache management without changing the API or model settings.
 
-The [previous E28b reference](historical_benchmarks/baselines/2026-09-25-e28b/baseline.json)
-remains frozen at three suites / 162 requests. Its complete return is
-[`baseline-20260925-e28b.env`](../scripts/node/reference/baseline-20260925-e28b.env), the
-immediate rollback. The [E27c reference](historical_benchmarks/baselines/2026-09-25-e27c/baseline.json)
+The performance reference is one complete suite of upstream Rigmark with the reference
+flags (54 requests, n = 1), measured on one load together with a same-load E29-equivalent
+arm. By owner decision the promotion used four-rank launcher-command parity with that
+measured load instead of a separate reproduction run; the
+[promotion record](historical_benchmarks/baselines/2026-09-28-e31/promotion.json) records the
+parity and live identity checks.
+
+The [previous E29 reference](historical_benchmarks/baselines/2026-09-25-e29/baseline.json)
+remains frozen at three suites / 162 requests, measured with the earlier Rigmark settings.
+Its complete return is
+[`baseline-20260925-e29.env`](../scripts/node/reference/baseline-20260925-e29.env). The
+[E28b reference](historical_benchmarks/baselines/2026-09-25-e28b/baseline.json)
+and its complete return [`baseline-20260925-e28b.env`](../scripts/node/reference/baseline-20260925-e28b.env),
+the [E27c reference](historical_benchmarks/baselines/2026-09-25-e27c/baseline.json)
 and its complete return [`baseline-20260925-e27c.env`](../scripts/node/reference/baseline-20260925-e27c.env),
 the [E27 reference](historical_benchmarks/baselines/2026-09-24-e27/baseline.json)
 and its complete return [`baseline-20260924-e27.env`](../scripts/node/reference/baseline-20260924-e27.env),
@@ -50,9 +79,9 @@ September 12 filenames identify the later capture of the September 11 recipe.
 | Hardware | four NVIDIA GB10 nodes, verified on ASUS Ascent GX10 | one GPU per TP rank; platform overrides belong in `cluster.env` |
 | Network | two-port ConnectX-7 switchless RoCE ring | four direct edges, MTU 9000; see [`fabric.md`](fabric.md) |
 | Serving engine | SparkRing/SparkCache R10 SM121 vLLM container pinned by registry digest (`IMAGE`) and content ID (`IMAGE_ID`) | rank 0 exposes the OpenAI-compatible API; ranks 1–3 are headless; the September 18 rollback uses the same image |
-| Prefix cache | SparkCache replay connector selected by `scripts/node/experiments/e03/drafter-w8a16/kv-transfer-config-e22b.json` (`SPARKCACHE_MODE=on`) | persistent cache in the dedicated E22b namespace; replay views connector and corrected encoder are included in `third_party/sparkcache/` and pinned by SHA-256 |
+| Prefix cache | protected SparkCache connector selected by `scripts/node/experiments/e03/sparkcache-ram-budget/kv-transfer-config.json` (`SPARKCACHE_MODE=on`) | persistent cache in a dedicated protected namespace; 8 MiB disk transfers, a shared 1 GiB transient budget per rank and a 1 GiB admission floor; connector and corrected encoder are included in `third_party/sparkcache/` and pinned by SHA-256 |
 | Transport | SIRCL bundle and runtime under `SIRCL_DIR`, started through its entrypoint; it carries the TP4 all-reduce and the single-rail sync prefill exchange | included in `third_party/sparkring-sircl/` and pinned by `scripts/node/sircl/SHA256SUMS`; the container runs with `--no-healthcheck` because that entrypoint never writes the image's readiness marker |
-| Engine overrides | 21 vLLM modules under `scripts/node/overrides/`, `scripts/node/experiments/e03/overrides/`, `scripts/node/experiments/e03/bf16-residue/`, `scripts/node/experiments/e03/drafter-w8a16/` and `scripts/node/experiments/e03/queued-cadence/` | cache allocation, worker instrumentation, GLM model/indexer, hybrid KDA scratch, per-call mHC sharding, E21 residual projections, the E22b drafter conversion and the E27c scheduler |
+| Engine overrides | tracked vLLM modules under `scripts/node/overrides/` and `scripts/node/experiments/e03/`, including `prefill-cache-trim/`, `prefill-step-cap/` and `bounded-admission/` | cache allocation, allocator trim, GLM model/indexer, hybrid KDA scratch, per-call mHC sharding, E21/E22b conversions, the E29 scheduler with its 6,912-token cap, and rank-0 API admission |
 | Target model | pinned `zai-org/GLM-5.3-Flash` FP8 snapshot | immutable file list and hashes under `scripts/node/model-manifests/` |
 | Drafter | pinned `incoai/GLM-5.3-Flash-DFlash2` | fused speculative draft; non-commercial upstream terms apply |
 | Expert kernels | vLLM Triton FP8 MoE with the GB10-specific JSON in `scripts/node/moe-configs/` | loads the selected platform configuration for the Triton backend |
@@ -225,7 +254,7 @@ E28b uses the full training block of the DFlash2 drafter for a single request:
 - **Graphs.** `--compilation-config={"max_cudagraph_capture_size":72}` keeps the E27c CUDA
   graph set; without it vLLM would capture sizes up to 96.
 
-The KV pool is **16 GiB per rank** (E28b), up from 15 GiB in E27c and earlier. Seven draft
+The E31 performance reference used **16 GiB per rank** (E28b), up from 15 GiB in E27c and earlier. Seven draft
 tokens hold about 5% fewer KV tokens per GiB, and the larger pool restores the capacity for
 five agents at the full context. The configured per-request context limit remains
 262,144 tokens. The measured boot reported **1,365,066 tokens** of pooled KV capacity and a
@@ -261,6 +290,42 @@ additions-only patch:
   E27c. A request that ends on EOS can still leave one step behind it.
 - **Signature.** Rank 0 logs `E29_END_DRAIN_READY trace=0` and
   `E29_IDLE_COALESCE_READY ms=4 trace=0` at startup.
+
+E31 fixes C4 pools that speculative decoding corrupted. The
+[overlay](../scripts/node/experiments/e03/e31-indexer/README.md) mounts copies of the pooled
+indexer and its C4 kernels:
+
+- **Bug.** The indexer builds one pooled key from every four tokens and keeps each request's
+  recent key/gate rows in a tail, so a pool can be completed across steps. The tail had four
+  slots indexed by `position % 4`. A DFlash2 verify step writes 1 + 7 consecutive positions,
+  including drafts that may be rejected. Their rows overwrote slots that still held committed
+  members of the open pool, and after a rejection the next step completed that pool from
+  rejected-draft keys. The target verify has no rollback; only the MTP speculator snapshots
+  the tail.
+- **Fix (`VLLM_GLM53_KPOOL_TAIL_RING`, on by default).** The tail becomes a ring of
+  `4 * cdiv(4 + K, 4)` slots (12 for seven drafts) indexed by `position % ring`; the pool
+  phase stays `position % 4`. No row of one step can reach a committed member of the open
+  pool. An offline proof and a GPU leaf test show the legacy tail corrupting pools (200
+  wrong pools in the leaf's random schedule) and the ring producing bit-exact pools.
+- **Cost.** One suite per arm on one load, against the E29-equivalent arm: code decode
+  +0.97%, prose −0.54%, code TTFT +0.42%, prefill within ±3.5%. C1/C2/C4 end-to-end moved
+  +7.3%/−6.5%/−6.7%, which is within the noise of three short rounds.
+- **Head gate (`VLLM_GLM53_INDEXER_GATE_TC`, off).** The same files can compute the indexer
+  head gate as a BF16 tensor-core GEMM with FP32 output. It is exact in products and changed
+  no top-512 selection in the leaf test, but its same-load comparison is unresolved: changing
+  the gate changed the generated tokens and therefore draft acceptance. It stays off.
+- **Runtime switches.** Both switches have in-container flag files
+  (`/tmp/glm53-indexer-gate-tc`, `/tmp/glm53-kpool-tail-ring`) for same-load experiments.
+  Switch only while running and waiting requests are 0.
+- **Cache namespace.** The SparkCache namespace was kept. Pools built by speculative decode
+  with the legacy tail could be restored for resumed sessions. It is not established that
+  decode-built pools are persisted, so this remains a residual risk rather than a
+  confirmed defect.
+- **Upstream.** vLLM merged the equivalent fix for its own kpool compressor on September 25,
+  2026 (PR #58454). The SparkRing source of the R10 image still has the four-slot tail;
+  profiles that use MTP3 are covered by its snapshot/restore, so the defect affects DFlash2.
+- **Signature.** Every rank logs `E31_INDEXER_GATE path=fp32` and
+  `E31_KPOOL_TAIL_RING ring=12` on its first forward.
 
 The GPU worker retains the allocator probe present during measurement. It reads
 cached allocator counters once per second after warmup without synchronizing CUDA
@@ -326,9 +391,16 @@ to base scheduling rather than taking down the endpoint.
 
 ## SparkCache prefix cache and SIRCL transport
 
+The operational default
+[streams synchronous snapshots and restores](../scripts/node/experiments/e03/sparkcache-ram-budget/README.md)
+through disk in 8 MiB pieces, with a shared 1 GiB transient budget per rank and a 1 GiB
+`MemAvailable` admission floor. It remains separate from the measured E31 performance
+recipe and does not change the model's context window.
+
 `SPARKCACHE_MODE=on` selects the Current configuration. The launcher builds `--kv-transfer-config`
-from the tracked `scripts/node/experiments/e03/drafter-w8a16/kv-transfer-config-e22b.json` (deployed to
-`~/tp4/experiments/e03/drafter-w8a16/`), which names the `SparkContextCacheConnector`, the target and
+from the tracked `scripts/node/experiments/e03/sparkcache-ram-budget/kv-transfer-config.json`
+(deployed to `~/tp4/experiments/e03/sparkcache-ram-budget/`), which names the
+`SparkContextCacheConnector`, the target and
 drafter checkpoint hashes it accepts, a 4,096–262,144-token span, store and restore
 enabled with `recompute` on a failed load, and the cache root under the runtime cache
 volume. The connector and encoder come from the Apache-2.0
@@ -359,33 +431,48 @@ patch. It checks both input and output hashes and retains the original connector
 connector. Its separate output, `spark_context_cache_connector-e03-replay-views.py`,
 views already validated snapshot spans instead of copying the full body again. Mutable
 per-layer copies, owner lifetime and final stream synchronization remain intact.
-Keep all three connector versions for the current, September 19 and September 18 recipes.
+Finally, `sparkcache-ram-budget/prepare.py --check` verifies the protected connector and
+its complete patch without changing the validated payload. Keep the protected connector
+and all three prior versions for the E31, September 19 and September 18 rollbacks.
 
 `SPARKCACHE_ENCODER` and `SPARKCACHE_ENCODER_SHA256` select and pin the encoder;
 the connector has corresponding variables. `scripts/node/sparkcache/SHA256SUMS`
-and the configuration pins must agree with the prepared files. The tracked JSON
-is the exact measured configuration, including its dedicated E22b cache namespace;
-its digest is recorded in the current accepted reference. Preserve that namespace when
-reproducing this recipe. Changing its spelling changes both the configuration hash
-and the cache selected by the engine.
+and the configuration pins must agree with the prepared files. The selected protected
+JSON has its own cache namespace and is pinned by the operational identity. The E31
+rollback JSON is the exact measured configuration and retains the E22b namespace recorded
+in the frozen reference. Preserve both namespaces for their respective recipes; changing
+either spelling changes both the configuration hash and the cache selected by the engine.
 
-SparkCache persists across container restarts. For cold-prefill measurements, use a
-fresh `cache_salt` per run and keep it unchanged for the cold/replay pairs within that
-run. Confirm that the client forwards it to prefill requests; restarting the container
-does not empty the persistent cache. Monitor free disk space on the runtime cache volume.
+SparkCache persists across container restarts. For current native Rigmark measurements,
+use a fresh `--comparison-id` for every suite and send no `cache_salt`; Rigmark's prompt
+nonce isolates the cache while preserving its cold/replay protocol. Restarting the
+container does not empty the persistent cache. Monitor free disk space on the runtime
+cache volume.
 
 A variant that changes weight precision or other calculations producing cached state
 must use its own `spark_cache_root`. Unchanged checkpoint hashes do not establish cache
 compatibility when weights are converted in memory. Keep the original cache for rollback;
 update the variant's config hash and manifest together with its separate cache path.
 
-The immediate rollback, [`baseline-20260925-e27c.env`](../scripts/node/reference/baseline-20260925-e27c.env),
+The immediate operational rollback,
+[`operational-20260929-sparkcache-protected.env`](../scripts/node/reference/operational-20260929-sparkcache-protected.env),
+preserves the bounded SparkCache connector but restores the 16 GiB pool and removes the new
+trim, step-cap and admission controls. The historical
+[`baseline-20260928-e31.env`](../scripts/node/reference/baseline-20260928-e31.env) restores
+the measured E31 recipe with unrestricted cache behavior.
+[`baseline-20260925-e29.env`](../scripts/node/reference/baseline-20260925-e29.env)
+also restores the E29 indexer.
+[`baseline-20260925-e28b.env`](../scripts/node/reference/baseline-20260925-e28b.env)
+restores the complete E28b recipe: seven draft tokens and a 16 GiB KV pool without the
+E29 scheduler or engine core.
+[`baseline-20260925-e27c.env`](../scripts/node/reference/baseline-20260925-e27c.env)
 restores the complete E27c recipe: five draft tokens and a 15 GiB KV pool.
 [`baseline-20260924-e27.env`](../scripts/node/reference/baseline-20260924-e27.env)
 restores the complete E27 recipe: the image's own scheduler.
 [`baseline-20260924-e22b.env`](../scripts/node/reference/baseline-20260924-e22b.env)
 restores the complete E22b recipe, without the prefill cadence. E27 and E27c keep the E22b
-cache namespace because they change no cached state; E28b and E29 keep it as well.
+cache namespace because they change no cached state; E28b and E29 keep it as well, and so
+does E31 by owner decision.
 [`baseline-20260923-e21.env`](../scripts/node/reference/baseline-20260923-e21.env)
 restores the complete E21 recipe: the vendor drafter, no E22 module or flags and the E21
 cache namespace. [`baseline-20260919-e03.env`](../scripts/node/reference/baseline-20260919-e03.env)
@@ -453,23 +540,25 @@ Generated-code quality audits remain separate from performance acceptance.
 
 ## Qualification and reproduction
 
-The [current reference](historical_benchmarks/baselines/2026-09-25-e29/baseline.json)
-uses exactly three complete native Rigmark suites / 162 requests on one candidate load,
-measured over direct LAN HTTP like the E28b reference. All streams completed visibly,
-with zero measurement/protocol/runtime errors, 45/45 native output gates and 54/54 prefill
-token counts. Both functional gates passed after the candidate boot. Host memory was
-sampled once per second on every rank; rank 0 kept at least 1.95 GiB available.
+The [current reference](historical_benchmarks/baselines/2026-09-28-e31/baseline.json) is one
+complete suite of upstream Rigmark (`alexellis/rigmark` c5a0db0) with the reference flags:
+every default plus `reasoning_effort` low, no cache salt, a fresh comparison ID per suite.
+It was measured over direct LAN HTTP on one load, together with a same-load arm running the
+E29 arithmetic (ring and gate off) and a head-gate arm. Every suite completed 54/54 streams
+visibly, with zero measurement/protocol/runtime errors. Both functional gates passed after
+the boot. Frozen records up to E29 used 8,192 decode tokens, thinking off and a cache salt,
+so their values are not comparable with E31's.
 
-Against the frozen E28b medians:
-- code decode +3.2%, prose +2.5%;
-- C1 +1.7%, C2 +0.1%, C4 +1.9% end-to-end;
-- C1/C2/C4 per-stream TTFT −13.2%/−14.7%/−9.8%;
-- cold prefill −0.4% to +2.2%, cached replay +3.6%/+2.7%/−1.0% at 8K/32K/64K.
+Against the same-load E29-equivalent arm (one suite each):
+- code decode +0.97%, prose −0.54%;
+- code TTFT +0.42%, prose TTFT −2.86%;
+- C1/C2/C4 end-to-end +7.3%/−6.5%/−6.7% (three short rounds each);
+- cold prefill −2.5% to +0.7%, cached replay −1.9% to +3.5%.
 
-See the [dated report](benchmarks/baselines/2026-09-25-e29.md) for all 16 metrics, the
-diagnosis, the owner-requested prefill re-runs, the memory samples, counts and limits.
+See the [dated report](benchmarks/baselines/2026-09-28-e31.md) for all 16 metrics, the leaf
+tests, the excluded series and the limits.
 
-The [promotion record](historical_benchmarks/baselines/2026-09-25-e29/promotion.json)
+The [promotion record](historical_benchmarks/baselines/2026-09-28-e31/promotion.json)
 records:
 - the owner's decision to promote without a separate reproduction run;
 - the four-rank launcher-command parity between the encoded default and the measured
@@ -479,9 +568,9 @@ records:
 default must be applied to a stack loaded from an overlay.
 
 The performance figures describe inference, not complete agent tasks. Concurrency
-requests have 256-token outputs; long code decode excludes TTFT. The context limit is
-262,144 tokens with 16 GiB KV per rank. Sampled free memory is not guaranteed headroom,
-and observer overhead was not isolated. No answer-quality audit is a performance gate.
+requests have 256-token outputs; long decode allows 4,096 tokens and excludes TTFT. The
+context limit is 262,144 tokens with 16 GiB KV per rank. Host memory was not sampled during
+the E31 suites. No answer-quality audit is a performance gate.
 
 ## Security and licensing boundary
 

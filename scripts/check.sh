@@ -7,7 +7,7 @@ export PYTHONDONTWRITEBYTECODE=1
 
 public_path() {
   case "$1" in
-    ./.git/*|./.claude/*|./data/*|./docs/rigmark_reports/*|./scripts/mirror-snapshot.sh|\
+    ./.git/*|./.claude/*|./data/*|./docs/rigmark_reports/*|./scripts/resilience/.campaign/*|./scripts/mirror-snapshot.sh|\
     ./scripts/mirror-allow.txt|./scripts/mirror-private-terms.example)
       return 1 ;;
     *) return 0 ;;
@@ -93,6 +93,19 @@ python3 scripts/tests/test-verify-node.py
 python3 scripts/tests/test-prepare-sparkcache.py
 python3 scripts/tests/test-sparkcache-launcher.py
 python3 scripts/tests/test-third-party-payload.py
+python3 scripts/tests/test-sparkcache-memory-budget.py
+python3 scripts/tests/test-sparkcache-ram-connector.py
+python3 scripts/tests/test-sparkcache-stream-io.py
+python3 scripts/tests/test-sparkcache-stream-connector.py
+python3 scripts/tests/test-sparkcache-ram-config.py
+python3 scripts/tests/test-resilience-faults.py
+python3 scripts/tests/test-resilience-overlay.py
+python3 scripts/tests/test-resilience-campaign.py
+python3 scripts/tests/test-resilience-combinations.py
+python3 scripts/tests/test-resilience-probe.py
+python3 scripts/tests/test-prefill-cache-trim.py
+python3 scripts/tests/test-prefill-step-cap.py
+python3 scripts/tests/test-bounded-admission.py
 python3 scripts/tests/test-kda-hybrid.py
 python3 scripts/tests/test-e03-config.py
 python3 scripts/tests/test-adaptive-draft-budget.py
@@ -104,6 +117,8 @@ python3 scripts/tests/test-queued-cadence-config.py
 python3 scripts/tests/test-draft-depth-7-config.py
 python3 scripts/tests/test-end-drain-config.py
 python3 scripts/tests/test-end-drain-policy.py
+python3 scripts/tests/test-e31-indexer-config.py
+python3 scripts/tests/test-e31-kpool-tail-ring.py
 python3 scripts/tests/test-accepted-recipe.py
 python3 scripts/tests/test-f0-reference.py
 ./scripts/tests/test-host-lifecycle.sh

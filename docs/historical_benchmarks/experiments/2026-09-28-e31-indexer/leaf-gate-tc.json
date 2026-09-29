@@ -1,0 +1,124 @@
+{
+  "schema": 1,
+  "test": "scripts/node/experiments/e03/e31-indexer/leaf_gate_tc.py",
+  "test_sha256_at_extraction": "980f707eb1e96eaaa63119cee94a7a03d68d0ea3b3620df28ef9f5a840bedd78",
+  "environment": "One idle GB10 inside the serving image while the stack was down (2026-09-28 window); real layer-11 weights_proj tensor from the checkpoint.",
+  "exit_code": 0,
+  "summary": {
+    "experiment": "e31-indexer-gate-tc",
+    "candidate_path": "bf16_tc_out_dtype_fp32",
+    "torch": "2.13.0+cu130",
+    "device": "NVIDIA GB10",
+    "weights": "file",
+    "iters": 200,
+    "pools": 16384,
+    "topk": 512,
+    "rows": [
+      {
+        "m": 4,
+        "max_abs": 0.00014495849609375,
+        "max_rel": 0.0003687427961267531,
+        "topk_mismatched": 0,
+        "topk_total": 2048,
+        "jaccard_mean": 1.0,
+        "near_ties": 1,
+        "eager_us": {
+          "ref": 19.74,
+          "cand": 17.79
+        },
+        "graph_us": {
+          "ref": 19.68,
+          "cand": 19.01
+        },
+        "ab_eager_us": {
+          "A": 21.73,
+          "B": 19.58
+        }
+      },
+      {
+        "m": 8,
+        "max_abs": 0.00028228759765625,
+        "max_rel": 0.0005015155766159296,
+        "topk_mismatched": 0,
+        "topk_total": 4096,
+        "jaccard_mean": 1.0,
+        "near_ties": 0,
+        "eager_us": {
+          "ref": 25.86,
+          "cand": 19.54
+        },
+        "graph_us": {
+          "ref": 21.76,
+          "cand": 19.07
+        },
+        "ab_eager_us": {
+          "A": 25.82,
+          "B": 19.62
+        }
+      },
+      {
+        "m": 16,
+        "max_abs": 1.9073486328125e-05,
+        "max_rel": 7.470390119124204e-05,
+        "topk_mismatched": 0,
+        "topk_total": 8192,
+        "jaccard_mean": 1.0,
+        "near_ties": 0,
+        "eager_us": {
+          "ref": 25.82,
+          "cand": 13.57
+        },
+        "graph_us": {
+          "ref": 21.79,
+          "cand": 6.99
+        },
+        "ab_eager_us": {
+          "A": 25.82,
+          "B": 13.57
+        }
+      },
+      {
+        "m": 32,
+        "max_abs": 1.52587890625e-05,
+        "max_rel": 0.0008439193479716778,
+        "topk_mismatched": 0,
+        "topk_total": 16384,
+        "jaccard_mean": 1.0,
+        "near_ties": 0,
+        "eager_us": {
+          "ref": 20.69,
+          "cand": 14.53
+        },
+        "graph_us": {
+          "ref": 11.49,
+          "cand": 6.94
+        },
+        "ab_eager_us": {
+          "A": 20.29,
+          "B": 14.45
+        }
+      },
+      {
+        "m": 48,
+        "max_abs": 1.1444091796875e-05,
+        "max_rel": 9.622375364415348e-05,
+        "topk_mismatched": 0,
+        "topk_total": 24576,
+        "jaccard_mean": 1.0,
+        "near_ties": 0,
+        "eager_us": {
+          "ref": 20.72,
+          "cand": 14.75
+        },
+        "graph_us": {
+          "ref": 13.06,
+          "cand": 7.39
+        },
+        "ab_eager_us": {
+          "A": 20.54,
+          "B": 14.88
+        }
+      }
+    ]
+  }
+}

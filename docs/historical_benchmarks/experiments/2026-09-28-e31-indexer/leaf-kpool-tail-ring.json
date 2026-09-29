@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "test": "scripts/node/experiments/e03/e31-indexer/leaf_kpool_tail_ring.py",
+  "test_sha256_at_extraction": "b7e025ea5fee646583b1947ee7d89672f6762695e5ca2c0d492d59fa4b31452a",
+  "environment": "One idle GB10 inside the serving image while the stack was down (2026-09-28 window).",
+  "exit_code": 0,
+  "summary": {
+    "experiment": "e31-kpool-tail-ring",
+    "pass": true,
+    "spec_tokens": 7,
+    "ring_max": 12,
+    "block": 2304,
+    "parent_stride_pages": 153,
+    "state_slots": [
+      5,
+      3,
+      9,
+      2
+    ],
+    "seed": 0,
+    "committed_tokens": [
+      2139,
+      2359,
+      719,
+      1668
+    ],
+    "batches": 163,
+    "counterexample": {
+      "reference": {
+        "finite": true,
+        "nonzero": true,
+        "distinct": true,
+        "independent_misses": 0
+      },
+      "legacy": {
+        "wrong_pools": 1,
+        "inexact_pools": 1,
+        "max_abs_diff": 1.9375
+      },
+      "e31": {
+        "wrong_pools": 0,
+        "inexact_pools": 0,
+        "max_abs_diff": 0.0
+      }
+    },
+    "random": {
+      "reference": {
+        "finite": true,
+        "nonzero": true,
+        "distinct": true,
+        "independent_misses": 0
+      },
+      "legacy": {
+        "wrong_pools": 200,
+        "inexact_pools": 200,
+        "max_abs_diff": 3.0625
+      },
+      "e31": {
+        "wrong_pools": 0,
+        "inexact_pools": 0,
+        "max_abs_diff": 0.0
+      }
+    },
+    "torch": "2.13.0+cu130"
+  }
+}

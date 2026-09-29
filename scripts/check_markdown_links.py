@@ -34,6 +34,8 @@ def is_public(path: Path) -> bool:
         return False
     if rel.parts[:1] == ("data",):  # ignored private evidence, as in scripts/check.sh
         return False
+    if rel.parts[:3] == ("scripts", "resilience", ".campaign"):
+        return False
     if rel.parts[:2] == ("docs", "rigmark_reports") and rel.as_posix() != "docs/rigmark_reports/README.md":
         return False
     if rel.as_posix() in INTERNAL_DOCUMENTS:

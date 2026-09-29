@@ -1,0 +1,539 @@
+{
+  "derived_csv": {
+    "rows": 24599,
+    "sha256": "ae46d8cd871002f10f5a5c8a4703b71c1353ae6655f216695b60d1346e69b598"
+  },
+  "generator": {
+    "build_py_sha256": "de5ee64fe311bb5083bdb9cc04d965932a64e625570dadf5a8548ae9829ffeef",
+    "portable_replot_sha256": "e342bda2782e8214d27db8dd2a105a47eeb57f1b6ebc62b049dd50ee99f17d41"
+  },
+  "matplotlib_version": "3.11.2",
+  "request_counts": {
+    "cancellation_requests_submitted": 84,
+    "cancellations_completed_with_drain": 84,
+    "cancellations_deadline_truncated_at_load_end": 0,
+    "cancellations_failed_or_incomplete": 0,
+    "denominator": "submitted growth, replay, and cancellation generation requests",
+    "growth_requests_submitted": 378,
+    "health_metrics_tokenization_rows_are_not_generation_requests": true,
+    "idle_rows_excluded_from_denominator": 41,
+    "ordinary_completed": 756,
+    "ordinary_deadline_truncated_at_load_end": 0,
+    "ordinary_failed_or_incomplete": 0,
+    "ordinary_requests_submitted": 756,
+    "other_rows_excluded_from_denominator": {},
+    "replay_requests_submitted": 378,
+    "total_generation_requests_submitted": 840
+  },
+  "schema": "tp4-requests-memory-readme/v1",
+  "semantics": {
+    "cancel_drain_x_requires_exact_raw_sample_identity_and_proof_scan": true,
+    "final_drain_x_requires_exact_raw_sample_identity_and_proof_scan": true,
+    "idle_and_drain_observations_are_not_load_samples": true,
+    "matched_final_drain_x_is_after_all_submitted_requests": true,
+    "memory_is_headroom_not_consumed_ram": true,
+    "missing_or_stale_host_samples_are_unknown": true,
+    "one_earliest_raw_sample_represents_each_proof_scan": true,
+    "request_sample_join_uses_uncalibrated_node_and_controller_wall_clocks": true,
+    "rss_cuda_and_host_memory_are_not_summed": true,
+    "values_are_not_forward_filled": true,
+    "x_axis": "cumulative submitted growth, replay, and cancellation requests",
+    "y_axis": "MemAvailable bytes from current host samples"
+  },
+  "source_checkpoint_status": "owner_stopped",
+  "source_elapsed_seconds": 5939.261920659919,
+  "source_hashes": {
+    "sealed_manifest_sha256": "9729e658400cdb1ea221d67c5c3802a6c67a46a13e9f36dd178536da9d85c29e",
+    "sealed_report_sha256": "c5660ecb2fb01b03c75b09ecc010a3ac34eb56e0666ced6dd9facb5f2e96fe55",
+    "soak_receipt_sha256": "6bc0d4138f2ab51e9e020042f0d23144a6406632356df4a6252e1591e1128353",
+    "telemetry_plot_csv_sha256": "0531734177681fa28b7ef8e8be30263eaf1a66a3dcd620b5624782cfda649846",
+    "telemetry_rank0_jsonl_sha256": "1bf962a6e05d4da93d5dfbaf2291dee36d7a13c049259a98fb9bab2c80c28ec4",
+    "telemetry_rank1_jsonl_sha256": "ffa018d81b62b133ddc0ef9965add89356d1addb78cf3cc231b3e43ddc4d0a28",
+    "telemetry_rank2_jsonl_sha256": "ea71f0136aaf6e78a172f51b5a4c19880f906edb1ae2ee3cb01da1efa0226a9b",
+    "telemetry_rank3_jsonl_sha256": "82bb390fdb8f429619c27e8532adc2282bb4ed9b39f118c49a2120a1afaa2f2d"
+  },
+  "source_interval": {
+    "end_ns": 1790697373695853000,
+    "start_ns": 1790691429321309000
+  },
+  "source_original_7200_second_gate_completed": false,
+  "source_status": "owner_stopped",
+  "telemetry_by_rank": [
+    {
+      "ambiguous_cancel_proof_scan_keys": 0,
+      "between_requests": {
+        "first": {
+          "cumulative_generation_requests_submitted": 0,
+          "graph_request_ordinal": 0,
+          "mem_available_bytes": 4362514432,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790691429381148879
+        },
+        "known_samples": 708,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 6216462336,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790697373537452953
+        },
+        "maximum_mem_available_bytes": 6399270912,
+        "minimum_mem_available_bytes": 4089982976
+      },
+      "cancel_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 10,
+          "graph_request_ordinal": 10,
+          "mem_available_bytes": 4332544000,
+          "request_ordinal_join": "exact-cancel-proof-identity",
+          "time_ns": 1790691457944554198
+        },
+        "known_samples": 84,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 6233751552,
+          "request_ordinal_join": "exact-cancel-proof-identity",
+          "time_ns": 1790697367944434485
+        },
+        "maximum_mem_available_bytes": 6293127168,
+        "minimum_mem_available_bytes": 4215164928
+      },
+      "cancel_drain_proofs": 84,
+      "drain_proof_match_status_counts": {
+        "exact": 84
+      },
+      "exact_cancel_drain_markers": 84,
+      "exact_final_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 6215430144,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373738099600
+        },
+        "known_samples": 1,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 6215430144,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373738099600
+        },
+        "maximum_mem_available_bytes": 6215430144,
+        "minimum_mem_available_bytes": 6215430144
+      },
+      "exact_final_drain_markers": 1,
+      "final_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 6215430144,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373738099600
+        },
+        "known_samples": 1,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 6215430144,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373738099600
+        },
+        "maximum_mem_available_bytes": 6215430144,
+        "minimum_mem_available_bytes": 6215430144
+      },
+      "final_drain_proofs": 1,
+      "idle": {
+        "first": {
+          "cumulative_generation_requests_submitted": 20,
+          "graph_request_ordinal": 20,
+          "mem_available_bytes": 4279365632,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790691513944435670
+        },
+        "known_samples": 1230,
+        "last": {
+          "cumulative_generation_requests_submitted": 820,
+          "graph_request_ordinal": 820,
+          "mem_available_bytes": 6255767552,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790697262944702846
+        },
+        "maximum_mem_available_bytes": 6316392448,
+        "minimum_mem_available_bytes": 4218605568
+      },
+      "mem_available_known_samples": 6150,
+      "mem_available_unknown_samples": 0,
+      "minimum_mem_available_bytes": 3313426432,
+      "minimum_under_load_mem_available_bytes": 3313426432,
+      "missing_or_unmatched_cancel_drain_proofs": 0,
+      "missing_or_unmatched_final_drain_proofs": 0,
+      "rank": 0,
+      "raw_sample_join_status_counts": {
+        "matched": 6150
+      },
+      "samples": 6150,
+      "sampling_gaps_over_twice_target": 1,
+      "unmatched_cancel_drain_markers": 0,
+      "unmatched_final_drain_markers": 0
+    },
+    {
+      "ambiguous_cancel_proof_scan_keys": 0,
+      "between_requests": {
+        "first": {
+          "cumulative_generation_requests_submitted": 0,
+          "graph_request_ordinal": 0,
+          "mem_available_bytes": 9793585152,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790691429516766329
+        },
+        "known_samples": 709,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11334459392,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790697373529654831
+        },
+        "maximum_mem_available_bytes": 11513012224,
+        "minimum_mem_available_bytes": 9336541184
+      },
+      "cancel_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 10,
+          "graph_request_ordinal": 10,
+          "mem_available_bytes": 9650003968,
+          "request_ordinal_join": "exact-cancel-proof-identity",
+          "time_ns": 1790691457960654415
+        },
+        "known_samples": 84,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11365048320,
+          "request_ordinal_join": "exact-cancel-proof-identity",
+          "time_ns": 1790697367960414734
+        },
+        "maximum_mem_available_bytes": 11411296256,
+        "minimum_mem_available_bytes": 9455513600
+      },
+      "cancel_drain_proofs": 84,
+      "drain_proof_match_status_counts": {
+        "exact": 84
+      },
+      "exact_cancel_drain_markers": 84,
+      "exact_final_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11327234048,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373730149079
+        },
+        "known_samples": 1,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11327234048,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373730149079
+        },
+        "maximum_mem_available_bytes": 11327234048,
+        "minimum_mem_available_bytes": 11327234048
+      },
+      "exact_final_drain_markers": 1,
+      "final_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11327234048,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373730149079
+        },
+        "known_samples": 1,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11327234048,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373730149079
+        },
+        "maximum_mem_available_bytes": 11327234048,
+        "minimum_mem_available_bytes": 11327234048
+      },
+      "final_drain_proofs": 1,
+      "idle": {
+        "first": {
+          "cumulative_generation_requests_submitted": 20,
+          "graph_request_ordinal": 20,
+          "mem_available_bytes": 9543593984,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790691513960633543
+        },
+        "known_samples": 1230,
+        "last": {
+          "cumulative_generation_requests_submitted": 820,
+          "graph_request_ordinal": 820,
+          "mem_available_bytes": 11375915008,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790697262961170807
+        },
+        "maximum_mem_available_bytes": 11426422784,
+        "minimum_mem_available_bytes": 9457176576
+      },
+      "mem_available_known_samples": 6149,
+      "mem_available_unknown_samples": 0,
+      "minimum_mem_available_bytes": 8552247296,
+      "minimum_under_load_mem_available_bytes": 8552247296,
+      "missing_or_unmatched_cancel_drain_proofs": 0,
+      "missing_or_unmatched_final_drain_proofs": 0,
+      "rank": 1,
+      "raw_sample_join_status_counts": {
+        "matched": 6149
+      },
+      "samples": 6149,
+      "sampling_gaps_over_twice_target": 1,
+      "unmatched_cancel_drain_markers": 0,
+      "unmatched_final_drain_markers": 0
+    },
+    {
+      "ambiguous_cancel_proof_scan_keys": 0,
+      "between_requests": {
+        "first": {
+          "cumulative_generation_requests_submitted": 0,
+          "graph_request_ordinal": 0,
+          "mem_available_bytes": 9771827200,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790691429359272629
+        },
+        "known_samples": 710,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11361947648,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790697373529078155
+        },
+        "maximum_mem_available_bytes": 11528663040,
+        "minimum_mem_available_bytes": 9360257024
+      },
+      "cancel_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 10,
+          "graph_request_ordinal": 10,
+          "mem_available_bytes": 9656356864,
+          "request_ordinal_join": "exact-cancel-proof-identity",
+          "time_ns": 1790691457956675396
+        },
+        "known_samples": 84,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11336953856,
+          "request_ordinal_join": "exact-cancel-proof-identity",
+          "time_ns": 1790697367956998786
+        },
+        "maximum_mem_available_bytes": 11416236032,
+        "minimum_mem_available_bytes": 9482522624
+      },
+      "cancel_drain_proofs": 84,
+      "drain_proof_match_status_counts": {
+        "exact": 84
+      },
+      "exact_cancel_drain_markers": 84,
+      "exact_final_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11360915456,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373728826722
+        },
+        "known_samples": 1,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11360915456,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373728826722
+        },
+        "maximum_mem_available_bytes": 11360915456,
+        "minimum_mem_available_bytes": 11360915456
+      },
+      "exact_final_drain_markers": 1,
+      "final_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11360915456,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373728826722
+        },
+        "known_samples": 1,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11360915456,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373728826722
+        },
+        "maximum_mem_available_bytes": 11360915456,
+        "minimum_mem_available_bytes": 11360915456
+      },
+      "final_drain_proofs": 1,
+      "idle": {
+        "first": {
+          "cumulative_generation_requests_submitted": 20,
+          "graph_request_ordinal": 20,
+          "mem_available_bytes": 9518415872,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790691513957212512
+        },
+        "known_samples": 1230,
+        "last": {
+          "cumulative_generation_requests_submitted": 820,
+          "graph_request_ordinal": 820,
+          "mem_available_bytes": 11383574528,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790697262957698970
+        },
+        "maximum_mem_available_bytes": 11421888512,
+        "minimum_mem_available_bytes": 9469927424
+      },
+      "mem_available_known_samples": 6150,
+      "mem_available_unknown_samples": 0,
+      "minimum_mem_available_bytes": 8571740160,
+      "minimum_under_load_mem_available_bytes": 8571740160,
+      "missing_or_unmatched_cancel_drain_proofs": 0,
+      "missing_or_unmatched_final_drain_proofs": 0,
+      "rank": 2,
+      "raw_sample_join_status_counts": {
+        "matched": 6150
+      },
+      "samples": 6150,
+      "sampling_gaps_over_twice_target": 1,
+      "unmatched_cancel_drain_markers": 0,
+      "unmatched_final_drain_markers": 0
+    },
+    {
+      "ambiguous_cancel_proof_scan_keys": 0,
+      "between_requests": {
+        "first": {
+          "cumulative_generation_requests_submitted": 0,
+          "graph_request_ordinal": 0,
+          "mem_available_bytes": 9726353408,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790691429338266062
+        },
+        "known_samples": 709,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11316785152,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790697373559807394
+        },
+        "maximum_mem_available_bytes": 11471880192,
+        "minimum_mem_available_bytes": 9297395712
+      },
+      "cancel_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 10,
+          "graph_request_ordinal": 10,
+          "mem_available_bytes": 9608830976,
+          "request_ordinal_join": "exact-cancel-proof-identity",
+          "time_ns": 1790691457966504867
+        },
+        "known_samples": 84,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11274448896,
+          "request_ordinal_join": "exact-cancel-proof-identity",
+          "time_ns": 1790697367966127536
+        },
+        "maximum_mem_available_bytes": 11359649792,
+        "minimum_mem_available_bytes": 9405997056
+      },
+      "cancel_drain_proofs": 84,
+      "drain_proof_match_status_counts": {
+        "exact": 84
+      },
+      "exact_cancel_drain_markers": 84,
+      "exact_final_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11311300608,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373759766732
+        },
+        "known_samples": 1,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11311300608,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373759766732
+        },
+        "maximum_mem_available_bytes": 11311300608,
+        "minimum_mem_available_bytes": 11311300608
+      },
+      "exact_final_drain_markers": 1,
+      "final_drain": {
+        "first": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11311300608,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373759766732
+        },
+        "known_samples": 1,
+        "last": {
+          "cumulative_generation_requests_submitted": 840,
+          "graph_request_ordinal": 840,
+          "mem_available_bytes": 11311300608,
+          "request_ordinal_join": "exact-final-proof-identity",
+          "time_ns": 1790697373759766732
+        },
+        "maximum_mem_available_bytes": 11311300608,
+        "minimum_mem_available_bytes": 11311300608
+      },
+      "final_drain_proofs": 1,
+      "idle": {
+        "first": {
+          "cumulative_generation_requests_submitted": 20,
+          "graph_request_ordinal": 20,
+          "mem_available_bytes": 9497931776,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790691513966573153
+        },
+        "known_samples": 1230,
+        "last": {
+          "cumulative_generation_requests_submitted": 820,
+          "graph_request_ordinal": 820,
+          "mem_available_bytes": 11332726784,
+          "request_ordinal_join": "approximate-uncalibrated-wall-clock",
+          "time_ns": 1790697262966208355
+        },
+        "maximum_mem_available_bytes": 11373150208,
+        "minimum_mem_available_bytes": 9395265536
+      },
+      "mem_available_known_samples": 6150,
+      "mem_available_unknown_samples": 0,
+      "minimum_mem_available_bytes": 8505368576,
+      "minimum_under_load_mem_available_bytes": 8505368576,
+      "missing_or_unmatched_cancel_drain_proofs": 0,
+      "missing_or_unmatched_final_drain_proofs": 0,
+      "rank": 3,
+      "raw_sample_join_status_counts": {
+        "matched": 6150
+      },
+      "samples": 6150,
+      "sampling_gaps_over_twice_target": 1,
+      "unmatched_cancel_drain_markers": 0,
+      "unmatched_final_drain_markers": 0
+    }
+  ]
+}

@@ -1,0 +1,462 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "experiment_id": "2026-09-28-e31-indexer",
+  "title": "E31: speculative-safe C4 tail ring, and the head gate on tensor cores",
+  "outcome": {
+    "tail_ring": "promote",
+    "head_gate": "unresolved"
+  },
+  "outcome_detail": "Tail ring (arm R) against the same-load E29-equivalent arm E, one suite each: code decode +0.97%, prose decode -0.54%, code TTFT +0.42%, prefill within +/-3.5%, C1/C2/C4 end-to-end +7.3%/-6.5%/-6.7% (three short rounds each; noise). It fixes pools corrupted by rejected drafts at no measurable cost. The head gate (arm G against R) is inconclusive: it changed generated tokens and therefore draft acceptance.",
+  "reference": {
+    "same_load_arm": "E",
+    "run": "run-1",
+    "note": "Frozen E29-and-earlier records used other Rigmark flags and are not comparable."
+  },
+  "coverage": "One load of the E31 overlay on the E29 recipe (booted 2026-09-28 06:12-06:23 UTC); three complete suites, one per arm, switched at runtime through the flag files with the service idle and all four ranks verified before each suite.",
+  "client_transport": "Direct LAN HTTP to the rank-0 API from an external macOS workstation; 0 ping timeouts during every suite.",
+  "rigmark": {
+    "repository": "alexellis/rigmark",
+    "revision": "c5a0db01b0542ac291883ab049b6141efae0c7d3",
+    "source_sha256": "61d71055b4a3a64cb0520fc1bc535de9a1863463c6937d423745957339f7f1b7",
+    "settings": {
+      "concurrency": [
+        1,
+        2,
+        4
+      ],
+      "concurrency_runs": 3,
+      "concurrency_tokens": 256,
+      "concurrency_workload": "code",
+      "decode_tokens": 4096,
+      "extra_body": {
+        "chat_template_kwargs": {
+          "reasoning_effort": "low"
+        }
+      },
+      "prefill_depths": [
+        8192,
+        32768,
+        65536
+      ],
+      "prefill_runs": 3,
+      "runs": 5,
+      "seed": 20260905,
+      "temperature": 0.0,
+      "top_p": 1.0
+    },
+    "cache_salt": null,
+    "comparison_ids": {
+      "run-1": "glm53-e31-alex-20260928-s1",
+      "run-2": "glm53-e31-alex-20260928-s2",
+      "run-3": "glm53-e31-alex-20260928-s3"
+    }
+  },
+  "arms": {
+    "E": {
+      "run": "run-1",
+      "description": "gate 0, ring 0: E29-equivalent arithmetic (legacy four-slot tail, FP32 head gate)",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-28-e31-indexer/run-1.json",
+        "sha256": "8f3299195cdf732004a8f082ab3659bc381cd80ba8aa97fdc48fee8d0b7d9358"
+      },
+      "receipt_sha256": "bbc52fd3368bb34cc10a6f1fc050feda6245f714fcdb472ce883c4ee57536310"
+    },
+    "R": {
+      "run": "run-2",
+      "description": "gate 0, ring 1: the promoted E31 default (12-slot tail ring, FP32 head gate)",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-28-e31-indexer/run-2.json",
+        "sha256": "fc9947dce0166c685fda84ef85e2f1567ef8bc6490836d7562f148abf86223a5"
+      },
+      "receipt_sha256": "31da4a70cb31b27d6af554510c5ce4090d3e57938b82d911dabb721cc890f300"
+    },
+    "G": {
+      "run": "run-3",
+      "description": "gate 1, ring 1: tail ring plus the BF16 tensor-core head gate",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-28-e31-indexer/run-3.json",
+        "sha256": "0eaf12bd4d987c211bf47d2f6d87fad766c85db805a80f4deb35866a63558731"
+      },
+      "receipt_sha256": "e064dbc8ec8e55221af1a875db7eb88736c3341bea20e961f55e5f673a3d6e0c"
+    }
+  },
+  "suite_order": [
+    "E",
+    "R",
+    "G"
+  ],
+  "performance_metrics": [
+    {
+      "key": "code_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "code",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "E": 64.559,
+      "R": 65.185,
+      "G": 62.501,
+      "R_vs_E_pct": 0.9696556638114048,
+      "G_vs_R_pct": -4.11751169747642,
+      "G_vs_E_pct": -3.1877817190476927
+    },
+    {
+      "key": "code_c1_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "1",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "E": 40.989,
+      "R": 43.988,
+      "G": 46.768,
+      "R_vs_E_pct": 7.316597135816933,
+      "G_vs_R_pct": 6.319905428753299,
+      "G_vs_E_pct": 14.098904584156735
+    },
+    {
+      "key": "code_c2_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "2",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "E": 73.103,
+      "R": 68.369,
+      "G": 76.429,
+      "R_vs_E_pct": -6.475794427041291,
+      "G_vs_R_pct": 11.788968684637778,
+      "G_vs_E_pct": 4.549744880511071
+    },
+    {
+      "key": "code_c4_aggregate_end_to_end_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "concurrency",
+        "4",
+        "aggregate_end_to_end_tokens_per_second",
+        "median"
+      ],
+      "E": 108.671,
+      "R": 101.448,
+      "G": 107.791,
+      "R_vs_E_pct": -6.646667464180887,
+      "G_vs_R_pct": 6.2524643166942715,
+      "G_vs_E_pct": -0.8097836589338551
+    },
+    {
+      "key": "prose_decode_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "decode",
+        "prose",
+        "decode_tokens_per_second",
+        "median"
+      ],
+      "E": 34.281,
+      "R": 34.095,
+      "G": 34.319,
+      "R_vs_E_pct": -0.5425746040080509,
+      "G_vs_R_pct": 0.6569878281273024,
+      "G_vs_E_pct": 0.11084857501240865
+    },
+    {
+      "key": "code_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "code",
+        "ttft_seconds",
+        "median"
+      ],
+      "E": 0.473,
+      "R": 0.475,
+      "G": 0.465,
+      "R_vs_E_pct": 0.4228329809725162,
+      "G_vs_R_pct": -2.105263157894727,
+      "G_vs_E_pct": -1.6913319238900535
+    },
+    {
+      "key": "prose_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "decode",
+        "prose",
+        "ttft_seconds",
+        "median"
+      ],
+      "E": 0.385,
+      "R": 0.374,
+      "G": 0.386,
+      "R_vs_E_pct": -2.8571428571428594,
+      "G_vs_R_pct": 3.2085561497326234,
+      "G_vs_E_pct": 0.25974025974025994
+    },
+    {
+      "key": "code_c1_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "1",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "E": 0.415,
+      "R": 0.421,
+      "G": 0.418,
+      "R_vs_E_pct": 1.4457831325301218,
+      "G_vs_R_pct": -0.7125890736342049,
+      "G_vs_E_pct": 0.7228915662650609
+    },
+    {
+      "key": "code_c2_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "2",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "E": 0.457,
+      "R": 0.469,
+      "G": 0.459,
+      "R_vs_E_pct": 2.62582056892778,
+      "G_vs_R_pct": -2.1321961620468985,
+      "G_vs_E_pct": 0.4376367614879653
+    },
+    {
+      "key": "code_c4_per_stream_ttft",
+      "unit": "seconds",
+      "source_path": [
+        "concurrency",
+        "4",
+        "per_stream_ttft_seconds",
+        "median"
+      ],
+      "E": 0.555,
+      "R": 0.548,
+      "G": 0.547,
+      "R_vs_E_pct": -1.2612612612612621,
+      "G_vs_R_pct": -0.18248175182481766,
+      "G_vs_E_pct": -1.4414414414414427
+    },
+    {
+      "key": "prefill_8k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "E": 2600.239,
+      "R": 2572.46,
+      "G": 2462.135,
+      "R_vs_E_pct": -1.0683248732135775,
+      "G_vs_R_pct": -4.28869642287926,
+      "G_vs_E_pct": -5.311204085470598
+    },
+    {
+      "key": "prefill_8k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "8192",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "E": 8708.409,
+      "R": 8848.095,
+      "G": 8813.303,
+      "R_vs_E_pct": 1.6040358233059528,
+      "G_vs_R_pct": -0.3932145846083192,
+      "G_vs_E_pct": 1.2045139358980526
+    },
+    {
+      "key": "prefill_32k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "E": 2765.952,
+      "R": 2697.888,
+      "G": 2719.241,
+      "R_vs_E_pct": -2.460780230459542,
+      "G_vs_R_pct": 0.7914709580234637,
+      "G_vs_E_pct": -1.688785633300948
+    },
+    {
+      "key": "prefill_32k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "32768",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "E": 32797.288,
+      "R": 33944.411,
+      "G": 33292.693,
+      "R_vs_E_pct": 3.49761541259143,
+      "G_vs_R_pct": -1.9199567198264267,
+      "G_vs_E_pct": 1.5105059906172695
+    },
+    {
+      "key": "prefill_64k_cold_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "cold",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "E": 2595.278,
+      "R": 2614.412,
+      "G": 2643.795,
+      "R_vs_E_pct": 0.737262058245784,
+      "G_vs_R_pct": 1.1238856002803028,
+      "G_vs_E_pct": 1.8694336406350411
+    },
+    {
+      "key": "prefill_64k_replay_throughput",
+      "unit": "tokens_per_second",
+      "source_path": [
+        "prefill",
+        "65536",
+        "warm_replay",
+        "effective_prefill_tokens_per_second",
+        "median"
+      ],
+      "E": 40326.546,
+      "R": 39576.624,
+      "G": 39564.749,
+      "R_vs_E_pct": -1.8596236831192998,
+      "G_vs_R_pct": -0.03000508583046396,
+      "G_vs_E_pct": -1.8890707872675199
+    }
+  ],
+  "aggregation": "One suite per arm (n = 1): values, not medians of several suites. No dispersion is available.",
+  "integrity": {
+    "run-1": {
+      "request_count": 54,
+      "completed_streams": 54,
+      "visible_responses": 54,
+      "native_validation_errors": [],
+      "protocol_errors": [],
+      "runtime_error": null,
+      "finish_reasons": {
+        "stop": 15,
+        "length": 39
+      },
+      "decode_output_gates": {
+        "code": {
+          "passed": 5,
+          "total": 5
+        },
+        "prose": {
+          "passed": 5,
+          "total": 5
+        },
+        "structured": {
+          "passed": 5,
+          "total": 5
+        }
+      },
+      "prefill_token_matches": 18
+    },
+    "run-2": {
+      "request_count": 54,
+      "completed_streams": 54,
+      "visible_responses": 54,
+      "native_validation_errors": [],
+      "protocol_errors": [],
+      "runtime_error": null,
+      "finish_reasons": {
+        "stop": 15,
+        "length": 39
+      },
+      "decode_output_gates": {
+        "code": {
+          "passed": 5,
+          "total": 5
+        },
+        "prose": {
+          "passed": 5,
+          "total": 5
+        },
+        "structured": {
+          "passed": 5,
+          "total": 5
+        }
+      },
+      "prefill_token_matches": 18
+    },
+    "run-3": {
+      "request_count": 54,
+      "completed_streams": 54,
+      "visible_responses": 54,
+      "native_validation_errors": [],
+      "protocol_errors": [],
+      "runtime_error": null,
+      "finish_reasons": {
+        "stop": 15,
+        "length": 39
+      },
+      "decode_output_gates": {
+        "code": {
+          "passed": 5,
+          "total": 5
+        },
+        "prose": {
+          "passed": 5,
+          "total": 5
+        },
+        "structured": {
+          "passed": 5,
+          "total": 5
+        }
+      },
+      "prefill_token_matches": 18
+    }
+  },
+  "switch_verification": "Before each suite every rank's flag files and latest E31 log lines named the intended arm; no rank logged the tensor-core path as unavailable.",
+  "post_boot_gates": "PASS, 4 s after health",
+  "leaf_tests": {
+    "kpool_tail_ring": {
+      "path": "docs/historical_benchmarks/experiments/2026-09-28-e31-indexer/leaf-kpool-tail-ring.json",
+      "sha256": "35c9206f51bf857eb069ae61c55b88ca299ac25e4a059065967a5fe6ea1d3e78"
+    },
+    "head_gate": {
+      "path": "docs/historical_benchmarks/experiments/2026-09-28-e31-indexer/leaf-gate-tc.json",
+      "sha256": "8519e13d6d9b2d5c7803a0c4e5c13d921cb4ea3d53ac3e8be1bbb050a4914f95"
+    }
+  },
+  "owner_decision": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-28-e31-indexer/owner-decision.json",
+    "sha256": "52d58f6a7d40f7f4bf8bcb05658a9c98ea2221b63f3a9d952e08f77c3390816e"
+  },
+  "excluded_series": {
+    "path": "docs/historical_benchmarks/experiments/2026-09-28-e31-indexer/excluded-series.json",
+    "sha256": "ab815496eb5f18f627d77b47b765e6b177705d9edf2184e6b4b63d4e56f921c8"
+  },
+  "notes": [
+    "The tail ring changes which keys build a pool only after a rejected draft; decode, prefill and concurrency costs are within the single-suite noise.",
+    "The GPU leaf test reproduced the corruption with the legacy tail (1 wrong pool on the counterexample, 200 on the random schedule, maximum difference 3.06) and none with the ring (bit-exact).",
+    "Upstream vLLM merged the equivalent fix (PR #58454) on 2026-09-25 in its own kpool compressor; the SparkRing source of the R10 image still had the four-slot tail."
+  ]
+}

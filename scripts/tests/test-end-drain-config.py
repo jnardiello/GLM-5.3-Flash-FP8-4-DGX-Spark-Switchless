@@ -144,7 +144,9 @@ RELAY_DEST=operator@192.0.2.23
             (root / "empty.env").write_text(e28b)
             (root / "candidate.env").write_text(e28b + delta)
             (root / "candidate-b.env").write_text(e28b + (CANDIDATE / "delta-b.env").read_text())
-            (root / "default.env").write_text("")
+            # The complete E29 return (the E29 default before E31) is the promoted load B.
+            (root / "default.env").write_text(
+                (REPO / "scripts/node/reference/baseline-20260925-e29.env").read_text())
             env = dict(os.environ, TP4_DRY_RUN="1")
             env.pop("TP4_ENV", None)
             forbidden = root / "forbidden.log"
@@ -191,7 +193,7 @@ RELAY_DEST=operator@192.0.2.23
 
             bad = {
                 "on-e27c-rollback": e27c + delta,
-                "on-e29-default": delta,
+                "on-e31-default": delta,
                 "applied-twice": e28b + delta + "\n" + delta,
                 "kv-15-gib": e28b + 'EXTRA_VLLM_ARGS="${EXTRA_VLLM_ARGS/--kv-cache-memory-bytes=17179869184/--kv-cache-memory-bytes=16106127360}"\n' + delta,
                 "five-drafts": e28b + "SPEC_TOKENS=5\n" + delta,

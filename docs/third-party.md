@@ -30,7 +30,9 @@ for byte.
 
 | File in `third_party/sparkcache/` | SHA-256 | Source | Status |
 | --- | --- | --- | --- |
-| `spark_context_cache_connector-e03-replay-views.py` | `5893f8747aa0…` | Upstream connector plus patches 01, 02 and 03; current connector | **Modified** |
+| `spark_context_cache_connector-ram-budget.py` | `aa046965637b6…` | Replay connector plus patch 05; current protected connector | **Modified** |
+| `spark_context_cache_memory_budget.py` | `980593295d68…` | Project-authored Apache-2.0 helper embedded in the protected connector | **Ours** |
+| `spark_context_cache_connector-e03-replay-views.py` | `5893f8747aa0…` | Upstream connector plus patches 01, 02 and 03; E31 rollback connector | **Modified** |
 | `spark_context_cache_hybrid.py` | `11a2db855306…` | Upstream encoder plus patch 04; current encoder | **Modified** |
 | `spark_context_cache_connector.py` | `23c1e05cc3bb…` | Upstream connector plus patches 01 and 02; September 19 rollback | **Modified** |
 | `spark_context_cache_connector-20260918.py` | `a0bedc1c33a3…` | Upstream connector plus patch 01; September 18 rollback | **Modified** |
@@ -57,6 +59,13 @@ sources and toolchain are recorded in the manifest. The
 
 ## What this project changed
 
+- **Bounded disk transfer and CPU budget (connector, patch 05).** The operational default uses shared
+  admission for cache stores/restores, holding reservations until their owners drain.
+  The embedded `stream_io.py` adapts the pinned upstream `cache_manifest.py` publication
+  contract to bounded disk IO; `bounded_connector.py` copies GPU pages in 8 MiB pieces.
+  The
+  [implementation guide](../scripts/node/experiments/e03/sparkcache-ram-budget/README.md)
+  describes the conservative accounting, supported snapshot paths and deployment limits.
 - **Pending-publication wait (connector, patch 01).** A replay that finds its prefix still
   being published waits up to `spark_cache_pending_wait_ms` for every rank to confirm it,
   instead of recomputing. Upstream SparkCache has no such option.

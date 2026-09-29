@@ -5,8 +5,10 @@ artifacts for the four cluster hosts. Nothing in this directory runs merely beca
 it exists in the repository; deploy, bootstrap, launcher, and configuration choices
 select the files explicitly.
 
-The base configuration is the [accepted September 25 E29 recipe](../../docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json).
-The previous E03 reference, the earlier September 19 base, September 18 and September 11 remain historical references with their own
+The operational default applies bounded SparkCache transfers, a 14 GiB KV pool,
+eager-prefill allocator trim, a 6,912-token scheduler-step cap and finite API admission to the
+[accepted September 28 E31 engine recipe](../../docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json).
+E31 and the previous E29, E28b, E27c, E27, E22b, E21 and E03 recipes remain historical references with their own
 rollback assets; the September 12 filenames below belong to the September 11
 reference's later capture.
 
@@ -21,8 +23,8 @@ reference's later capture.
 | `overrides/` | retained base vLLM modules, including hybrid KDA execution and the GPU allocator probe; the original model remains for rollback |
 | `experiments/e03/` | accepted mHC modules, cache config and draft-budget scheduler, retaining measured paths/hashes; archived preparation overlays and checks |
 | `patches/` | frozen previous adaptive scheduler and CPU-only policy tests, retained for rollback |
-| `reference/` | complete previous September 19 and September 18 overlays, original GLM model and cache JSON; separate frozen September 11 overlay, launcher/controller, artifact pins and private-archive autostart template |
-| `sparkcache/` | previous base cache JSON and manifest for current replay views plus rollback connector/encoder payloads |
+| `reference/` | complete historical recipe overlays from E31 through September 18, original GLM model and cache JSON; separate frozen September 11 overlay, launcher/controller, artifact pins and private-archive autostart template |
+| `sparkcache/` | SparkCache SHA-256 manifest and the earlier September 19 cache JSON; vendored connector/encoder payloads are under `third_party/sparkcache/` |
 | `sircl/` | SHA-256 manifest of the SIRCL bundle/runtime in `third_party/sparkring-sircl/`; the ignored `SHA256SUMS.site` and `site/` hold generated site files |
 | `flusher-unconditional.sh` | temporary page-cache flusher used while model weights load |
 | `sparse_attn_indexer_kpool_sm121.py` | SM121 sparse-attention patch deployed as `sparse_attn_indexer_kpool.py`; mounted only in the September 11 configuration (`SPARKCACHE_MODE=off`) |
@@ -44,7 +46,11 @@ reference's later capture.
 | shared `scripts/node/etc/common/` files | `/etc/sysctl.d/`, `/etc/sudoers.d/`, `/usr/local/sbin/`, `/etc/systemd/system/` | bootstrap/deploy-host |
 | GRUB drop-in | `/etc/default/grub.d/zz-tp4-perf.cfg` | bootstrap/deploy-host and `tp4-iommu.sh` |
 | built NCCL library | `$NCCL_DIR/libnccl.so.2` | `scripts/node/nccl/install-nccl.sh` |
-| E27c reference overlay selected through `TP4_ENV` (immediate rollback) | `~/tp4/scripts/node/reference/baseline-20260925-e27c.env` | `scripts/deploy.sh` |
+| immediate protected 16 GiB rollback selected through `TP4_ENV` | `~/tp4/scripts/node/reference/operational-20260929-sparkcache-protected.env` | `scripts/deploy.sh` |
+| historical E31 cache-behavior rollback selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260928-e31.env` | `scripts/deploy.sh` |
+| E29 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260925-e29.env` | `scripts/deploy.sh` |
+| E28b reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260925-e28b.env` | `scripts/deploy.sh` |
+| E27c reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260925-e27c.env` | `scripts/deploy.sh` |
 | E27 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260924-e27.env` | `scripts/deploy.sh` |
 | E22b reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260924-e22b.env` | `scripts/deploy.sh` |
 | E21 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260923-e21.env` | `scripts/deploy.sh` |
@@ -69,7 +75,8 @@ script activates `/etc` state only under `--apply`; it never reboots a node.
 ## Current engine and cache payload
 
 The current recipe mounts 22 vLLM modules: retained cache allocation, worker/probe,
-indexer and hybrid-KDA sources, the E03 model and mHC per-call sharding modules, the
+hybrid-KDA sources, the E31 pooled indexer and C4 kernels from
+[`experiments/e03/e31-indexer/`](experiments/e03/e31-indexer/README.md), the E03 model and mHC per-call sharding modules, the
 E21 residual-projection module, the E22b drafter override and conversion module, and the
 E29 scheduler and engine core from [`experiments/e03/end-drain/`](experiments/e03/end-drain/README.md).
 The E29 scheduler is the E27c scheduler from
@@ -92,10 +99,10 @@ dequantizes the same weights into a shared scratch and runs BF16 linear executio
 The scratch and inverse map occupy about 49.13 MiB per rank. The GPU worker's
 allocator probe is retained because it was active in the accepted measurement.
 
-The configured KV pool is 16 GiB per rank (E28b); with seven draft tokens the measured
-engine reported 1,365,066 tokens of pooled capacity while retaining the 262,144-token
-per-request limit.
-Those values do not guarantee six simultaneous full-context sessions. See
+The operational KV pool is 14 GiB per rank; with seven draft tokens the engine reports
+1,194,033 pooled tokens while retaining the 262,144-token per-request limit. This is a
+12.5% capacity reduction from E31's measured 16 GiB pool and cannot hold five complete
+maximum-length contexts at once. See
 [`production-recipe.md`](../../docs/production-recipe.md#hybrid-kda-projections-and-memory)
 for the measured configuration and its limits.
 
@@ -117,19 +124,37 @@ The preparer verifies both source hashes and resulting hashes. Its connector
 correction releases completed saver items through a per-item function scope; its
 encoder correction uses one join with identical output bytes. It emits those two files plus
 `spark_context_cache_connector-20260918.py`, preserving the original for rollback.
-The second command emits the separate current replay views connector; it verifies both
-input/output pins and refuses to replace an existing file. Preserve the corrected base
-connector for September 19 rollback as well. The outputs are identical to the included
-files.
+The second command emits the replay views connector used by the E31 rollback; it verifies
+both input/output pins and refuses to replace an existing file. Run
+`experiments/e03/sparkcache-ram-budget/prepare.py --check` to verify the protected default
+connector and patch. Preserve the corrected base connector for September 19 rollback as
+well. The outputs are identical to the included files.
 
 `SPARKCACHE_CONNECTOR_SHA256` and `SPARKCACHE_ENCODER_SHA256` pin the selected
 modules, and `SPARKCACHE_CONFIG_SHA256` pins the tracked JSON. Keep those values
-consistent with `sparkcache/SHA256SUMS`. Preserve the JSON's measured cache namespace
-when reproducing the Current recipe: its E22b JSON, which E27 and E27c keep unchanged, is
+consistent with `sparkcache/SHA256SUMS`. The current protected JSON is
+`experiments/e03/sparkcache-ram-budget/kv-transfer-config.json`; its namespace and limits
+are pinned by the operational identity. Preserve the measured E31 rollback JSON at
 `experiments/e03/drafter-w8a16/kv-transfer-config-e22b.json`, separate from the E21, E03
-and earlier cache computations, and its spelling is part of the hash.
+and earlier cache computations. Each namespace spelling is part of its config hash.
 
-For the immediate return to E27c, use
+For the immediate operational return, use
+[`reference/operational-20260929-sparkcache-protected.env`](reference/operational-20260929-sparkcache-protected.env).
+It preserves the protected connector and its cache-memory limits, restores the 16 GiB KV
+pool, and removes allocator trim, the step cap and API admission. It is not the complete
+memory-bounded recipe. For the historical E31 cache behavior, use
+[`reference/baseline-20260928-e31.env`](reference/baseline-20260928-e31.env); it restores
+the previous connector, config, namespace and unrestricted cache behavior.
+
+For the return to E29, use
+[`reference/baseline-20260925-e29.env`](reference/baseline-20260925-e29.env). It restores
+the previous pooled indexer and K-pool implementation while retaining the E29 scheduler.
+
+For the return to E28b, use
+[`reference/baseline-20260925-e28b.env`](reference/baseline-20260925-e28b.env). It removes
+the E29 scheduler and engine-core changes while retaining seven draft tokens and 16 GiB KV.
+
+For the return to E27c, use
 [`reference/baseline-20260925-e27c.env`](reference/baseline-20260925-e27c.env). It restores
 five draft tokens and the 15 GiB KV pool.
 
@@ -209,4 +234,4 @@ The first three inspect deployed nodes and require site configuration. The final
 command is fully offline and validates source syntax, manifests, templates, links,
 fixtures, the adaptive-k policy, hybrid dispatch contracts, and payload preparation
 without SSH, Docker, a GPU, or `cluster.env`. Offline checks do not constitute a new
-live deployment of the accepted E29 defaults.
+live deployment of the protected operational default.

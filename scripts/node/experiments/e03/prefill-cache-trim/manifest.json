@@ -1,0 +1,19 @@
+{
+  "schema": "tp4-prefill-cache-trim-candidate-v1",
+  "status": "experimental_diagnostic",
+  "parent": {
+    "path": "scripts/node/overrides/vllm/v1/worker/gpu_worker.py",
+    "sha256": "46aa3a7ea68948cc16c78ebeb3b8aff0de6d9583657d75711e8231ed4209ed9d"
+  },
+  "candidate": {
+    "path": "scripts/node/experiments/e03/prefill-cache-trim/gpu_worker.py",
+    "sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+    "patch": "scripts/node/experiments/e03/prefill-cache-trim/gpu_worker.patch",
+    "patch_sha256": "10f7eca3062513c1e66029833f8bd72c853cced118c737fb39f4e0d616622e42",
+    "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py"
+  },
+  "selection": {
+    "environment": "VLLM_PREFILL_CACHE_TRIM=1",
+    "validated_max_cudagraph_capture_size": 72
+  }
+}

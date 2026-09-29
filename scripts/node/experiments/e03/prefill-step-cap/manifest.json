@@ -1,0 +1,26 @@
+{
+  "schema": "tp4-prefill-step-cap-candidate-v1",
+  "status": "experimental_diagnostic",
+  "summary": "Strict opt-in scheduler-output target-token ceiling for the protected E31 resilience campaign.",
+  "parent": {
+    "path": "scripts/node/experiments/e03/end-drain/scheduler.py",
+    "sha256": "f41d6e9e4363b271ad8543a5ef7063b546952d4c0bd35565cee034884a61baec"
+  },
+  "candidate": {
+    "path": "scripts/node/experiments/e03/prefill-step-cap/scheduler.py",
+    "sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd",
+    "patch": "scripts/node/experiments/e03/prefill-step-cap/scheduler.patch",
+    "patch_sha256": "923a8cfa5ed9762b3dcf9e5717d63ede1ac146ab95321a9abf52887fc48fdb73",
+    "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py"
+  },
+  "selection": {
+    "environment": "VLLM_RESILIENCE_STEP_TOKEN_CAP=6912"
+  },
+  "preserved": {
+    "max_num_batched_tokens": 8192,
+    "cache_block_size": 2304,
+    "max_cudagraph_capture_size": 72,
+    "max_num_seqs": 6,
+    "max_model_len": 262144
+  }
+}

@@ -17,29 +17,32 @@ Readable reports live here; machine-readable frozen records and portable experim
 | 2026-09-24 E27 previous reference | 3 / 162 | [Report](baselines/2026-09-24-e27.md); [promotion record](../historical_benchmarks/baselines/2026-09-24-e27/promotion.json) |
 | 2026-09-25 E27c previous reference | 3 / 162 | [Report](baselines/2026-09-25-e27c.md); [promotion record](../historical_benchmarks/baselines/2026-09-25-e27c/promotion.json) |
 | 2026-09-25 E28b previous reference | 3 / 162 | [Report](baselines/2026-09-25-e28b.md); [promotion record](../historical_benchmarks/baselines/2026-09-25-e28b/promotion.json) |
-| 2026-09-25 E29 accepted current reference | 3 / 162 | [Report](baselines/2026-09-25-e29.md); [promotion record](../historical_benchmarks/baselines/2026-09-25-e29/promotion.json) |
+| 2026-09-25 E29 previous reference | 3 / 162 | [Report](baselines/2026-09-25-e29.md); [promotion record](../historical_benchmarks/baselines/2026-09-25-e29/promotion.json) |
+| 2026-09-28 E31 accepted current reference | 1 / 54 (n = 1, upstream Rigmark with the reference flags) plus a same-load E29-equivalent arm, 1 / 54 | [Report](baselines/2026-09-28-e31.md); [promotion record](../historical_benchmarks/baselines/2026-09-28-e31/promotion.json) |
 
 [Historical comparison table and archived charts](comparisons/2026-09-19-vs-2026-09-11.md).
 
-The README's comparison figures show all 16 saved medians for the current E29 reference
-and the previous E28b reference, with percentage changes from unrounded values. Both
-records have three accepted runs / 162 requests, measured over the same direct LAN client
-path. Small changes retain exact deltas alongside the owner's “≈ unchanged” display
-convention.
-From the repository root, run `python3 scripts/plot-baseline-comparison.py` in an
-environment with `matplotlib==3.11.2`. It writes PNG/SVG files under
-`docs/plots/comparisons/2026-09-25-e29-vs-2026-09-25-e28b/` without running inference.
-The [dated current report](baselines/2026-09-25-e29.md) links the figures and both
-frozen sources. Earlier comparisons, including E28b versus E27c, remain archived unchanged
-under `docs/plots/`.
+From September 28, 2026 references are measured with upstream, unmodified Rigmark and the
+reference flags: every default plus `reasoning_effort` low, no cache salt, and a fresh
+comparison ID per suite. A candidate is compared with a reference arm measured on the same
+load. The frozen E29-and-earlier records used a local fork, 8,192 decode tokens and thinking
+off, so they are not comparable with E31.
+
+The README table shows the E31 values against the same-load E29-equivalent arm. The comparison
+figures still show the earlier E29 versus E28b medians: the plotter
+(`scripts/plot-baseline-comparison.py`) compares two frozen records, while E31's comparison
+arm lives inside the E31 record. All earlier comparisons remain archived unchanged under
+`docs/plots/`.
 
 ## Experiment outcomes
 
 | Experiment | Evidence / recorded outcome |
 | --- | --- |
+| [2026-09-29-sparkcache-resilience](experiments/2026-09-29-sparkcache-resilience.md) | **Promoted operational default; deferred coverage retained.** Protected SparkCache, KV14, allocator trim, 6,912-token step cap and bounded API admission. Three five-client waves each completed the full 262,144-token budget, with 3.71 GiB minimum sampled rank-0 headroom; queueing/preemption is required. Three overload waves each admitted 128 requests and explicitly rejected 22. The selected 23-case matrix has 69 qualifying repetitions; a separately sealed 16-case subset retains detailed proofs. Mixed load: 98m59s, 756 complete ordinary requests, 84 cancellations and 41 idle windows, owner-stopped with final drain PASS; the first FAIL and incomplete two-hour gate are preserved. Initial/final native Rigmark: one suite / 54 requests each, zero errors; code −0.2%, C4 −0.5%, 8K replay −18.9%, descriptive across different loads. Four-rank default/autostart parity and identity verified without another model reload. Worker faults, larger queues and further combinations remain deferred; E31 performance record unchanged. |
+| [2026-09-28-e31-indexer](experiments/2026-09-28-e31-indexer.md) | One load, three complete suites / 162 requests with upstream Rigmark and the reference flags, one per arm, switched at runtime: E29-equivalent, speculative-safe C4 tail ring, ring plus tensor-core head gate. Maintenance-window GPU leaf tests: the legacy tail left 200 wrong pools on the random schedule, the ring none (bit-exact); the gate changed no top-512 selection. Ring against the same-load E29-equivalent arm (n = 1): code decode +0.97%, prose -0.54%, prefill within ±3.5%, C1/C2/C4 ±7% in both directions (noise). Two owner-stopped series excluded. **Promote** (ring), current reference; head gate **unresolved**, off. |
 | [2026-09-27-fidelity](../fidelity/REPORT.md) | Output-fidelity campaign, not a Rigmark run: 424 windows / 2,514,441 teacher-forced positions per full arm (R0 vendor FP8, E29, the pre-E21 recipe, NVFP4), repeated executions, a recipe ladder, 75 qeval tasks and a corruption probe; [portable data](../historical_benchmarks/experiments/2026-09-27-fidelity/README.md), which, unlike Rigmark extracts, include the model answers to the public qeval tasks; per-window rows cover only windows generated from public prompts. E29 against vendor FP8: dense-regime KL 0.184 nats, top-1 83.4% (pre-registered margin exceeded), perplexity change +0.14% [−0.32, +0.56] over all positions (no detectable loss); the sparse regime is unresolved because of engine nondeterminism; NVFP4 +7.07% [+4.61, +9.37]. Outcome: **reported**, a measurement, not a promotion candidate. |
 | [2026-09-25-e27d-prefill-cap](experiments/2026-09-25-e27d-prefill-cap.md) | 6 full suites / 324 requests on two loads, one same-night E29 control suite, the protocol-2 interference phase and a four-simultaneous-32K diagnostic against fresh E29 references; a 2,304-token per-step prefill cap while others decode: background decode during 8K–32K prefills 6–7 → 11–20 tok/s, longest gap ~3.0 → ~1.3 s, arriving TTFT +33–60%; standard suites within between-load variation, cap never engaged in them. Zero errors; outcome discard, owner judged the benefit not significant |
-| [2026-09-25-e29-end-drain](experiments/2026-09-25-e29-end-drain.md) | Targeted probes on two loads, then 3 full suites / 162 requests, the protocol-2 interference phase and the four-simultaneous-32K diagnostic; E28b plus no speculative step past a possible length finish and a 4 ms idle-coalescing window: against E28b C1 per-stream TTFT -13.2%, C2 -14.7%, C4 -9.8%, code decode +3.2%, cached replay +3.6% / +2.7% / -1.0% at 8K / 32K / 64K; three owner-requested prefill re-runs (six executions): replay +2.2% / +2.0% / +1.1% against E28b, 64K spikes not repeated. **Promote**, owner accepted; current reference. |
+| [2026-09-25-e29-end-drain](experiments/2026-09-25-e29-end-drain.md) | Targeted probes on two loads, then 3 full suites / 162 requests, the protocol-2 interference phase and the four-simultaneous-32K diagnostic; E28b plus no speculative step past a possible length finish and a 4 ms idle-coalescing window: against E28b C1 per-stream TTFT -13.2%, C2 -14.7%, C4 -9.8%, code decode +3.2%, cached replay +3.6% / +2.7% / -1.0% at 8K / 32K / 64K; three owner-requested prefill re-runs (six executions): replay +2.2% / +2.0% / +1.1% against E28b, 64K spikes not repeated. **Promote**, owner accepted; superseded as current by E31. |
 | [2026-09-25-e28b-kv16](experiments/2026-09-25-e28b-kv16.md) | 3 full suites / 162 requests on one retained load with per-second host-memory sampling; E28 with a 16 GiB KV pool: 1,365,066 KV tokens (5.21 full contexts), rank-0 minimum 2.12 GiB available, every metric within 3% of E28; against E27c code decode +8.7%, C1 TTFT +15.9%, 8K/32K replay -8.1%/-10.2%. **Promote**, owner accepted; superseded as current by E29. |
 | [2026-09-25-e28-draft-depth-7](experiments/2026-09-25-e28-draft-depth-7.md) | Acceptance probes and 3 full suites / 162 requests on one retained load; seven draft tokens for one request: code decode +10.5% against E27c, structured 7.8 tokens per step, C1 TTFT +16.5%, replay -8% to -10%, 4.9% fewer KV tokens (1,278,751). **Superseded**: accepted, then promoted inside E28b with a 16 GiB pool. |
 | [2026-09-25-e27c-queued-cadence](experiments/2026-09-25-e27c-queued-cadence.md) | 3 full suites / 162 requests on one retained load, the protocol-2 interference phase and a four-simultaneous-32K diagnostic; against E27: C4 per-stream TTFT -27.1%, C2 +2.4%, C4 +1.2%, C1 -1.8%, cold prefill -1.6% to -3.3%; with four 32K prompts arriving together the first stream decodes at 11.3-12.5 tok/s instead of 6.2. **Promote**, owner accepted; current reference. |

@@ -28,8 +28,10 @@ set -euo pipefail
 #
 #       --speculative-config "{\"method\":\"dflash\",\"model\":\"/draft\",\"num_speculative_tokens\":$SPEC_TOKENS,\"kv_cache_dtype\":\"auto\"}" \
 #
-#  c) rank 0 fails with NV_ERR_NO_MEMORY: lower the KV pool to 14 GiB by setting, in
-#     cluster.env, EXTRA_VLLM_ARGS="--kv-cache-memory=15032385536".
+#  c) rank 0 fails with NV_ERR_NO_MEMORY: replace only
+#     --kv-cache-memory-bytes=17179869184 with --kv-cache-memory-bytes=15032385536 in
+#     EXTRA_VLLM_ARGS, preserving every other engine option. The prepared bounded-memory
+#     candidate makes that replacement through its production.env overlay.
 #     Never raise GPU_MEM_UTIL.
 
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -489,6 +491,38 @@ case "${EXTRA_DOCKER_ENV:-}" in
     if [ "$DRY_RUN" != 1 ]; then
       (cd "$ENV_DIR/experiments/e03/end-drain" && sha256sum -c SHA256SUMS) \
         || { echo "[launch] ERROR: E29 end-drain source manifest failed" >&2; exit 1; }
+    fi ;;
+esac
+# Likewise for the E31 indexer candidate, when any of its files is mounted.
+case "${EXTRA_DOCKER_ENV:-}" in
+  */e31-indexer/*)
+    if [ "$DRY_RUN" != 1 ]; then
+      (cd "$ENV_DIR/experiments/e03/e31-indexer" && sha256sum -c SHA256SUMS) \
+        || { echo "[launch] ERROR: E31 indexer source manifest failed" >&2; exit 1; }
+    fi ;;
+esac
+# The opt-in allocator diagnostic has a separate, deployable source manifest.
+case "${EXTRA_DOCKER_ENV:-}" in
+  */prefill-cache-trim/gpu_worker.py:*)
+    if [ "$DRY_RUN" != 1 ]; then
+      (cd "$ENV_DIR/experiments/e03/prefill-cache-trim" && sha256sum -c SHA256SUMS) \
+        || { echo "[launch] ERROR: prefill-cache-trim source manifest failed" >&2; exit 1; }
+    fi ;;
+esac
+# The opt-in step cap keeps its scheduler payload separate from the E29 parent.
+case "${EXTRA_DOCKER_ENV:-}" in
+  */prefill-step-cap/scheduler.py:*)
+    if [ "$DRY_RUN" != 1 ]; then
+      (cd "$ENV_DIR/experiments/e03/prefill-step-cap" && sha256sum -c SHA256SUMS) \
+        || { echo "[launch] ERROR: prefill-step-cap source manifest failed" >&2; exit 1; }
+    fi ;;
+esac
+# The opt-in admission middleware is deployed from its own pinned source manifest.
+case "${EXTRA_DOCKER_ENV:-}" in
+  */bounded-admission/middleware.py:*)
+    if [ "$DRY_RUN" != 1 ]; then
+      (cd "$ENV_DIR/experiments/e03/bounded-admission" && sha256sum -c SHA256SUMS) \
+        || { echo "[launch] ERROR: bounded-admission source manifest failed" >&2; exit 1; }
     fi ;;
 esac
 if [ "$ASYNC_SCHEDULING" = "1" ]; then

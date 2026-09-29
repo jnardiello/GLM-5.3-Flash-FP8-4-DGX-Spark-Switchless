@@ -45,6 +45,9 @@ scripts/mirror-private-terms.txt
 # site inventories stay local. Only code, aggregates, plots and reports are tracked.
 /data/fidelity/
 
+# Generated resilience overlays contain private campaign/site configuration.
+/scripts/resilience/.campaign/
+
 # Local mirror tooling stays outside the public repository.
 /scripts/mirror-snapshot.sh
 /scripts/mirror-allow.txt

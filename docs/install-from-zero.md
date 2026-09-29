@@ -258,12 +258,17 @@ The deploy places the payload on **every** rank:
 
 | Payload | Node path (`cluster.env` key) | Verification |
 | --- | --- | --- |
-| replay views connector | `~/tp4/sparkcache/spark_context_cache_connector-e03-replay-views.py` (`SPARKCACHE_CONNECTOR`) | `scripts/node/sparkcache/SHA256SUMS` |
+| protected connector | `~/tp4/sparkcache/spark_context_cache_connector-ram-budget.py` (`SPARKCACHE_CONNECTOR`) | `scripts/node/sparkcache/SHA256SUMS` and the operational identity |
 | corrected hybrid encoder | `~/tp4/sparkcache/spark_context_cache_hybrid.py` (`SPARKCACHE_ENCODER`) | `scripts/node/sparkcache/SHA256SUMS` |
-| September 19 and September 18 rollback connectors | `~/tp4/sparkcache/spark_context_cache_connector.py` and `spark_context_cache_connector-20260918.py` | `SHA256SUMS` and the rollback recipes |
+| E31 replay, September 19 and September 18 rollback connectors | `~/tp4/sparkcache/spark_context_cache_connector-e03-replay-views.py`, `spark_context_cache_connector.py` and `spark_context_cache_connector-20260918.py` | `SHA256SUMS` and the rollback recipes |
 | SIRCL bundle | `~/tp4/sircl/bundle/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS` |
 | SIRCL runtime, entrypoint and GID check | `~/tp4/sircl/runtime/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS` |
 | SIRCL site files | `~/tp4/sircl/runtime/` (`SIRCL_DIR`) | `scripts/node/sircl/SHA256SUMS.site` |
+
+Before deployment, verify on every rank that `CACHE_DIR` is on a disk-backed filesystem,
+not tmpfs, and has space for the persistent cache plus at least one in-flight snapshot
+staging file. The protected connector relies on that staging file to keep full snapshots
+out of transient RAM.
 
 After the deploy in the next step, verify every rank:
 
@@ -278,8 +283,10 @@ match the manifests; never edit a manifest to match a file.
 The SparkCache files can also be rebuilt from upstream instead of taken from this checkout.
 Apply patch 01 of `third_party/sparkcache/patches/` to the upstream connector, then run
 [`prepare-sparkcache.py`](../scripts/prepare-sparkcache.py) and
-[`replay-views/prepare.py`](../scripts/node/experiments/e03/replay-views/prepare.py). Both
-check every input and output hash.
+[`replay-views/prepare.py`](../scripts/node/experiments/e03/replay-views/prepare.py), followed
+by [`sparkcache-ram-budget/prepare.py --check`](../scripts/node/experiments/e03/sparkcache-ram-budget/prepare.py).
+These tools check every input and output hash; the last check reproduces the protected
+connector and patch without rewriting validated bytes.
 
 ## 9. Deploy runtime and host files
 
@@ -316,17 +323,24 @@ only when those actions are outside its scope:
 Expected: static verification passes; fabric-check sees two addressed MTU-9000 ports
 per node and eight successful jumbo pings; `/health` reaches 200; all runtime
 signatures in [`operations.md`](operations.md) are present, including the mHC flag,
-replay connector pin, draft-budget scheduler startup marker and the
+protected connector pin, draft-budget scheduler startup marker and the
 `E21_BF16_RESIDUE_W8A16_READY` line with 67 modules and the `E22_DRAFTER_W8A16_READY`
 line with 30 modules on every rank, `--prefill-schedule-interval 8` in every rank's
 command (E27), and the `E27C_CADENCE_WHEN_QUEUED_READY` and `E27B_SHORT_PREFILL_READY`
-lines on rank 0 (E27c), `num_spec_tokens=7` and `GPU KV cache size: 1,365,066 tokens` in the
-rank-0 log (E28b), and the `E29_END_DRAIN_READY trace=0` and
-`E29_IDLE_COALESCE_READY ms=4 trace=0` lines on rank 0 (E29). All E21, E22b, E27, E27c and
-E29 sources are tracked in the checkout
-and need no extra operator payload. Run the
+lines on rank 0 (E27c), `num_spec_tokens=7` and `GPU KV cache size: 1,194,033 tokens` in the
+rank-0 log (14 GiB operational pool), the `E29_END_DRAIN_READY trace=0` and
+`E29_IDLE_COALESCE_READY ms=4 trace=0` lines on rank 0 (E29), and the
+`E31_INDEXER_GATE path=fp32` and `E31_KPOOL_TAIL_RING ring=12` lines that every rank logs on
+its first forward (E31), plus
+`SPARKCACHE_CPU_BUDGET_READY cap_bytes=1073741824 floor_bytes=1073741824` and
+`SPARKCACHE_DISK_STREAM_READY chunk_bytes=8388608` on every rank. All E21, E22b, E27,
+E27c, E29 and E31 sources are tracked in the
+checkout
+and need no extra operator payload. Also require `PREFILL_CACHE_TRIM_READY` with the correct
+rank on all four nodes, `RESILIENCE_STEP_TOKEN_CAP_READY configured=8192 effective=6912`
+and `TP4_ADMISSION_READY` on rank 0. Run the
 [post-boot functional gates](operations.md#post-boot-functional-gates) within two
-minutes of readiness, then verify the accepted identity with `./scripts/check-f0.py`.
+minutes of readiness, then verify the operational identity with `./scripts/check-f0.py`.
 Save installation evidence separately from the frozen performance reference.
 
 If status or the rank-0 unit shows that autostart is already loading, wait for that

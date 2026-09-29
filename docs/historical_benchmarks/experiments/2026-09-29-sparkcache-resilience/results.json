@@ -1,0 +1,3272 @@
+{
+  "schema": "tp4-resilience-experiment/v1",
+  "experiment_id": "2026-09-29-sparkcache-resilience",
+  "status": "closed_with_deferred_cases",
+  "outcome": "promote",
+  "outcome_scope": "operational memory resilience only; no performance baseline promotion",
+  "operational_identity": "2026-09-29-memory-bounded",
+  "performance_reference": "2026-09-28-e31",
+  "checkpoint_interpretation": "Checkpoint objects preserve the verdict and scope at capture; current operational disposition is recorded separately at the top level and in operational_promotion.",
+  "owner_stop_sampling_clarification": {
+    "sealed_and_portable_bytes_unchanged": true,
+    "campaign_samples_by_rank": [5943, 5942, 5943, 5943],
+    "handoff_samples_by_rank": [207, 207, 207, 207],
+    "campaign_target_seconds": 1,
+    "handoff_target_seconds": 0.2,
+    "sampler_overlap_seconds_by_rank": [36.376597307, 36.401493888, 36.396113877, 36.376536120],
+    "controller_signal_wall_minus_node_monitor_first_wall_seconds_by_rank": [36.649794783, 36.657577376, 36.656388986, 36.627928602],
+    "controller_node_wall_clock_offset_calibrated": false,
+    "cross_clock_difference_limitation": "These are arithmetic differences between uncalibrated clocks, not exact elapsed durations; only the sampler overlap uses same-node timestamps.",
+    "campaign_missed_deadlines_by_rank": [0, 0, 0, 0],
+    "campaign_maximum_interval_seconds": 1.001787135,
+    "interpretation": "The handoff monitor covers the last ten request bins and terminal drain. Request-bin attribution uses uncalibrated wall clocks. Streams are interleaved by same-node monotonic time and final bins are denser; cross-bin minima do not have equal sampling coverage.",
+    "reported_gap_interpretation": "The one archived interval over twice the current target per rank is a mixed-cadence transition, not evidence of a missing campaign sample.",
+    "oom_interpretation": "Each constituent sampler separately has complete host/cgroup coverage and zero deltas; their since-start baselines must not be concatenated for future nonzero data.",
+    "limitations": [
+      "The immutable combined CSV has no sampler-source column; separately hashed source streams retain the provenance.",
+      "The archived figure and derived summary retain the executed algorithm; these clarifications supersede an interpretation of its gap count as missing coverage."
+    ]
+  },
+  "operational_promotion": {
+    "decision": "promote_operational_only",
+    "scope": "Memory-resilience default; frozen E31 performance baseline unchanged.",
+    "identity": "2026-09-29-memory-bounded",
+    "identity_path": "docs/operational-identities/2026-09-29-memory-bounded.json",
+    "identity_sha256": "a38d6725b1bbeadac47e33e7a20e6bb8809948b2dff48b3db6ee5d8bad48ed1f",
+    "recipe_template_sha256": "a40f5da81fae8e1c041558c21f670f33da3f3d274560e086648a44d030b6d830",
+    "completed_ns": 1790700935476695000,
+    "launcher_parity": {
+      "candidate_default_ranks": 4,
+      "protected16_rollback_ranks": 4,
+      "e31_rollback_ranks": 4,
+      "all_full_argv_identical": true
+    },
+    "deployment": {
+      "four_rank_file_hashes_match": true,
+      "same_running_candidate_pids_and_start_times": true,
+      "model_reloaded_for_default_migration": false,
+      "autostart_enabled": true,
+      "autostart_overlay_active": false,
+      "autostart_dropins_removed": 0,
+      "daemon_reload_performed": false
+    },
+    "verification": {
+      "health_status": 200,
+      "coherent_response_gate": true,
+      "tool_call_gate": true,
+      "plain_default_identity": "PASS",
+      "local_check_sh": "PASS"
+    },
+    "source_sha256": {
+      "live_verification": "cfac3f300d8bf9ca179f8fed5e95751acc08fdbfcbdf78099d1a1711eabefe51",
+      "plain_identity": "6e35f604aed80248c6f7da30c5f188e23a2db6cbe31ec5f52f5f34a8cc6c7dd8",
+      "functional_gates": "9842b1a4ec10fa125b4f45dd4206a010a464b0477c1e7f2ee4e1f63420d30082",
+      "installed_parity": "d9783d461dd66e1defdb20c9ccd50b78aad6aace0c4cb68cdb8a8867545ad238",
+      "deploy": "91c05fa6913f126daac7cafae51dfbcae2a5bf4fd08863205cf27962ef84297a",
+      "deploy_hash_check": "934ee4a1a43f4fb75fc183face2c27bbfb11e9bffa9fe6837bcc23210d817c50",
+      "local_checks": "e68ac48556d6833c663294a6e45560d522fded53269179aeb4b63e3648e14b5d",
+      "candidate_boot": "cafa67160d2eb87d0fc70dccbbd6ae2fb7cbccce11d9be42fd0ab65552b6fec8"
+    },
+    "historical_checkpoints": "Per-checkpoint promotion flags and verdicts retain their value at capture. This record establishes the later operational decision.",
+    "retained_limits": [
+      "Original two-hour soak gate incomplete; owner_stopped after5939.261920659919 seconds.",
+      "First mixed-soak failure and failed initial restoration preserved; subsequent recovery and final verification are separate evidence.",
+      "Worker-crash cases, larger queues and remaining fault combinations deferred.",
+      "Production disk-capacity policy remains0/0; test3/2 GiB eviction does not establish production disk bounds.",
+      "Five full contexts cannot all be resident in the14 GiB pool; queueing/preemption required.",
+      "Performance comparisons are n=1 per recipe on different loads; 8K replay slower18.88 percent is documented."
+    ]
+  },
+  "candidate_sources": {
+    "prefill_cache_trim": {
+      "manifest": "scripts/node/experiments/e03/prefill-cache-trim/manifest.json",
+      "schema": "tp4-prefill-cache-trim-candidate-v1",
+      "parent_sha256": "46aa3a7ea68948cc16c78ebeb3b8aff0de6d9583657d75711e8231ed4209ed9d",
+      "candidate_sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "selection_environment": "VLLM_PREFILL_CACHE_TRIM=1"
+    },
+    "prefill_step_cap": {
+      "manifest": "scripts/node/experiments/e03/prefill-step-cap/manifest.json",
+      "schema": "tp4-prefill-step-cap-candidate-v1",
+      "parent_sha256": "f41d6e9e4363b271ad8543a5ef7063b546952d4c0bd35565cee034884a61baec",
+      "candidate_sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd",
+      "selection_environment": "VLLM_RESILIENCE_STEP_TOKEN_CAP=6912"
+    }
+  },
+  "native_runs": {
+    "initial": {
+      "native_sha256": "f2030d423bfaf35094ed4f3ad4f8fdcaf38e27ccc001933ac2cd7f20ad068991",
+      "protocol": {
+        "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+        "prompts_version": "1.0.0",
+        "repository_dirty": false,
+        "repository_revision": "c5a0db01b0542ac291883ab049b6141efae0c7d3",
+        "repository_source": "git-worktree",
+        "repository_source_sha256": "61d71055b4a3a64cb0520fc1bc535de9a1863463c6937d423745957339f7f1b7",
+        "version": "1.1.0"
+      },
+      "settings": {
+        "concurrency": [
+          1,
+          2,
+          4
+        ],
+        "concurrency_runs": 3,
+        "concurrency_tokens": 256,
+        "concurrency_workload": "code",
+        "decode_tokens": 4096,
+        "extra_body": {
+          "chat_template_kwargs": {
+            "reasoning_effort": "low"
+          }
+        },
+        "prefill_depths": [
+          8192,
+          32768,
+          65536
+        ],
+        "prefill_runs": 3,
+        "runs": 5,
+        "seed": 20260905,
+        "temperature": 0,
+        "top_p": 1
+      },
+      "actual_request_count": 54,
+      "counts": {
+        "decode": 15,
+        "prefill": 18,
+        "concurrency": 21
+      },
+      "finish_reasons": {
+        "stop": 15,
+        "length": 39
+      },
+      "done_markers": 54,
+      "rows_with_error": 0,
+      "native_basic_output_gates": {
+        "passed": 15,
+        "total": 15
+      },
+      "metrics": [
+        {
+          "key": "code_decode_throughput",
+          "unit": "tokens_per_second",
+          "value": 65.107,
+          "frozen_e31": 65.185,
+          "delta_pct": -0.11965943085066044
+        },
+        {
+          "key": "code_c1_aggregate_end_to_end_throughput",
+          "unit": "tokens_per_second",
+          "value": 47.444,
+          "frozen_e31": 43.988,
+          "delta_pct": 7.856688187687566
+        },
+        {
+          "key": "code_c2_aggregate_end_to_end_throughput",
+          "unit": "tokens_per_second",
+          "value": 75.489,
+          "frozen_e31": 68.369,
+          "delta_pct": 10.414076555163888
+        },
+        {
+          "key": "code_c4_aggregate_end_to_end_throughput",
+          "unit": "tokens_per_second",
+          "value": 108.618,
+          "frozen_e31": 101.448,
+          "delta_pct": 7.067660279157795
+        },
+        {
+          "key": "prose_decode_throughput",
+          "unit": "tokens_per_second",
+          "value": 35.501,
+          "frozen_e31": 34.095,
+          "delta_pct": 4.123771814048971
+        },
+        {
+          "key": "code_ttft",
+          "unit": "seconds",
+          "value": 0.472,
+          "frozen_e31": 0.475,
+          "delta_pct": -0.6315789473684164
+        },
+        {
+          "key": "prose_ttft",
+          "unit": "seconds",
+          "value": 0.397,
+          "frozen_e31": 0.374,
+          "delta_pct": 6.149732620320858
+        },
+        {
+          "key": "code_c1_per_stream_ttft",
+          "unit": "seconds",
+          "value": 0.415,
+          "frozen_e31": 0.421,
+          "delta_pct": -1.4251781472684133
+        },
+        {
+          "key": "code_c2_per_stream_ttft",
+          "unit": "seconds",
+          "value": 0.456,
+          "frozen_e31": 0.469,
+          "delta_pct": -2.771855010660973
+        },
+        {
+          "key": "code_c4_per_stream_ttft",
+          "unit": "seconds",
+          "value": 0.547,
+          "frozen_e31": 0.548,
+          "delta_pct": -0.18248175182481452
+        },
+        {
+          "key": "prefill_8k_cold_throughput",
+          "unit": "tokens_per_second",
+          "value": 2686.872,
+          "frozen_e31": 2572.46,
+          "delta_pct": 4.447571585175281
+        },
+        {
+          "key": "prefill_8k_replay_throughput",
+          "unit": "tokens_per_second",
+          "value": 9360.681,
+          "frozen_e31": 8848.095,
+          "delta_pct": 5.793179209762123
+        },
+        {
+          "key": "prefill_32k_cold_throughput",
+          "unit": "tokens_per_second",
+          "value": 2834.056,
+          "frozen_e31": 2697.888,
+          "delta_pct": 5.0472072969671045
+        },
+        {
+          "key": "prefill_32k_replay_throughput",
+          "unit": "tokens_per_second",
+          "value": 37166.634,
+          "frozen_e31": 33944.411,
+          "delta_pct": 9.492646668696047
+        },
+        {
+          "key": "prefill_64k_cold_throughput",
+          "unit": "tokens_per_second",
+          "value": 2841.258,
+          "frozen_e31": 2614.412,
+          "delta_pct": 8.67675025971424
+        },
+        {
+          "key": "prefill_64k_replay_throughput",
+          "unit": "tokens_per_second",
+          "value": 42589.086,
+          "frozen_e31": 39576.624,
+          "delta_pct": 7.611720494400931
+        }
+      ],
+      "limitations": [
+        "One complete suite (n=1); no three-run median or dispersion estimate.",
+        "Frozen E31 uses a different weight load and unprotected cache; differences are descriptive, not proof of a performance gain/regression.",
+        "Final native suite is reported separately under native_runs.final."
+      ]
+    },
+    "final": {
+      "status": "completed",
+      "native_sha256": "dceed1318ab03d321b731c10fe38d2ae105fae22723ae252ba39c59bb27eb901",
+      "protocol": {
+        "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+        "prompts_version": "1.0.0",
+        "repository_dirty": false,
+        "repository_revision": "c5a0db01b0542ac291883ab049b6141efae0c7d3",
+        "repository_source": "git-worktree",
+        "repository_source_sha256": "61d71055b4a3a64cb0520fc1bc535de9a1863463c6937d423745957339f7f1b7",
+        "version": "1.1.0"
+      },
+      "settings": {
+        "concurrency": [
+          1,
+          2,
+          4
+        ],
+        "concurrency_runs": 3,
+        "concurrency_tokens": 256,
+        "concurrency_workload": "code",
+        "decode_tokens": 4096,
+        "extra_body": {
+          "chat_template_kwargs": {
+            "reasoning_effort": "low"
+          }
+        },
+        "prefill_depths": [
+          8192,
+          32768,
+          65536
+        ],
+        "prefill_runs": 3,
+        "runs": 5,
+        "seed": 20260905,
+        "temperature": 0,
+        "top_p": 1
+      },
+      "suite_count": 1,
+      "excluded_suites": 0,
+      "actual_request_count": 54,
+      "counts": {
+        "decode": 15,
+        "prefill": 18,
+        "concurrency": 21
+      },
+      "finish_reasons": {
+        "stop": 15,
+        "length": 39
+      },
+      "done_markers": 54,
+      "visible_output_requests": 54,
+      "rows_with_error": 0,
+      "native_basic_output_gates": {
+        "passed": 15,
+        "total": 15
+      },
+      "operational_identity": "2026-09-29-memory-bounded-candidate",
+      "adopted_operational_identity": "2026-09-29-memory-bounded",
+      "identity_note": "The native suite ran on the explicitly checked candidate identity. Its immutable pre-run planning annotations are not deployment evidence; operational_promotion records the later verified default adoption, whose identity pins the candidate.",
+      "kv_cache_memory_bytes": 15032385536,
+      "max_context_tokens": 262144,
+      "metrics": [
+        {
+          "key": "code_decode_throughput",
+          "unit": "tokens_per_second",
+          "initial": 65.107,
+          "value": 64.979,
+          "delta_pct": -0.19659944399219587,
+          "source_path": [
+            "decode",
+            "code",
+            "decode_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "code_ttft",
+          "unit": "seconds",
+          "initial": 0.472,
+          "value": 0.478,
+          "delta_pct": 1.2711864406779627,
+          "source_path": [
+            "decode",
+            "code",
+            "ttft_seconds",
+            "median"
+          ]
+        },
+        {
+          "key": "prose_decode_throughput",
+          "unit": "tokens_per_second",
+          "initial": 35.501,
+          "value": 35.056,
+          "delta_pct": -1.2534858173009256,
+          "source_path": [
+            "decode",
+            "prose",
+            "decode_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "prose_ttft",
+          "unit": "seconds",
+          "initial": 0.397,
+          "value": 0.379,
+          "delta_pct": -4.534005037783384,
+          "source_path": [
+            "decode",
+            "prose",
+            "ttft_seconds",
+            "median"
+          ]
+        },
+        {
+          "key": "structured_decode_throughput",
+          "unit": "tokens_per_second",
+          "initial": 96.228,
+          "value": 96.213,
+          "delta_pct": -0.015587978550946069,
+          "source_path": [
+            "decode",
+            "structured",
+            "decode_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "structured_ttft",
+          "unit": "seconds",
+          "initial": 0.439,
+          "value": 0.448,
+          "delta_pct": 2.05011389521641,
+          "source_path": [
+            "decode",
+            "structured",
+            "ttft_seconds",
+            "median"
+          ]
+        },
+        {
+          "key": "code_c1_aggregate_end_to_end_throughput",
+          "unit": "tokens_per_second",
+          "initial": 47.444,
+          "value": 48.409,
+          "delta_pct": 2.0339768990810247,
+          "source_path": [
+            "concurrency",
+            "1",
+            "aggregate_end_to_end_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "code_c1_per_stream_ttft",
+          "unit": "seconds",
+          "initial": 0.415,
+          "value": 0.421,
+          "delta_pct": 1.4457831325301207,
+          "source_path": [
+            "concurrency",
+            "1",
+            "per_stream_ttft_seconds",
+            "median"
+          ]
+        },
+        {
+          "key": "code_c2_aggregate_end_to_end_throughput",
+          "unit": "tokens_per_second",
+          "initial": 75.489,
+          "value": 75.133,
+          "delta_pct": -0.47159188755978576,
+          "source_path": [
+            "concurrency",
+            "2",
+            "aggregate_end_to_end_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "code_c2_per_stream_ttft",
+          "unit": "seconds",
+          "initial": 0.456,
+          "value": 0.46,
+          "delta_pct": 0.8771929824561431,
+          "source_path": [
+            "concurrency",
+            "2",
+            "per_stream_ttft_seconds",
+            "median"
+          ]
+        },
+        {
+          "key": "code_c4_aggregate_end_to_end_throughput",
+          "unit": "tokens_per_second",
+          "initial": 108.618,
+          "value": 108.078,
+          "delta_pct": -0.4971551676517638,
+          "source_path": [
+            "concurrency",
+            "4",
+            "aggregate_end_to_end_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "code_c4_per_stream_ttft",
+          "unit": "seconds",
+          "initial": 0.547,
+          "value": 0.551,
+          "delta_pct": 0.7312614259597838,
+          "source_path": [
+            "concurrency",
+            "4",
+            "per_stream_ttft_seconds",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_8k_cold_throughput",
+          "unit": "tokens_per_second",
+          "initial": 2686.872,
+          "value": 2515.081,
+          "delta_pct": -6.393717303987678,
+          "source_path": [
+            "prefill",
+            "8192",
+            "cold",
+            "effective_prefill_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_8k_cold_ttft",
+          "unit": "seconds",
+          "initial": 3.049,
+          "value": 3.257,
+          "delta_pct": 6.821908822564771,
+          "source_path": [
+            "prefill",
+            "8192",
+            "cold",
+            "ttft_seconds",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_8k_replay_throughput",
+          "unit": "tokens_per_second",
+          "initial": 9360.681,
+          "value": 7593.334,
+          "delta_pct": -18.88053871294194,
+          "source_path": [
+            "prefill",
+            "8192",
+            "warm_replay",
+            "effective_prefill_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_8k_replay_ttft",
+          "unit": "seconds",
+          "initial": 0.875,
+          "value": 1.079,
+          "delta_pct": 23.31428571428571,
+          "source_path": [
+            "prefill",
+            "8192",
+            "warm_replay",
+            "ttft_seconds",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_32k_cold_throughput",
+          "unit": "tokens_per_second",
+          "initial": 2834.056,
+          "value": 2760.899,
+          "delta_pct": -2.5813533677527922,
+          "source_path": [
+            "prefill",
+            "32768",
+            "cold",
+            "effective_prefill_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_32k_cold_ttft",
+          "unit": "seconds",
+          "initial": 11.562,
+          "value": 11.869,
+          "delta_pct": 2.6552499567548793,
+          "source_path": [
+            "prefill",
+            "32768",
+            "cold",
+            "ttft_seconds",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_32k_replay_throughput",
+          "unit": "tokens_per_second",
+          "initial": 37166.634,
+          "value": 36928.556,
+          "delta_pct": -0.640569172876948,
+          "source_path": [
+            "prefill",
+            "32768",
+            "warm_replay",
+            "effective_prefill_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_32k_replay_ttft",
+          "unit": "seconds",
+          "initial": 0.882,
+          "value": 0.887,
+          "delta_pct": 0.5668934240362855,
+          "source_path": [
+            "prefill",
+            "32768",
+            "warm_replay",
+            "ttft_seconds",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_64k_cold_throughput",
+          "unit": "tokens_per_second",
+          "initial": 2841.258,
+          "value": 2793.916,
+          "delta_pct": -1.6662337598345345,
+          "source_path": [
+            "prefill",
+            "65536",
+            "cold",
+            "effective_prefill_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_64k_cold_ttft",
+          "unit": "seconds",
+          "initial": 23.066,
+          "value": 23.457,
+          "delta_pct": 1.6951356975635212,
+          "source_path": [
+            "prefill",
+            "65536",
+            "cold",
+            "ttft_seconds",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_64k_replay_throughput",
+          "unit": "tokens_per_second",
+          "initial": 42589.086,
+          "value": 41290.01,
+          "delta_pct": -3.05025564530782,
+          "source_path": [
+            "prefill",
+            "65536",
+            "warm_replay",
+            "effective_prefill_tokens_per_second",
+            "median"
+          ]
+        },
+        {
+          "key": "prefill_64k_replay_ttft",
+          "unit": "seconds",
+          "initial": 1.539,
+          "value": 1.587,
+          "delta_pct": 3.1189083820662766,
+          "source_path": [
+            "prefill",
+            "65536",
+            "warm_replay",
+            "ttft_seconds",
+            "median"
+          ]
+        }
+      ],
+      "comparison": {
+        "reference": "initial protected 16 GiB native suite",
+        "reference_native_sha256": "f2030d423bfaf35094ed4f3ad4f8fdcaf38e27ccc001933ac2cd7f20ad068991",
+        "same_settings": true,
+        "same_protocol_source": true,
+        "distinct_comparison_ids": true,
+        "same_weight_load": false,
+        "aggregation": "Native per-suite summary medians; one suite per recipe. Numeric fields retain native receipt precision."
+      },
+      "observation": {
+        "window": "Native start through completion, controller receiver clock; observer was ready before launch.",
+        "host_sample_target_seconds": 0.2,
+        "ranks": {
+          "0": {
+            "samples": 2583,
+            "mem_available_unknown_samples": 0,
+            "mem_available_min_bytes": 4283912192,
+            "container_states": [
+              "running"
+            ],
+            "oom_unknown_samples": {
+              "host_oom_delta_known": 0,
+              "cgroup_oom_delta_known": 0,
+              "earlyoom_known": 0,
+              "cuda_oom_known": 0
+            },
+            "positive_oom_samples": {},
+            "max_sample_gap_seconds": 0.200831619,
+            "worker_identity_unchanged": true
+          },
+          "1": {
+            "samples": 2583,
+            "mem_available_unknown_samples": 0,
+            "mem_available_min_bytes": 9598009344,
+            "container_states": [
+              "running"
+            ],
+            "oom_unknown_samples": {
+              "host_oom_delta_known": 0,
+              "cgroup_oom_delta_known": 0,
+              "earlyoom_known": 0,
+              "cuda_oom_known": 0
+            },
+            "positive_oom_samples": {},
+            "max_sample_gap_seconds": 0.201177701,
+            "worker_identity_unchanged": true
+          },
+          "2": {
+            "samples": 2583,
+            "mem_available_unknown_samples": 0,
+            "mem_available_min_bytes": 9512423424,
+            "container_states": [
+              "running"
+            ],
+            "oom_unknown_samples": {
+              "host_oom_delta_known": 0,
+              "cgroup_oom_delta_known": 0,
+              "earlyoom_known": 0,
+              "cuda_oom_known": 0
+            },
+            "positive_oom_samples": {},
+            "max_sample_gap_seconds": 0.20270584,
+            "worker_identity_unchanged": true
+          },
+          "3": {
+            "samples": 2583,
+            "mem_available_unknown_samples": 0,
+            "mem_available_min_bytes": 9556705280,
+            "container_states": [
+              "running"
+            ],
+            "oom_unknown_samples": {
+              "host_oom_delta_known": 0,
+              "cgroup_oom_delta_known": 0,
+              "earlyoom_known": 0,
+              "cuda_oom_known": 0
+            },
+            "positive_oom_samples": {},
+            "max_sample_gap_seconds": 0.201137911,
+            "worker_identity_unchanged": true
+          }
+        },
+        "safety_trips": 0,
+        "worker_deaths_observed": 0,
+        "observer_sha256": "70d9058c18b3d6f3eb2fc32d7e94254b18b81991927944f0b3bf72518ab1ded3"
+      },
+      "assessment": {
+        "operational_use": "Accepted within the owner-authorized memory-resilience scope.",
+        "performance": "Descriptive; no performance baseline promotion or proof of equivalence.",
+        "tradeoff": "8K replay throughput -18.88% versus initial suite; no causal attribution to an individual change or claim beyond measured n=1 variation."
+      },
+      "limitations": [
+        "One initial and one final suite on different loads; no repeated-suite median or matched causal claim.",
+        "The original two-hour soak was ended early by the operator; failed and deferred cases remain separate.",
+        "The production cache namespace and 0/0 disk-capacity policy differ from test-only 3/2 GiB eviction."
+      ]
+    }
+  },
+  "initial_observation": {
+    "ranks": {
+      "0": {
+        "samples": 2585,
+        "mem_available_min_bytes": 2256547840,
+        "max_sample_gap_seconds": 0.304328,
+        "container_states": [
+          "running"
+        ],
+        "oom_coverage_complete": true,
+        "new_oom_events": false
+      },
+      "1": {
+        "samples": 2585,
+        "mem_available_min_bytes": 7451201536,
+        "max_sample_gap_seconds": 0.304015,
+        "container_states": [
+          "running"
+        ],
+        "oom_coverage_complete": true,
+        "new_oom_events": false
+      },
+      "2": {
+        "samples": 2585,
+        "mem_available_min_bytes": 7450230784,
+        "max_sample_gap_seconds": 0.304066,
+        "container_states": [
+          "running"
+        ],
+        "oom_coverage_complete": true,
+        "new_oom_events": false
+      },
+      "3": {
+        "samples": 2585,
+        "mem_available_min_bytes": 7441375232,
+        "max_sample_gap_seconds": 0.305271,
+        "container_states": [
+          "running"
+        ],
+        "oom_coverage_complete": true,
+        "new_oom_events": false
+      }
+    },
+    "host_sample_target_seconds": 0.2,
+    "process_cache_target_seconds": 1,
+    "oom_log_target_seconds": 5,
+    "safety_trips": 0,
+    "limitations": [
+      "Process/cache/OOM source cadence differs from host sampling; individual source ages are present in raw telemetry.",
+      "RSS is nonadditive across shared mappings and is never added to GPU usage."
+    ]
+  },
+  "resilience_cases": {
+    "status": "resumed_after_bounded_diagnostics",
+    "new_results_recorded_after_resumption": 0,
+    "executed_cases": 3,
+    "passed_cases": 2,
+    "failed_cases": 1,
+    "passed_repetitions": 6,
+    "failed_repetitions": 1,
+    "cases": [
+      {
+        "id": "context-8000-c1-cold",
+        "passed_repetitions": 3
+      },
+      {
+        "id": "context-8000-c1-replay",
+        "passed_repetitions": 3
+      },
+      {
+        "id": "context-8000-c2-cold",
+        "failed_repetitions": 1,
+        "reason": "rank 0 MemAvailable below 768 MiB",
+        "individual_client_outcomes": "unavailable in first failure receipt"
+      }
+    ]
+  },
+  "memory_diagnostic": {
+    "recipe": "protected default without test overlay",
+    "prompt_tokens": 4000,
+    "c1_completed_requests": 1,
+    "c2_interrupted_requests": 2,
+    "result": "memory_guard_reproduced",
+    "rank0_mem_available_min_mib": 660,
+    "rank0_c1_idle_cuda_allocated_gib": 96.778,
+    "rank0_c1_idle_cuda_reserved_gib": 98.367,
+    "rank0_c2_cuda_allocated_gib": 98.002,
+    "rank0_c2_cuda_reserved_gib": 99.168,
+    "new_oom_events_observed": false,
+    "worker_death_observed": false,
+    "limitations": [
+      "Diagnostic requests are separate from the planned matrix.",
+      "Cache observations target an inactive test namespace and are excluded.",
+      "Reserved minus allocated is an upper bound, not a measurement of reclaimable blocks."
+    ]
+  },
+  "corrective_diagnostics": [
+    {
+      "variant": "prefill-cache-trim",
+      "worker_sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "private_receipt_sha256": "4e307f5e3ccfa4480ef190d893b877cadce08be2d1f38ab94f9810ef47998967",
+      "prompt_tokens": 4000,
+      "c1_completed_requests": 1,
+      "c2_interrupted_requests": 2,
+      "result": "memory_guard_reproduced",
+      "c2_scheduled_tokens_per_worker": 8000,
+      "c2_pre_step_reclaimed_bytes_per_rank": 715128832,
+      "rank0_mem_available_min_collected_bytes": 732291072,
+      "rank0_c2_cuda_allocated_sampled_max_bytes": 105160879616,
+      "rank0_c2_cuda_allocated_lifetime_peak_bytes": 105292080128,
+      "rank0_c2_cuda_reserved_max_bytes": 106650664960,
+      "rank0_same_process_anon_delta_bytes": 6344704,
+      "new_oom_events_observed": false,
+      "worker_death_observed": false,
+      "coordinated_down_returncode": 0,
+      "limitations": [
+        "One diagnostic execution; no successful C2 repetition or performance verdict.",
+        "CUDA maxima come from fresh raw worker logs, not the stale phase checkpoint.",
+        "Process snapshots span a wider interval than the diagnostic itself.",
+        "Cross-host wall clocks were not calibrated; precise cross-host event ordering is not inferred.",
+        "The standalone trim candidate released memory but did not preserve the campaign guard."
+      ]
+    },
+    {
+      "variant": "prefill-cache-trim+prefill-step-cap",
+      "worker_sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "scheduler_sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd",
+      "private_diagnostic_sha256": "426af36e9f65a8e93522e6df9af653a0fcee2cdc6a0798b729280f64f15758c6",
+      "prompt_tokens_per_request": 4000,
+      "output_tokens_per_request": 16,
+      "completed_requests": 7,
+      "c1_completed_requests": 1,
+      "c2_completed_requests": 6,
+      "c2_repetitions": 3,
+      "drained_after_each_phase": true,
+      "result": "bounded_case_passed",
+      "c2_scheduled_target_tokens_per_repetition": [
+        [
+          6304,
+          1700
+        ],
+        [
+          6304,
+          1700
+        ],
+        [
+          6304,
+          1700
+        ]
+      ],
+      "rank_mem_available_min_bytes": [
+        957231104,
+        6339817472,
+        6357831680,
+        6370758656
+      ],
+      "rank_mem_available_min_mib": [
+        912.89,
+        6046.12,
+        6063.3,
+        6075.63
+      ],
+      "samples_per_rank": [
+        368,
+        368,
+        368,
+        368
+      ],
+      "limitations": [
+        "This passes only the bounded 4k diagnostic; it is not a performance result or an aggregate-admission proof.",
+        "Memory minima are sampled values, not guarantees between samples."
+      ]
+    },
+    {
+      "variant": "prefill-cache-trim+prefill-step-cap",
+      "worker_sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "scheduler_sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd",
+      "private_diagnostic_sha256": "5c1276d256c6fadb43f41536d9dc1c5fc4c0df4ca372e6b3d9d2a0216d3ef8ed",
+      "prompt_tokens_per_request": 8000,
+      "output_tokens_per_request": 16,
+      "completed_requests": 7,
+      "c1_completed_requests": 1,
+      "c2_completed_requests": 6,
+      "c2_repetitions": 3,
+      "drained_after_each_phase": true,
+      "result": "bounded_case_passed",
+      "scheduler_eager_output_tokens": [
+        6912,
+        1088,
+        6912,
+        1088,
+        6912,
+        1096,
+        6912,
+        1088,
+        4616,
+        2304,
+        1096,
+        6912,
+        1088,
+        6912,
+        1096
+      ],
+      "max_observed_scheduler_eager_output_tokens": 6912,
+      "rank_mem_available_min_bytes": [
+        1201623040,
+        6602252288,
+        6630330368,
+        6605803520
+      ],
+      "rank_mem_available_min_mib": [
+        1145.96,
+        6296.4,
+        6323.18,
+        6299.79
+      ],
+      "samples_per_rank": [
+        453,
+        453,
+        453,
+        453
+      ],
+      "limitations": [
+        "This passes only the bounded 8k diagnostic; it is not a performance result or an aggregate-admission proof.",
+        "Prefill was partly serialized through the queue; concurrent clients do not establish simultaneous complete 8k prefills.",
+        "Memory minima are sampled values, not guarantees between samples."
+      ]
+    }
+  ],
+  "corrective_diagnostic_disposition": {
+    "bounded_cases": "passed",
+    "promotion": "not_promoted",
+    "protected_operational_default": "unchanged",
+    "aggregate_admission_control": "not_established",
+    "mixed_load_performance_tradeoff": "unresolved",
+    "remaining_matrix": "pending",
+    "final_soak": "pending",
+    "final_native_run": "pending"
+  },
+  "limits": {
+    "duration_hours": 12,
+    "final_soak_hours": 2,
+    "restoration_minutes": 45,
+    "namespace_bytes_per_node": 8589934592,
+    "stop_mem_available_bytes": 805306368
+  },
+  "main_matrix_checkpoint_2": {
+    "status": "interrupted_after_planned_controller_transition",
+    "outcome": "in_progress_unresolved",
+    "variant": "prefill-cache-trim+prefill-step-cap",
+    "scope": "context_cases_only",
+    "candidate_promoted": false,
+    "protected_operational_default_changed": false,
+    "completion_rule": "Three pass run records with the selected candidate identity after the resume boundary.",
+    "completed_cases": 34,
+    "completed_repetitions": 102,
+    "recorded_runs": 103,
+    "run_status_counts": {
+      "pass": 103
+    },
+    "completed_response_counts": {
+      "primary_group": 318,
+      "replay_seed": 51,
+      "total_inference_http": 369
+    },
+    "recorded_response_counts": {
+      "primary_group": 320,
+      "replay_seed": 51,
+      "total_inference_http": 371
+    },
+    "recorded_response_integrity": {
+      "primary_group": {
+        "denominator": 320,
+        "http_200": 320,
+        "json_body": 320,
+        "error_null": 320,
+        "guard_abort_cause_null": 320,
+        "exact_prompt_tokens": 320,
+        "completion_tokens_16": 320,
+        "finish_reason_length": 320
+      },
+      "replay_seed": {
+        "denominator": 51,
+        "http_200": 51,
+        "json_body": 51,
+        "valid_time_order": 51,
+        "exact_prompt_tokens": 51,
+        "completion_tokens_16": 51,
+        "finish_reason_length": 51,
+        "transport_error_fields_present": 0,
+        "guard_abort_cause_fields_present": 0
+      }
+    },
+    "completed_by_prompt_depth": [
+      {
+        "prompt_tokens": 8000,
+        "completed_cases": 8,
+        "completed_repetitions": 24,
+        "primary_group_responses": 78,
+        "replay_seed_responses": 12,
+        "total_inference_http_responses": 90,
+        "concurrencies": [
+          1,
+          2,
+          4,
+          6
+        ],
+        "cache_modes": [
+          "cold",
+          "replay"
+        ]
+      },
+      {
+        "prompt_tokens": 32000,
+        "completed_cases": 8,
+        "completed_repetitions": 24,
+        "primary_group_responses": 78,
+        "replay_seed_responses": 12,
+        "total_inference_http_responses": 90,
+        "concurrencies": [
+          1,
+          2,
+          4,
+          6
+        ],
+        "cache_modes": [
+          "cold",
+          "replay"
+        ]
+      },
+      {
+        "prompt_tokens": 64000,
+        "completed_cases": 8,
+        "completed_repetitions": 24,
+        "primary_group_responses": 78,
+        "replay_seed_responses": 12,
+        "total_inference_http_responses": 90,
+        "concurrencies": [
+          1,
+          2,
+          4,
+          6
+        ],
+        "cache_modes": [
+          "cold",
+          "replay"
+        ]
+      },
+      {
+        "prompt_tokens": 128000,
+        "completed_cases": 8,
+        "completed_repetitions": 24,
+        "primary_group_responses": 78,
+        "replay_seed_responses": 12,
+        "total_inference_http_responses": 90,
+        "concurrencies": [
+          1,
+          2,
+          4,
+          6
+        ],
+        "cache_modes": [
+          "cold",
+          "replay"
+        ]
+      },
+      {
+        "prompt_tokens": 180000,
+        "completed_cases": 2,
+        "completed_repetitions": 6,
+        "primary_group_responses": 6,
+        "replay_seed_responses": 3,
+        "total_inference_http_responses": 9,
+        "concurrencies": [
+          1
+        ],
+        "cache_modes": [
+          "cold",
+          "replay"
+        ]
+      }
+    ],
+    "partial_cases": [
+      {
+        "id": "context-180000-c2-cold",
+        "recorded_pass_repetitions": 1,
+        "target_repetitions": 3,
+        "primary_group_responses": 2,
+        "replay_seed_responses": 0,
+        "total_inference_http_responses": 2,
+        "unrecorded_or_interrupted_work_credited": false
+      }
+    ],
+    "replay_evidence": {
+      "replay_runs": 51,
+      "four_rank_same_digest_publication_and_restore_runs": 51,
+      "seed_publication_rank_events": 204,
+      "restore_rank_events": 204,
+      "seed_publication_errors": 0,
+      "restore_errors": 0
+    },
+    "reservation_drain_evidence": {
+      "rank_proof_denominator": 412,
+      "fresh_complete_zero_reservation_rank_proofs": 412
+    },
+    "resource_observation": {
+      "samples_per_rank": [
+        29808,
+        29808,
+        29808,
+        29808
+      ],
+      "mem_available_min_bytes": [
+        1092923392,
+        6302347264,
+        6374797312,
+        6373851136
+      ],
+      "stop_mem_available_bytes": 805306368,
+      "guard_breaches": 0,
+      "container_state_samples_running": 119232,
+      "stable_container_identity_values_per_rank": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "stable_worker_identity_values_per_rank": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "known_oom_samples_per_rank": [
+        29807,
+        29807,
+        29807,
+        29807
+      ],
+      "unknown_initial_oom_samples_per_rank": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "max_host_oom_kills_since_start": 0,
+      "max_cgroup_oom_kills_since_start": 0,
+      "max_cuda_allocator_retries": 0,
+      "max_earlyoom_kills": 0,
+      "cuda_oom_seen_since_start": false,
+      "source_max_known_age_ns": {
+        "host": 0,
+        "process": 985034137,
+        "cache": 985034137,
+        "container": 978601290,
+        "rank0_endpoint": 989791587,
+        "logs_and_oom": 5085861589
+      },
+      "last_pre_restoration_state": {
+        "reserved_bytes_per_rank": [
+          86999040,
+          86999040,
+          86999040,
+          86999040
+        ],
+        "active_publications_per_rank": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "interpretation": "Interrupted in-flight work; excluded from completed-run drain evidence and not evidence of a persistent leak."
+      },
+      "limitations": [
+        "Sampled minima do not guarantee unsampled headroom.",
+        "Memory domains overlap and are not summed.",
+        "One initial OOM sample per rank is unknown; unknown is not treated as zero."
+      ]
+    },
+    "planned_transition": {
+      "controller_result": "failed_unhandled",
+      "exception_class": "KeyboardInterrupt",
+      "campaign_stop_reasons": [],
+      "classification": "planned_driver_transition",
+      "worker_failure_observed": false,
+      "final_restoration_evaluated": false,
+      "signal_receipt_sha256": "a5e4319cbbab7fe59ded6bda58b4af870262fca7ede92eb2920230106eadc50b"
+    },
+    "source_sha256": {
+      "checkpoint_report": "66cf455b0354a1de35ba2b3cfc1d283a1ac39bf384ed94bf84938655dce70f03",
+      "campaign_state": "415bf60c0d0e4201e389dac7d2bc3581c7a03fdcdce006ff975c00c1240d3aba",
+      "events": "0249aceceae4c15805de1655552ee4eb0591787a3541e0f1bb4589ad4d44e54d",
+      "telemetry_by_rank": [
+        "538e5e81a7368bfd7830d38e854f8de7da5afc194973ae590472cdf097b83875",
+        "5bd715983afe669373d883202b056c828d17fed0db2773d31a14943b2e1b9c67",
+        "5ea14e1e4b7f0ea0a9c79f340f2bd57aeb33c17162c6b2f3cada6c4fced52067",
+        "9b9fdc78d7a397a4bec5ec2f32ca64d3bbf9f0c11a32567f29eb6be8132e42b7"
+      ]
+    },
+    "pending": [
+      "fault-injection cases",
+      "sustained soak",
+      "final restoration and identity verification",
+      "final native Rigmark suite",
+      "promotion decision"
+    ],
+    "limitations": [
+      "The checkpoint covers context cases only; it is not a fault-campaign pass.",
+      "The planned transition interrupted the next case before a run record was persisted; unsupported requests are excluded.",
+      "No final restoration, soak, performance, or promotion claim is supported."
+    ]
+  },
+  "api_cache_checkpoint_3": {
+    "status": "in_progress_checkpoint",
+    "outcome": "unresolved",
+    "variant": "prefill-cache-trim-plus-prefill-step-cap",
+    "scope": "disjoint resumed epoch containing API, cache, and legacy cancellation observations",
+    "relationship_to_checkpoint_2": "No checkpoint-2 case, request, or telemetry sample is included in these counts.",
+    "candidate_promoted": false,
+    "protected_operational_default_changed": false,
+    "source_recorded_results": {
+      "cases_with_records": 16,
+      "recorded_runs": 48,
+      "run_status_counts": {
+        "pass": 42,
+        "pending": 6,
+        "fail": 0
+      },
+      "cases_with_three_source_passes": 14,
+      "cases_with_three_pending_results": 2,
+      "qualification": "Source statuses are preserved. Legacy cancellation passes do not constitute replacement-protocol qualification."
+    },
+    "api_cache_results": {
+      "cases": 14,
+      "recorded_runs": 42,
+      "cases_with_three_source_passes": 13,
+      "cases_with_three_pending_results": 1,
+      "failed_cases": 0,
+      "fresh_complete_zero_reservation_rank_proofs": 168,
+      "rank_proof_denominator": 168,
+      "api": {
+        "cases_with_three_source_passes": [
+          "api-over-context",
+          "api-invalid-parameters",
+          "api-malformed-json",
+          "api-partial-upload"
+        ],
+        "attempts": 12,
+        "expected_http_4xx_responses": 9,
+        "intentional_partial_upload_disconnects": 3,
+        "evidence_qualifications": {
+          "api-invalid-parameters": "The request combined empty messages with negative max_tokens; HTTP 400 does not isolate which condition was rejected.",
+          "api-partial-upload": "This proves health and fresh drain after the client disconnected; it does not independently prove server rejection or complete connection cleanup."
+        }
+      },
+      "cache": {
+        "cases_with_three_source_passes": [
+          "cache-distinct-snapshots",
+          "cache-manifest-growth",
+          "cache-checksum",
+          "cache-missing",
+          "cache-truncated",
+          "cache-enospc",
+          "cache-eio",
+          "cache-delay",
+          "cache-publication-interrupted"
+        ],
+        "pending": {
+          "case": "cache-shared-prefix",
+          "recorded_runs": 3,
+          "inference_http_200_responses": 6,
+          "reason": "second four-rank snapshot publication was not proven"
+        },
+        "passed_case_inference_http_200_responses": 78,
+        "inference_http_200_responses": 84,
+        "response_integrity_passed": 84,
+        "response_integrity_denominator": 84,
+        "request_shape": {
+          "concurrency": 1,
+          "prompt_tokens": 32000,
+          "scope": "all cache fault cases"
+        },
+        "evidence_qualifications": {
+          "cache-checksum-missing-truncated": "Fallback is inferred from same-digest republication. Exact corruption detection is not captured, and harness backup restoration means autonomous self-healing is unproven.",
+          "cache-manifest-growth": "Manifest counts increased in all 12 rank checks, but eviction prevents interpreting this as one retained entry per publication.",
+          "cache-enospc": "The receipt proves a capture-stage error; it has no later negative proof that the affected digest was never served.",
+          "cache-publication-interrupted": "The receipt proves an uncommitted publication-stage error; it has no later negative proof that the affected digest was never served.",
+          "cache-delay": "The delay was configured at 500 ms; per-operation delay was not measured."
+        }
+      }
+    },
+    "workload_http_accounting": {
+      "attempts": 120,
+      "api_attempts": 12,
+      "cache_inference_responses": 84,
+      "legacy_cancellation_attempts": 24,
+      "legacy_cancellation_attempt_breakdown": {
+        "blocker_streams": 18,
+        "cancelled_target_streams": 3,
+        "successful_reissues": 3
+      },
+      "complete_http_200_responses_with_integrity_evidence": 87,
+      "complete_http_200_integrity_denominator": 87,
+      "complete_http_200_integrity_requirements": [
+        "JSON response body",
+        "exact requested prompt usage",
+        "16 completion tokens",
+        "length finish reason",
+        "ordered client timestamps"
+      ],
+      "denominator_note": "The 120 attempts include expected API rejections, intentional disconnects and cancelled streams; they are not 120 successful responses."
+    },
+    "cache_evidence": {
+      "baseline_four_rank_publication_runs": 30,
+      "action_four_rank_publication_runs": 18,
+      "fault_hit_rank_events": 48,
+      "fault_stage_ok_rank_events": 12,
+      "fault_stage_error_rank_events": 36,
+      "mutation_rank_actions": 36,
+      "manifest_rank_increases": 12,
+      "cleanup_errors": 0,
+      "shared_prefix_action_publication_errors": 12
+    },
+    "shared_prefix_limited_diagnostic": {
+      "matches": 12,
+      "denominator": 12,
+      "result": "rank-local same-digest existing-seed publication matched a successful restore for four ranks in each of three runs",
+      "original_case_status": "pending",
+      "limitation": "This supports restoration of the existing aligned seed only; it does not prove the required second larger snapshot publication and does not change the case status."
+    },
+    "cancellation_observations": {
+      "cancel_queue": {
+        "source_recorded_passes": 3,
+        "qualification": "legacy protocol only; three replacement-protocol passes remain required"
+      },
+      "cancel_prefill": {
+        "pending_results": 3,
+        "reason": "no exact prefill phase edge was exposed by the runtime"
+      },
+      "verified_cancellation_pass_claim": false
+    },
+    "reservation_drain_evidence": {
+      "recorded_runs": 48,
+      "fresh_complete_zero_reservation_rank_proofs": 192,
+      "rank_proof_denominator": 192
+    },
+    "resource_observation": {
+      "samples_per_rank": [
+        5872,
+        5878,
+        5883,
+        5888
+      ],
+      "total_samples": 23521,
+      "mem_available_min_bytes": [
+        1089974272,
+        6347558912,
+        6356807680,
+        6317469696
+      ],
+      "stop_mem_available_bytes": 805306368,
+      "rank0_sampled_headroom_above_guard_bytes": 284667904,
+      "guard_breaches": 0,
+      "cache_namespace_max_bytes": [
+        3990336038,
+        4057453151,
+        4015510111,
+        4074230363
+      ],
+      "cache_namespace_limit_bytes": 8589934592,
+      "namespace_limit_breaches": 0,
+      "container_state_samples_running_and_verified": 23521,
+      "stable_container_identity_values_per_rank": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "stable_worker_identity_values_per_rank": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "known_oom_samples_per_rank": [
+        5871,
+        5877,
+        5882,
+        5887
+      ],
+      "unknown_initial_oom_samples_per_rank": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "max_host_oom_kills_since_start": 0,
+      "max_cgroup_oom_kills_since_start": 0,
+      "max_cuda_allocator_retries": 0,
+      "max_earlyoom_kills": 0,
+      "cuda_oom_seen_since_start": false,
+      "observed_host_sample_interval_ns": {
+        "p50_by_rank": [
+          200002114,
+          200003625,
+          200004112,
+          200000607
+        ],
+        "p95_by_rank": [
+          200726454,
+          200690413,
+          200689182,
+          200719321
+        ],
+        "max": 214286087,
+        "missed_deadlines": 0
+      },
+      "source_max_known_age_ns": {
+        "process": 975135107,
+        "cache": 975135107,
+        "container": 971111822,
+        "rank0_endpoint": 988338566,
+        "logs_and_oom": 5119275984
+      },
+      "limitations": [
+        "Sampled minima do not guarantee unsampled headroom.",
+        "Rank 0's sampled minimum was 284667904 bytes (271.48 MiB) above the guard; this is not a guaranteed between-sample lower bound.",
+        "Host samples are approximately 200 ms, while process/cache sources are cached for about one second and log/OOM sources for about five seconds.",
+        "One initial OOM sample per rank is unknown; unknown is not treated as zero.",
+        "Host, cgroup, cache and CUDA memory domains overlap or have different semantics and are not summed."
+      ]
+    },
+    "source_sha256": {
+      "checkpoint_report": "129472c590fe6cb17618af0e6aa208862ad599df9712b09f1fe6e44340f80660",
+      "campaign_state": "9f8780348c1cf42b6be5150a2aa882010adf907e8150087d4db8bd92e5d555a2",
+      "events": "c59a89d4992acb8b73ded3a98c3aef2661e07275dcbe40d4c82cd4f0d72543bd",
+      "telemetry_spans_by_rank": [
+        "1be5c7c52cf276222a7abdf76a9e39ebbe0832d79a88105130aa9813b6908a47",
+        "833a9e093a3e3b0450252f659b1df4b559a054c5b0f3858511bc9346c068d0b0",
+        "d40f9fe06435dae1a43f9c3c138bc94b2a4515d5de4a9886f51aa0294af78bdc",
+        "72ad9a33033b3c54e509c5ac985916eeb8e07ee3c0401b7fd17400485e5788e2"
+      ],
+      "shared_prefix_limited_diagnostic": "b9609f0c525728b3ab1180c5828eb030820087e54580e01ce84d9a59e6d46578",
+      "checkpoint_validator": "6fbe7b89b525174981fac6f8ce82b5005ba24c643fdb9cd9e8a9b29d15dcc40b"
+    },
+    "pending": [
+      "shared-prefix second larger publication proof",
+      "replacement-protocol cancellation cases",
+      "remaining combined, worker and slow-client fault cases",
+      "sustained soak",
+      "final restoration and identity verification",
+      "final native Rigmark suite",
+      "promotion decision"
+    ],
+    "limitations": [
+      "The campaign was active at capture; later work and the planned next controller transition are outside these immutable bytes.",
+      "Telemetry spans were copied sequentially to fixed per-file sizes; cross-rank wall-clock subtraction is not used.",
+      "Source-recorded legacy cancellation passes are not a full cancellation qualification.",
+      "No final restoration, soak, performance, or promotion claim is supported."
+    ]
+  },
+  "kv14_max_context_checkpoint_1": {
+    "status": "completed_bounded_checkpoint",
+    "outcome": "in_progress_unresolved",
+    "variant": "prefill-cache-trim-plus-prefill-step-cap-kv14",
+    "candidate_promoted": false,
+    "protected_operational_default_changed": false,
+    "runtime_identity": {
+      "tp4_env_sha256": "4114c7cb7c1223462fdb16ebb1bf9e6531b718d3ecdbc2fe8cdbd6efd2433611",
+      "worker_sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "scheduler_sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd",
+      "kv_cache_memory_bytes": 15032385536,
+      "kv_cache_gib": 14,
+      "comparison_pool_bytes": 17179869184,
+      "comparison_pool_gib": 16,
+      "resident_pool_reduction_bytes": 2147483648,
+      "resident_pool_reduction_percent": 12.5
+    },
+    "boot_evidence": {
+      "ranks_with_matching_identity": 4,
+      "rank_denominator": 4,
+      "max_model_len": 262144,
+      "gpu_kv_cache_tokens": 1194033,
+      "maximum_concurrency_at_max_model_len": 4.55,
+      "health_200": true,
+      "functional_gates_passed": 2,
+      "functional_gate_denominator": 2,
+      "gates_completed_seconds_after_independent_first_health_200": 18.284239053726196
+    },
+    "cases": {
+      "completed": 2,
+      "passing_repetitions": 6,
+      "failed_repetitions": 0,
+      "prompt_tokens": 262128,
+      "completion_tokens": 16,
+      "total_tokens": 262144,
+      "concurrency": 1,
+      "cold": {
+        "case": "context-262128-c1-cold",
+        "passing_repetitions": 3
+      },
+      "replay": {
+        "case": "context-262128-c1-replay",
+        "passing_repetitions": 3
+      }
+    },
+    "http_responses": {
+      "primary": 6,
+      "replay_seeds": 3,
+      "total": 9,
+      "integrity_passed": 9,
+      "integrity_denominator": 9,
+      "requirements": [
+        "HTTP 200 JSON response",
+        "262128 prompt tokens",
+        "16 completion tokens",
+        "262144 total tokens",
+        "length finish reason",
+        "ordered client timestamps",
+        "no recorded error or guard abort"
+      ]
+    },
+    "replay_evidence": {
+      "runs": 3,
+      "four_rank_same_digest_publication_and_restore_runs": 3,
+      "distinct_seed_digests": 3,
+      "publication_rank_events": 12,
+      "restore_rank_events": 12,
+      "publication_errors": 0,
+      "restore_errors": 0
+    },
+    "reservation_drain_evidence": {
+      "recorded_runs": 6,
+      "fresh_complete_zero_reservation_and_staging_rank_proofs": 24,
+      "rank_proof_denominator": 24
+    },
+    "resource_observation": {
+      "total_samples": 14028,
+      "stop_mem_available_bytes": 805306368,
+      "guard_breaches": 0,
+      "known_oom_samples": 14024,
+      "unknown_initial_oom_samples": 4,
+      "max_host_oom_kills_since_start": 0,
+      "max_cgroup_oom_kills_since_start": 0,
+      "max_cuda_allocator_retries": 0,
+      "max_earlyoom_kills": 0,
+      "cuda_oom_seen_since_start": false,
+      "ranks": [
+        {
+          "rank": 0,
+          "samples": 3507,
+          "mem_available_min_bytes": 2925760512,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "running_verified_samples": 3507,
+          "known_oom_samples": 3506,
+          "unknown_oom_samples": 1,
+          "cache_namespace_max_bytes": 5651628867
+        },
+        {
+          "rank": 1,
+          "samples": 3507,
+          "mem_available_min_bytes": 8315645952,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "running_verified_samples": 3507,
+          "known_oom_samples": 3506,
+          "unknown_oom_samples": 1,
+          "cache_namespace_max_bytes": 5727127093
+        },
+        {
+          "rank": 2,
+          "samples": 3507,
+          "mem_available_min_bytes": 8448114688,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "running_verified_samples": 3507,
+          "known_oom_samples": 3506,
+          "unknown_oom_samples": 1,
+          "cache_namespace_max_bytes": 5735515701
+        },
+        {
+          "rank": 3,
+          "samples": 3507,
+          "mem_available_min_bytes": 8476688384,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "running_verified_samples": 3507,
+          "known_oom_samples": 3506,
+          "unknown_oom_samples": 1,
+          "cache_namespace_max_bytes": 5519983179
+        }
+      ],
+      "source_max_known_age_ns": {
+        "container": 971251225,
+        "process": 973746806,
+        "cache": 973746806,
+        "rank0_endpoint": 979921548,
+        "logs_and_oom": 4955513438
+      }
+    },
+    "source_sha256": {
+      "checkpoint_manifest": "bae98eaa6ff9bd136ff3ada30fee699ff86b8d1c5d8bbf9b7003ed3f52738f56",
+      "checkpoint_files": {
+        "campaign": "afc485ad97dfa6197ff7111cda3d64bf6087ce169ce60081f7c66b51c3d834ed",
+        "config": "67041c5870264c06a7504db40ad5559463465023bd02bdedcdc2b375c3530db8",
+        "main_driver_source": "de228c80350684f6d8c6c109ef2ecec3bcca0976783e53348468a7146e151307",
+        "telemetry_by_rank": [
+          "39aeb2fb34bd363ec42a58cc06f5a53071a0311e7ff5a3f84c67c7a4bbc66a10",
+          "61060e65a49e325935fb4bb50f0f83e6644f38f3d9977f82d1de4daea7f5e117",
+          "5717fcfaac65a98d95d00be5f5d089f2672a9ec129c42c0f35ac4350a40aa182",
+          "91f3d3f30a40529f0bf360ce10e04380da8eea311f8c6826bf98d90f27d8fc41"
+        ]
+      },
+      "boot_receipts": {
+        "boot.json": "b9958b643c5c4d79824674afd708b4f16d5acaeb8c128414068e44c8f1777614",
+        "gates.json": "f2f2b84c47473a55beeb00e9e9e943c3ac98e96c6f305ef3c33ee5e254b6a0df",
+        "independent-health-observation.json": "a4f9de8ffc1d299006c730301402e0d968899e005bfb3314ed06a1f3c8bbe001",
+        "root-boot-signatures.json": "33beb56e51229348f144975b11a2e0a88909f8e44102f5eee4e0df779b82ada1",
+        "root-gate-verification.json": "142b9b7fb8e4ed4cc9f6ee6d8884efe980439b852831293cb883401d3ad3ce11",
+        "root-overlay-identity.json": "bfd1d8ab4ed193adf3b80d5d31c93135830727b16798faf6a520d520d58fe11e"
+      }
+    },
+    "limitations": [
+      "This checkpoint proves bounded C1 cold and replay behavior at the maximum token budget; it is not a native Rigmark performance result.",
+      "The 14 GiB and earlier 16 GiB observations came from different retained loads and epochs, so no paired memory delta or performance effect is claimed.",
+      "Sampled minima do not guarantee unsampled headroom; one initial OOM sample per rank is retained as unknown.",
+      "Queue waves, cancellation, remaining fault cases, sustained soak, final restoration, and the final native suite remain pending.",
+      "The candidate is unpromoted and the protected operational default is unchanged."
+    ]
+  },
+  "kv14_queue_cancellation_checkpoint_1": {
+    "status": "stopped_on_management_telemetry_guard",
+    "outcome": "in_progress_unresolved",
+    "variant": "prefill-cache-trim-plus-prefill-step-cap-kv14",
+    "candidate_promoted": false,
+    "protected_operational_default_changed": false,
+    "disjoint_from": "kv14_max_context_checkpoint_1",
+    "runtime_identity": {
+      "tp4_env_sha256": "4114c7cb7c1223462fdb16ebb1bf9e6531b718d3ecdbc2fe8cdbd6efd2433611",
+      "worker_sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "scheduler_sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd",
+      "campaign_driver_sha256": "1ff84dd0ed54c88fa99e016204304265877cfb6dbb14483539953fe871288226",
+      "kv_cache_memory_bytes": 15032385536,
+      "kv_cache_gib": 14
+    },
+    "cases": {
+      "persisted_runs": 13,
+      "passing_runs": 9,
+      "pending_runs": 3,
+      "failed_runs": 1,
+      "queue_wave_8": {
+        "status": "pass",
+        "passing_repetitions": 3,
+        "client_requests_per_repetition": 8,
+        "blocker_streams_per_repetition": 6
+      },
+      "queue_wave_16": {
+        "status": "pass",
+        "passing_repetitions": 3,
+        "client_requests_per_repetition": 16,
+        "blocker_streams_per_repetition": 6
+      },
+      "cancel_multi": {
+        "status": "pass",
+        "protocol_version": 2,
+        "passing_repetitions": 3,
+        "cancelled_targets": 12,
+        "successful_reissues": 3
+      },
+      "cancel_queue": {
+        "status": "pending",
+        "protocol_version": 2,
+        "pending_repetitions": 3,
+        "cancelled_targets": 3,
+        "blocker_streams": 18,
+        "successful_reissues": 3,
+        "reason": "global waiting depth was observed, but the cancelled request could not be tied to that queue position"
+      },
+      "queue_wave_32": {
+        "status": "fail",
+        "failed_repetitions": 1,
+        "wave_requests": 32,
+        "blocker_streams": 6,
+        "wave_http_200": 0,
+        "wave_guard_aborts": 32,
+        "guard_abort_cause": "safety_event",
+        "blockers_terminated": 6,
+        "post_abort_api_idle": true
+      }
+    },
+    "http_activity": {
+      "actual_inference_request_attempts": 185,
+      "queue_wave_client_attempts": 104,
+      "blocker_stream_attempts": 60,
+      "cancellation_target_attempts": 15,
+      "cancellation_reissue_attempts": 6,
+      "complete_json_responses_with_integrity": 78,
+      "complete_blocker_streams": 5,
+      "noncomplete_or_aborted_stream_attempts": 102,
+      "successful_queue_wave_json_responses": 72,
+      "successful_cancellation_reissue_json_responses": 6,
+      "queue_response_prompt_tokens": {
+        "512": 45,
+        "64000": 9,
+        "128000": 18
+      },
+      "queue_response_completion_tokens": 16,
+      "cancellation_reissue_prompt_tokens": 32000,
+      "cancellation_reissue_completion_tokens": 16,
+      "json_response_finish_reason": "length"
+    },
+    "resource_observation": {
+      "fresh_zero_drain_runs": 12,
+      "fresh_zero_drain_rank_proofs": 48,
+      "terminal_zero_resource_rank_observations": 4,
+      "queue_wave_32_has_post_case_drain_barrier": false,
+      "total_samples": 26867,
+      "known_oom_samples": 26867,
+      "unknown_oom_samples": 0,
+      "positive_new_oom_samples": 0,
+      "node_sampling_missed_deadlines": 0,
+      "max_observed_node_sample_interval_ns": 202129170,
+      "max_known_source_age_ns": 4930688302,
+      "ranks": [
+        {
+          "rank": 0,
+          "samples": 6719,
+          "mem_available_min_bytes": 2888753152,
+          "running_verified_samples": 6719,
+          "container_identity_values": 1,
+          "worker_identity_values": 1
+        },
+        {
+          "rank": 1,
+          "samples": 6716,
+          "mem_available_min_bytes": 8092450816,
+          "running_verified_samples": 6716,
+          "container_identity_values": 1,
+          "worker_identity_values": 1
+        },
+        {
+          "rank": 2,
+          "samples": 6716,
+          "mem_available_min_bytes": 8114991104,
+          "running_verified_samples": 6716,
+          "container_identity_values": 1,
+          "worker_identity_values": 1
+        },
+        {
+          "rank": 3,
+          "samples": 6716,
+          "mem_available_min_bytes": 8131723264,
+          "running_verified_samples": 6716,
+          "container_identity_values": 1,
+          "worker_identity_values": 1
+        }
+      ]
+    },
+    "management_telemetry_stop": {
+      "watchdog_threshold_seconds": 2.0,
+      "affected_ranks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "node_probe_cadence_continued": true,
+      "maximum_node_monotonic_gap_ns_in_incident_window": 201409402,
+      "cause": "unknown_shared_delivery_or_controller_receiver_gap",
+      "service_oom_observed": false,
+      "worker_death_observed": false,
+      "network_loss_proven": false,
+      "controller_disk_or_scheduler_stall_proven": false,
+      "case_status_preserved": "fail"
+    },
+    "source_sha256": {
+      "checkpoint_manifest": "d58caaee19e7449b7e8d01d1499e500478b954b48ff77d80770dc313a7c9aa37",
+      "checkpoint_validator": "4493bb3ea0fbd1b4d220dd58dde303da2e97c2e85c875b8135db30f74d0dbb7e",
+      "campaign": "f224ea2fcbebab22c11efd0e01955126688811e69421215d3c8453366c2673cb",
+      "events": "1ba497d1e7e66b6f09e979602aac6f618af3deee3eaafd4352d03d6ec7aae943",
+      "incident_analysis": "14bdbfa97c349b4db742066cbba997dbe4bf20b20de73c41ca43515a7b3f7faa",
+      "telemetry_by_rank": [
+        "339dfe17ed45512624725f75d24a828995eae2b0a7c8b58c63ca6c8924cac768",
+        "3cdbc52e163d6a37f403f54e335b7f801954a3a20a7f8d4053adf39e17884bcf",
+        "c0fec0b9b52d9f01e17950e56c55953081f07746077951eb88d728875d86a5af",
+        "683d1c44f737e5b2e46791daccd2b42399df3c7facd76f1e5ce9a73819771aee"
+      ]
+    },
+    "limitations": [
+      "This checkpoint begins after the prior KV14 maximum-context checkpoint and does not recount its six repetitions or nine responses.",
+      "The queue-wave-32 failure is preserved: all 32 wave requests were aborted by the fail-closed management telemetry guard.",
+      "Continuous node probe cadence rules out a node sampling pause, but the frozen evidence cannot distinguish a shared management transport pause from controller receiver scheduling or local append delay.",
+      "The final four telemetry samples show zero reservation and staging bytes, but queue-wave-32 lacks a post-case barrier and is not credited with a drain proof.",
+      "No service OOM or worker death was observed; absence of those events does not convert the failed case to a pass.",
+      "Remaining fault cases, sustained soak, final restoration, the final native suite and a promotion decision are not established here."
+    ]
+  },
+  "kv14_bounded_admission_checkpoint_1": {
+    "status": "overflow_checkpoint_complete_campaign_in_progress",
+    "outcome": "in_progress_unresolved",
+    "variant": "prefill-cache-trim-plus-prefill-step-cap-kv14-plus-bounded-admission",
+    "candidate_promoted": false,
+    "protected_operational_default_changed": false,
+    "disjoint_from": [
+      "kv14_max_context_checkpoint_1",
+      "kv14_queue_cancellation_checkpoint_1"
+    ],
+    "runtime_identity": {
+      "tp4_env_sha256": "be00c0ec7d8b436fbe6abf56f626577e56ec22b76a37c541125b39a9d09e8491",
+      "admission_source_sha256": "3909b20d57752e4e68035bfe81f35490fe2dd763bf65f089b08d20374d97c6db",
+      "admission_manifest_sha256": "f233cc5f5de8c37b86d358654e12e74e73824bbc519e08443a72cb5ce10b7349",
+      "worker_sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "scheduler_sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd",
+      "campaign_driver_sha256": "2d107b4707be15f48367a88b4d99bdc93ed43dc72c361e24d92189c7e2f08a41",
+      "kv_cache_memory_bytes": 15032385536,
+      "kv_cache_gib": 14,
+      "bounded_admission": {
+        "max_active": 6,
+        "max_queued": 128,
+        "max_body_bytes": 8388608,
+        "queue_timeout_seconds": 1800,
+        "request_timeout_seconds": 3600,
+        "body_idle_seconds": 30,
+        "send_idle_seconds": 30
+      }
+    },
+    "cases": {
+      "persisted_runs": 6,
+      "passing_runs": 6,
+      "max_context_c1_cold": {
+        "status": "pass",
+        "passing_repetitions": 3,
+        "prompt_tokens": 262128,
+        "completion_tokens": 16,
+        "actual_requests": 3
+      },
+      "admission_overflow": {
+        "status": "pass",
+        "passing_repetitions": 3,
+        "wave_requests_per_repetition": 150,
+        "blocker_streams_per_repetition": 6,
+        "accepted_wave_http_200_per_repetition": 128,
+        "explicit_queue_full_http_503_per_repetition": 22,
+        "wave_prompt_tokens": 512,
+        "blocker_prompt_tokens": 32000
+      },
+      "subsequent_persisted_cases": []
+    },
+    "request_accounting": {
+      "actual_inference_attempts": 471,
+      "accepted_http_200": 405,
+      "complete_json_responses_with_integrity": 387,
+      "complete_blocker_streams": 18,
+      "explicit_admission_queue_full_http_503": 66,
+      "other_errors_or_guard_aborts": 0,
+      "overflow_wave_requests": 450,
+      "overflow_accepted_wave_responses": 384,
+      "max_context_json_responses": 3
+    },
+    "admission_observation": {
+      "rank0_current_source_samples": 4836,
+      "rank0_total_samples": 4837,
+      "observed_maximum_active": 6,
+      "observed_maximum_waiting": 128,
+      "observed_maximum_inflight": 134,
+      "observed_rejected_full_total": 66,
+      "observed_rejected_queue_timeout_total": 0,
+      "observed_request_timeout_total": 0,
+      "observed_body_too_large_total": 0,
+      "observed_body_idle_total": 0,
+      "observed_send_idle_total": 0,
+      "admitted_total_is_request_denominator": false,
+      "admitted_total_scope": "all admitted POST traffic including tokenization calls"
+    },
+    "reservation_drain_evidence": {
+      "qualifying_runs": 6,
+      "fresh_complete_zero_reservation_and_staging_rank_proofs": 24,
+      "rank_proof_denominator": 24
+    },
+    "resource_observation": {
+      "total_samples": 19348,
+      "known_oom_samples": 19344,
+      "unknown_initial_oom_samples": 4,
+      "known_cuda_retry_samples": 19269,
+      "unknown_initial_cuda_retry_samples": 79,
+      "positive_oom_or_cuda_retry_samples": 0,
+      "node_sampling_missed_deadlines": 0,
+      "maximum_observed_node_interval_ns": 202568551,
+      "maximum_known_source_age_ns": 4952117916,
+      "ranks": [
+        {
+          "rank": 0,
+          "samples": 4837,
+          "mem_available_min_bytes": 2738782208,
+          "running_verified_samples": 4837,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "known_oom_samples": 4836,
+          "unknown_oom_samples": 1,
+          "known_cuda_retry_samples": 4836,
+          "unknown_cuda_retry_samples": 1,
+          "max_observed_node_interval_ns": 201746995,
+          "max_known_source_age_ns": 4930201254
+        },
+        {
+          "rank": 1,
+          "samples": 4837,
+          "mem_available_min_bytes": 8237555712,
+          "running_verified_samples": 4837,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "known_oom_samples": 4836,
+          "unknown_oom_samples": 1,
+          "known_cuda_retry_samples": 4811,
+          "unknown_cuda_retry_samples": 26,
+          "max_observed_node_interval_ns": 201495370,
+          "max_known_source_age_ns": 4936873128
+        },
+        {
+          "rank": 2,
+          "samples": 4837,
+          "mem_available_min_bytes": 8265936896,
+          "running_verified_samples": 4837,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "known_oom_samples": 4836,
+          "unknown_oom_samples": 1,
+          "known_cuda_retry_samples": 4811,
+          "unknown_cuda_retry_samples": 26,
+          "max_observed_node_interval_ns": 201788139,
+          "max_known_source_age_ns": 4952117916
+        },
+        {
+          "rank": 3,
+          "samples": 4837,
+          "mem_available_min_bytes": 8305766400,
+          "running_verified_samples": 4837,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "known_oom_samples": 4836,
+          "unknown_oom_samples": 1,
+          "known_cuda_retry_samples": 4811,
+          "unknown_cuda_retry_samples": 26,
+          "max_observed_node_interval_ns": 202568551,
+          "max_known_source_age_ns": 4947396386
+        }
+      ]
+    },
+    "active_follow_up": {
+      "case": "five-client maximum-context work",
+      "status": "in_progress_no_result_counted",
+      "completed_runs_counted": 0,
+      "live_observations_included": false,
+      "owner_extended_original_campaign_window": true,
+      "fixed_stop_time_inferred": false
+    },
+    "source_sha256": {
+      "checkpoint_manifest": "1362b550ac379097a11e3cd41bd2039ecb9747bc227545706f6a550b0bcbd14c",
+      "checkpoint_report": "21bae57f95059bc0b55585c892134c99a6313abcf0a3f9b6a17aae2f3400d8c7",
+      "checkpoint_validator": "dbb601073227adbd500ec904d45b4facdd32e72e96484c8542d37efc1a76183e",
+      "campaign": "b8fe058524be1f5e1b4f11b39a7b52ea3e6b7a710c6cfdc65094d59dc9aab704",
+      "events": "ebaca4f7090680f2f6050f57405500df02839032346920ef4490eddecd272b9f",
+      "driver_source": "2d107b4707be15f48367a88b4d99bdc93ed43dc72c361e24d92189c7e2f08a41",
+      "telemetry_by_rank": [
+        "c68932287e3bd1fa4703e7a4c44d755d9b545b7630ac7fd05a6bb1ec73671ec1",
+        "acd6e47f42b3c78820b0887cb34d230336ced8d9e17bf6c14170aedc7b5965fe",
+        "563a5bc9d99f0b387af9ff6f78486c7fa52d216a1f9b1102bb204d26e79074d4",
+        "08b0c7356c67a2e769a74aa26703d99243f8f2cd3ebad9371e30bde7491ad9b4"
+      ]
+    },
+    "limitations": [
+      "The overflow wave uses a shared 512-token prompt and the six blockers share a 32000-token prompt; this proves bounded-admission accounting, not 134 distinct long-context requests resident in model memory.",
+      "The cumulative admitted-total gauge includes all admitted POST traffic, including tokenization calls, and is diagnostic rather than a count of accepted inference requests.",
+      "OOM coverage is unknown in the first sample per rank; CUDA-retry evidence is unknown in the first rank-0 sample and first 26 samples on ranks 1-3. All covered values and all samples with a known value are zero.",
+      "No case after admission-overflow had a persisted run in the immutable cut.",
+      "Five-client maximum-context work is active but has no completed result here; no resident-request or preemption conclusion is drawn from it.",
+      "The owner explicitly extended the original campaign window; no fixed stop time is inferred.",
+      "This checkpoint is not a native performance result, sustained-soak completion, final restoration or promotion. The protected operational default is unchanged."
+    ]
+  },
+  "kv14_c5_max_context_cold_checkpoint_1": {
+    "status": "complete_three_pass_checkpoint",
+    "outcome": "in_progress_unresolved",
+    "variant": "prefill-cache-trim-plus-prefill-step-cap-kv14-plus-bounded-admission",
+    "candidate_promoted": false,
+    "protected_operational_default_changed": false,
+    "disjoint_from": "kv14_bounded_admission_checkpoint_1",
+    "runtime_identity": {
+      "tp4_env_sha256": "be00c0ec7d8b436fbe6abf56f626577e56ec22b76a37c541125b39a9d09e8491",
+      "admission_source_sha256": "3909b20d57752e4e68035bfe81f35490fe2dd763bf65f089b08d20374d97c6db",
+      "worker_sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "scheduler_sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd",
+      "loaded_campaign_driver_sha256": "239a65e3f5e3f9a3038afc1d44bc9b4889e754d751ed536279d310d4a8a27b13",
+      "campaign_config_sha256": "b42c4ff4ac8800a1de177ab81a0725b7c60924c8e44abae3f358274fa8e73b62",
+      "kv_cache_memory_bytes": 15032385536,
+      "kv_cache_gib": 14
+    },
+    "case": {
+      "id": "context-262128-c5-cold",
+      "status": "pass",
+      "passing_repetitions": 3,
+      "clients_per_repetition": 5,
+      "actual_http_requests": 15,
+      "http_200": 15,
+      "errors_or_guard_aborts": 0,
+      "prompt_tokens": 262128,
+      "completion_tokens": 16,
+      "total_tokens": 262144,
+      "finish_reason": "length",
+      "cold_prompt_distinctness": {
+        "source_reconstructed_generator_prefix_hashes": 15,
+        "distinct_generator_prefix_hashes": 15,
+        "prompt_bodies_captured": false,
+        "hash_scope": "loaded_driver_generator_prefix_contract"
+      },
+      "dispatch_spread_ns_by_repetition": [
+        9114000,
+        6919000,
+        7627000
+      ],
+      "five_client_overlap_ns_by_repetition": [
+        105647246000,
+        107000169000,
+        105347282000
+      ],
+      "latency_ns_by_repetition": [
+        [
+          105656360000,
+          205717920000,
+          306116529000,
+          405612734000,
+          495580632000
+        ],
+        [
+          107007088000,
+          206430426000,
+          301217883000,
+          400773050000,
+          493389349000
+        ],
+        [
+          105354909000,
+          205296282000,
+          304763971000,
+          403904910000,
+          494217035000
+        ]
+      ]
+    },
+    "reservation_drain_evidence": {
+      "qualifying_runs": 3,
+      "fresh_complete_zero_reservation_and_staging_rank_proofs": 12,
+      "rank_proof_denominator": 12
+    },
+    "scheduling_observation": {
+      "rank0_admission_active_max": 5,
+      "rank0_admission_waiting_max": 0,
+      "rank0_admission_inflight_max": 5,
+      "rank0_engine_requests_running_max": 2.0,
+      "rank0_engine_requests_waiting_max": 4.0,
+      "five_client_overlap_proven": true,
+      "five_engine_resident_requests_proven": false
+    },
+    "gpu_cache_usage_perc": {
+      "scope": "all_known_rank0_checkpoint_samples",
+      "samples": 8124,
+      "percentile_method": "nearest_rank",
+      "min": 0.0,
+      "p50": 0.24932975871313678,
+      "p90": 0.3994638069705094,
+      "p95": 0.45442359249329756,
+      "p99": 0.47050938337801607,
+      "max": 0.48257372654155495,
+      "joined_to_request_phases_across_hosts": false
+    },
+    "resource_observation": {
+      "total_samples": 32500,
+      "known_oom_samples": 32496,
+      "unknown_initial_oom_samples": 4,
+      "known_cuda_retry_samples": 32421,
+      "unknown_initial_cuda_retry_samples": 79,
+      "positive_oom_or_cuda_retry_samples": 0,
+      "node_sampling_missed_deadlines": 0,
+      "maximum_observed_node_interval_ns": 201655361,
+      "maximum_known_source_age_ns": 5048585816,
+      "ranks": [
+        {
+          "rank": 0,
+          "samples": 8125,
+          "mem_available_min_bytes": 4560814080,
+          "running_verified_samples": 8125,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "known_oom_samples": 8124,
+          "unknown_oom_samples": 1,
+          "known_cuda_retry_samples": 8124,
+          "unknown_cuda_retry_samples": 1
+        },
+        {
+          "rank": 1,
+          "samples": 8125,
+          "mem_available_min_bytes": 10178969600,
+          "running_verified_samples": 8125,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "known_oom_samples": 8124,
+          "unknown_oom_samples": 1,
+          "known_cuda_retry_samples": 8099,
+          "unknown_cuda_retry_samples": 26
+        },
+        {
+          "rank": 2,
+          "samples": 8125,
+          "mem_available_min_bytes": 10161168384,
+          "running_verified_samples": 8125,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "known_oom_samples": 8124,
+          "unknown_oom_samples": 1,
+          "known_cuda_retry_samples": 8099,
+          "unknown_cuda_retry_samples": 26
+        },
+        {
+          "rank": 3,
+          "samples": 8125,
+          "mem_available_min_bytes": 10156134400,
+          "running_verified_samples": 8125,
+          "container_identity_values": 1,
+          "worker_identity_values": 1,
+          "known_oom_samples": 8124,
+          "unknown_oom_samples": 1,
+          "known_cuda_retry_samples": 8099,
+          "unknown_cuda_retry_samples": 26
+        }
+      ]
+    },
+    "native_preemption_observation": {
+      "http_status": 200,
+      "num_preemptions_total": 0.0,
+      "supplementary_single_observation": true,
+      "continuous_coverage": false
+    },
+    "pending_follow_up": {
+      "five_client_long_decode": "pending",
+      "result_counted": false
+    },
+    "source_sha256": {
+      "checkpoint_manifest": "a323fae06c7376d347d752d67da111886c49b0c999045be5aea77b4c5928bf49",
+      "checkpoint_report": "ded48c1d7f6eacb04db2a562d89156057bfa46ca065fe4c2090a7f98e9b8b3fe",
+      "checkpoint_validator": "0608f4ccdacd46705b6ddf5f99617be17de364472dd0bc4eb4f78ab6c5f4dad1",
+      "capture": "2fd91adb9d83da0a8bca5e4bd24583cd5c01f59ea407bd802f5ebe73e6f1bad0",
+      "campaign": "ffea66f2601c4da3a617d5b88029eb4f635a0da6b4ca78e9b80aa1f2cc11144f",
+      "events": "e211a3d179b256abe735142a84d25afd02c1477b84aa17e074b2c03f8a286b2f",
+      "loaded_driver": "239a65e3f5e3f9a3038afc1d44bc9b4889e754d751ed536279d310d4a8a27b13",
+      "loaded_source_manifest": "bf2f288b699062cc8131be405504c74f003dda0f521782b5189904273c28dd3a",
+      "loaded_driver_receipt": "1e1e70e93de7031956e01c44d72c2322ce24f6afaccd648bba9f024520db87a3",
+      "configuration": "b42c4ff4ac8800a1de177ab81a0725b7c60924c8e44abae3f358274fa8e73b62",
+      "native_preemption_observation": "4d093782b5ca3da2b87d1e34f15bd8635d51998b19523720fb8b031660d2aa2a",
+      "telemetry_by_rank": [
+        "17be3e1e26647d99d780fa18df4f455130cf95fb79c5edcc2de492b2cd7e417f",
+        "6babeeb2dd34a145e6523392c3992a8da73aac533a3bb35d9606c2459fad58ff",
+        "9969a9fe214215c4d430e6f744e05a23d34e305f935681edf27b0fa19c192cfa",
+        "c89b2bc646c2c57619065064a8bde1d8c0e211b9d568a7e1e7c3370f9c872154"
+      ]
+    },
+    "limitations": [
+      "Five clients overlap at the client and admission layers, while sampled engine running reaches at most two; this does not prove five simultaneous resident engine requests.",
+      "The native preemption total is one supplementary read-only snapshot, not continuous preemption coverage.",
+      "GPU-cache percentiles cover all known rank-0 samples in the checkpoint epoch and are not joined to request phases across machine clocks.",
+      "The 15 distinct prompt-prefix hashes are reconstructed from the pinned loaded-driver generator contract; prompt bodies were not captured.",
+      "Sampled memory minima do not guarantee unsampled headroom.",
+      "The separate long-decode checkpoint does not extend this short-output checkpoint. Replay, native performance, sustained soak, final restoration and promotion are not established. The protected operational default is unchanged."
+    ]
+  },
+  "kv14_c5_long_decode_checkpoint_1": {
+    "status": "complete_three_pass_checkpoint",
+    "outcome": "in_progress_unresolved",
+    "variant": "prefill-cache-trim-plus-prefill-step-cap-kv14-plus-bounded-admission",
+    "candidate_promoted": false,
+    "protected_operational_default_changed": false,
+    "disjoint_from": [
+      "kv14_bounded_admission_checkpoint_1",
+      "kv14_c5_max_context_cold_checkpoint_1"
+    ],
+    "runtime_identity": {
+      "tp4_env_sha256": "be00c0ec7d8b436fbe6abf56f626577e56ec22b76a37c541125b39a9d09e8491",
+      "admission_source_sha256": "3909b20d57752e4e68035bfe81f35490fe2dd763bf65f089b08d20374d97c6db",
+      "worker_sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "scheduler_sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd",
+      "loaded_campaign_driver_sha256": "b4d722c94e1a8ac67e8792401c0d323f1153d27b7502a0162b140133e47480a2",
+      "campaign_config_sha256": "78cff2ba88584ad080de030bd21b88f88bd814e930641ac4df419f1ccd20b0bf",
+      "kv_cache_memory_bytes": 15032385536,
+      "kv_cache_gib": 14
+    },
+    "case": {
+      "id": "context-245760-c5-long-decode-cold",
+      "status": "pass",
+      "passing_repetitions": 3,
+      "clients_per_repetition": 5,
+      "actual_http_requests": 15,
+      "http_200": 15,
+      "successful_exact_responses": 15,
+      "errors_or_guard_aborts": 0,
+      "prompt_tokens": 245760,
+      "completion_tokens": 16384,
+      "total_tokens": 262144,
+      "finish_reason": "length",
+      "ignore_eos": true,
+      "distinct_prompt_hashes": 15,
+      "distinct_request_payload_hashes": 15,
+      "prompt_bodies_in_public_extract": false,
+      "dispatch_spread_ns_by_repetition": [
+        5131000,
+        9376000,
+        11181000
+      ],
+      "five_client_overlap_ns_by_repetition": [
+        1335026973000,
+        1602941181000,
+        1333176184000
+      ]
+    },
+    "retrospective_output_rate_diagnostic": {
+      "scope": "15 completed requests in three five-client waves",
+      "aggregate_formula": "sum output tokens divided by latest response finish minus earliest request start for each wave; inter-wave gaps excluded",
+      "request_formula": "16384 output tokens divided by each response finish minus request start; arithmetic mean over requests",
+      "wave_output_tokens": 81920,
+      "wave_seconds": [
+        2233.724726,
+        2299.812066,
+        2211.615644
+      ],
+      "aggregate_output_tokens_per_second_by_repetition": [
+        36.67416985023785,
+        35.62030185469946,
+        37.040794236668006
+      ],
+      "overall_output_tokens": 245760,
+      "summed_wave_seconds": 6745.152436,
+      "aggregate_output_tokens_per_second": 36.43505500162428,
+      "arithmetic_mean_request_tokens_per_second_by_repetition": [
+        10.203345759604858,
+        8.181599185566249,
+        10.251250192364397
+      ],
+      "arithmetic_mean_request_tokens_per_second": 9.5453983791785,
+      "request_tokens_per_second_min": 7.1240888417447525,
+      "request_tokens_per_second_max": 12.28934539144841,
+      "includes": [
+        "prefill",
+        "queueing",
+        "reasoning",
+        "preemption",
+        "decode"
+      ],
+      "pure_decode_rate": false,
+      "native_rigmark_result": false,
+      "promotion_metric": false,
+      "source_report_sha256": "98fb2ff075d6997ef69cc41928a2c2a827841350da6184e550cf1bca71722564",
+      "derivation_source_sha256": "80acad51cc5cf033ab3ab145484e77841d29cea95181a02b8528e82e98722882",
+      "derivation_result_sha256": "1654df6f733ff414c192c2e6717f317a5a0ae2d0f7136565dcac5776516a09b5"
+    },
+    "reservation_drain_evidence": {
+      "qualifying_runs": 3,
+      "fresh_complete_zero_reservation_and_staging_rank_proofs": 12,
+      "rank_proof_denominator": 12
+    },
+    "native_metrics": {
+      "sampling_interval_seconds": 1,
+      "composite_current_epoch_samples": 6820,
+      "known_counter_samples": 6820,
+      "unknown_counter_samples": 0,
+      "http_or_collection_error_samples": 0,
+      "malformed_metric_lines": 0,
+      "maximum_sample_interval_ns": 1102153000,
+      "sample_gaps_over_1_5_seconds": 0,
+      "requests_running_max": 4,
+      "requests_waiting_max": 4,
+      "requests_running_plus_waiting_max": 5,
+      "five_fully_resident_contexts_proven": false,
+      "preemption_counter": {
+        "first": 0,
+        "last": 22,
+        "positive_delta": 22,
+        "counter_resets": 0
+      },
+      "generation_counter_coverage": {
+        "starts_with_second_series": true,
+        "earlier_decode_rate_known": false,
+        "known_samples": 6146,
+        "generation_tokens_positive_delta": 230324,
+        "request_success_length_positive_delta": 15,
+        "request_success_abort_positive_delta": 0,
+        "request_success_error_positive_delta": 0,
+        "counter_resets": 0
+      }
+    },
+    "resource_observation": {
+      "total_samples": 138120,
+      "scope": "controller epoch through capture, including the tail after the third cache drain",
+      "post_third_drain_samples_per_rank": 243,
+      "rank0_capture_tail_after_final_response_seconds": 49.111154176,
+      "third_drain_clipping_changes_memory_minima_or_process_identities": false,
+      "third_rank0_admission_gauge_is_post_completion": false,
+      "cache_drain_proof_does_not_refresh_other_source_gauges": true,
+      "samples_per_rank": [
+        34530,
+        34530,
+        34530,
+        34530
+      ],
+      "mem_available_min_bytes_by_rank": [
+        3978424320,
+        9475051520,
+        9465421824,
+        9418985472
+      ],
+      "known_oom_samples": 138116,
+      "unknown_oom_samples": 4,
+      "known_cuda_retry_samples": 138041,
+      "unknown_cuda_retry_samples": 79,
+      "positive_oom_or_cuda_retry_samples": 0,
+      "node_sampling_missed_deadlines": 0,
+      "max_observed_node_interval_ns_by_rank": [
+        201547464,
+        286732853,
+        282419147,
+        279562491
+      ],
+      "stable_container_and_worker_identity_by_rank": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "rank0_admission_known_samples": 23729,
+      "rank0_admission_unknown_samples": 10801,
+      "rank0_engine_known_samples": 34529,
+      "rank0_engine_unknown_samples": 1
+    },
+    "rank0_post_drain_memory": [
+      {
+        "repetition": 1,
+        "mem_available_bytes": 5730828288,
+        "cuda_reserved_bytes_current": 102894665728
+      },
+      {
+        "repetition": 2,
+        "mem_available_bytes": 4028260352,
+        "cuda_reserved_bytes_current": 104532541440
+      },
+      {
+        "repetition": 3,
+        "mem_available_bytes": 5699284992,
+        "cuda_reserved_bytes_current": 102894665728
+      }
+    ],
+    "allocator_progression_diagnostic": {
+      "second_idle_rank0": {
+        "mem_available_mib": 3841.65,
+        "cuda_allocated_mib": 97023.63,
+        "cuda_reserved_mib": 99690,
+        "cache_reserved_bytes": 0,
+        "cache_staging_bytes": 0
+      },
+      "next_prefill_rank0": {
+        "mem_available_mib": 4673.15,
+        "cuda_allocated_mib": 97685.5,
+        "cuda_reserved_mib": 98568,
+        "cache_reserved_bytes": 0,
+        "cache_staging_bytes": 0
+      },
+      "interpretation": "The second idle retained more CUDA reserved memory; the subsequent prefill trim lowered reserved memory while current allocation increased. This is not immediate idle release and does not prove a stable plateau or persistent leak.",
+      "unified_memory_categories_summed": false
+    },
+    "source_sha256": {
+      "checkpoint_manifest": "3c841bb2e6da23e5b5881500abca2b53bc600d5ea3220fa2abeecd92d4c0469b",
+      "checkpoint_report": "98fb2ff075d6997ef69cc41928a2c2a827841350da6184e550cf1bca71722564",
+      "checkpoint_validator": "0fb5d44481622705aead32cbd94ddd0b1e59e3005c87b39d0231d1b069b63b76",
+      "campaign": "d0e93b50c5e915086a230ef906c7b8eb42e4df58edbbba0c4f899c0d8a8a8392",
+      "configuration": "78cff2ba88584ad080de030bd21b88f88bd814e930641ac4df419f1ccd20b0bf",
+      "loaded_driver": "b4d722c94e1a8ac67e8792401c0d323f1153d27b7502a0162b140133e47480a2",
+      "loaded_driver_receipt": "6234b44df9ba12b1606233cc592a3519e60ea1ee02cfcb12dda0e562b59ae12d",
+      "loaded_source_manifest": "49946279de180bd4dd911aa91a2e3f511ce0b2e9fde4a62b27c8723e4080aa4b",
+      "native_metrics_series": [
+        "26273de495295829f1b3529dec6b3f445863a06549751e43207b0d1f6974b0e7",
+        "8de2a82d6a70ddd1e92b19b463d0ca42a01665ae1e79c2addc69fe53a458c452"
+      ],
+      "telemetry_by_rank": [
+        "80433efa5951d67b9657777908c7420c8208bbe17a890a016d70d4db24b8738f",
+        "632f278ac49b52598c03343e59ece70f74b775692feb210ba9eee13aa451aa16",
+        "a1325dba7c948ddcc5ce4e38e66b736011ea677a10494d23b71aa3757e108f0c",
+        "108fb18f97daa43649c7d2c632a8dd812611ef80f1f4aa51d5bbefcad6f48314"
+      ]
+    },
+    "pending": [
+      "five-client replay",
+      "queue-attributed cancellation",
+      "remaining combined and worker fault cases",
+      "slow-client cases",
+      "sustained soak",
+      "final restoration and identity verification",
+      "final native Rigmark suite",
+      "promotion decision"
+    ],
+    "limitations": [
+      "Five client intervals overlap and sampled running-plus-waiting reaches five; this does not prove five simultaneous fully resident engine requests.",
+      "The one-second native series can miss subsecond transitions; its observed errors, malformed records, gaps and resets are reported explicitly.",
+      "Generation and finish-reason counters begin only with the second native series, so earlier decode rate is unknown.",
+      "Rank-0 admission state is unknown for 10801 samples and is not carried forward as a current gauge through that interval.",
+      "Sampled memory minima do not guarantee unsampled headroom; uncovered OOM and retry samples remain unknown.",
+      "The second-idle and next-prefill samples show retained CUDA reservation followed by trim and reuse, not immediate idle release, a proven stable plateau or a proven leak.",
+      "CUDA allocator, cgroup, process and host-memory views are not added together.",
+      "The output-rate diagnostic includes prefill, queueing, reasoning, preemption and decode; it is neither pure decode nor a native Rigmark promotion result.",
+      "Replay, sustained soak, final restoration, native performance and promotion remain unproven; the protected operational default is unchanged."
+    ]
+  },
+  "kv14_bounded_targeted_checkpoint_1": {
+    "status": "complete_three_pass_checkpoint",
+    "outcome": "in_progress_unresolved",
+    "variant": "prefill-cache-trim-plus-prefill-step-cap-kv14-plus-bounded-admission",
+    "candidate_promoted": false,
+    "protected_operational_default_changed": false,
+    "disjoint_from": [
+      "kv14_c5_long_decode_checkpoint_1",
+      "earlier_api_cache_checkpoint_3"
+    ],
+    "runtime_identity": {
+      "kv_cache_memory_bytes": 15032385536,
+      "kv_cache_gib": 14,
+      "loaded_campaign_driver_sha256": "b4d722c94e1a8ac67e8792401c0d323f1153d27b7502a0162b140133e47480a2",
+      "campaign_config_sha256": "78cff2ba88584ad080de030bd21b88f88bd814e930641ac4df419f1ccd20b0bf",
+      "admission_source_sha256": "3909b20d57752e4e68035bfe81f35490fe2dd763bf65f089b08d20374d97c6db",
+      "worker_sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "scheduler_sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd"
+    },
+    "selection": {
+      "selected_cases": 16,
+      "passing_repetitions_per_case": 3,
+      "recorded_runs": 48,
+      "run_status_counts": {
+        "pass": 48
+      },
+      "cases": [
+        "queue-wave-16",
+        "context-262128-c1-replay",
+        "cancel-multi",
+        "slow-client-slow-read",
+        "slow-client-suspended-read",
+        "slow-client-abandon",
+        "api-over-context",
+        "api-invalid-parameters",
+        "api-malformed-json",
+        "api-partial-upload",
+        "cache-checksum",
+        "cache-missing",
+        "cache-truncated",
+        "cache-enospc",
+        "cache-eio",
+        "cache-publication-interrupted"
+      ],
+      "deferred_by_owner_fast_finish_direction": [
+        "cancel-restore",
+        "combination-cache-eio-cancel-restore",
+        "queue-wave-32",
+        "queue-wave-64"
+      ],
+      "earlier_c5_and_queue8_results_included": false
+    },
+    "http_accounting": {
+      "total_inference_http_attempts": 144,
+      "exact_json_responses": 93,
+      "queue_wave_attempts": 48,
+      "queue_wave_http_200": 48,
+      "blocker_stream_attempts": 18,
+      "primary_json_attempts": 3,
+      "seed_json_attempts": 3,
+      "cancelled_stream_attempts": 12,
+      "reissue_json_attempts": 3,
+      "slow_client_stream_attempts": 9,
+      "api_protocol_attempts": 12,
+      "expected_api_4xx": 9,
+      "intentional_partial_upload_disconnects": 3,
+      "cache_store_seed_attempts": 18,
+      "cache_replay_attempts": 18,
+      "explicit_admission_queue_full": 0,
+      "explicit_admission_queue_timeout": 0
+    },
+    "reservation_drain_evidence": {
+      "qualifying_runs": 48,
+      "fresh_complete_zero_reservation_and_staging_rank_proofs": 192,
+      "rank_proof_denominator": 192,
+      "exact_telemetry_scan_matches": 192
+    },
+    "resource_observation": {
+      "total_samples": 35440,
+      "samples_per_rank": [
+        8860,
+        8860,
+        8860,
+        8860
+      ],
+      "mem_available_min_bytes_by_rank": [
+        4668162048,
+        10155859968,
+        10138165248,
+        10135093248
+      ],
+      "known_oom_samples": 35440,
+      "unknown_oom_samples": 0,
+      "known_cuda_retry_samples": 35440,
+      "unknown_cuda_retry_samples": 0,
+      "positive_oom_or_cuda_retry_samples": 0,
+      "node_sampling_missed_deadlines": 0,
+      "max_observed_node_interval_ns_by_rank": [
+        201725490,
+        283620003,
+        280121003,
+        280911156
+      ],
+      "stable_container_and_worker_identity_by_rank": [
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    "source_sha256": {
+      "checkpoint_manifest": "0a2e859b07f61be2df5e26ef4adde3e4f5999c6e202e5762e6b54b4c834dc56b",
+      "checkpoint_report": "087bdb1d0c99a900ab2d73c50e837dc899f0f416ab47a5da9720b70f472bdd2f",
+      "checkpoint_validator": "d34e4d28b28f06141b5f4fec3a031f5de5fefc72b954a70bbb71888768f3c7db",
+      "capture": "5d60cd7a970cd2b434df7de652577afe41746c380521dab56aef1202a4d1d2a8",
+      "campaign": "8f362cb406f5f7607e01592a415cee1ed4f9903b8163b18872d3bd14b6dc388d",
+      "events": "2732d794733a3fb8b9360f9d6ce930f211403f77bae556f47049a0e1a867de25",
+      "combination_cases": "5a524aa9dd2c076c14e71d7a58f876ac1c4a4c8c50210b4ad28da0462ba0541f",
+      "probe": "7918db81f5fa668a7c531e7c8f876eb96b9a9eda7a07b26bb1ae420a23f161bb",
+      "telemetry_by_rank": [
+        "d7c48b1514d25b19ac21e8520295f64c6cf21ba56f75b3744e514b7a632b9484",
+        "25599e35d9de0ad9a655b780a0493fcef37e6e04644e6082b0a90ec2e2514a1d",
+        "0704ff405e64c2ee6f57644c1879fb151cea84401ecf06fec9b78971ca703e7e",
+        "a3be264f4c2eaf3f91be7bb01099e63a8e8056de7a3ead0dd75d536f6c6cd940"
+      ]
+    },
+    "remaining": {
+      "core_targeted_selection": "complete_in_later_fast_finish_driver_summary",
+      "two_hour_mixed_soak": "in_progress_no_sealed_result_counted",
+      "final_restoration_and_identity": "pending",
+      "final_native_rigmark": "pending",
+      "default_integration": "pending",
+      "worker_faults": "deferred",
+      "larger_queue_waves": "deferred",
+      "combined_fault_permutations": "deferred"
+    },
+    "limitations": [
+      "The owner reduced this checkpoint from the original 20-case request after the first 16 cases reached three passes; deferred cases receive no status here.",
+      "API invalid-parameters combines empty messages with negative max_tokens, so its rejection does not isolate one condition.",
+      "Partial upload and slow-client cases prove their recorded recovery, health and drain behavior rather than a server-side rejection cause.",
+      "Cache fallback is inferred from same-digest response and publication receipts; exact internal corruption detection and autonomous self-healing are not proven.",
+      "ENOSPC and interrupted publication prove their recorded error boundaries; they do not prove that an affected digest was never served later.",
+      "Older ownership snapshots are not live evidence for this interval. Current-identity case events and exact fresh zero-drain scans provide the case-bound proof; repeated cached source status is not independently fresh on every host tick.",
+      "Sampled memory minima do not guarantee unsampled headroom. Host, cgroup, process and CUDA memory categories overlap and are not summed.",
+      "This checkpoint does not establish worker-fault coverage, soak completion, final restoration, native performance, default integration or promotion. The protected operational default is unchanged."
+    ]
+  },
+  "fast_finish_targeted_checkpoint_1": {
+    "status": "selected_targeted_complete_soak_failed",
+    "outcome": "in_progress_unresolved",
+    "variant": "prefill-cache-trim-plus-prefill-step-cap-kv14-plus-bounded-admission",
+    "candidate_promoted": false,
+    "protected_operational_default_changed": false,
+    "selection": {
+      "selected_case_count": 23,
+      "qualifying_repetitions": 69,
+      "required_successes_per_case": 3,
+      "success_rule": "successes_after_last_failure",
+      "exact_runtime_identity_required": true,
+      "exact_protocol_version_required": true,
+      "cases": [
+        "context-245760-c5-long-decode-cold",
+        "context-262128-c5-cold",
+        "context-262128-c5-replay",
+        "context-262128-c1-cold",
+        "admission-overflow",
+        "queue-wave-8",
+        "queue-wave-16",
+        "context-262128-c1-replay",
+        "cancel-multi",
+        "slow-client-slow-read",
+        "slow-client-suspended-read",
+        "slow-client-abandon",
+        "api-over-context",
+        "api-invalid-parameters",
+        "api-malformed-json",
+        "api-partial-upload",
+        "cache-checksum",
+        "cache-missing",
+        "cache-truncated",
+        "cache-enospc",
+        "cache-eio",
+        "cache-publication-interrupted",
+        "cancel-restore"
+      ],
+      "cancel_restore": {
+        "protocol_version": 2,
+        "qualifying_successes": 3
+      }
+    },
+    "runtime_identity": {
+      "kv_cache_memory_bytes": 15032385536,
+      "kv_cache_gib": 14,
+      "admission_source_sha256": "3909b20d57752e4e68035bfe81f35490fe2dd763bf65f089b08d20374d97c6db",
+      "worker_sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "scheduler_sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd"
+    },
+    "soak": {
+      "status": "sealed_fail",
+      "result_counted": true,
+      "result_counted_as_pass": false,
+      "required_duration_seconds": 7200,
+      "actual_duration_seconds": 2380.5492884849664,
+      "failure": "post-cancellation API-idle proof timed out with one established connection"
+    },
+    "deferred": {
+      "worker_faults": true,
+      "queue_wave_32": "incomplete_after_earlier_failure_and_two_later_passes",
+      "queue_wave_64": true,
+      "combined_fault_permutations": true
+    },
+    "pending": [
+      "passing two-hour mixed-soak result",
+      "candidate production verification",
+      "final native Rigmark suite",
+      "candidate integration",
+      "promotion decision"
+    ],
+    "source_sha256": {
+      "campaign_snapshot": "bd64744e09dce3152b4c2cefb57d95b3de804c32027158174daff95fdd7bc99e",
+      "driver_status_summary": "aebbea32def1f297d419456085f392fefb39ab5dc510094dd6da18924dbb7b98",
+      "campaign_driver": "242f5172e4c696e5fffc2f2be050993d4be931d12bd2133cb5654b07b1208ccd",
+      "campaign_configuration": "3c3931ab2a8e197fa29a85cd838d1b4d94fa4e6e49bda2bc28584e38798a4acb",
+      "soak_checkpoint_manifest": "5511fdbb750ef4b9fff3f32561e4668e6ac80e91a08d333c542601efefe2da6e",
+      "soak_checkpoint_report": "b50c3be60f6f8ce41c3eb25eebe8e10caa1539bc2c0b930310f2700497188fd1"
+    },
+    "limitations": [
+      "This is a driver-status summary using the campaign's success-selection rule and exact runtime/protocol matching, not an independent validation of every response.",
+      "C5 replay, queue-8 and cancel-restore are status-only in this extraction; no separate independent response/telemetry validator covers these nine successful repetitions.",
+      "Some repetitions span controller revisions. C5 replay and queue-8 have no case protocol version, so this summary does not independently verify unchanged pass criteria across revisions.",
+      "Cases overlap earlier sealed checkpoints, so no aggregate HTTP-attempt or response total is computed across them.",
+      "Queue wave 32 has two later passes after an earlier failure and remains incomplete and deferred; it is outside the 23 selected successful cases.",
+      "The first mixed soak is sealed FAIL after 2380.549 of 7200 required seconds and is not counted as passing.",
+      "The mixed soak is single-in-flight up to 64k; its partial run does not establish five-client endurance or absence of a slow leak below the memory guard.",
+      "Targeted selection completion and the separate protected-default recovery do not establish soak completion, candidate production verification, native performance, candidate integration or promotion."
+    ]
+  },
+  "kv14_first_mixed_soak_failure_1": {
+    "status": "fail",
+    "outcome": "in_progress_unresolved",
+    "variant": "prefill-cache-trim-plus-prefill-step-cap-kv14-plus-bounded-admission",
+    "candidate_promoted": false,
+    "protected_operational_default_changed": false,
+    "protocol": {
+      "version": 2,
+      "request_concurrency": 1,
+      "maximum_target_tokens": 64000,
+      "required_duration_seconds": 7200,
+      "actual_duration_seconds": 2380.5492884849664,
+      "receipt_wall_clock_span_seconds": 2348.180951
+    },
+    "receipt": {
+      "rows": 356,
+      "raw_row_type_counts": {
+        "growth": 153,
+        "replay": 153,
+        "cancel": 34,
+        "idle": 16
+      },
+      "credited_category_counts": {
+        "ordinary": 306,
+        "growth": 153,
+        "replay": 153,
+        "cancel": 33,
+        "idle": 16
+      },
+      "http_attempts": 340,
+      "http_status_200": 340,
+      "ordinary_http_errors": 0,
+      "ordinary_growth_replay_rows_not_credited": 0,
+      "maximum_successful_ordinary_http_latency_ns": 14991691000,
+      "maximum_gap_between_rows_ns": 35836987000
+    },
+    "failure_boundary": {
+      "attempt": 340,
+      "request_interrupted": true,
+      "request_terminated": true,
+      "post_cancel_proof_status": "fail",
+      "api_idle_reason": "API requests/connections did not prove idle",
+      "engine_requests_running": 0,
+      "engine_requests_waiting": 0,
+      "admission_requests_inflight": 0,
+      "connections_established": 1,
+      "memory_guard_triggered": false,
+      "worker_death_observed": false
+    },
+    "competing_traffic_observation": {
+      "source_class": "same_physical_controller_unknown_application",
+      "non_driver_chat_post_access_events": 5,
+      "access_log_status_200": 5,
+      "admission_admitted_total_before": 5477,
+      "admission_admitted_total_after": 5482,
+      "admission_admitted_total_delta": 5,
+      "event_times_utc": [
+        "12:50:02.874014",
+        "12:50:20.956409",
+        "12:50:21.122339",
+        "12:50:22.450102",
+        "12:50:28.184594"
+      ],
+      "evidence_coverage_utc": {
+        "start": "07:47:34.184254",
+        "end": "12:50:36.603507"
+      },
+      "events_are_access_log_not_stream_completion_timestamps": true,
+      "separate_host_or_user_proven": false,
+      "non_driver_inference_posts_observed_in_covered_c5_long_and_core_intervals": 0,
+      "periodic_non_inference_model_list_gets_observed": true,
+      "whole_campaign_exclusivity_proven": false,
+      "events_added_to_driver_http_denominator": false
+    },
+    "telemetry": {
+      "samples_total": 9544,
+      "samples_per_rank": [
+        2386,
+        2386,
+        2386,
+        2386
+      ],
+      "mem_available_min_bytes_by_rank": [
+        4807307264,
+        10306117632,
+        10297479168,
+        10240028672
+      ],
+      "stable_container_and_worker_identity_by_rank": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "node_sampling_missed_deadlines": 0,
+      "maximum_actual_interval_ns_by_rank": [
+        1000984626,
+        1001211292,
+        1001412042,
+        1001408694
+      ],
+      "oom_and_retry_coverage": {
+        "host_oom_known_samples": 9544,
+        "host_oom_delta": 0,
+        "cgroup_oom_known_samples": 9544,
+        "cgroup_oom_delta": 0,
+        "earlyoom_known_samples": 9540,
+        "earlyoom_unknown_samples": 4,
+        "cuda_retry_known_samples": 9525,
+        "cuda_retry_unknown_samples": 19,
+        "positive_values_in_known_samples": 0,
+        "complete_zero_event_interval_proven": false
+      },
+      "idle_windows": 16,
+      "first_before_to_last_after_mem_available_delta_bytes_by_rank": [
+        6578176,
+        4726784,
+        11624448,
+        13443072
+      ],
+      "rank0_first_idle_before": {
+        "mem_available_bytes": 5740609536,
+        "cgroup_anon_bytes": 10129821696,
+        "cuda_allocated_bytes_current": 101736654336,
+        "cuda_reserved_bytes_current": 102829654016
+      },
+      "rank0_last_idle_after": {
+        "mem_available_bytes": 5747187712,
+        "cgroup_anon_bytes": 10127613952,
+        "cuda_allocated_bytes_current": 101736654336,
+        "cuda_reserved_bytes_current": 102829654016
+      },
+      "terminal_final_proof_memory": {
+        "context": "after_interrupted_cancel_and_five_competing_post_access_events",
+        "last_idle_receipt_finished_ns": 1790686120669090000,
+        "cause_inferred_from_endpoint": false,
+        "persistent_leak_inferred_from_endpoint": false,
+        "ranks": [
+          {
+            "rank": 0,
+            "last_idle_sample_time_ns": 1790686120183264017,
+            "final_sample_time_ns": 1790686235183222257,
+            "seconds_after_last_idle_sample": 114.99995824,
+            "mem_available_bytes": 5584936960,
+            "mem_available_delta_from_last_idle_bytes": -162250752,
+            "cgroup_anon_bytes": 10125692928,
+            "cgroup_anon_delta_from_last_idle_bytes": -1921024,
+            "cuda_allocated_bytes_current": 101736654336,
+            "cuda_allocated_delta_from_last_idle_bytes": 0,
+            "cuda_reserved_bytes_current": 102957580288,
+            "cuda_reserved_delta_from_last_idle_bytes": 127926272,
+            "source_age_ns": {
+              "host": 0,
+              "container": 961047860,
+              "endpoint": 966808323,
+              "process": 961824225,
+              "cache": 961824225,
+              "logs_and_oom": 2888936809,
+              "admission": 2888936809,
+              "cuda": 674667796
+            }
+          },
+          {
+            "rank": 1,
+            "last_idle_sample_time_ns": 1790686120170588514,
+            "final_sample_time_ns": 1790686235170751982,
+            "seconds_after_last_idle_sample": 115.000163468,
+            "mem_available_bytes": 11097288704,
+            "mem_available_delta_from_last_idle_bytes": -154529792,
+            "cgroup_anon_bytes": 5245788160,
+            "cgroup_anon_delta_from_last_idle_bytes": -3072000,
+            "cuda_allocated_bytes_current": 101736654336,
+            "cuda_allocated_delta_from_last_idle_bytes": 0,
+            "cuda_reserved_bytes_current": 102955483136,
+            "cuda_reserved_delta_from_last_idle_bytes": 127926272,
+            "source_age_ns": {
+              "host": 0,
+              "container": 955867553,
+              "endpoint": null,
+              "process": 956111762,
+              "cache": 956111762,
+              "logs_and_oom": 2826176892,
+              "admission": null,
+              "cuda": 283202118
+            }
+          },
+          {
+            "rank": 2,
+            "last_idle_sample_time_ns": 1790686120188262313,
+            "final_sample_time_ns": 1790686235187960800,
+            "seconds_after_last_idle_sample": 114.999698487,
+            "mem_available_bytes": 11109675008,
+            "mem_available_delta_from_last_idle_bytes": -132857856,
+            "cgroup_anon_bytes": 5249245184,
+            "cgroup_anon_delta_from_last_idle_bytes": -2138112,
+            "cuda_allocated_bytes_current": 101736654336,
+            "cuda_allocated_delta_from_last_idle_bytes": 0,
+            "cuda_reserved_bytes_current": 102957580288,
+            "cuda_reserved_delta_from_last_idle_bytes": 127926272,
+            "source_age_ns": {
+              "host": 0,
+              "container": 950698341,
+              "endpoint": null,
+              "process": 951290884,
+              "cache": 951290884,
+              "logs_and_oom": 2813411870,
+              "admission": null,
+              "cuda": 1052282464
+            }
+          },
+          {
+            "rank": 3,
+            "last_idle_sample_time_ns": 1790686120195452317,
+            "final_sample_time_ns": 1790686235195401406,
+            "seconds_after_last_idle_sample": 114.999949089,
+            "mem_available_bytes": 11035512832,
+            "mem_available_delta_from_last_idle_bytes": -159506432,
+            "cgroup_anon_bytes": 5237952512,
+            "cgroup_anon_delta_from_last_idle_bytes": -8232960,
+            "cuda_allocated_bytes_current": 101736654336,
+            "cuda_allocated_delta_from_last_idle_bytes": 0,
+            "cuda_reserved_bytes_current": 102955483136,
+            "cuda_reserved_delta_from_last_idle_bytes": 127926272,
+            "source_age_ns": {
+              "host": 0,
+              "container": 953313656,
+              "endpoint": null,
+              "process": 953756823,
+              "cache": 953756823,
+              "logs_and_oom": 2846025364,
+              "admission": null,
+              "cuda": 416099522
+            }
+          }
+        ],
+        "all_present_source_statuses_current": true,
+        "endpoint_and_admission_are_rank0_only": true,
+        "spark_reserved_and_staging_bytes_by_rank": [
+          [0, 0],
+          [0, 0],
+          [0, 0],
+          [0, 0]
+        ],
+        "cuda_reserved_within_observed_run_range_by_rank": [
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "memory_views_are_nonadditive": true
+    },
+    "final_proof": {
+      "status": "pass_after_source_failure",
+      "health_200": true,
+      "api_idle": true,
+      "fresh_complete_zero_reservation_and_staging_rank_proofs": 4,
+      "changes_source_failure_to_pass": false
+    },
+    "plot_export": {
+      "rows": 9544,
+      "missing_values_are_empty_and_not_forward_filled": true,
+      "receipt_phase_sample_counts": {
+        "growth_request": 4833,
+        "replay_request": 984,
+        "cancel_request": 504,
+        "idle": 1920,
+        "unclassified": 1303
+      },
+      "exact_drain_proof_sample_counts": {
+        "cancel_drain": 132,
+        "final_drain": 4
+      },
+      "controller_to_node_wall_clock_offset_measured": false,
+      "driver_phase_labels_include_competing_client_intervals": false,
+      "direct_server_gauges_can_reflect_competing_clients": true
+    },
+    "restoration_after_failure": {
+      "campaign_restoration_status": "fail",
+      "protected_16_gib_recipe_requested": true,
+      "functional_gates_passed": true,
+      "identity_verification_passed": false,
+      "controller_exit_code": 1,
+      "full_group_shutdown_completed": true,
+      "final_restoration_verified": false,
+      "diagnosis": {
+        "original_auxiliary_verifier_output_retained": false,
+        "original_leaf_failure_directly_proven": false,
+        "static_repeat_reproduced_rank3_need_daemon_reload": true,
+        "reproduced_verifier_row": "systemd daemon reload",
+        "fabric_unit_sha256": "0a08578435d0fbb33553a5d1d8cf847725a3c74a66ed829730fa9c7c1f337ade",
+        "unit_bytes_match_expected_all_four_ranks": true,
+        "rank3_dropins_present": false,
+        "daemon_reload_changed_unit_script_or_environment_bytes": false,
+        "daemon_reload_changed_active_enter_timestamp": false,
+        "need_daemon_reload_after": false,
+        "fresh_quick_verify_passed": true,
+        "historical_trigger_for_reload_requirement": "unknown",
+        "first_raw_iptables_hash_fail_receipt_preserved": true,
+        "counter_normalized_post_reload_rules_match": true,
+        "pre_reload_rules_reconstructed": false
+      },
+      "separate_protected_default_recovery": {
+        "status": "pass",
+        "controller_exit_code": 0,
+        "recipe": "protected_16_gib_default",
+        "candidate_recipe_loaded": false,
+        "health_time_seconds": 1790688524.5210292,
+        "finish_time_seconds": 1790688533.085876,
+        "functional_gates_passed": true,
+        "functional_gate_elapsed_seconds": 3.7,
+        "plain_identity_check": "2026-09-29-sparkcache-protected CHECK PASS",
+        "current_service_online": true,
+        "rewrites_failed_campaign_restoration": false,
+        "candidate_production_verification": false,
+        "final_native_measurement": false
+      }
+    },
+    "source_sha256": {
+      "checkpoint_manifest": "5511fdbb750ef4b9fff3f32561e4668e6ac80e91a08d333c542601efefe2da6e",
+      "checkpoint_report": "b50c3be60f6f8ce41c3eb25eebe8e10caa1539bc2c0b930310f2700497188fd1",
+      "campaign_driver": "242f5172e4c696e5fffc2f2be050993d4be931d12bd2133cb5654b07b1208ccd",
+      "campaign_configuration": "3c3931ab2a8e197fa29a85cd838d1b4d94fa4e6e49bda2bc28584e38798a4acb",
+      "campaign_state": "22e0480186ad85001deb09e494a02d1b116b239a2f715b18b300a40a4247af26",
+      "receipt": "18769b34df61e7afc8f63920fb971b2dafdc2445ca83d43436be30f8246b0be7",
+      "plot_csv": "10304313ce26d3a33aad1e89fe707848a23305a3e4a621810c6403a741dd5600",
+      "telemetry_by_rank": [
+        "f716084d2ae8d4e17ccdae2c44b46853042d31a4230912be596052ac00862534",
+        "f7945e25b755d588591cfc5b730bacbf3a64687655bcb3c7bdc89535ae2682be",
+        "8bed25201ad0c70cbcc11b2598f96d15258c3ce1e33a8424ace4a6c896f4f148",
+        "1ab5a83f8de90b5c0a68d83c0d84595c83b442cdc57bb60fd348890c652dfaef"
+      ],
+      "competing_traffic_access_evidence": "69267f1ca68d99cc098c3cbfb2283fc0d59be70a46842eb6acbce369840e73bb",
+      "restoration_adjudication": "2c12aaffda3d8643fe9c13432749119e1a6d1456c92e24b35b228c0e6714d090",
+      "rank3_daemon_reload_receipt": "ff1ee5ccdca9098e14afaedabf36f6d98b977354709d098cdd45ede6a552998c",
+      "rank3_verify_after_receipt": "561f426d95cf528973c54f08f5678d638cc59344332cc9e904da2134e9e8f851",
+      "separate_default_recovery_boot": "b041f69daa5d2c72f5f1927c098783bfebdfda4c4aa92f56f217fa221e12d345",
+      "separate_default_recovery_gates": "893fb7ba3c831ca3cdd032e5e1822da19e2b221813090898b69b039f13fbd9fa",
+      "separate_default_recovery_identity": "c438e6f5407d263a80a7e9490fcf0cf6079dda49c7cf24c596f2c12e08adffc0",
+      "separate_default_recovery_identity_report": "e8960a2c286f20260062ffe7fa8798a2c513046b6ed0e53eb60bc6d38a9ac7d0"
+    },
+    "limitations": [
+      "The run ended after 2380.549 of 7200 required seconds and is a failure; the later final proof does not change it to pass.",
+      "Five non-driver chat POST access events overlap the terminal window, but the source application and exact connection owner at the failed sample are unknown.",
+      "The access events are not guaranteed stream-completion timestamps and are excluded from the driver's 340-attempt denominator.",
+      "The plotting CSV joins driver wall-clock intervals to node wall clocks without measured offset and cannot assign competing traffic to driver phases.",
+      "Earlyoom and CUDA-retry coverage have explicit unknown samples; only known samples support the zero-positive observation.",
+      "The interrupted 40-minute interval and its terminal endpoint neither demonstrate a persistent memory leak nor prove leak immunity.",
+      "Host, cgroup, process and CUDA allocator memory views overlap and are not summed.",
+      "The failed campaign restoration remains failed. A separate protected-default recovery is healthy and identity-verified, but does not verify the candidate in production.",
+      "Candidate production verification, the final native suite, candidate integration and promotion remain unresolved."
+    ]
+  },
+  "kv14_owner_stopped_mixed_soak_2": {
+    "status": "owner_stopped",
+    "outcome": "in_progress_unresolved",
+    "variant": "prefill-cache-trim-plus-prefill-step-cap-kv14-plus-bounded-admission",
+    "candidate_promoted": false,
+    "classification": "owner-authorized early closure; neither technical failure nor 7200-second pass",
+    "protocol": {
+      "version": 2,
+      "request_concurrency": 1,
+      "maximum_target_tokens": 64000,
+      "required_duration_seconds": 7200,
+      "actual_duration_seconds": 5939.261920659919,
+      "required_duration_completed": false,
+      "receipt_wall_clock_span_seconds": 5930.291914
+    },
+    "receipt": {
+      "rows": 881,
+      "raw_row_type_counts": {
+        "growth": 378,
+        "replay": 378,
+        "cancel": 84,
+        "idle": 41
+      },
+      "generation_requests_submitted": 840,
+      "ordinary_requests_completed": 756,
+      "cancellations_completed_with_exact_drain": 84,
+      "failed_or_incomplete_generation_requests": 0,
+      "http_attempts": 840,
+      "http_status_200": 840,
+      "ordinary_http_errors": 0,
+      "maximum_successful_ordinary_http_latency_ns": 16754484000,
+      "maximum_gap_between_rows_ns": 30368218000,
+      "denominator": "submitted growth, replay, and cancellation generation requests; idle, health, metrics and tokenization are excluded"
+    },
+    "drain_evidence": {
+      "exact_cancel_drain_proofs_per_rank": [
+        84,
+        84,
+        84,
+        84
+      ],
+      "exact_final_drain_proofs_per_rank": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "missing_or_ambiguous_proofs": 0,
+      "final_health_200": true,
+      "final_api_idle": true,
+      "final_zero_reservation_and_staging_all_ranks": true
+    },
+    "telemetry": {
+      "samples_total": 24599,
+      "samples_per_rank": [
+        6150,
+        6149,
+        6150,
+        6150
+      ],
+      "mem_available_known_samples_per_rank": [
+        6150,
+        6149,
+        6150,
+        6150
+      ],
+      "mem_available_unknown_samples_per_rank": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "mem_available_min_bytes_by_rank": [
+        3313426432,
+        8552247296,
+        8571740160,
+        8505368576
+      ],
+      "final_drain_mem_available_bytes_by_rank": [
+        6215430144,
+        11327234048,
+        11360915456,
+        11311300608
+      ],
+      "idle_after_mem_available_bytes_by_rank": {
+        "first": [
+          4301230080,
+          9575157760,
+          9563598848,
+          9510567936
+        ],
+        "middle": [
+          6282166272,
+          11366920192,
+          11399434240,
+          11305046016
+        ],
+        "last": [
+          6255767552,
+          11375915008,
+          11383574528,
+          11332726784
+        ]
+      },
+      "stable_container_and_worker_identity_by_rank": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "maximum_actual_interval_ns_by_rank": [
+        1001727887,
+        1001625726,
+        1001787135,
+        1001406491
+      ],
+      "sampling_gaps_over_twice_target_by_rank": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "oom_and_retry_coverage": {
+        "host_oom_known_samples": 24599,
+        "host_oom_unknown_samples": 0,
+        "host_oom_delta": 0,
+        "cgroup_oom_known_samples": 24599,
+        "cgroup_oom_unknown_samples": 0,
+        "cgroup_oom_delta": 0,
+        "earlyoom_known_samples_per_rank": [
+          6148,
+          6147,
+          6148,
+          6148
+        ],
+        "earlyoom_unknown_samples_per_rank": [
+          2,
+          2,
+          2,
+          2
+        ],
+        "cuda_retry_known_samples_per_rank": [
+          6148,
+          6117,
+          6118,
+          6123
+        ],
+        "cuda_retry_unknown_samples_per_rank": [
+          2,
+          32,
+          32,
+          27
+        ],
+        "positive_values_in_known_samples": 0,
+        "complete_zero_event_interval_proven": false
+      },
+      "memory_views_are_nonadditive": true,
+      "missing_values_forward_filled": false
+    },
+    "memory_interpretation": {
+      "observed_pattern": "available memory increased between the first and middle idle observations and remained similar at the last idle observation",
+      "persistent_leak_inferred": false,
+      "leak_immunity_proven": false,
+      "causal_mechanism_identified": false
+    },
+    "cache_policy_scope": {
+      "test_namespace_budget_bytes": 3221225472,
+      "test_namespace_eviction_target_bytes": 2147483648,
+      "protected_production_controls": [
+        0,
+        0
+      ],
+      "test_result_generalizes_to_production_disk_growth": false,
+      "zero_active_reservation_and_staging_is_a_disk_usage_bound": false
+    },
+    "portable_graph": {
+      "csv_rows": 24599,
+      "x_axis": "cumulative submitted growth, replay, and cancellation requests",
+      "y_axis": "MemAvailable bytes from current host samples",
+      "under_load_join": "uncalibrated node/controller wall clock",
+      "drain_join": "exact raw sample identity and proof scan",
+      "png": "../../../plots/experiments/2026-09-29-sparkcache-resilience/requests-vs-memavailable.png",
+      "svg": "../../../plots/experiments/2026-09-29-sparkcache-resilience/requests-vs-memavailable.svg",
+      "portable_data": "portable-data/",
+      "matplotlib_version": "3.11.2"
+    },
+    "source_sha256": {
+      "sealed_manifest": "9729e658400cdb1ea221d67c5c3802a6c67a46a13e9f36dd178536da9d85c29e",
+      "sealed_report": "c5660ecb2fb01b03c75b09ecc010a3ac34eb56e0666ced6dd9facb5f2e96fe55",
+      "soak_receipt": "6bc0d4138f2ab51e9e020042f0d23144a6406632356df4a6252e1591e1128353",
+      "campaign_driver": "242f5172e4c696e5fffc2f2be050993d4be931d12bd2133cb5654b07b1208ccd",
+      "campaign_configuration": "3c3931ab2a8e197fa29a85cd838d1b4d94fa4e6e49bda2bc28584e38798a4acb",
+      "portable_manifest": "c6fd2f86c0961d8575c2ac0b4aad5e43a33c8d2f5a093a782fe4c94d79ec0dc3",
+      "portable_summary": "3ecfe9289f6be92db3961f01bbd275c9ec683ef4b7d5b132e89ae6c096d89de3",
+      "portable_csv": "ae46d8cd871002f10f5a5c8a4703b71c1353ae6655f216695b60d1346e69b598",
+      "portable_png": "7bbc6c18d3e0a1b0d50ec0e58841eb0ef16ddbb161d24e1117fb6fb11fb981c0",
+      "portable_svg": "b0d861000c360520b733af4b2a38a4bba27e3ca19cc190b82818cae65eaa866d"
+    },
+    "limitations": [
+      "The owner ended the run before 7200 seconds; it is not a two-hour soak pass.",
+      "The run used one in-flight request at a time and does not add concurrent-request endurance evidence.",
+      "Earlyoom and CUDA-retry coverage contain explicit unknown samples; only known samples support the zero-positive observation.",
+      "Under-load receipt/sample joins use uncalibrated node/controller wall clocks; exact drain markers use raw sample and proof identities.",
+      "Sampled pause stabilization neither identifies a cause nor proves leak immunity.",
+      "The test namespace eviction settings do not establish protected-production disk growth behavior.",
+      "Candidate production verification, the final native suite, integration and promotion remain unresolved."
+    ]
+  }
+}

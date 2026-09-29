@@ -83,31 +83,41 @@ Then verify these signatures that `docker ps` does not prove:
 | Host IOMMU tier | `deploy-host.sh ... tp4-iommu.sh --status` | passthrough on all four ranks, drop-in installed, GRUB synchronized |
 | NCCL HCA/GID selection | `./scripts/verify-node.sh` | every configured HCA has an active IPv4-mapped RoCEv2 GID on its addressed fabric netdev; explicit index or automatic `-1` mode is identified |
 | Adaptive scheduler | rank-0 log | `AdaptiveKScheduler active (enabled=1 … mode=batch-uniform engine_k=7 async=True)` and a `num_speculative_tokens_per_batch_size` table in engine initialization |
-| E28b draft length and KV pool | rank-0 log, `docker inspect`, `./scripts/check-f0.py` | `num_spec_tokens=7` and `cudagraph_capture_sizes` ending at 72 in engine initialization, `engine_k=7` in the draft-budget line, `VLLM_ADAPTIVE_K_HI=7` and `--compilation-config={"max_cudagraph_capture_size":72}` on every rank, `--kv-cache-memory-bytes=17179869184`, and `GPU KV cache size: 1,365,066 tokens` (5.21x at 262,144) |
+| Draft length and operational KV pool | rank-0 log, `docker inspect`, `./scripts/check-f0.py` | `num_spec_tokens=7`, `engine_k=7`, CUDA graph ceiling 72, `--kv-cache-memory-bytes=15032385536`, and `GPU KV cache size: 1,194,033 tokens` (4.55x at 262,144); five full maximum contexts cannot be resident together |
 | SparkCache lane | `docker inspect`, `./scripts/verify-node.sh` | `--kv-transfer-config` naming `SparkContextCacheConnector` in the command, entrypoint `/opt/sircl-serving/entrypoint.sh`, the connector, encoder, engine override and SIRCL mounts present, `sparkcache payload` and `sircl payload` rows PASS; `docker ps` shows no health state because the lane runs with `--no-healthcheck` |
-| Hybrid KDA and KV pool | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E20_KDA_INPUT_W8A16_READY` on every rank: 34 modules, group 128, padded N=6400, threshold 2048, shared scratch 51,515,392 bytes; `--kv-cache-memory-bytes=16106127360`; matching source hashes and `E20_MEMORY_PROBE` records |
+| Hybrid KDA | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E20_KDA_INPUT_W8A16_READY` on every rank: 34 modules, group 128, padded N=6400, threshold 2048, shared scratch 51,515,392 bytes; matching source hashes and `E20_MEMORY_PROBE` records |
 | E21 residual projections | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E21_BF16_RESIDUE_W8A16_READY` on every rank: 67 modules in the `kda_o_proj`, `mla_fused_qkv_a_proj`, `mla_o_proj` and `mla_q_b_proj` families, `mla_layout=q_lora`, group 128, threshold 2048, added scratch 79,691,776 bytes; `VLLM_E21_BF16_RESIDUE_W8A16=1` and matching `experiments/e03/bf16-residue/` source hashes |
 | E22b drafter conversion | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E22_DRAFTER_W8A16_READY` on every rank: 30 modules in the `down_proj`, `gate_up_proj`, `kernel_projection`, `o_proj` and `qkv_proj` families, `context_kv_w8a16` false, 0 added scratch bytes; `VLLM_E22_DRAFTER_W8A16=1`, `VLLM_E22_CONTEXT_KV_W8A16=0` and matching `experiments/e03/drafter-w8a16/` source hashes; the drafter CUDA graphs are captured fresh at every boot |
 | E27 prefill cadence | `docker inspect`, `./scripts/check-f0.py` | `--prefill-schedule-interval 8` exactly once in every rank's command; no boot log line, because the argument is native to the image |
 | E27c scheduler | rank-0 logs, `docker inspect`, `./scripts/check-f0.py` | `E27C_CADENCE_WHEN_QUEUED_READY interval=8` and `E27B_SHORT_PREFILL_READY tokens=2048 interval=8` on rank 0; `VLLM_E27B_SHORT_PREFILL_TOKENS=2048`, `VLLM_E27C_CADENCE_WHEN_QUEUED=1` and the E29 scheduler below (which contains the E27c patch) mounted over `vllm/v1/core/sched/scheduler.py` on every rank; `E27C_CADENCE_KEPT_WHILE_QUEUED` appears the first time long prompts are queued while others decode |
 | E29 end-drain and idle coalescing | rank-0 logs, `docker inspect`, `./scripts/check-f0.py` | `E29_END_DRAIN_READY trace=0` and `E29_IDLE_COALESCE_READY ms=4 trace=0` on rank 0; `VLLM_E29_END_DRAIN=1`, `VLLM_E29_IDLE_COALESCE_MS=4` and `VLLM_E29_TRACE=0` on every rank, with the `experiments/e03/end-drain/scheduler.py` hash mounted over `vllm/v1/core/sched/scheduler.py` and the `experiments/e03/end-drain/core.py` hash over `vllm/v1/engine/core.py`; the first request held at a length finish logs `E29_END_DRAIN_HELD` |
+| E31 indexer (tail ring on, head gate off) | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E31_INDEXER_GATE path=fp32` and `E31_KPOOL_TAIL_RING ring=12` on every rank, logged by the first forward; `VLLM_GLM53_INDEXER_GATE_TC_FLAG=/tmp/glm53-indexer-gate-tc` and `VLLM_GLM53_KPOOL_TAIL_RING_FLAG=/tmp/glm53-kpool-tail-ring` on every rank and no `VLLM_GLM53_INDEXER_GATE_TC` or `VLLM_GLM53_KPOOL_TAIL_RING` variable, with the `experiments/e03/e31-indexer/pooled_indexer.py` and `glm_kpool.py` hashes mounted over `vllm/models/glm5next/nvidia/pooled_indexer.py` and `ops/glm_kpool.py`; `ring=4` or `path=bf16-tc` means a flag file was changed and is not the accepted state |
+| Protected SparkCache default | all rank logs, deployed recipe, `docker inspect`, `./scripts/check-f0.py` | connector SHA-256 `aa046965637b…`, config SHA-256 `d99bd6720572…`, `SPARKCACHE_CPU_BUDGET_READY cap_bytes=1073741824 floor_bytes=1073741824` and `SPARKCACHE_DISK_STREAM_READY chunk_bytes=8388608` on every rank; the versioned operational identity pins the full values |
+| Memory bounds and API admission | rank logs, `docker inspect`, `./scripts/check-f0.py` | `PREFILL_CACHE_TRIM_READY rank=<rank> enabled=1 trigger=pre_eager_prefill` on every rank; `RESILIENCE_STEP_TOKEN_CAP_READY configured=8192 effective=6912 block=2304 eager_above=72` and `TP4_ADMISSION_READY` on rank 0; limits are six active admission slots, 128 queued, 8 MiB body, 1,800 s queue, 3,600 s request, and 30 s body/send idle; active slots do not imply resident engine requests |
 
-The default [accepted E29 recipe](benchmarks/baselines/2026-09-25-e29.md) retains those
+The operational default retains the [accepted E31 engine recipe](benchmarks/baselines/2026-09-28-e31.md) and those
 signatures, including the E03 `SPARK_MHC_PREFILL_SHARD=1` and its measured source
 mounts, the E21 residual projections, the E22b drafter conversion with its own cache
 namespace, the E27 prefill cadence, the E27c scheduler patch, and seven draft tokens for a
-single request with a 16 GiB KV pool (E28b). E29 adds the length-finish hold and the 4 ms
-idle-coalescing window. Eligible eager long prefills log
+single request, and the E29 length-finish hold and 4 ms
+idle-coalescing window. E31 replaces the pooled indexer and its C4 kernels with the
+speculative-safe tail ring, and keeps the head-gate switch off. Eligible eager long prefills log
 `SPARK_MHC_PREFILL rows=6912 owner_rows=1728 rs=90 ag=95 aux=5` on all four ranks;
 this is a workload activation receipt, not a requirement to run extra inference during
 an identity-only check. Runtime sources keep their `experiments/e03/` paths to preserve
 measured hashes; the E21 hook and module live under `experiments/e03/bf16-residue/`, the
-E22b drafter override and module under `experiments/e03/drafter-w8a16/` and the E27c
-scheduler under `experiments/e03/queued-cadence/`.
-Do not append the historical experiment overlays to the new defaults.
+E22b drafter override and module under `experiments/e03/drafter-w8a16/`, the E27c
+scheduler under `experiments/e03/queued-cadence/` and the E31 indexer under
+`experiments/e03/e31-indexer/`. Leave the two E31 flag files absent or at their defaults
+(gate `0`, ring `1`); change them only for a same-load experiment, following that
+directory's README.
+Do not append the historical experiment overlays to the new defaults. `CACHE_DIR` must be a
+disk-backed filesystem with free space for the persistent cache and at least one in-flight
+snapshot staging file. Do not place it on tmpfs: the bounded connector uses disk staging to
+avoid holding a full serialized snapshot in RAM.
 
-The selected replay connector SHA-256 is
-`5893f8747aa093874c46a0185f93c786265d99b5a4cd8da849a7471132422d66`.
+The selected protected connector SHA-256 is
+`aa046965637b685ec1f6a00e427eb46279e28bf0d49ee546236bc774be2de9bd`.
 The scheduler SHA-256 is
 `697f99bf1951535dcc3381776fa744ad8204d83d2606f341b617bac7a31949b4`.
 Its rank-0 startup signature is
@@ -117,10 +127,41 @@ limit, expect `draft-budget first-cap budget=3` and aggregate `limited_requests`
 `trimmed_tokens`. These count placeholder handouts, not accepted tokens or saved compute.
 An adaptive-policy fallback invalidates activation.
 
-The complete immediate return is `TP4_ENV=scripts/node/reference/baseline-20260925-e28b.env`:
-the E28b recipe with the E27c scheduler and the image's engine core, with the same cache
-namespace. `baseline-20260925-e27c.env` restores the E27c recipe with five draft tokens and a
-15 GiB KV pool.
+The optional [prefill allocator diagnostic](../scripts/node/experiments/e03/prefill-cache-trim/README.md)
+uses a separate worker overlay. Its launcher verifies the deployed source manifest;
+each rank must emit `PREFILL_CACHE_TRIM_READY ... enabled=1` after warmup and emit
+before/after allocator receipts for eligible eager prefills. These signatures apply
+only to that experiment. They are not part of the protected default or evidence that
+concurrent requests fit in memory.
+
+The separate [prefill step-cap candidate](../scripts/node/experiments/e03/prefill-step-cap/README.md)
+retains the configured 8,192-token capacity and uses an effective 6,912-token target
+budget per scheduler output. Its launcher verifies the scheduler manifest. Rank 0
+must emit `RESILIENCE_STEP_TOKEN_CAP_READY configured=8192 effective=6912 block=2304 eager_above=72`;
+each eager output has a `RESILIENCE_STEP_TOKEN_CAP` receipt. The remaining request
+tokens are scheduled later through the existing alignment and draft-slot rules.
+These experiment signatures do not establish an aggregate memory bound or change
+the protected default. Stop the candidate with its full overlay and return to the
+default without `TP4_ENV`, using the coordinated procedure and both functional gates.
+The resilience overlay can additionally select a smaller KV pool. Its optional
+`kv_cache_memory_bytes` identity must match exactly one loaded
+`--kv-cache-memory-bytes` value on each rank, with `--max-model-len 262144`
+unchanged. Record the engine's actual KV-token capacity and test the largest context
+and concurrent admission before drawing a resilience conclusion; see
+[the campaign procedure](resilience.md).
+
+The complete immediate operational return is
+`TP4_ENV=scripts/node/reference/operational-20260929-sparkcache-protected.env`.
+It keeps the bounded SparkCache connector, 8 MiB transfers and 1 GiB transient/admission
+budgets, but restores the 16 GiB KV pool and removes allocator trim, the 6,912-token step cap
+and API admission. It therefore does not retain the complete memory-bounded protection.
+The historical `TP4_ENV=scripts/node/reference/baseline-20260928-e31.env` return restores
+the measured E31 recipe with the prior replay connector, transfer config and cache namespace;
+it also removes the SparkCache memory limits.
+`baseline-20260925-e29.env` additionally restores the E29 indexer.
+`baseline-20260925-e28b.env` restores the E28b recipe with the E27c scheduler and
+the image's engine core. `baseline-20260925-e27c.env` restores the E27c recipe with five draft
+tokens and a 15 GiB KV pool.
 `baseline-20260924-e27.env` restores the E27 recipe with the image's own scheduler.
 `baseline-20260924-e22b.env` restores the E22b recipe without the prefill cadence.
 `baseline-20260923-e21.env` restores the E21 recipe with the vendor drafter, no E22 module
@@ -141,14 +182,16 @@ unreachable rank, or health mismatch. `/v1/models` is never a readiness check.
 `tp4ctl status` exits nonzero unless it can verify the configured container running on
 all four ranks and receive `/health` 200.
 
-### Fast baseline operational check
+### Fast operational identity check
 
-Run the reusable read-only check when a single concise baseline identity and idle
+Run the reusable read-only check when a single concise operational identity and idle
 verdict is needed:
 
 ```sh
 ./scripts/check-f0.py
 ./scripts/check-f0.py --base-url http://127.0.0.1:8000
+TP4_ENV=scripts/node/reference/baseline-20260928-e31.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json
+TP4_ENV=scripts/node/reference/baseline-20260925-e29.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json
 TP4_ENV=scripts/node/reference/baseline-20260925-e28b.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json
 TP4_ENV=scripts/node/reference/baseline-20260925-e27c.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json
 TP4_ENV=scripts/node/reference/baseline-20260924-e27.env ./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json
@@ -162,22 +205,27 @@ TP4_ENV=scripts/node/reference/baseline-20260918.env ./scripts/check-f0.py --bas
 
 The second form uses an already-established localhost SSH tunnel when the management LAN
 is not directly reachable. The checker reads the local `cluster.env` and honors `TP4_ENV`
-as the effective delta. By default it validates the **September 25 E29** identity from
-[the current reference](historical_benchmarks/baselines/2026-09-25-e29/baseline.json), including
-seven draft tokens, the adaptive table and high state, the CUDA graph limit, the 16 GiB KV
-budget, the E29 scheduler and engine-core hashes, the E27c and E29 flags and rank-0 boot lines, the E27 prefill cadence in the recipe
-and every rank's command, the E22b drafter sources/flags/boot signature, the E21 sources/flag/boot signature, the mHC sources/flag, replay connector, draft-budget scheduler/activation, hybrid KDA,
-KV byte budget and image content ID. Historical `--baseline` selection also requires
-the matching complete runtime recipe. A baseline-changing delta fails the check.
+as the effective delta. By default it validates the
+[memory-bounded operational identity](operational-identities/2026-09-29-memory-bounded.json),
+which pins the frozen **September 28 E31** engine identity by hash and adds the bounded
+connector, KV14, trim, scheduler-cap and API-admission identities. It still checks
+seven draft tokens, the adaptive table and high state, the CUDA graph limit, the 14 GiB KV
+budget, the E29 scheduler and engine-core hashes, the E31 indexer hashes and flag files, the E27c, E29 and E31 flags and rank-0 boot lines, the E27 prefill cadence in the recipe
+and every rank's command, the E22b drafter sources/flags/boot signature, the E21 sources/flag/boot signature, the mHC sources/flag, protected connector, draft-budget scheduler/activation, hybrid KDA,
+KV byte budget and image content ID. Historical `--baseline` selection requires an
+explicit record and its matching complete runtime recipe. An identity-changing delta
+fails the check.
 
 The checker runs bounded SSH probes for all four ranks in parallel with strict host-key checking.
-It verifies the effective recipe against the selected baseline's pins, the configured running
+It verifies the effective recipe against the selected identity's pins, the configured running
 container and key command/environment identity, image digest and model marker, the
-selected baseline’s runtime source hashes and boot receipts, unfiltered
+selected identity's runtime source hashes and boot receipts, unfiltered
 GPU containers and processes, inactive flusher, addressed MTU-9000 interfaces, all eight
 jumbo directions, `/health` 200, and zero running/waiting requests. Stdout is exactly one
-concise `F0 CHECK PASS` or `F0 CHECK FAIL` line; details and command errors go to a
-mode-0600 JSON report in a new mode-0700 system temporary directory outside the checkout.
+concise `<selected-identity> CHECK PASS` or `<selected-identity> CHECK FAIL` line. If
+configuration or identity loading fails before selection, the label is the neutral fallback
+`BASELINE CHECK FAIL`. Details and command errors go to a mode-0600 JSON report in a new
+mode-0700 system temporary directory outside the checkout.
 
 PASS covers only those operational checks. It does not hash every model/drafter file,
 replay engine async metadata, or send the coherent-response and tool-call requests. Use
@@ -357,9 +405,10 @@ restart:
 
 1. Install the prepared site configuration locally, unset `TP4_ENV`, run
    `./scripts/deploy.sh --check`, then `./scripts/deploy.sh`.
-2. In the same step, remove any autostart overlay selection on rank 0 and run
-   `systemctl daemon-reload`, so the next boot selects the same default recipe. A
-   frozen experiment overlay may reject the new base, so never leave it selected.
+2. In the same step, remove only the candidate's verified autostart overlay selection on
+   rank 0 and run `systemctl daemon-reload`, so the next boot selects the same default
+   recipe. Preserve every unrelated drop-in. A frozen experiment overlay may reject the
+   new base, so never leave that candidate selection active.
 3. Run `./scripts/check-f0.py` and retain its four-rank identity report.
 
 **A different recipe is serving.** Retain the serving `cluster.env` and its exact
@@ -369,14 +418,50 @@ in an authorized window:
 
 1. Stop all ranks using the still-active site configuration and serving `TP4_ENV`.
 2. Install the prepared site configuration locally, unset `TP4_ENV`, and deploy.
-   Remove any obsolete autostart overlay selection and reload systemd.
+   Remove only the verified obsolete overlay selection and reload systemd; preserve every
+   unrelated drop-in.
 3. Verify the pinned payloads and all eight jumbo pings; start the four-rank service
    once. Complete both functional gates within two minutes of `/health` 200.
 4. Run `./scripts/check-f0.py` and retain its four-rank identity report.
 
-Record the parity and live identity in the promotion record. A reproduction benchmark
-runs only on explicit owner request, with the frozen source/settings, fresh salts and
-unique absolute outputs, recorded separately from the accepted measurements.
+For a performance promotion, record parity and live identity in its promotion record.
+For an operational-only default such as cache protection, keep the frozen performance
+record unchanged and retain a separate operational identity and private migration receipt.
+A reproduction benchmark runs only on explicit owner request, with the frozen
+source/settings, a fresh comparison ID and unique absolute outputs, recorded separately
+from the accepted measurements; the current protocol sends no `cache_salt`.
+
+### Migrate the protected SparkCache default without reloading the model
+
+Use this path only when all four configured ranks are serving the bounded-transfer
+variant coherently, `/health` is 200, both functional gates have passed, and there is no
+second stack. Capture the four process IDs/start times, commands, protected config and
+payload hashes, plus rank 0's effective autostart unit and complete drop-in list. In a
+private directory, render the active E31-plus-budget recipe and the prepared default with
+the same site configuration. Require byte-for-byte launcher-command equality on ranks
+0–3. A local template parity test does not replace this site-specific proof.
+
+Inspect the one SparkCache overlay drop-in recorded as created for that candidate. Remove
+it only when its path and bytes match that record and it contains only the exact
+`TP4_ENV` selection being retired. Preserve every other directive and file. If provenance,
+content or ownership is uncertain, leave it in place and report the mismatch.
+
+With those prerequisites satisfied:
+
+1. Install the prepared protected `cluster.env` locally with no `TP4_ENV`; run
+   `./scripts/deploy.sh --check`, then `./scripts/deploy.sh`. Deployment updates the next
+   autostart recipe but does not restart the running containers.
+2. Remove only the verified SparkCache selection described above and run
+   `systemctl daemon-reload` on rank 0. Confirm the effective unit now selects no overlay.
+3. Re-read all four process IDs/start times and require them to be unchanged. Require
+   `/health` 200, then run the default `./scripts/check-f0.py` and retain its private
+   report with the four-rank parity evidence.
+
+Do not edit the frozen E31 baseline or its promotion record for this operational migration.
+If a rank is missing, health is inconsistent, commands differ, another stack exists or the
+drop-in cannot be identified exactly, stop this procedure and report. Recover the whole
+group through the coordinated recovery procedure before considering a later migration;
+never reload or repair one rank to make the prerequisites appear true.
 
 ## Start, stop, restart, logs, and power
 
@@ -421,6 +506,17 @@ container or flusher on any rank. Stop and report partial teardown or launch; do
 repair only the failed node.
 
 ## Configuration overlays
+
+The [SparkCache bounded-transfer implementation](../scripts/node/experiments/e03/sparkcache-ram-budget/README.md)
+is part of the operational default: a shared 1 GiB transient-work budget per rank, a
+1 GiB host admission floor and 8 MiB disk-transfer pieces. It avoids a complete snapshot
+in RAM. Its worker boot signatures are
+`SPARKCACHE_CPU_BUDGET_READY cap_bytes=1073741824 floor_bytes=1073741824` and
+`SPARKCACHE_DISK_STREAM_READY chunk_bytes=8388608`; pressure skips
+log `SPARKCACHE_CPU_BUDGET_SKIP` and restores recompute. The guide gives the supported
+cache paths, separate namespace, runtime validation and E31 rollback. The historical
+`sparkcache-ram-budget/delta.env` is retained only to prove command parity with the
+previously loaded E31-plus-delta configuration; do not apply it on top of the default.
 
 A local overlay named by `TP4_ENV` is sourced after production `cluster.env`. It is a
 delta and remains inert when not named:
@@ -529,7 +625,9 @@ below is full-cluster and must fall within an authorized service window.
 | --- | --- | --- |
 | Overlay result is bad | `./scripts/tp4ctl restart` with no `TP4_ENV` | base `cluster.env` signatures and gates return |
 | Production engine knob is bad | restore the rollback documented beside the value in `cluster.env.example`, update local `cluster.env`, deploy, restart | all runtime signatures plus task gate |
-| Restore the previous E28b reference | use the [complete E28b rollback](#restore-the-previous-e28b-reference) | E27c scheduler mounted over `vllm/v1/core/sched/scheduler.py`, no engine-core mount, no `VLLM_E29_` flag or boot line, seven draft tokens and 16 GiB KV retained, same cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json` with the same overlay, both gates |
+| Restore measured E31 cache behavior | use the [complete E31 rollback](#restore-the-measured-e31-cache-behavior) | E31 engine identity retained; previous replay connector/config/cache namespace restored; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json` with the same overlay, both gates |
+| Restore the previous E29 reference | use the [complete E29 rollback](#restore-the-previous-e29-reference) | production `pooled_indexer.py` and `ops/glm_kpool.py` mounted, no `VLLM_GLM53_` variable, no `E31_` log line, E29 scheduler and engine core retained, same cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json` with the same overlay, both gates |
+| Restore the older E28b reference | use the [complete E28b rollback](#restore-the-older-e28b-reference) | E27c scheduler mounted over `vllm/v1/core/sched/scheduler.py`, no engine-core mount, no `VLLM_E29_` flag or boot line, seven draft tokens and 16 GiB KV retained, same cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json` with the same overlay, both gates |
 | Restore the older E27c reference | use the [complete E27c rollback](#restore-the-older-e27c-reference) | `num_spec_tokens=5`, no `VLLM_ADAPTIVE_K_HI` or `--compilation-config`, `--kv-cache-memory-bytes=16106127360`, same scheduler mount and cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json` with the same overlay, both gates |
 | Restore the older E27 reference | use the [complete E27 rollback](#restore-the-older-e27-reference) | no scheduler mount over `vllm/v1/core/sched/scheduler.py`, no `VLLM_E27B_`/`VLLM_E27C_` flag or boot line, `--prefill-schedule-interval 8` retained, same cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json` with the same overlay, both gates |
 | Restore the older E22b reference | use the [complete E22b rollback](#restore-the-older-e22b-reference) | no `--prefill-schedule-interval` in any rank's command, same mounts, flags and cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-23-e22b/baseline.json` with the same overlay, both gates |
@@ -550,13 +648,183 @@ An IOMMU revert exit code 4 means GRUB was not safely regenerated: do not reboot
 Never use `EXTRA_DOCKER_ENV=""` as a generic rollback. Never purge a model to recover
 space without a fresh disk census and explicit owner decision.
 
-### Restore the previous E28b reference
+### Restore the protected 16 GiB operational predecessor
+
+Use [`operational-20260929-sparkcache-protected.env`](../scripts/node/reference/operational-20260929-sparkcache-protected.env)
+to remove bounded admission, allocator trim and the 6,912-token step cap while retaining
+the protected SparkCache namespace, 262,144-token context, six-sequence scheduler limit and
+the complete E31 engine lineage. It restores the 16 GiB KV pool. In an authorized window,
+first stop the cluster with the exact recipe that is serving. Then select the rollback for
+deploy, every lifecycle command, and the explicit historical operational identity check:
+
+```sh
+export TP4_ENV=scripts/node/reference/operational-20260929-sparkcache-protected.env
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Complete both functional gates within two minutes of /health 200.
+./scripts/check-f0.py --identity docs/operational-identities/2026-09-29-sparkcache-protected.json
+```
+
+Keep the overlay selected for every lifecycle command. Before leaving this rollback
+unattended, inspect `systemctl cat tp4-autostart.service` and the effective environment on
+rank 0. Use a distinct
+`/etc/systemd/system/tp4-autostart.service.d/60-protected16-rollback.conf` containing exactly:
+
+```ini
+[Service]
+Environment=TP4_ENV=scripts/node/reference/operational-20260929-sparkcache-protected.env
+```
+
+Do not install it alongside an active `60-e31-rollback.conf` or another drop-in that sets
+`TP4_ENV`. Before changing any file, inspect `systemctl cat tp4-autostart.service` and stop
+if an unrecognized drop-in sets `TP4_ENV`. Validate every present known rollback file before
+mutating either one, then remove the E31 selection and create the protected16 selection with
+one reload at most:
+
+```sh
+protected_dropin=/etc/systemd/system/tp4-autostart.service.d/60-protected16-rollback.conf
+e31_dropin=/etc/systemd/system/tp4-autostart.service.d/60-e31-rollback.conf
+sudo install -d -m 0755 /etc/systemd/system/tp4-autostart.service.d
+if sudo test -e "$protected_dropin"; then
+  printf '%s\n' '[Service]' \
+    'Environment=TP4_ENV=scripts/node/reference/operational-20260929-sparkcache-protected.env' \
+    | sudo cmp -s - "$protected_dropin" || exit 1
+fi
+if sudo test -e "$e31_dropin"; then
+  printf '%s\n' '[Service]' \
+    'Environment=TP4_ENV=scripts/node/reference/baseline-20260928-e31.env' \
+    | sudo cmp -s - "$e31_dropin" || exit 1
+fi
+unit_changed=0
+if sudo test -e "$e31_dropin"; then
+  sudo rm -- "$e31_dropin"
+  unit_changed=1
+fi
+if ! sudo test -e "$protected_dropin"; then
+  printf '%s\n' '[Service]' \
+    'Environment=TP4_ENV=scripts/node/reference/operational-20260929-sparkcache-protected.env' \
+    | sudo tee "$protected_dropin" >/dev/null
+  sudo chmod 0644 "$protected_dropin"
+  unit_changed=1
+fi
+if [ "$unit_changed" = 1 ]; then
+  sudo systemctl daemon-reload
+fi
+```
+
+Preserve every unrelated directive and drop-in. Require
+`systemctl show tp4-autostart.service -p Environment --value` to contain exactly one
+`TP4_ENV` assignment, selecting the protected16 overlay above.
+
+Returning to the memory-bounded default requires a coordinated stop with the protected16
+overlay. Before any mutation, inspect `systemctl cat tp4-autostart.service` and
+`systemctl show tp4-autostart.service -p Environment --value`; abort if the E31 file, an
+unrecognized `TP4_ENV` source or any conflicting effective assignment is present. Use this
+separate non-creating removal block; never reuse the creation block:
+
+```sh
+protected_dropin=/etc/systemd/system/tp4-autostart.service.d/60-protected16-rollback.conf
+e31_dropin=/etc/systemd/system/tp4-autostart.service.d/60-e31-rollback.conf
+if sudo test -e "$e31_dropin"; then
+  echo "refusing protected16 removal while the E31 rollback drop-in exists" >&2
+  exit 1
+fi
+if sudo test -e "$protected_dropin"; then
+  printf '%s\n' '[Service]' \
+    'Environment=TP4_ENV=scripts/node/reference/operational-20260929-sparkcache-protected.env' \
+    | sudo cmp -s - "$protected_dropin" || exit 1
+  sudo rm -- "$protected_dropin"
+  sudo systemctl daemon-reload
+fi
+```
+
+If the file was absent, change no unit file and do not run `daemon-reload`. Require
+`systemctl show tp4-autostart.service -p Environment --value` to have no `TP4_ENV`; an E31
+or unrecognized assignment is a conflict, not something to remove by guess. Then deploy/start
+without `TP4_ENV`, complete both functional gates and run the default `./scripts/check-f0.py`.
+
+### Restore the measured E31 cache behavior
+
+Use the complete
+[`baseline-20260928-e31.env`](../scripts/node/reference/baseline-20260928-e31.env) when the
+protected connector must be rolled back. It retains the E31 indexer, E29 scheduler,
+16 GiB KV pool, 262,144-token context and every other engine setting, while restoring the
+previous replay connector, E22b transfer config and cache namespace.
+
+In an authorized window, stop with the recipe that is serving, then use the rollback for
+deploy and every lifecycle command:
+
+```sh
+export TP4_ENV=scripts/node/reference/baseline-20260928-e31.env
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Complete both functional gates within two minutes of /health 200.
+./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json
+```
+
+Keep the overlay selected for every lifecycle command. Before leaving the rollback
+unattended, create
+`/etc/systemd/system/tp4-autostart.service.d/60-e31-rollback.conf` on rank 0 with exactly:
+
+```ini
+[Service]
+Environment=TP4_ENV=scripts/node/reference/baseline-20260928-e31.env
+```
+
+Do not install this file while `60-protected16-rollback.conf` or another drop-in sets
+`TP4_ENV`; transition between rollback overlays only after checking and removing the old
+file's exact documented content. Preserve unrelated directives and drop-ins.
+Run `sudo systemctl daemon-reload` only when a rollback drop-in was created, replaced or
+removed; an already exact E31 file requires no reload. Then require
+`systemctl show tp4-autostart.service -p Environment --value` to contain exactly the
+`TP4_ENV=scripts/node/reference/baseline-20260928-e31.env` assignment. Returning to the
+memory-bounded default requires a coordinated stop with this rollback overlay. Verify that the
+named file, when present, still has exactly the two lines above, remove only that file and run
+`sudo systemctl daemon-reload` only after removal. If it was absent, change no unit file and
+do not reload. Require the assignment to be absent from `systemctl show`.
+Then deploy/start without `TP4_ENV`, complete both functional gates and run the default
+`./scripts/check-f0.py` check.
+
+### Restore the previous E29 reference
 
 The immediate complete return is
+[`baseline-20260925-e29.env`](../scripts/node/reference/baseline-20260925-e29.env). It
+mounts the production `pooled_indexer.py` and `ops/glm_kpool.py` again and removes the two
+E31 flag-file variables; every other mount, flag and the cache namespace are unchanged, so
+the same persistent cache is reused.
+
+Without a restart, writing `0` to `/tmp/glm53-kpool-tail-ring` in the container on all four
+ranks returns the pool arithmetic to the legacy four-slot tail (E29 behaviour, including its
+speculative-decoding defect). Do it only with running and waiting requests at 0 on
+`/metrics`, as described in
+[`experiments/e03/e31-indexer/README.md`](../scripts/node/experiments/e03/e31-indexer/README.md).
+The running identity is still E31 until the complete return below is deployed and started.
+
+In the authorized window, first stop using the currently serving recipe. Then:
+
+```sh
+export TP4_ENV=scripts/node/reference/baseline-20260925-e29.env
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Complete both functional gates within two minutes of /health 200.
+./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json
+```
+
+Keep this overlay for subsequent lifecycle commands and configure autostart to use it
+before an unattended reboot. Returning to current defaults requires a coordinated stop
+with the rollback overlay, then deploy/start without it and removal of that autostart
+selection.
+
+### Restore the older E28b reference
+
+The complete return is
 [`baseline-20260925-e28b.env`](../scripts/node/reference/baseline-20260925-e28b.env). It
-mounts the E27c scheduler again, removes the engine-core mount and the three `VLLM_E29_`
-flags, and keeps seven draft tokens, the 16 GiB KV pool, the other mounts and the cache
-namespace, so the same persistent cache is reused.
+restores the E29 return with the E27c scheduler instead of the E29 one, without the
+engine-core mount and the three `VLLM_E29_` flags. It keeps seven draft tokens, the 16 GiB KV
+pool, the other mounts and the cache namespace, so the same persistent cache is reused.
 
 In the authorized window, first stop using the currently serving recipe. Then:
 
@@ -743,7 +1011,7 @@ export TP4_ENV=scripts/node/reference/baseline-20260918.env
 
 Keep this overlay for later lifecycle commands. For unattended autostart, install a
 systemd drop-in that sets this same `TP4_ENV` and run `systemctl daemon-reload`; otherwise
-a later reboot would select the accepted E29 default recipe. Returning to the current defaults
+a later reboot would select the protected operational default. Returning to the current defaults
 requires a coordinated transition with no overlay and removal of that drop-in. Preserve
 both persistent-cache directories; do not reuse their contents across quantization
 recipes. The frozen baseline medians are not remeasured as part of rollback.
@@ -784,6 +1052,12 @@ Creating and verifying it does not rehearse a full restore and does not prove un
 recovery from kernel, driver, firmware, boot-loader or network failure.
 
 ## Keep an accepted change
+
+For an explicitly authorized exclusive production load and fault window, use the
+[resilience campaign runbook](resilience.md). Its temporary overlay confines cache
+faults to a separate namespace, retains private receipts and restores the protected
+default through the same coordinated controller. Performance checks still use native
+Rigmark from its independent checkout.
 
 After the owner accepts a recipe change, persist the value and rollback in its source
 file, update any affected runtime signature and `CHANGELOG.md`, and run

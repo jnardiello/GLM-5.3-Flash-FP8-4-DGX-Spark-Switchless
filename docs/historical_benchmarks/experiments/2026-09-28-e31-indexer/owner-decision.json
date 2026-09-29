@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-28-e31-indexer",
+  "date": "2026-09-28",
+  "decision": "promote",
+  "promoted": "Speculative-safe C4 tail ring (VLLM_GLM53_KPOOL_TAIL_RING default 1) with the head-gate switch present and off (VLLM_GLM53_INDEXER_GATE_TC default 0), exactly as the E31 overlay was measured.",
+  "method": "No restart: the running service already is the measured overlay; the default encodes it with four-rank launcher parity.",
+  "sparkcache_namespace": "Kept (warm cache kept, no restart). Residual risk: pools built by speculative decode with the legacy four-slot tail could be restored for resumed sessions; it is not established that decode-built pools are persisted. The external review concurred that this is not a confirmed blocker.",
+  "head_gate": "unresolved; stays off. Arm G versus arm R is inconclusive because changing the gate changed generated tokens and therefore draft acceptance.",
+  "rigmark_policy": "From 2026-09-28: upstream unmodified Rigmark (alexellis/rigmark c5a0db0) with exactly the reference flags of Alex Ellis's GLM receipts: all defaults plus --extra-body '{\"chat_template_kwargs\": {\"reasoning_effort\": \"low\"}}', no cache_salt, a fresh comparison ID per suite. Quick screens may use one suite per arm on the same load. Frozen E29-and-earlier records used 8,192 decode tokens, thinking off and a local fork forwarding cache_salt to prefill requests; they are historical and not comparable with the new flags."
+}

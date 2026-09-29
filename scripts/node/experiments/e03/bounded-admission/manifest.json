@@ -1,0 +1,44 @@
+{
+  "schema": "tp4-bounded-admission-candidate-v1",
+  "status": "experimental_candidate",
+  "summary": "Finite pre-parse admission queue and active-request bound for expensive rank-0 API routes.",
+  "runtime": {
+    "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+    "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+    "python": "3.12",
+    "fastapi": "0.136.3",
+    "starlette": "1.6.0",
+    "registration": "vllm.entrypoints.serve.middleware.register"
+  },
+  "candidate": {
+    "path": "scripts/node/experiments/e03/bounded-admission/middleware.py",
+    "sha256": "3909b20d57752e4e68035bfe81f35490fe2dd763bf65f089b08d20374d97c6db",
+    "mount_target": "/opt/tp4/tp4_admission.py",
+    "import_string": "tp4_admission.BoundedAdmissionMiddleware"
+  },
+  "selection": {
+    "environment": {
+      "TP4_ADMISSION_MAX_ACTIVE": "6",
+      "TP4_ADMISSION_MAX_QUEUED": "128",
+      "TP4_ADMISSION_MAX_BODY_BYTES": "8388608",
+      "TP4_ADMISSION_QUEUE_TIMEOUT_SECONDS": "1800",
+      "TP4_ADMISSION_REQUEST_TIMEOUT_SECONDS": "3600",
+      "TP4_ADMISSION_BODY_IDLE_SECONDS": "30",
+      "TP4_ADMISSION_SEND_IDLE_SECONDS": "30"
+    }
+  },
+  "guard": {
+    "mode": "all_post_except",
+    "bypass_paths": [
+      "/is_scaling_elastic_ep",
+      "/ping",
+      "/scale_elastic_ep"
+    ],
+    "bypass_pattern": "/v1/responses/{nonempty-single-segment}/cancel"
+  },
+  "limitations": [
+    "Queued disconnects are observed only when admitted, timed out, externally cancelled or shut down because the middleware does not consume queued bodies.",
+    "The limits bound middleware membership but do not bound transport buffers or memory retained inside vLLM.",
+    "The selected values require mixed-load, cancellation and soak measurement before promotion."
+  ]
+}

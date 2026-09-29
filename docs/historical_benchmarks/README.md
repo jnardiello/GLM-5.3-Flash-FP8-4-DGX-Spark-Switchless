@@ -14,8 +14,9 @@ tables, measured recipes, decisions and evidence limits.
 | [`baselines/2026-09-23-e22b/`](baselines/2026-09-23-e22b/baseline.json) | Previous reference, three full suites of E22b; [promotion record](baselines/2026-09-23-e22b/promotion.json) |
 | [`baselines/2026-09-24-e27/`](baselines/2026-09-24-e27/baseline.json) | Previous reference, three full suites of E27; [promotion record](baselines/2026-09-24-e27/promotion.json) |
 | [`baselines/2026-09-25-e27c/`](baselines/2026-09-25-e27c/baseline.json) | Earlier reference, three full suites of E27c; [promotion record](baselines/2026-09-25-e27c/promotion.json) |
-| [`baselines/2026-09-25-e28b/`](baselines/2026-09-25-e28b/baseline.json) | Previous reference, three full suites of E28b; [promotion record](baselines/2026-09-25-e28b/promotion.json) |
-| [`baselines/2026-09-25-e29/`](baselines/2026-09-25-e29/baseline.json) | Current accepted reference, three full suites of E29; [promotion record](baselines/2026-09-25-e29/promotion.json) |
+| [`baselines/2026-09-25-e28b/`](baselines/2026-09-25-e28b/baseline.json) | Earlier reference, three full suites of E28b; [promotion record](baselines/2026-09-25-e28b/promotion.json) |
+| [`baselines/2026-09-25-e29/`](baselines/2026-09-25-e29/baseline.json) | Previous reference, three full suites of E29 with the earlier Rigmark settings; [promotion record](baselines/2026-09-25-e29/promotion.json) |
+| [`baselines/2026-09-28-e31/`](baselines/2026-09-28-e31/baseline.json) | Current accepted reference, one suite of E31 (n = 1) with upstream Rigmark and the reference flags, plus a same-load E29-equivalent arm; [promotion record](baselines/2026-09-28-e31/promotion.json) |
 | `experiments/<date-experiment>/` | Portable results for accepted, discarded, unresolved, incomplete or excluded measurements |
 
 Baseline JSON files are immutable. Their original embedded paths describe provenance;

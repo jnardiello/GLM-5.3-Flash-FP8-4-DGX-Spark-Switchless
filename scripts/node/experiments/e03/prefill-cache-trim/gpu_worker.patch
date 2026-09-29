@@ -1,0 +1,220 @@
+--- scripts/node/overrides/vllm/v1/worker/gpu_worker.py
++++ scripts/node/experiments/e03/prefill-cache-trim/gpu_worker.py
+@@ -3,6 +3,7 @@
+ """A GPU worker class."""
+ 
+ import gc
++import json
+ import os
+ import time
+ from collections.abc import Callable
+@@ -94,6 +95,156 @@
+ logger = init_logger(__name__)
+ 
+ 
++def _strict_env_flag(name: str) -> bool:
++    value = os.environ.get(name, "0")
++    if value not in ("0", "1"):
++        raise ValueError(f"{name} must be 0 or 1, got {value!r}")
++    return value == "1"
++
++
++_PREFILL_CACHE_TRIM = _strict_env_flag("VLLM_PREFILL_CACHE_TRIM")
++
++
++def _prefill_cache_trim_decision(scheduler_output, capture_sizes) -> tuple[bool, str]:
++    """Select only known prefill steps too large for every configured graph."""
++    if not isinstance(capture_sizes, (list, tuple)) or not capture_sizes:
++        return False, "missing_capture_sizes"
++    if any(not isinstance(size, int) or size <= 0 for size in capture_sizes):
++        return False, "unknown_capture_sizes"
++    try:
++        total_tokens = scheduler_output.total_num_scheduled_tokens
++        new_reqs = scheduler_output.scheduled_new_reqs
++        cached = scheduler_output.scheduled_cached_reqs
++        cached_req_ids = cached.req_ids
++        is_context_phase = cached.is_context_phase
++    except (AttributeError, TypeError):
++        return False, "unknown_scheduler_output"
++    if not isinstance(total_tokens, int) or total_tokens < 0:
++        return False, "unknown_scheduled_tokens"
++    try:
++        cached_context = any(
++            bool(is_context_phase(req_id)) for req_id in cached_req_ids
++        )
++    except Exception:
++        return False, "unknown_cached_phase"
++    has_prefill = bool(new_reqs) or cached_context
++    if not has_prefill:
++        return False, "decode_only"
++    if total_tokens <= max(capture_sizes):
++        return False, "captured_or_small_prefill"
++    return True, "eager_prefill"
++
++
++def _read_mem_available_bytes() -> int:
++    with open("/proc/meminfo", encoding="utf-8") as meminfo:
++        for line in meminfo:
++            if line.startswith("MemAvailable:"):
++                return int(line.split()[1]) * 1024
++    raise RuntimeError("MemAvailable is absent from /proc/meminfo")
++
++
++def _trim_allocator_cache(
++    torch_module,
++    device,
++    rank: int,
++    trim_logger,
++    step_metadata: dict[str, int],
++    *,
++    monotonic_ns=None,
++    wall_time_ns=None,
++    pid_fn=None,
++    mem_available_fn=None,
++) -> None:
++    """Trim free allocator blocks and emit one truthful success/error receipt."""
++    monotonic_ns = monotonic_ns or time.monotonic_ns
++    wall_time_ns = wall_time_ns or time.time_ns
++    pid_fn = pid_fn or os.getpid
++    mem_available_fn = mem_available_fn or _read_mem_available_bytes
++    started = monotonic_ns()
++    record = {
++        "schema": "prefill-cache-trim-v1",
++        "rank": rank,
++        "pid": pid_fn(),
++        "wall_time_ns": wall_time_ns(),
++        "monotonic_ns": started,
++        "trigger": "pre_eager_prefill",
++        "stage": "before",
++        "status": "error",
++        **step_metadata,
++    }
++
++    def snapshot() -> dict[str, int]:
++        stats = torch_module.cuda.memory_stats(device)
++        return {
++            "allocated_bytes": int(stats["allocated_bytes.all.current"]),
++            "reserved_bytes": int(stats["reserved_bytes.all.current"]),
++            "mem_available_bytes": int(mem_available_fn()),
++        }
++
++    try:
++        record["before"] = snapshot()
++        record["stage"] = "empty_cache"
++        torch_module.accelerator.empty_cache()
++        record["stage"] = "after"
++        record["after"] = snapshot()
++        record["reclaimed_reserved_bytes"] = (
++            record["before"]["reserved_bytes"]
++            - record["after"]["reserved_bytes"]
++        )
++        record["status"] = "ok"
++    except Exception as exc:
++        record["error"] = f"{type(exc).__name__}: {exc}"
++        record["duration_ns"] = monotonic_ns() - started
++        trim_logger.error("PREFILL_CACHE_TRIM %s", json.dumps(record, sort_keys=True))
++        raise
++    record["duration_ns"] = monotonic_ns() - started
++    trim_logger.info("PREFILL_CACHE_TRIM %s", json.dumps(record, sort_keys=True))
++
++
++def _maybe_trim_prefill_cache(
++    *,
++    enabled: bool,
++    runtime_ready: bool,
++    scheduler_output,
++    capture_sizes,
++    trim_fn,
++    rank: int,
++    trim_logger,
++) -> bool:
++    if not enabled or not runtime_ready:
++        return False
++    selected, reason = _prefill_cache_trim_decision(
++        scheduler_output, capture_sizes
++    )
++    if not selected:
++        if reason.startswith(("missing_", "unknown_")):
++            trim_logger.warning(
++                "PREFILL_CACHE_TRIM_SKIP %s",
++                json.dumps({"rank": rank, "reason": reason}, sort_keys=True),
++            )
++        return False
++    try:
++        step_metadata = {
++            "total_num_scheduled_tokens": (
++                scheduler_output.total_num_scheduled_tokens
++            ),
++            "num_scheduled_new_requests": len(
++                scheduler_output.scheduled_new_reqs
++            ),
++        }
++    except (AttributeError, TypeError):
++        trim_logger.warning(
++            "PREFILL_CACHE_TRIM_SKIP %s",
++            json.dumps(
++                {"rank": rank, "reason": "unknown_step_metadata"},
++                sort_keys=True,
++            ),
++        )
++        return False
++    trim_fn(step_metadata)
++    return True
++
++
+ def _start_e20_memory_probe(torch_module, device, rank, probe_logger, interval_seconds=1.0):
+     """Read allocator counters off the inference thread; never synchronize CUDA."""
+     import json
+@@ -242,6 +393,7 @@
+         self.use_v2_model_runner = vllm_config.use_v2_model_runner
+         # pending non-blocking PP send work from the previous iteration
+         self._pp_send_work: list[Handle] = []
++        self._prefill_cache_trim_runtime_ready = False
+ 
+         # Resolved lazily on first sleep/wake; persists worker-process state.
+         self._sleep_mode_backend: SleepModeBackend | None = None
+@@ -767,6 +919,7 @@
+ 
+     @instrument(span_name="Warmup (GPU)")
+     def compile_or_warm_up_model(self) -> CompilationTimes:
++        self._prefill_cache_trim_runtime_ready = False
+         warmup_sizes: list[int] = []
+ 
+         if self.vllm_config.compilation_config.mode == CompilationMode.VLLM_COMPILE:
+@@ -947,6 +1100,14 @@
+                 torch, self.device, self.rank, logger
+             )
+ 
++        self._prefill_cache_trim_runtime_ready = True
++        logger.info(
++            "PREFILL_CACHE_TRIM_READY rank=%d enabled=%d trigger=pre_eager_prefill capture_sizes=%s",
++            self.rank,
++            int(_PREFILL_CACHE_TRIM),
++            self.vllm_config.compilation_config.cudagraph_capture_sizes,
++        )
++
+         return CompilationTimes(
+             language_model=self.compilation_config.compilation_time,
+             encoder=self.compilation_config.encoder_compilation_time,
+@@ -1140,6 +1301,20 @@
+                 handle.wait()
+             self._pp_send_work = []
+ 
++        _maybe_trim_prefill_cache(
++            enabled=_PREFILL_CACHE_TRIM,
++            runtime_ready=self._prefill_cache_trim_runtime_ready,
++            scheduler_output=scheduler_output,
++            capture_sizes=(
++                self.vllm_config.compilation_config.cudagraph_capture_sizes
++            ),
++            trim_fn=lambda step_metadata: _trim_allocator_cache(
++                torch, self.device, self.rank, logger, step_metadata
++            ),
++            rank=self.rank,
++            trim_logger=logger,
++        )
++
+         intermediate_tensors = None
+         forward_pass = scheduler_output.total_num_scheduled_tokens > 0
+         num_scheduled_tokens = scheduler_output.total_num_scheduled_tokens
+

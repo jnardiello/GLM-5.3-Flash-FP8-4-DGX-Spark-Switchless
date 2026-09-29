@@ -1,0 +1,27 @@
+{
+  "allow_worker_faults": false,
+  "campaign_id": "replace-with-unique-id",
+  "container": "glm53-tp4",
+  "container_cache_root": "/cache/jit/tp4-resilience-replace-with-unique-id",
+  "duration_hours": 8,
+  "endpoint": "http://<rank0-management-address>:8000/v1",
+  "final_restore_minutes": 45,
+  "host_cache_roots": [
+    "/absolute/rank0/cache/jit/tp4-resilience-replace-with-unique-id",
+    "/absolute/rank1/cache/jit/tp4-resilience-replace-with-unique-id",
+    "/absolute/rank2/cache/jit/tp4-resilience-replace-with-unique-id",
+    "/absolute/rank3/cache/jit/tp4-resilience-replace-with-unique-id"
+  ],
+  "model": "glm-5.3-flash",
+  "max_queue_clients": 256,
+  "nodes": ["<rank0>", "<rank1>", "<rank2>", "<rank3>"],
+  "output_dir": "/absolute/private/path/to/campaign-receipts",
+  "repo_root": "/absolute/path/to/this-checkout",
+  "rigmark": {
+    "initial": "/absolute/private/path/to/rigmark-initial.json",
+    "final": "/absolute/private/path/to/rigmark-final.json"
+  },
+  "soak_hours": 2,
+  "started_at_unix": null,
+  "tp4_env": "scripts/resilience/.campaign/replace-with-unique-id/delta.env"
+}

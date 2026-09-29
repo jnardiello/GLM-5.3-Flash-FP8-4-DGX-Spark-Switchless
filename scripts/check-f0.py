@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only operational identity check against the selected frozen baseline."""
+"""Read-only check of the current operational or an explicit historical identity."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import argparse
 import base64
 import concurrent.futures
 import datetime as dt
+import hashlib
 import ipaddress
 import json
 import math
@@ -23,7 +24,16 @@ from typing import Any, Callable
 
 
 REPO = Path(__file__).resolve().parents[1]
-BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json"
+BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json"
+IDENTITY = REPO / "docs/operational-identities/2026-09-29-memory-bounded.json"
+KV_CONFIG_PATHS = (
+    "scripts/node/reference/sparkcache-20260918.json",
+    "scripts/node/sparkcache/kv-transfer-config.json",
+    "scripts/node/experiments/e03/kv-transfer-config.json",
+    "scripts/node/experiments/e03/bf16-residue/kv-transfer-config.json",
+    "scripts/node/experiments/e03/drafter-w8a16/kv-transfer-config-e22b.json",
+    "scripts/node/experiments/e03/sparkcache-ram-budget/kv-transfer-config.json",
+)
 ADAPTIVE_DEFAULTS = {
     "VLLM_ADAPTIVE_K_ENABLE": "1", "VLLM_ADAPTIVE_K_LO": "3",
     "VLLM_ADAPTIVE_K_HI": "5", "VLLM_ADAPTIVE_K_MODE": "per-request",
@@ -151,6 +161,12 @@ safe_env_names = (
     "NCCL_IB_ROCE_VERSION_NUM", "NCCL_IB_ADDR_FAMILY", "NCCL_IB_QPS_PER_CONNECTION",
     "VLLM_E27B_SHORT_PREFILL_TOKENS", "VLLM_E27C_CADENCE_WHEN_QUEUED",
     "VLLM_E29_END_DRAIN", "VLLM_E29_IDLE_COALESCE_MS", "VLLM_E29_TRACE",
+    "VLLM_GLM53_INDEXER_GATE_TC", "VLLM_GLM53_KPOOL_TAIL_RING",
+    "VLLM_GLM53_INDEXER_GATE_TC_FLAG", "VLLM_GLM53_KPOOL_TAIL_RING_FLAG",
+    "VLLM_PREFILL_CACHE_TRIM", "VLLM_RESILIENCE_STEP_TOKEN_CAP",
+    "TP4_ADMISSION_MAX_ACTIVE", "TP4_ADMISSION_MAX_QUEUED", "TP4_ADMISSION_MAX_BODY_BYTES",
+    "TP4_ADMISSION_QUEUE_TIMEOUT_SECONDS", "TP4_ADMISSION_REQUEST_TIMEOUT_SECONDS",
+    "TP4_ADMISSION_BODY_IDLE_SECONDS", "TP4_ADMISSION_SEND_IDLE_SECONDS",
 )
 identity = p.get("runtime_identity") or {}
 safe_env_names = set(safe_env_names) | set(identity.get("environment", {}))
@@ -191,7 +207,8 @@ safe_options = (
     "--max-model-len", "--max-num-seqs", "--max-num-batched-tokens", "--kv-cache-dtype",
     "--kv-cache-memory-bytes", "--kv-cache-memory",
     "--scheduler-cls", "--moe-backend", "--speculative-config",
-    "--prefill-schedule-interval", "--compilation-config",
+    "--prefill-schedule-interval", "--compilation-config", "--kv-transfer-config",
+    "--middleware",
 )
 option_values = {key: [] for key in safe_options}
 for index, item in enumerate(command):
@@ -210,6 +227,14 @@ if len(option_values["--speculative-config"]) == 1:
     except (json.JSONDecodeError, TypeError):
         errors.append({"check": "speculative configuration", "error": "invalid JSON"})
 option_values.pop("--speculative-config")
+kv_transfer_config = None
+if len(option_values["--kv-transfer-config"]) == 1:
+    try: kv_transfer_config = json.loads(option_values["--kv-transfer-config"][0])
+    except (json.JSONDecodeError, TypeError):
+        errors.append({"check": "KV transfer configuration", "error": "invalid JSON"})
+elif option_values["--kv-transfer-config"]:
+    errors.append({"check": "KV transfer configuration", "error": "duplicate option"})
+option_values.pop("--kv-transfer-config")
 
 configured_pids = set()
 if container:
@@ -262,6 +287,13 @@ if container and identity.get("kda_boot_receipt"):
             for signature in identity.get("boot_lines", []):
                 if p.get("rank") == 0 and signature in line:
                     runtime_receipts.setdefault("boot_lines", []).append(signature)
+            for signature in identity.get("all_rank_boot_lines", []):
+                if signature in line:
+                    runtime_receipts.setdefault("all_rank_boot_lines", []).append(signature)
+            for signature in identity.get("all_rank_boot_lines_by_rank", {}).get(
+                    str(p.get("rank")), []):
+                if signature in line:
+                    runtime_receipts.setdefault("rank_boot_lines", []).append(signature)
             if "E22_DRAFTER_W8A16_READY " in line:
                 try: runtime_receipts["e22"] = json.loads(line.split("E22_DRAFTER_W8A16_READY ", 1)[1])
                 except json.JSONDecodeError: pass
@@ -314,8 +346,11 @@ print(json.dumps({
                   "draft_commit": draft_commit,
                   "draft_metadata_present": draft_metadata_present,
                   "draft_config_sha": draft_config_sha,
+                  "kv_transfer_config": kv_transfer_config,
                   "model_mount": mounts.get("/model") == os.path.expandvars(p["model_dir"]),
                   "draft_mount": mounts.get("/draft") == os.path.expandvars(p["draft_dir"]),
+                  "candidate_mount_targets": [target for target in ("/opt/tp4/tp4_admission.py",)
+                                              if target in mounts],
                   "runtime_files": runtime_files, "runtime_receipts": runtime_receipts,
                   "runtime_workers": runtime_workers},
     "flusher": {"unit_state": unit, "unit_rc": unit_rc, "legacy_process": legacy_rc == 0},
@@ -356,6 +391,23 @@ def load_recipe(timeout: float) -> tuple[dict[str, str], dict[str, Any]]:
             diagnostic)
 
 
+def pinned_kv_transfer_config(digest: str | None) -> dict[str, Any] | None:
+    """Return the repository config selected by a recorded content pin, when retained."""
+    if not digest:
+        return None
+    matches = []
+    for relative in KV_CONFIG_PATHS:
+        path = REPO / relative
+        if path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() == digest:
+            matches.append(path)
+    if not matches:
+        return None
+    parsed = [json.loads(path.read_text(encoding="utf-8")) for path in matches]
+    if any(item != parsed[0] for item in parsed[1:]):
+        raise CheckFailure("same SparkCache config pin resolved to different semantics")
+    return parsed[0]
+
+
 def expected_f0(baseline: Path | None = None) -> dict[str, Any]:
     record = json.loads((baseline or BASELINE).read_text(encoding="utf-8"))
     system = record["system"]
@@ -379,8 +431,13 @@ def expected_f0(baseline: Path | None = None) -> dict[str, Any]:
         match = re.search(r"\b(\d+)-byte pool per rank\b", system["kv_cache"])
         if not match: raise CheckFailure("frozen baseline KV memory budget is not parseable")
         kv_bytes = int(match.group(1))
+    sparkcache = system.get("sparkcache") or {}
+    config_pin = sparkcache.get("kv_transfer_config_sha256")
+    kv_transfer_config = pinned_kv_transfer_config(config_pin)
+    if config_pin and kv_transfer_config is None:
+        raise CheckFailure("frozen baseline SparkCache config pin is not retained in the repository")
     return {
-        "baseline_id": record["baseline_id"],
+        "identity_id": record["baseline_id"], "baseline_id": record["baseline_id"],
         "model_repo": system["model"], "model_rev": system["model_revision"],
         "draft_rev": system["drafter"]["revision"], "image_digest": image_digest,
         "max_model_len": str(system["context_limit_tokens"]), "max_num_seqs": seqs.group(1),
@@ -400,11 +457,170 @@ def expected_f0(baseline: Path | None = None) -> dict[str, Any]:
         "sparkcache_mode": "on" if system.get("sparkcache") else "off",
         "spark_mhc_prefill_shard": str(int(system.get("mhc_prefill", {}).get("enabled", False))),
         "payload_pins": {key: value for key, value in {
-            "sparkcache_config_sha256": system.get("sparkcache", {}).get("kv_transfer_config_sha256"),
-            "sparkcache_connector_sha256": system.get("sparkcache", {}).get("connector_sha256"),
-            "sparkcache_encoder_sha256": system.get("sparkcache", {}).get("hybrid_encoder_sha256"),
+            "sparkcache_config_sha256": sparkcache.get("kv_transfer_config_sha256"),
+            "sparkcache_connector_sha256": sparkcache.get("connector_sha256"),
+            "sparkcache_encoder_sha256": sparkcache.get("hybrid_encoder_sha256"),
         }.items() if value},
+        "kv_transfer_config": kv_transfer_config,
     }
+
+
+def expected_operational(identity_path: Path = IDENTITY) -> dict[str, Any]:
+    """Build the default identity from a pinned performance baseline plus explicit deltas."""
+    identity_record = json.loads(identity_path.read_text(encoding="utf-8"))
+    base = identity_record["performance_baseline"]
+    baseline_path = REPO / base["path"]
+    if hashlib.sha256(baseline_path.read_bytes()).hexdigest() != base["sha256"]:
+        raise CheckFailure("operational identity performance baseline hash mismatch")
+    expected = expected_f0(baseline_path)
+    if expected["baseline_id"] != base["id"]:
+        raise CheckFailure("operational identity performance baseline ID mismatch")
+    cache = identity_record["sparkcache"]
+    expected["performance_baseline_id"] = expected["baseline_id"]
+    expected["identity_id"] = identity_record["identity_id"]
+    expected["operational_identity_status"] = identity_record["status"]
+    expected["payload_pins"].update({
+        "sparkcache_connector_sha256": cache["connector_sha256"],
+        "sparkcache_config_sha256": cache["kv_transfer_config_sha256"],
+        "sparkcache_encoder_sha256": cache["hybrid_encoder_sha256"],
+    })
+    config = pinned_kv_transfer_config(cache["kv_transfer_config_sha256"])
+    if config is None:
+        raise CheckFailure("operational SparkCache config pin is not retained in the repository")
+    extra = config.get("kv_connector_extra_config") or {}
+    required = {
+        "spark_cache_root": cache["cache_namespace"],
+        "spark_cache_cpu_budget_bytes": cache["cpu_budget_bytes_per_rank"],
+        "spark_cache_min_available_bytes": cache["min_available_bytes_per_rank"],
+    }
+    if any(extra.get(key) != value for key, value in required.items()):
+        raise CheckFailure("operational SparkCache identity does not match its pinned config")
+    expected["kv_transfer_config"] = config
+    runtime = expected["runtime_identity"]
+    overrides = identity_record["runtime_identity_overrides"]
+    allowed_override_keys = {
+        "container_file_sha256", "environment", "boot_lines", "all_rank_boot_lines",
+        "all_rank_boot_lines_by_rank",
+    }
+    if set(overrides) - allowed_override_keys:
+        raise CheckFailure("operational identity has unsupported runtime overrides")
+    allowed_override_targets = {
+        "/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_connector.py",
+        "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py",
+        "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py",
+        "/opt/tp4/tp4_admission.py",
+    }
+    if set(overrides.get("container_file_sha256", {})) - allowed_override_targets:
+        raise CheckFailure("operational identity has unsupported container file overrides")
+    if set(overrides.get("environment", {})) - set(CANDIDATE_ENV):
+        raise CheckFailure("operational identity has unsupported runtime environment overrides")
+    runtime["container_file_sha256"].update(overrides.get("container_file_sha256", {}))
+    runtime["environment"].update({
+        key: str(value) for key, value in overrides.get("environment", {}).items()
+    })
+    runtime["boot_lines"] = [
+        *runtime.get("boot_lines", []), *overrides.get("boot_lines", [])
+    ]
+    required_boot_lines = [
+        ("SPARKCACHE_CPU_BUDGET_READY "
+         f"cap_bytes={cache['cpu_budget_bytes_per_rank']} "
+         f"floor_bytes={cache['min_available_bytes_per_rank']}"),
+        f"SPARKCACHE_DISK_STREAM_READY chunk_bytes={cache['transfer_chunk_bytes']}",
+    ]
+    if overrides.get("all_rank_boot_lines") != required_boot_lines:
+        raise CheckFailure("operational SparkCache boot lines do not match protection values")
+    runtime["all_rank_boot_lines"] = required_boot_lines
+    rank_lines = overrides.get("all_rank_boot_lines_by_rank", {})
+    if ((rank_lines and set(rank_lines) != {"0", "1", "2", "3"}) or any(
+            not isinstance(lines, list) or not all(isinstance(line, str) and line for line in lines)
+            for lines in rank_lines.values())):
+        raise CheckFailure("operational identity has invalid rank boot lines")
+    if rank_lines:
+        runtime["all_rank_boot_lines_by_rank"] = rank_lines
+
+    engine = identity_record.get("engine_overrides", {})
+    if set(engine) - {"kv_cache_memory_bytes", "actual_kv_cache_tokens"}:
+        raise CheckFailure("operational identity has unsupported engine overrides")
+    if engine:
+        kv_bytes = engine.get("kv_cache_memory_bytes")
+        kv_tokens = engine.get("actual_kv_cache_tokens")
+        if (isinstance(kv_bytes, bool) or not isinstance(kv_bytes, int) or kv_bytes <= 0
+                or isinstance(kv_tokens, bool) or not isinstance(kv_tokens, int)
+                or kv_tokens <= 0):
+            raise CheckFailure("operational identity has invalid engine overrides")
+        if not any(f"GPU KV cache size: {kv_tokens:,} tokens" in line
+                   for line in overrides.get("boot_lines", [])):
+            raise CheckFailure("operational identity KV capacity receipt is missing")
+        expected["kv_cache_memory_bytes"] = str(kv_bytes)
+
+    runtime_sources = identity_record.get("runtime_sources", [])
+    if not isinstance(runtime_sources, list):
+        raise CheckFailure("operational identity runtime sources must be a list")
+    recipe_mounts: dict[str, str] = {}
+    allowed_targets = {
+        "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py",
+        "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py",
+        "/opt/tp4/tp4_admission.py",
+    }
+    for source in runtime_sources:
+        try:
+            path = REPO / source["path"]
+            digest = source["sha256"]
+            target = source["container_path"]
+            mount_source = source["mount_source"]
+        except (KeyError, TypeError) as exc:
+            raise CheckFailure("operational identity has malformed runtime source") from exc
+        if target not in allowed_targets or target in recipe_mounts:
+            raise CheckFailure("operational identity has unsupported or duplicate runtime target")
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            raise CheckFailure("operational identity runtime source hash mismatch")
+        if runtime.get("container_file_sha256", {}).get(target) != digest:
+            raise CheckFailure("operational identity runtime source and container hashes differ")
+        recipe_mounts[target] = mount_source
+    source_override_targets = set(overrides.get("container_file_sha256", {})) & allowed_targets
+    if set(recipe_mounts) != source_override_targets:
+        raise CheckFailure("operational identity runtime sources do not cover its file overrides")
+    if runtime_sources and set(recipe_mounts) != allowed_targets:
+        raise CheckFailure("operational identity runtime source set is incomplete")
+    expected["recipe_mounts"] = recipe_mounts
+
+    admission = identity_record.get("api_admission")
+    if admission:
+        if not all(isinstance(identity_record.get(field), dict)
+                   for field in ("recipe", "rollback")):
+            raise CheckFailure("bounded operational identity requires recipe and rollback metadata")
+        middleware = admission.get("middleware")
+        limits = admission.get("environment")
+        if middleware != "tp4_admission.BoundedAdmissionMiddleware" or not isinstance(limits, dict):
+            raise CheckFailure("operational identity has invalid API admission selection")
+        candidate_limits = {key: str(value) for key, value in limits.items()}
+        runtime_limits = {key: str(value) for key, value in overrides.get("environment", {}).items()
+                          if key.startswith("TP4_ADMISSION_")}
+        if candidate_limits != runtime_limits:
+            raise CheckFailure("operational identity API admission limits disagree")
+        expected["middleware"] = middleware
+    else:
+        expected["middleware"] = None
+    expected["required_runtime_environment"] = {
+        key: str(value) for key, value in overrides.get("environment", {}).items()
+    }
+
+    for field in ("recipe", "rollback"):
+        artifact = identity_record.get(field)
+        if isinstance(artifact, dict):
+            path = REPO / artifact["path"]
+            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != artifact["sha256"]:
+                raise CheckFailure(f"operational identity {field} hash mismatch")
+    expected["direct_operational_recipe"] = (
+        isinstance(identity_record.get("recipe"), dict)
+        and identity_record["recipe"].get("path") == "cluster.env.example"
+    )
+    expected["sparkcache_protection"] = {
+        key: cache[key] for key in (
+            "transfer_chunk_bytes", "cpu_budget_bytes_per_rank", "min_available_bytes_per_rank"
+        )
+    }
+    return expected
 
 
 def flag_values(command: list[str], name: str) -> list[str | None]:
@@ -431,15 +647,43 @@ def docker_env(value: str) -> dict[str, str]:
     return result
 
 
+def docker_mounts(value: str) -> dict[str, list[str]]:
+    tokens, result, index = shlex.split(value), {}, 0
+    while index < len(tokens):
+        item, volume = tokens[index], ""
+        if item in ("-v", "--volume") and index + 1 < len(tokens):
+            index += 1; volume = tokens[index]
+        elif item.startswith("--volume="):
+            volume = item.split("=", 1)[1]
+        fields = volume.split(":")
+        if len(fields) >= 2 and fields[0] and fields[1]:
+            result.setdefault(fields[1], []).append(fields[0])
+        index += 1
+    return result
+
+
 def adaptive_env(value: str) -> dict[str, str]:
     parsed = docker_env(value)
     return {key: parsed.get(key, default) for key, default in ADAPTIVE_DEFAULTS.items()}
 
 
-# Scheduler flags that only records from E27c (E27B/E27C) or E29 (E29) on may carry; older
-# records require absence.
+# Runtime flags that only records from E27c (E27B/E27C), E29 (E29) or E31 (GLM53 indexer
+# switches and flag files) on may carry; a record requires exactly the ones it lists.
 SCHEDULER_FLAGS = ("VLLM_E27B_SHORT_PREFILL_TOKENS", "VLLM_E27C_CADENCE_WHEN_QUEUED",
-                   "VLLM_E29_END_DRAIN", "VLLM_E29_IDLE_COALESCE_MS", "VLLM_E29_TRACE")
+                   "VLLM_E29_END_DRAIN", "VLLM_E29_IDLE_COALESCE_MS", "VLLM_E29_TRACE",
+                   "VLLM_GLM53_INDEXER_GATE_TC", "VLLM_GLM53_KPOOL_TAIL_RING",
+                   "VLLM_GLM53_INDEXER_GATE_TC_FLAG", "VLLM_GLM53_KPOOL_TAIL_RING_FLAG")
+CANDIDATE_ENV = (
+    "VLLM_PREFILL_CACHE_TRIM", "VLLM_RESILIENCE_STEP_TOKEN_CAP",
+    "TP4_ADMISSION_MAX_ACTIVE", "TP4_ADMISSION_MAX_QUEUED", "TP4_ADMISSION_MAX_BODY_BYTES",
+    "TP4_ADMISSION_QUEUE_TIMEOUT_SECONDS", "TP4_ADMISSION_REQUEST_TIMEOUT_SECONDS",
+    "TP4_ADMISSION_BODY_IDLE_SECONDS", "TP4_ADMISSION_SEND_IDLE_SECONDS",
+)
+CANDIDATE_MOUNTS = (
+    "/opt/tp4/tp4_admission.py",
+    "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py",
+    "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py",
+)
 
 
 def compilation_flag(expected: dict[str, Any]) -> list[str]:
@@ -456,6 +700,35 @@ def interval_flag(expected: dict[str, Any]) -> list[str]:
     """Expected --prefill-schedule-interval values: none for the engine default of 1."""
     value = expected.get("prefill_schedule_interval", "1")
     return [] if value == "1" else [value]
+
+
+def candidate_vllm_args(value: str) -> list[str] | None:
+    """Return the only candidate delta allowed over the protected base arguments."""
+    tokens = shlex.split(value)
+    found, result, index = 0, [], 0
+    while index < len(tokens):
+        item = tokens[index]
+        if item == "--kv-cache-memory-bytes" and index + 1 < len(tokens):
+            if tokens[index + 1] != "17179869184": return None
+            result.append("--kv-cache-memory-bytes=15032385536")
+            found += 1; index += 2; continue
+        if item == "--kv-cache-memory-bytes=17179869184":
+            result.append("--kv-cache-memory-bytes=15032385536"); found += 1
+        elif item.startswith("--kv-cache-memory") or item == "--middleware" or item.startswith("--middleware="):
+            return None
+        else:
+            result.append(item)
+        index += 1
+    if found != 1: return None
+    return [*result, "--middleware", "tp4_admission.BoundedAdmissionMiddleware"]
+
+
+MEMORY_BOUNDED_VLLM_ARGS = shlex.split(
+    '--kv-cache-memory-bytes=15032385536 --attention-backend B12X --moe-backend triton '
+    '--linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler '
+    '--prefill-schedule-interval 8 --compilation-config={"max_cudagraph_capture_size":72} '
+    '--middleware tp4_admission.BoundedAdmissionMiddleware'
+)
 
 
 def recipe_problems(recipe: dict[str, str], expected: dict[str, Any]) -> list[str]:
@@ -484,6 +757,7 @@ def recipe_problems(recipe: dict[str, str], expected: dict[str, Any]) -> list[st
     for key, value in expected.get("adaptive_env", ADAPTIVE_DEFAULTS).items():
         if env[key] != value: problems.append("effective baseline adaptive policy: " + key)
     raw_env = docker_env(recipe.get("extra_docker_env", ""))
+    mounts = docker_mounts(recipe.get("extra_docker_env", ""))
     if "NCCL_IB_QPS_PER_CONNECTION" in raw_env: problems.append("NQ2 QPS delta still present")
     args = shlex.split(recipe.get("extra_vllm_args", ""))
     if flag_values(args, "--scheduler-cls") != ["adaptive_k_scheduler.AdaptiveKScheduler"]:
@@ -496,6 +770,13 @@ def recipe_problems(recipe: dict[str, str], expected: dict[str, Any]) -> list[st
         problems.append("baseline prefill schedule interval")
     if unquoted(flag_values(args, "--compilation-config")) != compilation_flag(expected):
         problems.append("baseline compilation config")
+    middleware = expected.get("middleware")
+    if flag_values(args, "--middleware") != ([middleware] if middleware else []):
+        problems.append("operational admission middleware")
+    candidate_args = (MEMORY_BOUNDED_VLLM_ARGS if expected.get("direct_operational_recipe")
+                      else candidate_vllm_args(recipe.get("base_extra_vllm_args", "")))
+    if middleware and args != candidate_args:
+        problems.append("operational candidate engine argument delta")
     if recipe.get("sparkcache_mode", "off") != expected["sparkcache_mode"]:
         problems.append("baseline SparkCache mode")
     if recipe.get("spark_mhc_prefill_shard", "0") != expected["spark_mhc_prefill_shard"]:
@@ -509,6 +790,26 @@ def recipe_problems(recipe: dict[str, str], expected: dict[str, Any]) -> list[st
         # the actual container; only explicit EXTRA_DOCKER_ENV entries live here.
         if key in raw_env and raw_env[key] != str(value):
             problems.append("baseline runtime environment: " + key)
+    for key, value in expected.get("required_runtime_environment", {}).items():
+        if raw_env.get(key) != value:
+            problems.append("operational runtime environment: " + key)
+    for key in CANDIDATE_ENV:
+        if key in raw_env and key not in expected.get("required_runtime_environment", {}):
+            problems.append("baseline runtime environment: unexpected " + key)
+    for target in CANDIDATE_MOUNTS:
+        wanted = expected.get("recipe_mounts", {}).get(target)
+        actual = mounts.get(target, [])
+        if wanted is not None and actual != [wanted]:
+            problems.append("operational runtime mount: " + target)
+        elif wanted is None and actual and (
+                target == "/opt/tp4/tp4_admission.py"
+                or any("/prefill-cache-trim/" in source or "/prefill-step-cap/" in source
+                       for source in actual)):
+            problems.append("baseline runtime mount: unexpected " + target)
+    if any(target.startswith("/opt/tp4-resilience/")
+           or any("/scripts/resilience/.campaign/" in source for source in sources)
+           for target, sources in mounts.items()):
+        problems.append("operational runtime mount: resilience campaign selection")
     for key in SCHEDULER_FLAGS:
         if key in raw_env and key not in identity.get("environment", {}):
             problems.append("baseline runtime environment: unexpected " + key)
@@ -654,6 +955,21 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
             problems.append(f"rank {rank}: command --prefill-schedule-interval")
         if unquoted(options.get("--compilation-config", [])) != compilation_flag(expected):
             problems.append(f"rank {rank}: command --compilation-config")
+        middleware = expected.get("middleware")
+        if options.get("--middleware", []) != ([middleware] if middleware else []):
+            problems.append(f"rank {rank}: command --middleware")
+        admission_mounted = "/opt/tp4/tp4_admission.py" in container.get(
+            "candidate_mount_targets", [])
+        if admission_mounted != bool(middleware):
+            problems.append(f"rank {rank}: admission middleware mount")
+        running_kv_config = container.get("kv_transfer_config")
+        if expected.get("kv_transfer_config") is not None:
+            if running_kv_config != expected["kv_transfer_config"]:
+                problems.append(f"rank {rank}: command --kv-transfer-config")
+        elif expected["sparkcache_mode"] == "on" and not isinstance(running_kv_config, dict):
+            problems.append(f"rank {rank}: command --kv-transfer-config")
+        elif expected["sparkcache_mode"] == "off" and running_kv_config is not None:
+            problems.append(f"rank {rank}: unexpected --kv-transfer-config")
         speculative = container.get("speculative") or {}
         if (speculative.get("method"), speculative.get("model"),
                 speculative.get("num_speculative_tokens")) != ("dflash", "/draft", int(expected["spec_tokens"])):
@@ -685,6 +1001,9 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
         for key in SCHEDULER_FLAGS:
             if key in env and key not in identity.get("environment", {}):
                 problems.append(f"rank {rank}: unexpected runtime environment {key}")
+        for key in CANDIDATE_ENV:
+            if key in env and key not in expected.get("required_runtime_environment", {}):
+                problems.append(f"rank {rank}: unexpected runtime environment {key}")
         for path, sha in identity.get("container_file_sha256", {}).items():
             if container.get("runtime_files", {}).get(path) != sha:
                 problems.append(f"rank {rank}: runtime file {path}")
@@ -696,6 +1015,12 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
             for signature in identity.get("boot_lines", []):
                 if signature not in (receipts.get("boot_lines") or []):
                     problems.append("rank 0: boot signature " + signature)
+        for signature in identity.get("all_rank_boot_lines", []):
+            if signature not in (receipts.get("all_rank_boot_lines") or []):
+                problems.append(f"rank {rank}: boot signature " + signature)
+        for signature in identity.get("all_rank_boot_lines_by_rank", {}).get(str(rank), []):
+            if signature not in (receipts.get("rank_boot_lines") or []):
+                problems.append(f"rank {rank}: boot signature " + signature)
         kda = receipts.get("kda") or {}
         for key, value in identity.get("kda_boot_receipt", {}).items():
             if key == "padded_n":
@@ -798,8 +1123,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", help="endpoint base URL, including a localhost SSH tunnel")
     parser.add_argument("--timeout", type=positive, default=90.0)
-    parser.add_argument("--baseline", type=Path, default=BASELINE,
-                        help="frozen baseline JSON to check against (default: %(default)s)")
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--baseline", type=Path,
+                           help="explicit frozen baseline JSON; default checks the operational identity")
+    selection.add_argument("--identity", type=Path,
+                           help="explicit operational identity JSON; default checks the protected identity")
     parser.add_argument("--report-root", type=Path, help=argparse.SUPPRESS)
     return parser.parse_args(argv)
 
@@ -813,8 +1141,9 @@ def main(argv: list[str] | None = None, *, rank_probe: Callable = probe_rank,
         return 1
     report: dict[str, Any] = {
         "schema": 1, "started_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-        "baseline_file": str(args.baseline),
-        "verified_scope": ["selected baseline recipe and verify-node static checks",
+        "identity_file": str(args.identity or IDENTITY) if args.baseline is None else None,
+        "baseline_file": str(args.baseline) if args.baseline else None,
+        "verified_scope": ["selected identity recipe and verify-node static checks",
                            "running containers, GPU work, flusher and key command identity",
                            "addressed MTU-9000 fabric and eight jumbo directions",
                            "GET /health 200 and endpoint idle metrics"],
@@ -825,8 +1154,10 @@ def main(argv: list[str] | None = None, *, rank_probe: Callable = probe_rank,
     }
     passed = False
     try:
-        recipe, diagnostic = load_recipe(args.timeout); expected = expected_f0(args.baseline)
-        report["baseline_id"] = expected["baseline_id"]
+        recipe, diagnostic = load_recipe(args.timeout)
+        expected = (expected_f0(args.baseline) if args.baseline
+                    else expected_operational(args.identity or IDENTITY))
+        report["identity_id"] = expected["identity_id"]
         configuration_problems = recipe_problems(recipe, expected)
         if configuration_problems:
             report.update({"configuration_diagnostic": diagnostic,
@@ -844,7 +1175,7 @@ def main(argv: list[str] | None = None, *, rank_probe: Callable = probe_rank,
             endpoint = http_probe(base_url, args.timeout)
             ranks = [future.result() for future in futures]
         problems = evaluate(recipe, expected, ranks, endpoint); passed = not problems
-        report.update({"configuration_diagnostic": diagnostic, "expected_baseline": expected,
+        report.update({"configuration_diagnostic": diagnostic, "expected_identity": expected,
                        "rank_probes": [reportable_rank_probe(item) for item in ranks],
                        "endpoint": endpoint, "problems": problems})
     except Exception as exc:
@@ -853,7 +1184,7 @@ def main(argv: list[str] | None = None, *, rank_probe: Callable = probe_rank,
             report["problems"] = [f"{type(exc).__name__}: {detail}"]
     report["status"] = "PASS" if passed else "FAIL"
     report["finished_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
-    write_report(directory, report); print_summary(passed, report.get("baseline_id", "BASELINE"))
+    write_report(directory, report); print_summary(passed, report.get("identity_id", "BASELINE"))
     return 0 if passed else 1
 
 

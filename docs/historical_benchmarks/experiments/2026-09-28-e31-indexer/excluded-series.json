@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-28-e31-indexer",
+  "series": [
+    {
+      "name": "std",
+      "status": "excluded_not_a_measurement",
+      "reason": "Stopped by owner direction during suite 1 (arm E): the upstream template default selects maximum reasoning effort, and the owner asked for Alex Ellis's exact reference flags (reasoning_effort low). No receipt was written; the partial log is retained privately."
+    },
+    {
+      "name": "low",
+      "status": "excluded_not_a_measurement",
+      "reason": "Stopped by owner direction during suite 1: it used the local Rigmark fork that forwards cache_salt to prefill requests, with a cache salt; the owner asked for upstream, unmodified Rigmark with the reference flags. No receipt was written; the partial log is retained privately."
+    }
+  ]
+}

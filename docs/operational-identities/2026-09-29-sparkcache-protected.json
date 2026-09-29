@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "identity_id": "2026-09-29-sparkcache-protected",
+  "status": "deployed; four-rank live identity verified",
+  "description": "The measured E31 engine recipe with bounded SparkCache disk transfers and shared transient-memory admission enabled as the operational default.",
+  "performance_baseline": {
+    "id": "2026-09-28-e31",
+    "path": "docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json",
+    "sha256": "33647fe7c40840f1bdeaefea31e97493f4a98187492acf158c7e006c80a150b1"
+  },
+  "sparkcache": {
+    "connector_sha256": "aa046965637b685ec1f6a00e427eb46279e28bf0d49ee546236bc774be2de9bd",
+    "kv_transfer_config_sha256": "d99bd6720572b2f46668d0a11229f7662f1e8fdd69a69f61cbfa5592aa600c72",
+    "hybrid_encoder_sha256": "11a2db855306b816a4f3d377d04207cc2d62112a381bcc54162099248bbf75f6",
+    "transfer_chunk_bytes": 8388608,
+    "cpu_budget_bytes_per_rank": 1073741824,
+    "min_available_bytes_per_rank": 1073741824,
+    "cache_namespace": "/cache/jit/sparkcache-e22b-drafter-context-bf16-cpu-budget-v1"
+  },
+  "runtime_identity_overrides": {
+    "container_file_sha256": {
+      "/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_connector.py": "aa046965637b685ec1f6a00e427eb46279e28bf0d49ee546236bc774be2de9bd"
+    },
+    "all_rank_boot_lines": [
+      "SPARKCACHE_CPU_BUDGET_READY cap_bytes=1073741824 floor_bytes=1073741824",
+      "SPARKCACHE_DISK_STREAM_READY chunk_bytes=8388608"
+    ]
+  },
+  "rollback": "scripts/node/reference/baseline-20260928-e31.env",
+  "verification": {
+    "date": "2026-09-29",
+    "launcher_parity_ranks": 4,
+    "live_identity_ranks": 4,
+    "functional_gates": {
+      "passed": 2,
+      "total": 2,
+      "seconds_since_health": 3.6
+    },
+    "autostart_uses_default": true,
+    "resilience_campaign": "in progress; no resilience verdict yet"
+  }
+}

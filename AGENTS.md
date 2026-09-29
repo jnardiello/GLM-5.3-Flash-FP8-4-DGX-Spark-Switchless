@@ -18,8 +18,10 @@ for each part of the requested task before substantive work:
 
 For installation, read both [`docs/install-from-zero.md`](docs/install-from-zero.md)
 and [`docs/operations.md`](docs/operations.md). The default recipe is
-[`cluster.env.example`](cluster.env.example); its measured identity and performance
-record is [`docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json`](docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json). Preserve its
+[`cluster.env.example`](cluster.env.example); its current identity is
+[`docs/operational-identities/2026-09-29-memory-bounded.json`](docs/operational-identities/2026-09-29-memory-bounded.json).
+The unchanged E31 performance record is
+[`docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json`](docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json). Preserve the recipe's
 non-site settings unless the owner requests a variant. Use this checklist to navigate
 the existing procedures:
 
@@ -144,37 +146,57 @@ benchmark interface. Do not recreate it with private wrapper scripts, blanket ca
 qualification prerequisites, or a parallel benchmark/admission framework; necessary
 measurement fixes belong in Rigmark.
 
-Run one experiment at a time. Use the owner-accepted **September 25, 2026 E29**
-reference in [`docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json`](docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json)
-for future comparisons. Its fixed medians use exactly three complete native Rigmark
-suites (162 requests) measured on one load of the E29 candidate. That is the E28b recipe
-(seven draft tokens for a single request and a 16 GiB KV pool per rank) plus the end-drain
-scheduler and a 4 ms idle-coalescing window in the engine core. The client reached the
-rank-0 API over direct LAN HTTP; keep that path for comparisons of small effects.
+Run one experiment at a time. The owner-accepted **September 28, 2026 E31** reference is
+[`docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json`](docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json):
+the E29 recipe (E28b's seven draft tokens and 16 GiB KV pool, the end-drain scheduler and
+4 ms idle coalescing) plus the speculative-safe C4 tail ring, with the head-gate switch off.
+It holds one suite of the promoted arm (n = 1) and a same-load E29-equivalent arm. The
+client reached the rank-0 API over direct LAN HTTP; keep that path for small effects.
 
-The IaC defaults in `cluster.env.example` select those measured sources: the E03 mHC
+**Rigmark policy (owner, September 28, 2026).** Measure with upstream, unmodified Rigmark
+(`alexellis/rigmark`, the revision in the current record's `rigmark.source`) and exactly
+the reference flags of Alex Ellis's GLM receipts: every default plus
+`--extra-body '{"chat_template_kwargs": {"reasoning_effort": "low"}}'`, no `cache_salt`, and
+a fresh `--comparison-id` for every suite (its nonce at the start of every prompt isolates
+the cache). Compare a candidate against a reference arm measured on the same load with the
+same flags. Quick screens may run one suite per arm on one load, switching arms at runtime
+where the candidate allows it; label them n = 1. Frozen records up to E29 used 8,192 decode
+tokens, thinking off and a local Rigmark fork that forwarded `cache_salt` to prefill
+requests; they are historical and not comparable with the current flags.
+
+The IaC defaults in `cluster.env.example` select those measured engine sources: the E03 mHC
 6,912-row prefill, replay views and effective draft-budget cap, the E21 residual
 projections, the E22b drafter conversion and its cache namespace, and the E27 prefill
-cadence with the E27c scheduler, the E28b draft length and 16 GiB KV pool, and the E29
-end-drain scheduler and idle coalescing, retaining hybrid KDA.
-`scripts/check-f0.py` selects this identity by default without inference. The
-[promotion record](docs/historical_benchmarks/baselines/2026-09-25-e29/promotion.json)
-records how the default was applied. The immediate rollback is
-`scripts/node/reference/baseline-20260925-e28b.env`, the complete E28b recipe.
+cadence with the E27c scheduler, the E28b draft length, the E29
+end-drain scheduler and idle coalescing, and the E31 indexer tail ring, retaining hybrid KDA.
+They also select the protected SparkCache connector and its 8 MiB transfers, shared 1 GiB
+transient budget per rank and 1 GiB admission floor, a 14 GiB operational KV pool,
+eager-prefill allocator trim, a 6,912-token step cap and bounded API admission. E31's
+frozen performance record retains its measured 16 GiB engine. `scripts/check-f0.py` selects the
+versioned operational identity by default; use `--baseline` explicitly for a historical
+performance identity. The
+[promotion record](docs/historical_benchmarks/baselines/2026-09-28-e31/promotion.json)
+records how E31 was applied. The immediate operational rollback is
+`scripts/node/reference/operational-20260929-sparkcache-protected.env`, the complete
+protected E31 operational recipe with a 16 GiB KV pool. The historical performance return is
+`scripts/node/reference/baseline-20260928-e31.env`, the complete measured E31 recipe with
+the previous cache management. The older E29 return remains
+`scripts/node/reference/baseline-20260925-e29.env`.
 
 Rigmark's optional interference phase (`--interference-depths`) measures running
 requests' decode while another request cold-prefills. Use its protocol 2, which the
 E29 record stores with its Rigmark source hash (one execution; the E27c record holds the earlier values), for scheduling candidates, together with
 several long contexts arriving at once: the standard suites cover neither case.
 
-The [previous E28b reference](docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json),
+The [previous E29 reference](docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json),
+the [E28b reference](docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json),
 the [E27c reference](docs/historical_benchmarks/baselines/2026-09-25-e27c/baseline.json),
 the [E27 reference](docs/historical_benchmarks/baselines/2026-09-24-e27/baseline.json),
 the [E22b reference](docs/historical_benchmarks/baselines/2026-09-23-e22b/baseline.json),
 the [E21 reference](docs/historical_benchmarks/baselines/2026-09-23-e21/baseline.json)
 and the [E03 reference](docs/historical_benchmarks/baselines/2026-09-19-e03/baseline.json)
 remain immutable at three suites / 162 requests each; their complete returns are
-`baseline-20260925-e28b.env`, `baseline-20260925-e27c.env`, `baseline-20260924-e27.env`, `baseline-20260924-e22b.env`,
+`baseline-20260925-e29.env`, `baseline-20260925-e28b.env`, `baseline-20260925-e27c.env`, `baseline-20260924-e27.env`, `baseline-20260924-e22b.env`,
 `baseline-20260923-e21.env` and
 `baseline-20260919-e03.env`,
 and the older pre-E03 return is `scripts/node/reference/baseline-20260919.env`.
@@ -189,9 +211,10 @@ an explicit owner request.
 ### Run the benchmark
 
 Use the selected frozen record's `rigmark.source`, prompts and settings as the
-execution specification. Keep version/source hash, comparison ID, model, seed,
-request body, reasoning controls, token limits, prefill depths and concurrency
-settings matched. Do not substitute Rigmark's defaults for explicit recorded values.
+execution specification. Keep version/source hash, model, seed, request body, reasoning
+controls, token limits, prefill depths and concurrency settings matched; for the current
+reference these are the upstream defaults plus the reference `--extra-body`. Use a fresh
+comparison ID per suite. Do not substitute other values for explicit recorded ones.
 For the current reference, the complete suite has 54 requests: five requests for each
 of three decode workloads, three cold/replay pairs at each of three prefill depths,
 and three rounds at concurrency 1/2/4. `--runs 5` is an internal suite setting;
@@ -199,10 +222,9 @@ and three rounds at concurrency 1/2/4. `--runs 5` is an internal suite setting;
 
 Run one experiment at a time. By default run each variant three consecutive times,
 with one authorized coordinated four-rank transition and one weight load retained
-across the series. Use comparable idle, warmup and cache conditions. Generate a fresh
-`cache_salt` for every complete execution, forwarded to both chat and prefill requests;
-preserve it within that run's cold/replay pairs. Keep the comparison ID matched to
-the reference so the benchmark prompt construction remains comparable.
+across the series; the owner's quick-screen practice above may shorten this to one suite
+per arm. Use comparable idle, warmup and cache conditions. Do not send a `cache_salt`
+with the current flags; the fresh comparison ID per suite isolates the cache.
 
 **Every native `./rigmark run` command must specify `--output`:**
 

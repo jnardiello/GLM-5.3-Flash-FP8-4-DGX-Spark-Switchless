@@ -1,0 +1,126 @@
+--- a/vllm/models/glm5next/nvidia/pooled_indexer.py
++++ b/vllm/models/glm5next/nvidia/pooled_indexer.py
+@@ -5,6 +5,8 @@
+ from __future__ import annotations
+ 
+ import math
++import os
++import time
+ from typing import TYPE_CHECKING, Any, cast
+ 
+ import torch
+@@ -15,6 +17,7 @@
+ from vllm.config import CacheConfig, CUDAGraphMode, VllmConfig
+ from vllm.distributed import get_dcp_group
+ from vllm.forward_context import get_forward_context
++from vllm.logger import init_logger
+ from vllm.model_executor.layers.layernorm import LayerNorm
+ from vllm.model_executor.layers.linear import ReplicatedLinear
+ from vllm.model_executor.layers.quantization.base_config import QuantizationConfig
+@@ -50,7 +53,43 @@
+ _INDEX_PAGE_BYTES = _INDEX_PAGE_SIZE * _INDEX_CACHE_WIDTH
+ _MLA_RECORD_BYTES = 528
+ 
++# E31 (TP4 candidate) switches. Each NAME (0/1, read at import) sets a default; a file
++# named by NAME_FLAG overrides it with content 1/0, re-read at most every 0.5 s; a
++# missing or unreadable file, or other content, means the default.
++# VLLM_GLM53_INDEXER_GATE_TC (default 0), after the Apache-2.0 RiNGSiDE patch of that
++# name: the head gate as a BF16 tensor-core GEMM with FP32 output. Both operands are
++# exact BF16 values, so the products equal the FP32 path's; only accumulation order
++# differs. VLLM_GLM53_KPOOL_TAIL_RING (default 1): the speculative-safe tail ring of
++# ops/glm_kpool.py; 0 keeps the legacy four slots. Switch the ring only while no request
++# is running, because the tail contents are specific to the ring size.
++logger = init_logger(__name__)
+ 
++
++def _e31_switch(name: str, default: str) -> dict:
++    value = os.environ.get(name, default)
++    if value not in ("0", "1"):
++        raise ValueError(f"{name} must be 0 or 1")
++    flag = os.environ.get(f"{name}_FLAG") or None
++    return {"default": value, "on": value == "1", "flag": flag, "at": -1.0}
++
++
++def _e31_on(switch: dict) -> bool:
++    if switch["flag"] is not None and time.monotonic() - switch["at"] >= 0.5:
++        switch["at"] = time.monotonic()
++        try:
++            with open(switch["flag"]) as flag:
++                value = flag.read().strip()
++        except OSError:
++            value = switch["default"]
++        switch["on"] = (value if value in ("0", "1") else switch["default"]) == "1"
++    return bool(switch["on"])
++
++
++_E31_GATE_TC = _e31_switch("VLLM_GLM53_INDEXER_GATE_TC", "0")
++_E31_TAIL_RING = _e31_switch("VLLM_GLM53_KPOOL_TAIL_RING", "1")
++_e31 = {"usable": True, "path": None, "ring": None}
++
++
+ class Glm5NextPooledIndexer(nn.Module):
+     """Produce GLM C4 pools, select them with b12x, and expand token IDs."""
+ 
+@@ -129,6 +168,11 @@
+             raise ValueError("GLM pool selection buffer has the wrong row capacity")
+ 
+         device = topk_indices_buffer.device
++        # E31: 4 * cdiv(4 + K, 4) tail slots for K speculative tokens (4 without).
++        spec = vllm_config.speculative_config
++        spec_tokens = int(spec.num_speculative_tokens) if spec is not None else 0
++        ring_pools = math.ceil((_POOL_SIZE + spec_tokens) / _POOL_SIZE)
++        self._tail_ring = _POOL_SIZE * ring_pools
+         self.index_kpool_compress_ape = nn.Parameter(
+             torch.empty(
+                 (_POOL_SIZE, _INDEX_HEAD_DIM),
+@@ -183,7 +227,7 @@
+         self.register_buffer(
+             "_tail",
+             torch.empty(
+-                (self.max_seqs, 2, _POOL_SIZE, _INDEX_HEAD_DIM),
++                (self.max_seqs, 2, self._tail_ring, _INDEX_HEAD_DIM),
+                 dtype=torch.bfloat16,
+                 device=device,
+             ),
+@@ -352,6 +396,21 @@
+         self._index_cache = None
+ 
+     def _project_head_weights(self, hidden_states: torch.Tensor) -> torch.Tensor:
++        # E31: forward is @eager_break_during_capture; the image's breakable_cudagraph
++        # re-runs it eagerly on every graph replay, so this applies without recapture.
++        weight = self.weights_proj.weight
++        use_tc = _e31_on(_E31_GATE_TC) and _e31["usable"]
++        use_tc = use_tc and hidden_states.dtype == torch.bfloat16
++        use_tc = use_tc and weight.dtype == torch.bfloat16
++        if _e31["path"] != (path := "bf16-tc" if use_tc else "fp32"):
++            _e31["path"] = path
++            logger.info("E31_INDEXER_GATE path=%s", path)
++        if use_tc:
++            try:
++                return torch.mm(hidden_states, weight.t(), out_dtype=torch.float32)
++            except (TypeError, RuntimeError) as exc:  # first call probes out_dtype
++                _e31["usable"] = False
++                logger.warning("E31_INDEXER_GATE bf16-tc unavailable: %s", exc)
+         if self._weights_proj_fp32 is None:
+             self._weights_proj_fp32 = self.weights_proj.weight.detach().float()
+         return F.linear(hidden_states.float(), self._weights_proj_fp32)
+@@ -431,6 +490,11 @@
+                 f"actual={actual_table_width}, required={self._parent_table_width}"
+             )
+ 
++        # E31: forward is @eager_break_during_capture (see _project_head_weights).
++        tail_ring = self._tail_ring if _e31_on(_E31_TAIL_RING) else _POOL_SIZE
++        if _e31["ring"] != tail_ring:
++            _e31["ring"] = tail_ring
++            logger.info("E31_KPOOL_TAIL_RING ring=%d", tail_ring)
+         update_decode_pools(
+             index_cache,
+             self._tail,
+@@ -446,6 +510,7 @@
+             max_query_len=int(main_metadata.max_query_len),
+             model_block_size=self.block_size,
+             parent_stride_pages=self._parent_stride_pages,
++            tail_ring=tail_ring,
+         )
+         parent_table = main_metadata.block_table[:num_reqs, : self._parent_table_width]
+         seq_lens = self._pool_seq_lens[:live_rows]

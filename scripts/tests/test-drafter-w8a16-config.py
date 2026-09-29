@@ -27,6 +27,7 @@ REPO = Path(__file__).resolve().parents[2]
 E03 = REPO / "scripts/node/experiments/e03"
 CANDIDATE = E03 / "drafter-w8a16"
 PARENT = E03 / "bf16-residue"
+PROTECTED16 = REPO / "scripts/node/reference/operational-20260929-sparkcache-protected.env"
 OVERRIDE = CANDIDATE / "qwen3_dflash2.py"
 MODULE = CANDIDATE / "e22_drafter_w8a16.py"
 MANIFEST = json.loads((CANDIDATE / "manifest.json").read_text())
@@ -313,9 +314,11 @@ RELAY_DEST=operator@192.0.2.23
             e21 = (REPO / "scripts/node/reference/baseline-20260923-e21.env").read_text() + "\n"
             # E27 is now the default; its complete E22b return must equal the measured E22b load.
             e22b = (REPO / "scripts/node/reference/baseline-20260924-e22b.env").read_text() + "\n"
-            (root / "empty.env").write_text("")
+            e31 = (REPO / "scripts/node/reference/baseline-20260928-e31.env").read_text() + "\n"
+            (root / "protected16.env").write_text(PROTECTED16.read_text())
             (root / "e21.env").write_text(e21)
             (root / "e22b.env").write_text(e22b)
+            (root / "e31.env").write_text(e31)
             (root / "candidate.env").write_text(e21 + delta)
             env = dict(os.environ, TP4_DRY_RUN="1")
             env.pop("TP4_ENV", None)
@@ -351,17 +354,22 @@ RELAY_DEST=operator@192.0.2.23
                 self.assertEqual(Counter(before) - Counter(after), Counter([old_cfg]))
                 self.assertEqual(Counter(after) - Counter(before),
                                  Counter([new_cfg, "-v", override, "-v", module, "-e", flags[0], "-e", flags[1]]))
-                # The E22b return is exactly the measured E22b command; the E29 default adds the
+                # The E22b return is exactly the measured E22b command; the E31 default adds the
                 # prefill cadence, the E29 scheduler (E27c patch included) and engine core with
-                # their flags, and the E28b draft length and KV pool.
+                # their flags, the E28b draft length and KV pool, and swaps in the E31 indexer
+                # sources with their two flag files.
                 self.assertEqual(argv(launch("e22b.env", rank)), after)
-                current = argv(launch("empty.env", rank))
+                current_e31 = argv(launch("e31.env", rank))
+                current = argv(launch("protected16.env", rank))
                 spec = lambda k: ('{"method":"dflash","model":"/draft","num_speculative_tokens":%d,'
                                   '"num_speculative_tokens_per_batch_size":[[1,1,%d],[2,6,3]],'
                                   '"kv_cache_dtype":"fp8_e4m3"}' % (k, k))
-                self.assertEqual(Counter(after) - Counter(current),
-                                 Counter([spec(5), "--kv-cache-memory-bytes=16106127360"]))
-                self.assertEqual(Counter(current) - Counter(after), Counter([
+                indexer = str(Path.home()) + "/tp4/%s:/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/%s:ro"
+                self.assertEqual(Counter(after) - Counter(current_e31), Counter([
+                    spec(5), "--kv-cache-memory-bytes=16106127360",
+                    indexer % ("overrides/vllm/models/glm5next/nvidia/pooled_indexer.py", "pooled_indexer.py"),
+                    indexer % ("overrides/vllm/models/glm5next/nvidia/ops/glm_kpool.py", "ops/glm_kpool.py")]))
+                self.assertEqual(Counter(current_e31) - Counter(after), Counter([
                     "--prefill-schedule-interval", "8", "-v",
                     str(Path.home()) + "/tp4/experiments/e03/end-drain/scheduler.py:"
                     "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py:ro",
@@ -370,7 +378,23 @@ RELAY_DEST=operator@192.0.2.23
                     "--kv-cache-memory-bytes=17179869184", "-v",
                     str(Path.home()) + "/tp4/experiments/e03/end-drain/core.py:"
                     "/usr/local/lib/python3.12/dist-packages/vllm/v1/engine/core.py:ro",
-                    "-e", "VLLM_E29_END_DRAIN=1", "-e", "VLLM_E29_IDLE_COALESCE_MS=4", "-e", "VLLM_E29_TRACE=0"]))
+                    "-e", "VLLM_E29_END_DRAIN=1", "-e", "VLLM_E29_IDLE_COALESCE_MS=4", "-e", "VLLM_E29_TRACE=0",
+                    indexer % ("experiments/e03/e31-indexer/pooled_indexer.py", "pooled_indexer.py"),
+                    indexer % ("experiments/e03/e31-indexer/glm_kpool.py", "ops/glm_kpool.py"),
+                    "-e", "VLLM_GLM53_INDEXER_GATE_TC_FLAG=/tmp/glm53-indexer-gate-tc",
+                    "-e", "VLLM_GLM53_KPOOL_TAIL_RING_FLAG=/tmp/glm53-kpool-tail-ring"]))
+                old_connector = (f"{home}/tp4/sparkcache/spark_context_cache_connector-e03-replay-views.py:"
+                                 "/usr/local/lib/python3.12/dist-packages/sparkcache/"
+                                 "spark_context_cache_connector.py:ro")
+                protected_connector = (f"{home}/tp4/sparkcache/spark_context_cache_connector-ram-budget.py:"
+                                       "/usr/local/lib/python3.12/dist-packages/sparkcache/"
+                                       "spark_context_cache_connector.py:ro")
+                protected_cfg = (f"<canonical JSON of {home}/tp4/experiments/e03/"
+                                 "sparkcache-ram-budget/kv-transfer-config.json>")
+                self.assertEqual(Counter(current_e31) - Counter(current),
+                                 Counter([new_cfg, old_connector]))
+                self.assertEqual(Counter(current) - Counter(current_e31),
+                                 Counter([protected_cfg, protected_connector]))
                 mounts = [after[i + 1] for i, item in enumerate(after[:-1]) if item == "-v"]
                 targets = [item.split(":")[1] for item in mounts]
                 self.assertEqual(len(targets), len(set(targets)), "Duplicate container mount")

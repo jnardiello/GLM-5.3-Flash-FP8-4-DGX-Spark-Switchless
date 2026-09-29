@@ -19,19 +19,23 @@ The launcher verifies the selected connector and encoder against the SHA-256 pin
 
 | File | SHA-256 | Origin | Use |
 | --- | --- | --- | --- |
-| `spark_context_cache_connector-e03-replay-views.py` | `5893f8747aa0…` | Upstream connector plus patches 01, 02 and 03 | Current connector (E03 onward) |
+| `spark_context_cache_connector-ram-budget.py` | `aa046965637b6…` | Replay connector plus patch 05 | Current protected connector |
+| `spark_context_cache_memory_budget.py` | `980593295d68…` | Project-authored Apache-2.0 helper, embedded into the protected connector | Atomic transient-memory reservations |
+| `spark_context_cache_connector-e03-replay-views.py` | `5893f8747aa0…` | Upstream connector plus patches 01, 02 and 03 | E31 rollback connector |
 | `spark_context_cache_hybrid.py` | `11a2db855306…` | Upstream encoder plus patch 04 | Current encoder |
 | `spark_context_cache_connector.py` | `23c1e05cc3bb…` | Upstream connector plus patches 01 and 02 | September 19 rollback |
 | `spark_context_cache_connector-20260918.py` | `a0bedc1c33a3…` | Upstream connector plus patch 01 | September 18 rollback |
 
 ## Changes made by this project
 
-**Modified files notice:** this project changed all four files above. Each patch in
+**Modified files notice:** this project changed the upstream-derived files above and
+authored the memory-budget helper. Each patch in
 [`patches/`](patches/) is the complete unified diff for one change, so the files can be
 compared with upstream line by line. All other code is unchanged SparkCache code.
 
 | Patch | Files | Change |
 | --- | --- | --- |
+| [`05-connector-ram-budget.patch`](patches/05-connector-ram-budget.patch) | Connector | Shared memory admission and disk transfers in 8 MiB pieces, with owner-scoped release. [`sparkcache-ram-budget/prepare.py`](../../scripts/node/experiments/e03/sparkcache-ram-budget/prepare.py) embeds the helper, `bounded_connector.py` and `stream_io.py`; the latter adapts publication from upstream `cache_manifest.py` at the same pinned commit. See [limits and activation](../../scripts/node/experiments/e03/sparkcache-ram-budget/README.md). |
 | [`01-connector-pending-publication.patch`](patches/01-connector-pending-publication.patch) | Connector | A replay that finds its prefix still being published by another rank waits up to `spark_cache_pending_wait_ms` for every rank to confirm it, instead of recomputing. It adds the option, the wait and its trace logging. |
 | [`02-connector-memory.patch`](patches/02-connector-memory.patch) | Connector | The saver commits each item in its own call frame, so the item's references are released before the next queue wait. [`scripts/prepare-sparkcache.py`](../../scripts/prepare-sparkcache.py) applies it. |
 | [`03-connector-replay-views.patch`](patches/03-connector-replay-views.patch) | Connector | A restore reads each layer as a view of the authenticated snapshot instead of copying its whole body again. [`replay-views/prepare.py`](../../scripts/node/experiments/e03/replay-views/prepare.py) applies it. |

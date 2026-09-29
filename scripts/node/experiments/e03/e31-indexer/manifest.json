@@ -1,0 +1,71 @@
+{
+  "schema": "tp4-experiment-candidate/v1",
+  "experiment": "E31",
+  "candidate": "e31-indexer",
+  "status": "promoted",
+  "status_note": "Promoted on 2026-09-28 as the E31 reference with the measured switch defaults: tail ring on (VLLM_GLM53_KPOOL_TAIL_RING unset = 1), head gate off (VLLM_GLM53_INDEXER_GATE_TC unset = 0; its A/B is unresolved). cluster.env.example mounts both files and names both flag files; the overlay refuses the E31 default, apply it on scripts/node/reference/baseline-20260925-e29.env to reproduce the measured load.",
+  "summary": "E29 plus two runtime-selectable indexer changes. (1) Head gate on tensor cores: with its flag at 1, the per-layer head gate (N=32 index heads, K=4096) is a BF16 tensor-core GEMM with FP32 accumulation and FP32 output, replacing the FP32 SIMT GEMM and the BF16-to-FP32 copy of hidden_states; the products are unchanged and only the accumulation order differs, which can reorder near-tie pool selections. (2) Speculative-safe C4 tail ring (fix candidate, on by default in the overlay): the per-request key/gate tail that completes four-token pools had four slots indexed by position % 4, so the rows of a DFlash verify step (1 + K positions, including drafts that may be rejected) overwrote committed members of the still-open pool, and the next step completed that pool from rejected-draft keys. The ring has 4 * cdiv(4 + K, 4) slots (12 for K = 7) indexed by position % ring, while the ape/pool phase stays position % 4; no row of one step can then reach a committed member of the open pool.",
+  "parent": {
+    "recipe": "cluster.env.example defaults (accepted E29)",
+    "baseline_id": "2026-09-25-e29",
+    "baseline_sha256": "f7d7b0dfa9eec863c183ff46dbafb2f32ab8e2c140afb5e75f515322af15895e"
+  },
+  "files": {
+    "pooled_indexer.py": {
+      "base_path": "scripts/node/overrides/vllm/models/glm5next/nvidia/pooled_indexer.py",
+      "base_sha256": "a8b55ac2a80b94b263160a5a17bd88fbf0663cdc536a3a0c4447b390ee28dfe9",
+      "patch": "pooled_indexer.patch",
+      "patch_base": "base_path",
+      "patch_sha256": "8ff725f541f75c4eed8d891662fb81607c76441e4ec730df365eb1b7d16cf167",
+      "candidate_sha256": "fe3ee1ce067c8824daf128d30e5accac0b9950600bc7dfc5808def9a2bfca1d2",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/pooled_indexer.py",
+      "change": "The production pooled_indexer.py plus pooled_indexer.patch, which adds lines and replaces only the _tail shape. _project_head_weights calls torch.mm(hidden_states, W.t(), out_dtype=torch.float32) when the switch is on and both operands are BF16; the first call probes out_dtype, and a TypeError or RuntimeError disables the path for the process with a warning. Otherwise it runs the unchanged FP32 path. VLLM_GLM53_INDEXER_GATE_TC (0 or 1, read at import, default 0) is the default; when VLLM_GLM53_INDEXER_GATE_TC_FLAG is set, the named file's content 1 or 0 overrides it, re-read at most every 0.5 s with a monotonic clock; a missing or unreadable file, or other content, means the default. With VLLM_GLM53_INDEXER_GATE_TC_FLAG unset there is no file access. The forward is @eager_break_during_capture, which the image's breakable_cudagraph re-runs eagerly on every graph replay, so a change applies without recapture. The tail (and its MTP snapshot) holds 4 * cdiv(4 + K, 4) slots for K = speculative_config.num_speculative_tokens (4 without speculation); VLLM_GLM53_KPOOL_TAIL_RING (default 1, flag file VLLM_GLM53_KPOOL_TAIL_RING_FLAG, same semantics) passes that ring, or 4 for the legacy mapping, to update_decode_pools on every forward and logs E31_KPOOL_TAIL_RING ring=<n> on each change. Switch it only while no request is running."
+    },
+    "glm_kpool.py": {
+      "base_path": "scripts/node/overrides/vllm/models/glm5next/nvidia/ops/glm_kpool.py",
+      "base_sha256": "960515841061a6d89868f06876b3014f8b1247f9edf22c726b61819c7e4e5479",
+      "patch": "glm_kpool.patch",
+      "patch_base": "base_path",
+      "patch_sha256": "8872e65668d7ed99d5614766ab4e4cdfb487b647d11c753939762b53cb31af74",
+      "candidate_sha256": "41fd6992cb1441d7964324a428e03dba48a52e8727c7032abaa1f9af5184bacc",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/ops/glm_kpool.py",
+      "change": "The production glm_kpool.py plus glm_kpool.patch: a runtime int argument tail_ring for _decode_update_kernel, _prefill_pool_kernel and _prefill_tail_kernel and update_decode_pools(..., tail_ring=4), validated against the tail capacity. Tail stores use position % tail_ring; decode pool reads use (pool_start + slot) % tail_ring with pool_start = position - position % 4; prefill pool reads of members before the chunk use (completion_position - 3 + slot) % tail_ring; the ape and pool phase stay position % 4. With tail_ring = 4 every index equals the legacy one. Six tail-offset lines are replaced; the rest is added."
+    }
+  },
+  "activation": {
+    "flags": {
+      "VLLM_GLM53_INDEXER_GATE_TC": "unset (0) in the overlay",
+      "VLLM_GLM53_INDEXER_GATE_TC_FLAG": "/tmp/glm53-indexer-gate-tc inside the container; written with docker exec, no bind mount",
+      "VLLM_GLM53_KPOOL_TAIL_RING": "unset (1, E31 ring) in the overlay",
+      "VLLM_GLM53_KPOOL_TAIL_RING_FLAG": "/tmp/glm53-kpool-tail-ring inside the container; switch only while no request is running"
+    },
+    "overlay": "scripts/node/experiments/e03/e31-indexer/delta.env",
+    "runtime_signatures": [
+      "E31_INDEXER_GATE path=fp32",
+      "E31_INDEXER_GATE path=bf16-tc",
+      "E31_INDEXER_GATE bf16-tc unavailable",
+      "E31_KPOOL_TAIL_RING ring=12",
+      "E31_KPOOL_TAIL_RING ring=4"
+    ]
+  },
+  "leaf_test": "leaf_gate_tc.py: single-GPU, Torch-only comparison of both head-gate paths (error, top-512 pool-selection proxy, eager, CUDA-graph and alternating A/B timings). leaf_kpool_tail_ring.py: the E31 Triton kernels with production page geometry (2304-token parent pages with their FP8 index tail), several requests in mixed decode-then-prefill batches with non-contiguous state slots, chunked prefill and DFlash-style verify steps with rejections; committed pools are compared with a prefill over the committed tokens and, for sampled pools, an independent Torch computation of the pool formula. It passes only if the reference is finite, non-zero, distinct and matches the independent pools, the legacy ring corrupts pools on the reported counterexample and on the random schedule, and the E31 ring corrupts none. scripts/tests/test-e31-kpool-tail-ring.py proves the index arithmetic offline and runs the leaf's schedules and geometry through the simulation.",
+  "provenance": {
+    "gate": {
+      "idea": "GLM53_INDEXER_GATE_TC in othexmr/GLM-5.3-Flash-NVFP4-2x-4x-DGX-Sparks-RiNGSiDE patches/vllm/tp4/models-glm5next-nvidia-attention.py.patch",
+      "revision": "776054810b1603b0250b55edaafecad4881a9bf5",
+      "license": "Apache-2.0"
+    },
+    "tail_ring": {
+      "idea": "the speculative-decoding compressor ring of vllm#58454, also ported by RiNGSiDE",
+      "license": "Apache-2.0"
+    },
+    "note": "Both ideas are reimplemented for this repository's pooled indexer; no upstream file is vendored."
+  },
+  "preserved": {
+    "production_pooled_indexer_sha256": "a8b55ac2a80b94b263160a5a17bd88fbf0663cdc536a3a0c4447b390ee28dfe9",
+    "other_mounts_and_flags": "unchanged from the E29 default",
+    "production_glm_kpool_sha256": "960515841061a6d89868f06876b3014f8b1247f9edf22c726b61819c7e4e5479"
+  },
+  "not_included": "Fusing the indexer projections for prefill, and any other indexer change.",
+  "promotion_note": "Pools already built by speculative decode with the legacy four-slot tail can be wrong and SparkCache may have stored them; a promotion of the tail ring needs a new SparkCache namespace."
+}

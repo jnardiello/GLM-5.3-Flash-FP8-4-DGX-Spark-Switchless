@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 import contextlib
+import ast
 import importlib.util
 import io
 import json
 import os
+import shlex
 import shutil
 import stat
+import subprocess
 import sys
 import tempfile
 from copy import deepcopy
@@ -116,6 +119,23 @@ def test_baseline_adaptive_policy_is_read_from_the_baseline() -> None:
 test_baseline_adaptive_policy_is_read_from_the_baseline()
 
 
+def test_unretained_sparkcache_config_pin_fails_closed() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        data = json.loads((BASELINES / "2026-09-28-e31/baseline.json").read_text(encoding="utf-8"))
+        data["system"]["sparkcache"]["kv_transfer_config_sha256"] = "0" * 64
+        path = Path(tmp) / "baseline.json"
+        path.write_text(json.dumps(data), encoding="utf-8")
+        try:
+            check.expected_f0(path)
+        except check.CheckFailure as exc:
+            assert "config pin is not retained" in str(exc)
+        else:
+            raise AssertionError("accepted an unresolved SparkCache config pin")
+
+
+test_unretained_sparkcache_config_pin_fails_closed()
+
+
 def probe(rank: int) -> dict:
     exp = expected()
     rec = recipe()
@@ -147,6 +167,7 @@ def probe(rank: int) -> dict:
         "--max-model-len", "--max-num-seqs", "--max-num-batched-tokens",
         "--kv-cache-dtype", "--scheduler-cls", "--moe-backend",
         "--kv-cache-memory-bytes", "--prefill-schedule-interval",
+        "--middleware",
     )
     remote = {
         "errors": [],
@@ -166,6 +187,7 @@ def probe(rank: int) -> dict:
             "draft_config_sha": "a" * 64,
             "model_mount": True,
             "draft_mount": True,
+            "candidate_mount_targets": [],
             "environment": {
                 "VLLM_ADAPTIVE_K_MODE": "per-request",
                 "NCCL_ALGO": "Ring",
@@ -375,8 +397,7 @@ with contextlib.redirect_stdout(output):
 assert output.getvalue() == "BASELINE CHECK FAIL\n"
 
 
-def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
-    exp = check.expected_f0(path)
+def identity_fixture(exp: dict) -> tuple[dict, dict, list]:
     rec = recipe()
     low, high = exp["adaptive_tokens"]
     rec.update(spec_tokens=exp["spec_tokens"],
@@ -386,15 +407,26 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
                spark_mhc_prefill_shard=exp["spark_mhc_prefill_shard"], **exp["payload_pins"])
     scheduler_env = {key: value for key, value in exp["runtime_identity"].get("environment", {}).items()
                      if key in check.SCHEDULER_FLAGS}
-    for name in ("extra_docker_env", "base_extra_docker_env"):
-        rec[name] = " ".join(f"-e {key}={value}" for key, value in
-                             {**exp["adaptive_env"], **scheduler_env}.items())
+    explicit_env = {**scheduler_env, **exp.get("required_runtime_environment", {})}
+    rec["extra_docker_env"] = " ".join(
+        f"-e {key}={value}" for key, value in {**exp["adaptive_env"], **explicit_env}.items())
+    for target, source in exp.get("recipe_mounts", {}).items():
+        rec["extra_docker_env"] += f" -v {source}:{target}:ro"
+    rec["base_extra_docker_env"] = " ".join(
+        f"-e {key}={value}" for key, value in {**exp["adaptive_env"], **scheduler_env}.items())
+    rec["extra_vllm_args"] = rec["extra_vllm_args"].replace(
+        "17179869184", exp["kv_cache_memory_bytes"])
     for name in ("extra_vllm_args", "base_extra_vllm_args"):
-        rec[name] = rec[name].replace("17179869184", exp["kv_cache_memory_bytes"])
         if exp["prefill_schedule_interval"] != "1":
             rec[name] += " --prefill-schedule-interval " + exp["prefill_schedule_interval"]
         if exp["max_cudagraph_capture_size"]:
             rec[name] += ' --compilation-config={"max_cudagraph_capture_size":' + exp["max_cudagraph_capture_size"] + "}"
+    if exp.get("middleware"):
+        rec["extra_vllm_args"] += " --middleware " + exp["middleware"]
+    if exp.get("direct_operational_recipe"):
+        rec["base_extra_docker_env"] = rec["extra_docker_env"]
+        rec["extra_vllm_args"] = shlex.join(check.MEMORY_BOUNDED_VLLM_ARGS)
+        rec["base_extra_vllm_args"] = rec["extra_vllm_args"]
     ranks = [probe(rank) for rank in range(4)]
     identity = exp["runtime_identity"]
     for rank, item in enumerate(ranks):
@@ -403,11 +435,15 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
                                 num_speculative_tokens_per_batch_size=[[1, 1, high], [2, 6, low]])
         c.update(image_reference=rec["image"], image_digests=[exp["image_digest"]],
                  image_id=exp["image_id"], runtime_files=deepcopy(identity.get("container_file_sha256", {})))
+        c["kv_transfer_config"] = deepcopy(exp.get("kv_transfer_config"))
         c["options"]["--kv-cache-memory-bytes"] = [exp["kv_cache_memory_bytes"]]
         c["options"]["--prefill-schedule-interval"] = check.interval_flag(exp)
         c["options"]["--compilation-config"] = (
             ['{"max_cudagraph_capture_size":' + exp["max_cudagraph_capture_size"] + "}"]
             if exp["max_cudagraph_capture_size"] else [])
+        c["options"]["--middleware"] = [exp["middleware"]] if exp.get("middleware") else []
+        c["candidate_mount_targets"] = (["/opt/tp4/tp4_admission.py"]
+                                        if exp.get("middleware") else [])
         c["environment"].update(exp["adaptive_env"])
         c["environment"].update(identity.get("environment", {}))
         c["runtime_workers"] = [{"pid": 100 + rank, "patched_nccl_loaded": True}]
@@ -423,35 +459,192 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
             c["runtime_receipts"]["e22"] = deepcopy(identity["e22_boot_receipt"])
         if identity.get("boot_lines"):
             c["runtime_receipts"]["boot_lines"] = list(identity["boot_lines"])
+        if identity.get("all_rank_boot_lines"):
+            c["runtime_receipts"]["all_rank_boot_lines"] = list(identity["all_rank_boot_lines"])
+        rank_lines = identity.get("all_rank_boot_lines_by_rank", {}).get(str(rank), [])
+        if rank_lines:
+            c["runtime_receipts"]["rank_boot_lines"] = list(rank_lines)
     return rec, exp, ranks
 
 
-assert check.BASELINE == BASELINES / "2026-09-25-e29/baseline.json"
+def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
+    return identity_fixture(check.expected_f0(path))
+
+
+assert check.BASELINE == BASELINES / "2026-09-28-e31/baseline.json"
+assert check.IDENTITY == REPO / "docs/operational-identities/2026-09-29-memory-bounded.json"
+PROTECTED_IDENTITY = REPO / "docs/operational-identities/2026-09-29-sparkcache-protected.json"
+CANDIDATE_IDENTITY = REPO / "docs/operational-identities/2026-09-29-memory-bounded-candidate.json"
+launcher_text = (REPO / "scripts/launcher/launch-glm53-tp4.sh").read_text(encoding="utf-8")
+assert "*/bounded-admission/middleware.py:*)" in launcher_text
+assert 'cd "$ENV_DIR/experiments/e03/bounded-admission" && sha256sum -c SHA256SUMS' in launcher_text
+assert "bounded-admission source manifest failed" in launcher_text
 HISTORICAL = ("2026-09-11", "2026-09-18", "2026-09-19", "2026-09-19-e03", "2026-09-23-e21",
-              "2026-09-23-e22b", "2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b", "2026-09-25-e29")
+              "2026-09-23-e22b", "2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b", "2026-09-25-e29",
+              "2026-09-28-e31")
 E27_FLAGS = {"VLLM_E27B_SHORT_PREFILL_TOKENS", "VLLM_E27C_CADENCE_WHEN_QUEUED"}
 E29_FLAGS = {"VLLM_E29_END_DRAIN", "VLLM_E29_IDLE_COALESCE_MS", "VLLM_E29_TRACE"}
-assert E27_FLAGS | E29_FLAGS == set(check.SCHEDULER_FLAGS)
+E31_FLAGS = {"VLLM_GLM53_INDEXER_GATE_TC_FLAG", "VLLM_GLM53_KPOOL_TAIL_RING_FLAG"}
+E31_SWITCHES = {"VLLM_GLM53_INDEXER_GATE_TC", "VLLM_GLM53_KPOOL_TAIL_RING"}
+assert E27_FLAGS | E29_FLAGS | E31_FLAGS | E31_SWITCHES == set(check.SCHEDULER_FLAGS)
 for name in HISTORICAL:
     baseline_path = BASELINES / name / "baseline.json"
     baseline_recipe, baseline_expected, baseline_ranks = baseline_fixture(baseline_path)
+    if "sparkcache_config_sha256" in baseline_expected["payload_pins"]:
+        assert baseline_expected["kv_transfer_config"] is not None, name
     assert check.evaluate(baseline_recipe, baseline_expected, baseline_ranks, endpoint()) == [], name
     # Records before E27 ran without the cadence and must refuse it; E27 requires it.
     assert baseline_expected["prefill_schedule_interval"] == (
-        "8" if name in ("2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b", "2026-09-25-e29") else "1"), name
+        "8" if name in ("2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b", "2026-09-25-e29",
+                        "2026-09-28-e31") else "1"), name
     # Records before E27c ran the image's scheduler and must refuse the E27c flags; records
-    # before E29 must refuse the E29 flags.
+    # before E29 must refuse the E29 flags and records before E31 the E31 flag files. E31
+    # carries only the flag files: its switches run at their defaults.
     flags = set(baseline_expected["runtime_identity"].get("environment", {})) & set(check.SCHEDULER_FLAGS)
-    assert flags == (E27_FLAGS | E29_FLAGS if name == "2026-09-25-e29" else E27_FLAGS
+    assert flags == (E27_FLAGS | E29_FLAGS | E31_FLAGS if name == "2026-09-28-e31"
+                     else E27_FLAGS | E29_FLAGS if name == "2026-09-25-e29" else E27_FLAGS
                      if name in ("2026-09-25-e27c", "2026-09-25-e28b") else set()), name
     # E28b and E29 fix the CUDA graph capture limit.
     assert baseline_expected["max_cudagraph_capture_size"] == (
-        "72" if name in ("2026-09-25-e28b", "2026-09-25-e29") else ""), name
+        "72" if name in ("2026-09-25-e28b", "2026-09-25-e29", "2026-09-28-e31") else ""), name
 
-current_recipe, current_expected, current_ranks = baseline_fixture(check.BASELINE)
-assert current_expected["baseline_id"] == "2026-09-25-e29"
+current_recipe, current_expected, current_ranks = identity_fixture(
+    check.expected_operational(PROTECTED_IDENTITY))
+assert current_expected["identity_id"] == "2026-09-29-sparkcache-protected"
+assert current_expected["baseline_id"] == "2026-09-28-e31"
+assert current_expected["performance_baseline_id"] == "2026-09-28-e31"
 assert current_expected["spec_tokens"] == "7" and current_expected["adaptive_tokens"] == [3, 7]
 assert current_expected["kv_cache_memory_bytes"] == "17179869184"
+assert current_expected["sparkcache_protection"] == {
+    "transfer_chunk_bytes": 8388608,
+    "cpu_budget_bytes_per_rank": 1073741824,
+    "min_available_bytes_per_rank": 1073741824,
+}
+current_extra = current_expected["kv_transfer_config"]["kv_connector_extra_config"]
+assert current_extra["spark_cache_root"] == (
+    "/cache/jit/sparkcache-e22b-drafter-context-bf16-cpu-budget-v1")
+assert current_extra["spark_cache_cpu_budget_bytes"] == 1073741824
+assert current_extra["spark_cache_min_available_bytes"] == 1073741824
+for key, value in (("spark_cache_root", "/cache/jit/wrong"),
+                   ("spark_cache_cpu_budget_bytes", 0),
+                   ("spark_cache_min_available_bytes", 0)):
+    wrong_live_config = deepcopy(current_ranks)
+    wrong_live_config[2]["remote"]["container"]["kv_transfer_config"][
+        "kv_connector_extra_config"][key] = value
+    assert "rank 2: command --kv-transfer-config" in check.evaluate(
+        current_recipe, current_expected, wrong_live_config, endpoint()), key
+assert current_expected["payload_pins"]["sparkcache_connector_sha256"] == (
+    "aa046965637b685ec1f6a00e427eb46279e28bf0d49ee546236bc774be2de9bd")
+
+candidate_recipe, candidate_expected, candidate_ranks = identity_fixture(
+    check.expected_operational(CANDIDATE_IDENTITY))
+assert candidate_expected["identity_id"] == "2026-09-29-memory-bounded-candidate"
+assert candidate_expected["performance_baseline_id"] == "2026-09-28-e31"
+assert candidate_expected["kv_cache_memory_bytes"] == "15032385536"
+assert candidate_expected["max_model_len"] == "262144"
+assert candidate_expected["max_num_seqs"] == "6"
+assert candidate_expected["middleware"] == "tp4_admission.BoundedAdmissionMiddleware"
+assert candidate_expected["runtime_identity"]["container_file_sha256"][
+    "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py"
+] == "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de"
+assert candidate_expected["runtime_identity"]["container_file_sha256"][
+    "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py"
+] == "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd"
+assert check.evaluate(candidate_recipe, candidate_expected, candidate_ranks, endpoint()) == []
+default_recipe, default_expected, default_ranks = identity_fixture(check.expected_operational())
+assert default_expected["identity_id"] == "2026-09-29-memory-bounded"
+assert default_expected["kv_cache_memory_bytes"] == "15032385536"
+assert default_expected["runtime_identity"] == candidate_expected["runtime_identity"]
+assert check.evaluate(default_recipe, default_expected, default_ranks, endpoint()) == []
+
+for key in candidate_expected["required_runtime_environment"]:
+    missing_recipe = deepcopy(candidate_recipe)
+    value = candidate_expected["required_runtime_environment"][key]
+    missing_recipe["extra_docker_env"] = missing_recipe["extra_docker_env"].replace(
+        f"-e {key}={value}", "")
+    assert "operational runtime environment: " + key in check.recipe_problems(
+        missing_recipe, candidate_expected), key
+    missing_live = deepcopy(candidate_ranks)
+    missing_live[2]["remote"]["container"]["environment"].pop(key)
+    assert f"rank 2: runtime environment {key}" in check.evaluate(
+        candidate_recipe, candidate_expected, missing_live, endpoint()), key
+
+for target, source in candidate_expected["recipe_mounts"].items():
+    missing_mount = deepcopy(candidate_recipe)
+    missing_mount["extra_docker_env"] = missing_mount["extra_docker_env"].replace(
+        f" -v {source}:{target}:ro", "")
+    assert "operational runtime mount: " + target in check.recipe_problems(
+        missing_mount, candidate_expected), target
+
+for bad in ([], ["wrong.Middleware"], [candidate_expected["middleware"]] * 2):
+    wrong_middleware = deepcopy(candidate_ranks)
+    wrong_middleware[3]["remote"]["container"]["options"]["--middleware"] = bad
+    assert "rank 3: command --middleware" in check.evaluate(
+        candidate_recipe, candidate_expected, wrong_middleware, endpoint()), bad
+missing_admission_mount = deepcopy(candidate_ranks)
+missing_admission_mount[1]["remote"]["container"]["candidate_mount_targets"] = []
+assert "rank 1: admission middleware mount" in check.evaluate(
+    candidate_recipe, candidate_expected, missing_admission_mount, endpoint())
+
+for rank in range(4):
+    missing_trim_receipt = deepcopy(candidate_ranks)
+    missing_trim_receipt[rank]["remote"]["container"]["runtime_receipts"][
+        "rank_boot_lines"] = []
+    assert f"rank {rank}: boot signature PREFILL_CACHE_TRIM_READY" in "\n".join(
+        check.evaluate(candidate_recipe, candidate_expected, missing_trim_receipt, endpoint()))
+
+candidate_on_default = check.recipe_problems(candidate_recipe, current_expected)
+assert "baseline KV memory budget" in candidate_on_default
+assert "operational admission middleware" in candidate_on_default
+assert any(problem.startswith("baseline runtime environment: unexpected VLLM_PREFILL_CACHE_TRIM")
+           for problem in candidate_on_default)
+assert any(problem.startswith("baseline runtime mount: unexpected ")
+           for problem in candidate_on_default)
+campaign_mount = deepcopy(candidate_recipe)
+campaign_mount["extra_docker_env"] += (
+    " -v $HOME/tp4/scripts/resilience/.campaign/stale/runtime.py:"
+    "/opt/tp4-resilience/runtime.py:ro")
+assert "operational runtime mount: resilience campaign selection" in check.recipe_problems(
+    campaign_mount, candidate_expected)
+extra_candidate_arg = deepcopy(candidate_recipe)
+extra_candidate_arg["extra_vllm_args"] += " --attention-backend WRONG"
+assert "operational candidate engine argument delta" in check.recipe_problems(
+    extra_candidate_arg, candidate_expected)
+candidate_live_on_default = deepcopy(current_ranks)
+candidate_live_on_default[1]["remote"]["container"]["environment"].update(
+    candidate_expected["required_runtime_environment"])
+assert "rank 1: unexpected runtime environment VLLM_PREFILL_CACHE_TRIM" in check.evaluate(
+    current_recipe, current_expected, candidate_live_on_default, endpoint())
+
+candidate_record = json.loads(CANDIDATE_IDENTITY.read_text(encoding="utf-8"))
+for mutate, message in (
+    (lambda record: record["engine_overrides"].update(kv_cache_memory_bytes=True),
+     "invalid engine overrides"),
+    (lambda record: record["engine_overrides"].update(actual_kv_cache_tokens=1),
+     "KV capacity receipt is missing"),
+    (lambda record: record["runtime_sources"][0].update(sha256="0" * 64),
+     "runtime source hash mismatch"),
+    (lambda record: record["recipe"].update(sha256="0" * 64),
+     "recipe hash mismatch"),
+    (lambda record: record["api_admission"]["environment"].update(
+        TP4_ADMISSION_MAX_ACTIVE="7"), "API admission limits disagree"),
+    (lambda record: record["runtime_identity_overrides"]["all_rank_boot_lines_by_rank"].pop("3"),
+     "invalid rank boot lines"),
+    (lambda record: record.pop("recipe"),
+     "requires recipe and rollback metadata"),
+):
+    bad_record = deepcopy(candidate_record)
+    mutate(bad_record)
+    with tempfile.TemporaryDirectory(prefix="tp4-bad-operational-identity.") as temp:
+        bad_path = Path(temp) / "identity.json"
+        bad_path.write_text(json.dumps(bad_record), encoding="utf-8")
+        try:
+            check.expected_operational(bad_path)
+        except check.CheckFailure as exc:
+            assert message in str(exc), (message, str(exc))
+        else:
+            raise AssertionError("accepted malformed operational identity: " + message)
+
 for bad in ("", ' --compilation-config={"max_cudagraph_capture_size":96}'):
     wrong_compilation = deepcopy(current_recipe)
     wrong_compilation["extra_vllm_args"] = wrong_compilation["extra_vllm_args"].replace(
@@ -464,7 +657,7 @@ for bad in ([], ['{"max_cudagraph_capture_size":96}']):
         current_recipe, current_expected, wrong_live_compilation, endpoint()), bad
 scheduler_target = "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py"
 assert scheduler_target in current_expected["runtime_identity"]["container_file_sha256"]
-for key in check.SCHEDULER_FLAGS:
+for key in [k for k in check.SCHEDULER_FLAGS if k in current_expected["runtime_identity"]["environment"]]:
     missing = deepcopy(current_ranks)
     missing[1]["remote"]["container"]["environment"].pop(key)
     assert f"rank 1: runtime environment {key}" in check.evaluate(
@@ -474,6 +667,16 @@ for key in check.SCHEDULER_FLAGS:
         f" -e {key}=" + current_expected["runtime_identity"]["environment"][key], "")
     assert "baseline runtime environment: " + key in check.recipe_problems(
         missing_recipe, current_expected), key
+# E31 runs its switches at their defaults: setting either one is a different identity.
+for key in E31_SWITCHES:
+    switched = deepcopy(current_ranks)
+    switched[1]["remote"]["container"]["environment"][key] = "0"
+    assert f"rank 1: unexpected runtime environment {key}" in check.evaluate(
+        current_recipe, current_expected, switched, endpoint()), key
+    switched_recipe = deepcopy(current_recipe)
+    switched_recipe["extra_docker_env"] += f" -e {key}=0"
+    assert "baseline runtime environment: unexpected " + key in check.recipe_problems(
+        switched_recipe, current_expected), key
 wrong_scheduler = deepcopy(current_ranks)
 wrong_scheduler[2]["remote"]["container"]["runtime_files"][scheduler_target] = "0" * 64
 assert f"rank 2: runtime file {scheduler_target}" in check.evaluate(
@@ -482,6 +685,11 @@ for signature in current_expected["runtime_identity"]["boot_lines"]:
     unsigned = deepcopy(current_ranks)
     unsigned[0]["remote"]["container"]["runtime_receipts"]["boot_lines"].remove(signature)
     assert "rank 0: boot signature " + signature in check.evaluate(
+        current_recipe, current_expected, unsigned, endpoint()), signature
+for signature in current_expected["runtime_identity"]["all_rank_boot_lines"]:
+    unsigned = deepcopy(current_ranks)
+    unsigned[2]["remote"]["container"]["runtime_receipts"]["all_rank_boot_lines"].remove(signature)
+    assert "rank 2: boot signature " + signature in check.evaluate(
         current_recipe, current_expected, unsigned, endpoint()), signature
 # The E27 record refuses a running or configured E27c scheduler.
 e27_recipe, e27_expected, e27_ranks = baseline_fixture(BASELINES / "2026-09-24-e27/baseline.json")
@@ -592,6 +800,30 @@ assert "rank 0: running image content ID" in check.evaluate(
 original_load = check.load_recipe
 try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-selection.") as temp:
+        check.load_recipe = lambda timeout: (deepcopy(default_recipe), {"returncode": 0})
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            rc = check.main(["--report-root", temp],
+                            rank_probe=lambda rank, host, recipe, timeout: deepcopy(default_ranks[rank]),
+                            http_probe=lambda url, timeout: endpoint())
+        assert rc == 0
+        assert output.getvalue() == "2026-09-29-memory-bounded CHECK PASS\n"
+        check.load_recipe = lambda timeout: (deepcopy(current_recipe), {"returncode": 0})
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            rc = check.main(["--identity", str(PROTECTED_IDENTITY), "--report-root", temp],
+                            rank_probe=lambda rank, host, recipe, timeout: deepcopy(current_ranks[rank]),
+                            http_probe=lambda url, timeout: endpoint())
+        assert rc == 0
+        assert output.getvalue() == "2026-09-29-sparkcache-protected CHECK PASS\n"
+        check.load_recipe = lambda timeout: (deepcopy(candidate_recipe), {"returncode": 0})
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            rc = check.main(["--identity", str(CANDIDATE_IDENTITY), "--report-root", temp],
+                            rank_probe=lambda rank, host, recipe, timeout: deepcopy(candidate_ranks[rank]),
+                            http_probe=lambda url, timeout: endpoint())
+        assert rc == 0
+        assert output.getvalue() == "2026-09-29-memory-bounded-candidate CHECK PASS\n"
         for name in HISTORICAL:
             path = BASELINES / name / "baseline.json"
             rec, exp, ranks = baseline_fixture(path)
@@ -606,7 +838,27 @@ try:
 finally:
     check.load_recipe = original_load
 
+try:
+    with contextlib.redirect_stderr(io.StringIO()):
+        check.parse_args(["--identity", str(CANDIDATE_IDENTITY),
+                          "--baseline", str(BASELINES / "2026-09-28-e31/baseline.json")])
+except SystemExit as exc:
+    assert exc.code == 2
+else:
+    raise AssertionError("accepted --identity and --baseline together")
+
 compile(check.REMOTE_PROBE, "remote-identity-probe", "exec")
+probe_tree = ast.parse(check.REMOTE_PROBE)
+probe_safe_names = None
+for node in ast.walk(probe_tree):
+    if (isinstance(node, ast.Assign)
+            and any(isinstance(target, ast.Name) and target.id == "safe_env_names"
+                    for target in node.targets)
+            and isinstance(node.value, (ast.Tuple, ast.List))):
+        probe_safe_names = set(ast.literal_eval(node.value))
+        break
+assert probe_safe_names is not None
+assert set(check.CANDIDATE_ENV) <= probe_safe_names
 
 # Load the real current template and the shipped historical overlays. The base
 # stays current while each overlay's effective runtime must match its own record.
@@ -615,7 +867,10 @@ saved_overlay = os.environ.get("TP4_ENV")
 try:
     with tempfile.TemporaryDirectory(prefix="tp4-baseline-overlay.") as temp:
         isolated = Path(temp)
-        for relative in ("scripts/lib/common.sh", "scripts/node/bootstrap/versions.env",
+        for relative in ("docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json",
+                         "scripts/lib/common.sh", "scripts/node/bootstrap/versions.env",
+                         "scripts/node/reference/baseline-20260928-e31.env",
+                         "scripts/node/reference/baseline-20260925-e29.env",
                          "scripts/node/reference/baseline-20260925-e28b.env",
                          "scripts/node/reference/baseline-20260925-e27c.env",
                          "scripts/node/reference/baseline-20260924-e27.env",
@@ -624,6 +879,18 @@ try:
                          "scripts/node/reference/baseline-20260919-e03.env",
                          "scripts/node/reference/baseline-20260919.env",
                          "scripts/node/reference/baseline-20260918.env",
+                         "scripts/node/reference/sparkcache-20260918.json",
+                         "scripts/node/sparkcache/kv-transfer-config.json",
+                         "scripts/node/experiments/e03/kv-transfer-config.json",
+                         "scripts/node/experiments/e03/bf16-residue/kv-transfer-config.json",
+                         "scripts/node/experiments/e03/drafter-w8a16/kv-transfer-config-e22b.json",
+                         "scripts/node/experiments/e03/sparkcache-ram-budget/kv-transfer-config.json",
+                         "scripts/node/experiments/e03/bounded-admission/production.env",
+                         "scripts/node/experiments/e03/bounded-admission/middleware.py",
+                         "scripts/node/experiments/e03/prefill-cache-trim/gpu_worker.py",
+                         "scripts/node/experiments/e03/prefill-step-cap/scheduler.py",
+                         "scripts/node/reference/operational-20260929-sparkcache-protected.env",
+                         "scripts/launcher/launch-glm53-tp4.sh",
                          "scripts/node/reference/f0-20260912.env", "cluster.env.example"):
             target = isolated / relative
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -636,7 +903,9 @@ RELAY_DEST=operator@192.0.2.23
 '''
         check.REPO = isolated
         for overlay, baseline in (
-            (None, "2026-09-25-e29"),
+            (None, None),
+            ("scripts/node/reference/baseline-20260928-e31.env", "2026-09-28-e31"),
+            ("scripts/node/reference/baseline-20260925-e29.env", "2026-09-25-e29"),
             ("scripts/node/reference/baseline-20260925-e28b.env", "2026-09-25-e28b"),
             ("scripts/node/reference/baseline-20260925-e27c.env", "2026-09-25-e27c"),
             ("scripts/node/reference/baseline-20260924-e27.env", "2026-09-24-e27"),
@@ -656,28 +925,35 @@ RELAY_DEST=operator@192.0.2.23
             else:
                 os.environ.pop("TP4_ENV", None)
             effective, diagnostic = check.load_recipe(10)
-            selected = check.expected_f0(BASELINES / baseline / "baseline.json")
+            selected = (check.expected_f0(BASELINES / baseline / "baseline.json")
+                        if baseline else check.expected_operational())
             assert diagnostic["returncode"] == 0
             problems = check.recipe_problems(effective, selected)
-            assert problems == [], (baseline, problems)
+            assert problems == [], (baseline or "operational", problems)
             if overlay:
-                # Every return drops the E29 flags. Returns before E28b also restore five draft
-                # tokens and no fixed graph limit; returns before E27c also drop the E27c flags,
-                # and returns before E27 also drop the cadence.
+                # Every return drops the E31 flag files; returns before E29 also drop the E29
+                # flags. Returns before E28b also restore five draft tokens and no fixed graph
+                # limit; returns before E27c also drop the E27c flags, and returns before E27
+                # also drop the cadence.
                 against_current = check.recipe_problems(effective, current_expected)
                 assert ("effective recipe mismatch: spec_tokens" in against_current) == (
-                    baseline != "2026-09-25-e28b"), baseline
+                    baseline not in ("2026-09-25-e28b", "2026-09-25-e29", "2026-09-28-e31")), baseline
                 assert ("baseline compilation config" in against_current) == (
-                    baseline != "2026-09-25-e28b"), baseline
+                    baseline not in ("2026-09-25-e28b", "2026-09-25-e29", "2026-09-28-e31")), baseline
                 for key in check.SCHEDULER_FLAGS:
                     assert ("baseline runtime environment: " + key in against_current) == (
-                        key in E29_FLAGS or baseline not in ("2026-09-25-e27c", "2026-09-25-e28b")), baseline
+                        key in E31_FLAGS and baseline not in ("2026-09-28-e31",)
+                        or key in E29_FLAGS and baseline not in ("2026-09-25-e29", "2026-09-28-e31")
+                        or key in E27_FLAGS and baseline not in (
+                            "2026-09-25-e27c", "2026-09-25-e28b", "2026-09-25-e29",
+                            "2026-09-28-e31")), (baseline, key)
                 assert ("baseline prefill schedule interval" in against_current) == (
-                    baseline not in ("2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b")), baseline
+                    baseline not in ("2026-09-24-e27", "2026-09-25-e27c", "2026-09-25-e28b",
+                                     "2026-09-25-e29", "2026-09-28-e31")), baseline
                 assert effective["extra_docker_env"] != effective["base_extra_docker_env"]
-                if baseline == "2026-09-25-e28b":
-                    # E29 changes only the docker mounts and environment.
-                    assert effective["extra_vllm_args"] == effective["base_extra_vllm_args"]
+                if baseline in ("2026-09-25-e28b", "2026-09-25-e29", "2026-09-28-e31"):
+                    # Every historical return removes the operational KV14/admission delta.
+                    assert effective["extra_vllm_args"] != effective["base_extra_vllm_args"]
                     assert "baseline KV memory budget" not in against_current
                 elif baseline in ("2026-09-24-e27", "2026-09-25-e27c"):
                     # E28b adds the graph limit and 1 GiB of KV to the engine arguments.
@@ -699,6 +975,91 @@ RELAY_DEST=operator@192.0.2.23
             changed_site = deepcopy(effective)
             changed_site["container"] += "-other"
             assert "TP4_ENV changed protected field: container" in check.recipe_problems(changed_site, selected)
+
+        # The promoted template must equal the prepared candidate on every rank. The complete
+        # protected rollback must produce the same 16 GiB command whether applied over the
+        # promoted default or over a protected base reconstructed without site-value changes.
+        production_overlay = "scripts/node/experiments/e03/bounded-admission/production.env"
+        protected_overlay = "scripts/node/reference/operational-20260929-sparkcache-protected.env"
+        protected_body = (isolated / protected_overlay).read_text(encoding="utf-8")
+
+        def launcher_commands(base_text, overlay=None):
+            (isolated / "cluster.env").write_text(base_text, encoding="utf-8")
+            selected_env = os.environ.copy()
+            selected_env["TP4_DRY_RUN"] = "1"
+            if overlay:
+                selected_env["TP4_ENV"] = overlay
+            else:
+                selected_env.pop("TP4_ENV", None)
+            commands = []
+            for rank in range(4):
+                result = subprocess.run(
+                    ["bash", str(isolated / "scripts/launcher/launch-glm53-tp4.sh"), str(rank)],
+                    env=selected_env, capture_output=True, text=True, check=False,
+                )
+                assert result.returncode == 0, (rank, result.stderr)
+                commands.append(shlex.split(next(
+                    line for line in result.stdout.splitlines() if line.startswith("sudo docker "))))
+            return commands
+
+        default_commands = launcher_commands(config)
+        (isolated / "cluster.env").write_text(config, encoding="utf-8")
+        os.environ.pop("TP4_ENV", None)
+        effective, diagnostic = check.load_recipe(10)
+        promoted_selected = check.expected_operational()
+        assert diagnostic["returncode"] == 0
+        assert check.recipe_problems(effective, promoted_selected) == []
+        assert check.flag_values(shlex.split(effective["extra_vllm_args"]),
+                                 "--kv-cache-memory-bytes") == ["15032385536"]
+        assert check.flag_values(shlex.split(effective["extra_vllm_args"]),
+                                 "--middleware") == [promoted_selected["middleware"]]
+
+        protected_commands = launcher_commands(config, protected_overlay)
+        (isolated / "cluster.env").write_text(config, encoding="utf-8")
+        os.environ["TP4_ENV"] = protected_overlay
+        rolled_back, diagnostic = check.load_recipe(10)
+        protected_selected = check.expected_operational(PROTECTED_IDENTITY)
+        assert diagnostic["returncode"] == 0
+        assert check.recipe_problems(rolled_back, protected_selected) == []
+        assert check.flag_values(shlex.split(rolled_back["extra_vllm_args"]),
+                                 "--kv-cache-memory-bytes") == ["17179869184"]
+        assert check.flag_values(shlex.split(rolled_back["extra_vllm_args"]), "--middleware") == []
+        for rank in range(4):
+            assert protected_commands[rank] != default_commands[rank]
+
+        protected_config = config + "\n" + protected_body
+        assert launcher_commands(protected_config) == protected_commands
+        candidate_commands = launcher_commands(protected_config, production_overlay)
+        assert candidate_commands == default_commands
+        (isolated / "cluster.env").write_text(protected_config, encoding="utf-8")
+        os.environ["TP4_ENV"] = production_overlay
+        prepared_candidate, diagnostic = check.load_recipe(10)
+        candidate_selected = check.expected_operational(CANDIDATE_IDENTITY)
+        assert diagnostic["returncode"] == 0
+        assert check.recipe_problems(prepared_candidate, candidate_selected) == []
+        assert launcher_commands(protected_config, protected_overlay) == protected_commands
+
+        rollback_env = check.docker_env(rolled_back["extra_docker_env"])
+        assert not (set(check.CANDIDATE_ENV) & set(rollback_env))
+        rollback_mounts = check.docker_mounts(rolled_back["extra_docker_env"])
+        assert "/opt/tp4/tp4_admission.py" not in rollback_mounts
+        assert all("/prefill-cache-trim/" not in source and "/prefill-step-cap/" not in source
+                   for sources in rollback_mounts.values() for source in sources)
+
+        for contamination in (
+            '\nEXTRA_DOCKER_ENV="$EXTRA_DOCKER_ENV -v $HOME/tp4/scripts/resilience/.campaign/'
+            'stale/runtime.py:/opt/tp4-resilience/runtime.py:ro"\n',
+            '\nEXTRA_VLLM_ARGS="$EXTRA_VLLM_ARGS --attention-backend WRONG"\n',
+        ):
+            (isolated / "cluster.env").write_text(protected_config + contamination,
+                                                   encoding="utf-8")
+            os.environ["TP4_ENV"] = production_overlay
+            try:
+                check.load_recipe(10)
+            except check.CheckFailure as exc:
+                assert "effective configuration is invalid" in str(exc)
+            else:
+                raise AssertionError("candidate accepted contaminated production base")
 finally:
     check.REPO = original_repo
     if saved_overlay is None:

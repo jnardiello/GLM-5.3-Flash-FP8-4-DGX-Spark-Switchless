@@ -1,0 +1,150 @@
+--- a/vllm/models/glm5next/nvidia/ops/glm_kpool.py
++++ b/vllm/models/glm5next/nvidia/ops/glm_kpool.py
+@@ -11,6 +11,15 @@
+ _HEAD_DIM = 128
+ _POOL_SIZE = 4
+ _FP8_MAX = 448.0
++
++# E31 (TP4 candidate, cf. vllm#58454): the per-request key/gate tail is a ring of
++# tail_ring slots indexed by position % tail_ring, while the ape/pool phase stays
++# position % 4. A verify step writes 1 + K consecutive positions, including drafts that
++# may be rejected; the open pool's committed members are at most 3 positions before the
++# step, so no row of the step (at most K + 3 positions after a member) can overwrite one
++# when tail_ring >= K + 4. The indexer uses tail_ring = 4 * cdiv(4 + K, 4). With
++# tail_ring = 4, every ring index below reduces to the legacy phase slot: a pool starts
++# at a multiple of 4, so (pool_start + slot) % 4 == slot and position % 4 is the phase.
+ 
+ 
+ @triton.jit
+@@ -172,6 +181,7 @@
+     key_stride_0,
+     gate_stride_0,
+     ape_stride_0,
++    tail_ring,
+     PAGE_SIZE: tl.constexpr,
+     HEAD_DIM: tl.constexpr,
+     POOL_SIZE: tl.constexpr,
+@@ -188,6 +198,7 @@
+     for row in tl.range(start, end):
+         position = tl.load(positions + row).to(tl.int64)
+         physical_slot = position % POOL_SIZE
++        pool_start = position - physical_slot
+         current_key = tl.load(
+             key + row * key_stride_0 + dim, mask=dim_mask, other=0.0
+         ).to(tl.float32)
+@@ -219,7 +230,7 @@
+                 tail_offset = (
+                     state_slot * tail_stride_0
+                     + tail_stride_1
+-                    + slot * tail_stride_2
++                    + ((pool_start + slot) % tail_ring) * tail_stride_2
+                     + dim
+                 )
+                 score = tl.load(tail + tail_offset, mask=pool_mask, other=0.0).to(
+@@ -237,7 +248,8 @@
+             value = current_key
+             score = current_gate
+             if slot != POOL_SIZE - 1:
+-                base = state_slot * tail_stride_0 + slot * tail_stride_2 + dim
++                ring_slot = (pool_start + slot) % tail_ring
++                base = state_slot * tail_stride_0 + ring_slot * tail_stride_2 + dim
+                 value = tl.load(tail + base, mask=pool_mask, other=0.0).to(tl.float32)
+                 score = tl.load(
+                     tail + base + tail_stride_1, mask=pool_mask, other=0.0
+@@ -264,7 +276,7 @@
+             HEAD_DIM,
+             FP8_MAX,
+         )
+-        base = state_slot * tail_stride_0 + physical_slot * tail_stride_2
++        base = state_slot * tail_stride_0 + (position % tail_ring) * tail_stride_2
+         tl.store(tail + base + dim, current_key, mask=dim_mask)
+         tl.store(tail + base + tail_stride_1 + dim, current_gate, mask=dim_mask)
+ 
+@@ -291,6 +303,7 @@
+     key_stride_0,
+     gate_stride_0,
+     ape_stride_0,
++    tail_ring,
+     PAGE_SIZE: tl.constexpr,
+     HEAD_DIM: tl.constexpr,
+     POOL_SIZE: tl.constexpr,
+@@ -331,8 +344,9 @@
+     for slot in tl.static_range(0, POOL_SIZE):
+         source_row = completion_row - (POOL_SIZE - 1 - slot)
+         from_current_chunk = source_row >= start
++        ring_slot = (completion_position - (POOL_SIZE - 1) + slot) % tail_ring
+         tail_offset = (
+-            state_slot * tail_stride_0 + tail_stride_1 + slot * tail_stride_2 + dim
++            state_slot * tail_stride_0 + tail_stride_1 + ring_slot * tail_stride_2 + dim
+         )
+         current_score = tl.load(
+             gate + source_row * gate_stride_0 + dim,
+@@ -357,7 +371,8 @@
+     for slot in tl.static_range(0, POOL_SIZE):
+         source_row = completion_row - (POOL_SIZE - 1 - slot)
+         from_current_chunk = source_row >= start
+-        tail_offset = state_slot * tail_stride_0 + slot * tail_stride_2 + dim
++        ring_slot = (completion_position - (POOL_SIZE - 1) + slot) % tail_ring
++        tail_offset = state_slot * tail_stride_0 + ring_slot * tail_stride_2 + dim
+         current_value = tl.load(
+             key + source_row * key_stride_0 + dim,
+             mask=dim_mask & write_pool & from_current_chunk,
+@@ -419,6 +434,7 @@
+     tail_stride_2,
+     key_stride_0,
+     gate_stride_0,
++    tail_ring,
+     HEAD_DIM: tl.constexpr,
+     POOL_SIZE: tl.constexpr,
+     BLOCK_D: tl.constexpr,
+@@ -453,7 +469,8 @@
+             mask=write_slot,
+             other=0.0,
+         )
+-        tail_offset = state_slot * tail_stride_0 + slot * tail_stride_2 + dim
++        ring_slot = source_position % tail_ring
++        tail_offset = state_slot * tail_stride_0 + ring_slot * tail_stride_2 + dim
+         tl.store(tail + tail_offset, value, mask=write_slot)
+         tl.store(tail + tail_offset + tail_stride_1, score, mask=write_slot)
+ 
+@@ -474,6 +491,7 @@
+     max_query_len: int | None = None,
+     model_block_size: int | None = None,
+     parent_stride_pages: int | None = None,
++    tail_ring: int = _POOL_SIZE,
+ ) -> None:
+     """Update request tails and write every newly completed FP8 C4 pool.
+ 
+@@ -484,6 +502,8 @@
+     """
+     if num_requests <= 0:
+         return
++    if not _POOL_SIZE <= tail_ring <= int(tail.shape[2]):
++        raise ValueError("GLM C4 tail_ring must lie between 4 and the tail capacity")
+     page_size = int(kv_cache.shape[1])
+     if page_size != 64:
+         raise ValueError("GLM C4 decode requires a 64-entry index-cache page")
+@@ -544,6 +564,7 @@
+     if num_decode_requests:
+         _decode_update_kernel[(num_decode_requests,)](
+             *common_args,
++            tail_ring,
+             PACKED_MAIN_SLOTS=packed_main_slots,
+             **common_meta,
+         )
+@@ -555,6 +576,7 @@
+             *common_args[:10],
+             num_decode_requests,
+             *common_args[10:],
++            tail_ring,
+             **common_meta,
+         )
+         _prefill_tail_kernel[(num_prefill_requests,)](
+@@ -570,6 +592,7 @@
+             int(tail.stride(2)),
+             int(key.stride(0)),
+             int(gate.stride(0)),
++            tail_ring,
+             HEAD_DIM=_HEAD_DIM,
+             POOL_SIZE=_POOL_SIZE,
+             BLOCK_D=128,

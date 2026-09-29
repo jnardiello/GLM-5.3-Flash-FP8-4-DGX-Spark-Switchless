@@ -11,7 +11,7 @@ import subprocess
 import tempfile
 
 REPO = Path(__file__).resolve().parents[2]
-REFERENCE = REPO / "docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json"
+REFERENCE = REPO / "docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json"
 record = json.loads(REFERENCE.read_text())
 sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
 for item in record["provenance"].values():
@@ -24,11 +24,17 @@ for item in record["receipts"].values():
     data = json.loads((REPO / extract["path"]).read_text())
     assert data["receipt_sha256"] == item["native_receipt_sha256"]
     assert data["request_count"] == data["completed_streams"] == data["visible_responses"] == 54
-assert record["performance"]["included_run_count"] == 3
-assert record["functional"]["measured_requests"]["count"] == 162
+# E31 was accepted from one suite of the promoted arm (owner screening practice), with the
+# same-load E29-equivalent arm as its comparison; the record states n = 1 explicitly.
+runs = record["performance"]["included_run_count"]
+assert runs == 1 and record["performance"]["accepted_run"] in record["receipts"]
+assert record["functional"]["measured_requests"]["count"] == 54 * runs
 for row in record["performance"]["metrics"]:
     # A metric may exclude a run by recorded owner decision; the value and reason stay in the record.
-    assert len(row["per_run"]) + len(row.get("excluded_per_run", [])) == 3, row["key"]
+    assert len(row["per_run"]) + len(row.get("excluded_per_run", [])) == runs, row["key"]
+    reference = row["same_load_reference"]
+    assert reference["arm"] == "E" and reference["value"] > 0
+    assert abs((row["median"] - reference["value"]) / reference["value"] * 100 - reference["change_pct"]) < 1e-9
     assert all(item["reason"] for item in row.get("excluded_per_run", [])), row["key"]
     assert statistics.median(row["per_run"]) == row["median"], row["key"]
 
@@ -40,6 +46,8 @@ e22b_rollback = (REPO / "scripts/node/reference/baseline-20260924-e22b.env").rea
 e27_rollback = (REPO / "scripts/node/reference/baseline-20260924-e27.env").read_text()
 e27c_rollback = (REPO / "scripts/node/reference/baseline-20260925-e27c.env").read_text()
 e28b_rollback = (REPO / "scripts/node/reference/baseline-20260925-e28b.env").read_text()
+e29_rollback = (REPO / "scripts/node/reference/baseline-20260925-e29.env").read_text()
+e31_rollback = (REPO / "scripts/node/reference/baseline-20260928-e31.env").read_text()
 # The historical E03 measurement: previous base plus the three E03 deltas.
 historical_e03 = "\n".join([previous, (e03 / "candidate.env").read_text(),
                             (e03 / "replay-views/delta.env").read_text(),
@@ -58,7 +66,25 @@ historical_e27c = "\n".join([e27_rollback, (e03 / "queued-cadence/delta.env").re
 historical_e28b = "\n".join([e27c_rollback, (e03 / "draft-depth-7/delta.env").read_text(),
                              (e03 / "kv-16gib/delta.env").read_text()])
 # The measured E29 candidate (load B): the complete E28b recipe plus the end-drain overlay.
-historical_candidate = "\n".join([e28b_rollback, (e03 / "end-drain/delta-b.env").read_text()])
+historical_e29 = "\n".join([e28b_rollback, (e03 / "end-drain/delta-b.env").read_text()])
+# The measured E31 load: the complete E29 recipe plus the E31 indexer overlay. The
+# protected operational default is that exact engine recipe plus the RAM-budget delta.
+historical_e31 = "\n".join([e29_rollback, (e03 / "e31-indexer/delta.env").read_text()])
+protected_candidate = "\n".join(
+    [historical_e31, (e03 / "sparkcache-ram-budget/delta.env").read_text()])
+bounded_candidate = "\n".join([
+    protected_candidate,
+    (e03 / "bounded-admission/production.env").read_text(),
+])
+bounded_identity = json.loads((
+    REPO / "docs/operational-identities/2026-09-29-memory-bounded.json").read_text())
+NVIDIA = "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/"
+E31_ADDED = [str(Path.home()) + "/tp4/experiments/e03/e31-indexer/pooled_indexer.py:" + NVIDIA + "pooled_indexer.py:ro",
+             str(Path.home()) + "/tp4/experiments/e03/e31-indexer/glm_kpool.py:" + NVIDIA + "ops/glm_kpool.py:ro",
+             "-e", "VLLM_GLM53_INDEXER_GATE_TC_FLAG=/tmp/glm53-indexer-gate-tc",
+             "-e", "VLLM_GLM53_KPOOL_TAIL_RING_FLAG=/tmp/glm53-kpool-tail-ring"]
+E31_REMOVED = [str(Path.home()) + "/tp4/overrides/vllm/models/glm5next/nvidia/pooled_indexer.py:" + NVIDIA + "pooled_indexer.py:ro",
+               str(Path.home()) + "/tp4/overrides/vllm/models/glm5next/nvidia/ops/glm_kpool.py:" + NVIDIA + "ops/glm_kpool.py:ro"]
 SCHED = "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py:ro"
 E29_ADDED = [str(Path.home()) + "/tp4/experiments/e03/end-drain/scheduler.py:" + SCHED,
              "-v", str(Path.home()) + "/tp4/experiments/e03/end-drain/core.py:"
@@ -85,7 +111,10 @@ MASTER_IP=192.0.2.21
 RELAY_DEST=operator@192.0.2.23
 '''
     (root / "cluster.env").write_text(config)
-    (root / "measured.env").write_text(historical_candidate)
+    (root / "protected.env").write_text(protected_candidate)
+    (root / "bounded.env").write_text(bounded_candidate)
+    (root / "operational-protected.env").write_text((
+        REPO / "scripts/node/reference/operational-20260929-sparkcache-protected.env").read_text())
     (root / "rollback.env").write_text(previous)
     (root / "rollback-e03.env").write_text(e03_rollback)
     (root / "rollback-e21.env").write_text(e21_rollback)
@@ -93,6 +122,10 @@ RELAY_DEST=operator@192.0.2.23
     (root / "rollback-e27.env").write_text(e27_rollback)
     (root / "rollback-e27c.env").write_text(e27c_rollback)
     (root / "rollback-e28b.env").write_text(e28b_rollback)
+    (root / "rollback-e29.env").write_text(e29_rollback)
+    (root / "rollback-e31.env").write_text(e31_rollback)
+    (root / "historical-e31.env").write_text(historical_e31)
+    (root / "historical-e29.env").write_text(historical_e29)
     (root / "historical-e28b.env").write_text(historical_e28b)
     (root / "historical-e27c.env").write_text(historical_e27c)
     (root / "historical-e27.env").write_text(historical_e27)
@@ -120,13 +153,15 @@ RELAY_DEST=operator@192.0.2.23
 
     for rank in range(4):
         current = launch(rank)
-        assert current == launch(rank, "measured.env"), f"rank {rank}: changed measured command"
+        assert current == launch(rank, "bounded.env"), f"rank {rank}: bounded default drifted"
         mounts = dict(arg.split(":")[1::-1] for i, arg in enumerate(current) if i and current[i-1] == "-v")
         mount_count = Counter(arg.split(":")[1] for i, arg in enumerate(current) if i and current[i-1] == "-v")
         assert all(n == 1 for n in mount_count.values()), "Duplicate mount target"
         payloads = record["system"]["payload_packaging"]["operator_payloads"]
         private_targets = {item["container_path"] for item in payloads.values()}
-        for target, digest in record["system"]["operational_identity"]["container_file_sha256"].items():
+        runtime_hashes = dict(record["system"]["operational_identity"]["container_file_sha256"])
+        runtime_hashes.update(bounded_identity["runtime_identity_overrides"]["container_file_sha256"])
+        for target, digest in runtime_hashes.items():
             assert target in mounts, target
             if target in private_targets:
                 continue
@@ -134,11 +169,29 @@ RELAY_DEST=operator@192.0.2.23
             assert source.startswith(str(Path.home()) + "/tp4/")
             local = REPO / "scripts/node" / source.split("/tp4/", 1)[1]
             assert sha(local) == digest, local
-        # Immediate rollback: exactly the measured E28b command, with the E27c scheduler.
+        # Immediate operational rollback: protected SparkCache with the 16 GiB E31 engine.
+        protected_restored = launch(rank, "operational-protected.env")
+        assert protected_restored == launch(rank, "protected.env"), (
+            f"rank {rank}: protected operational rollback drifted")
+        assert "--kv-cache-memory-bytes=17179869184" in protected_restored
+        assert "--middleware" not in protected_restored
+        # Historical rollback: exactly the measured E31 command and previous cache behavior.
+        e31_restored = launch(rank, "rollback-e31.env")
+        assert e31_restored == launch(rank, "historical-e31.env"), f"rank {rank}: E31 rollback drifted"
+        changes = [(old, new) for old, new in zip(e31_restored, protected_restored) if old != new]
+        assert len(e31_restored) == len(protected_restored) and len(changes) == 2, (rank, changes)
+        assert any("spark_context_cache_connector-ram-budget.py" in new for old, new in changes)
+        assert any("sparkcache-ram-budget/kv-transfer-config.json" in new for old, new in changes)
+        # Older E29 rollback: exactly the measured E29 command, with the production indexer.
+        e29_restored = launch(rank, "rollback-e29.env")
+        assert e29_restored == launch(rank, "historical-e29.env"), f"rank {rank}: E29 rollback drifted"
+        assert Counter(e31_restored) - Counter(e29_restored) == Counter(E31_ADDED), f"rank {rank}: E31 delta"
+        assert Counter(e29_restored) - Counter(e31_restored) == Counter(E31_REMOVED), f"rank {rank}: E31 removed"
+        # Older E28b return: exactly the measured E28b command, with the E27c scheduler.
         e28b_restored = launch(rank, "rollback-e28b.env")
         assert e28b_restored == launch(rank, "historical-e28b.env"), f"rank {rank}: E28b rollback drifted"
-        assert Counter(current) - Counter(e28b_restored) == Counter(E29_ADDED), f"rank {rank}: E29 delta"
-        assert Counter(e28b_restored) - Counter(current) == Counter(E29_REMOVED), f"rank {rank}: E29 removed"
+        assert Counter(e29_restored) - Counter(e28b_restored) == Counter(E29_ADDED), f"rank {rank}: E29 delta"
+        assert Counter(e28b_restored) - Counter(e29_restored) == Counter(E29_REMOVED), f"rank {rank}: E29 removed"
         # Older E27c return: exactly the measured E27c command, five draft tokens and 15 GiB.
         e27c_restored = launch(rank, "rollback-e27c.env")
         assert e27c_restored == launch(rank, "historical-e27c.env"), f"rank {rank}: E27c rollback drifted"
@@ -179,4 +232,4 @@ RELAY_DEST=operator@192.0.2.23
         assert not any("connector-e03-replay-views" in item for item in restored)
         assert "--kv-cache-memory-bytes=16106127360" in restored
 
-print("test-accepted-recipe: PASS (four-rank command parity, mounted hashes, E27c, E27, E22b, E21, E03 and pre-E03 rollbacks, 3-run provenance)")
+print("test-accepted-recipe: PASS (four-rank bounded default; protected16, E31, E29, E28b, E27c, E27, E22b, E21, E03 and pre-E03 rollbacks)")

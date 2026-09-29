@@ -56,7 +56,9 @@ class SparkCacheTest(unittest.TestCase):
     def test_files_match_pins(self):
         pins = manifest(REPO / "scripts/node/sparkcache/SHA256SUMS")
         for name in ("spark_context_cache_connector.py", "spark_context_cache_hybrid.py",
-                     "spark_context_cache_connector-e03-replay-views.py"):
+                     "spark_context_cache_connector-e03-replay-views.py",
+                     "spark_context_cache_connector-ram-budget.py",
+                     "spark_context_cache_memory_budget.py"):
             self.assertEqual(sha(SPARKCACHE / name), pins[name], name)
         rollback = (REPO / "scripts/prepare-sparkcache.py").read_text()
         self.assertIn(sha(SPARKCACHE / "spark_context_cache_connector-20260918.py"), rollback)
@@ -67,6 +69,11 @@ class SparkCacheTest(unittest.TestCase):
             path = re.search(rf"^SPARKCACHE_{key}='\$HOME/tp4/sparkcache/([^']+)'$", recipe, re.M).group(1)
             pin = re.search(rf"^SPARKCACHE_{key}_SHA256=([0-9a-f]{{64}})$", recipe, re.M).group(1)
             self.assertEqual(sha(SPARKCACHE / path), pin, key)
+        config_path = re.search(
+            r"^SPARKCACHE_CONFIG='\$HOME/tp4/([^']+)'$", recipe, re.M).group(1)
+        config_pin = re.search(
+            r"^SPARKCACHE_CONFIG_SHA256=([0-9a-f]{64})$", recipe, re.M).group(1)
+        self.assertEqual(sha(REPO / "scripts/node" / config_path), config_pin, "CONFIG")
 
     def test_patches_reverse_to_upstream(self):
         patches = SPARKCACHE / "patches"

@@ -1,0 +1,151 @@
+--- scripts/node/experiments/e03/end-drain/scheduler.py
++++ scripts/node/experiments/e03/prefill-step-cap/scheduler.py
+@@ -1,6 +1,8 @@
+ # SPDX-License-Identifier: Apache-2.0
+ # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+ import itertools
++import json
++import os
+ import time
+ from collections import defaultdict, deque
+ from collections.abc import Iterable
+@@ -71,6 +73,57 @@
+ from vllm.v1.utils import record_function_or_nullcontext
+ 
+ logger = init_logger(__name__)
++
++
++_RESILIENCE_STEP_TOKEN_CAP = 6912
++_RESILIENCE_CONFIGURED_TOKEN_BUDGET = 8192
++_RESILIENCE_CACHE_BLOCK_SIZE = 2304
++_RESILIENCE_EAGER_THRESHOLD = 72
++
++
++def _resilience_step_token_cap() -> int:
++    """Parse the diagnostic as an exact opt-in; zero preserves E29."""
++    value = os.environ.get("VLLM_RESILIENCE_STEP_TOKEN_CAP", "0")
++    if value == "0":
++        return 0
++    if value != str(_RESILIENCE_STEP_TOKEN_CAP):
++        raise ValueError(
++            "VLLM_RESILIENCE_STEP_TOKEN_CAP must be 0 or 6912, "
++            f"got {value!r}"
++        )
++    return _RESILIENCE_STEP_TOKEN_CAP
++
++
++def _resilience_effective_token_budget(configured: int, cap: int) -> int:
++    """Return the target-token budget for one scheduler output."""
++    if configured <= 0 or cap < 0:
++        raise ValueError("scheduler token budgets must be positive")
++    return min(configured, cap) if cap else configured
++
++
++def _resilience_step_receipt(
++    *,
++    schedule_sequence: int,
++    scheduled_target_tokens: int,
++    num_scheduled_new_requests: int,
++    configured_token_budget: int,
++    effective_token_cap: int,
++    wall_time_ns=time.time_ns,
++    monotonic_ns=time.monotonic_ns,
++    pid_fn=os.getpid,
++) -> dict[str, int | str]:
++    """Build one bounded receipt for an eager scheduler output."""
++    return {
++        "schema": "prefill-step-cap-v1",
++        "wall_time_ns": wall_time_ns(),
++        "monotonic_ns": monotonic_ns(),
++        "pid": pid_fn(),
++        "schedule_sequence": schedule_sequence,
++        "scheduled_target_tokens": scheduled_target_tokens,
++        "num_scheduled_new_requests": num_scheduled_new_requests,
++        "configured_token_budget": configured_token_budget,
++        "effective_token_cap": effective_token_cap,
++    }
+ 
+ 
+ # E27b (TP4 candidate): with the native prefill cadence, a throttled step still
+@@ -194,6 +247,31 @@
+             if self.scheduler_config.max_num_scheduled_tokens is not None
+             else self.scheduler_config.max_num_batched_tokens
+         )
++        self.resilience_step_token_cap = _resilience_step_token_cap()
++        self.resilience_eager_threshold = _RESILIENCE_EAGER_THRESHOLD
++        if self.resilience_step_token_cap:
++            captures = self.vllm_config.compilation_config.cudagraph_capture_sizes
++            if (
++                self.scheduler_config.max_num_batched_tokens
++                != _RESILIENCE_CONFIGURED_TOKEN_BUDGET
++                or self.max_num_scheduled_tokens
++                != _RESILIENCE_CONFIGURED_TOKEN_BUDGET
++                or block_size != _RESILIENCE_CACHE_BLOCK_SIZE
++                or not captures
++                or max(captures) != _RESILIENCE_EAGER_THRESHOLD
++            ):
++                raise ValueError(
++                    "VLLM_RESILIENCE_STEP_TOKEN_CAP requires the E31 8192-token "
++                    "budget, 2304-token scheduler block and 72-token graph ceiling"
++                )
++            logger.info(
++                "RESILIENCE_STEP_TOKEN_CAP_READY configured=%d effective=%d "
++                "block=%d eager_above=%d",
++                self.max_num_scheduled_tokens,
++                self.resilience_step_token_cap,
++                block_size,
++                self.resilience_eager_threshold,
++            )
+         self.max_model_len = vllm_config.model_config.max_model_len
+         self.enable_kv_cache_events = (
+             self.kv_events_config is not None
+@@ -706,7 +784,10 @@
+ 
+         req_to_new_blocks: dict[str, KVCacheBlocks] = {}
+         num_scheduled_tokens: dict[str, int] = {}
+-        token_budget = self.max_num_scheduled_tokens
++        effective_token_cap = _resilience_effective_token_budget(
++            self.max_num_scheduled_tokens, self.resilience_step_token_cap
++        )
++        token_budget = effective_token_cap
+         spec = self.vllm_config.speculative_config
+         draft_slots = spec.max_num_new_slots_for_drafting if spec is not None else 0
+         input_budget = self.scheduler_config.max_num_batched_tokens
+@@ -1493,6 +1574,7 @@
+         # Check if the scheduling constraints are satisfied.
+         total_num_scheduled_tokens = sum(num_scheduled_tokens.values())
+         assert total_num_scheduled_tokens <= self.max_num_scheduled_tokens
++        assert total_num_scheduled_tokens <= effective_token_cap
+ 
+         assert token_budget >= 0
+         assert input_budget >= 0
+@@ -1503,6 +1585,7 @@
+         assert len(scheduled_new_reqs) + len(scheduled_resumed_reqs) + len(
+             scheduled_running_reqs
+         ) <= len(self.running)
++        num_scheduled_new_requests = len(scheduled_new_reqs)
+ 
+         # Get the longest common prefix among all requests in the running queue.
+         # This can be potentially used for cascade attention.
+@@ -1661,6 +1744,21 @@
+ 
+         with record_function_or_nullcontext("schedule: update_after_schedule"):
+             self._update_after_schedule(scheduler_output)
++        if (
++            self.resilience_step_token_cap
++            and total_num_scheduled_tokens > self.resilience_eager_threshold
++        ):
++            receipt = _resilience_step_receipt(
++                schedule_sequence=self.current_step,
++                scheduled_target_tokens=total_num_scheduled_tokens,
++                num_scheduled_new_requests=num_scheduled_new_requests,
++                configured_token_budget=self.max_num_scheduled_tokens,
++                effective_token_cap=effective_token_cap,
++            )
++            logger.info(
++                "RESILIENCE_STEP_TOKEN_CAP %s",
++                json.dumps(receipt, sort_keys=True),
++            )
+         return scheduler_output
+ 
+     def _e27b_admit(self, remaining: int) -> bool:
