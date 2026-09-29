@@ -22,7 +22,7 @@ The [portable results](../../historical_benchmarks/experiments/2026-09-29-sparkc
 retain numeric extracts and the SHA-256 of both unchanged private native receipts.
 The [operational identity](../../operational-identities/2026-09-29-memory-bounded.json)
 pins the protected connector, KV14, allocator trim, step cap and bounded admission. The
-[campaign runbook](../../resilience-campaign.md) describes the isolated fault namespace,
+[campaign runbook](../../resilience.md) describes the isolated fault namespace,
 coordinated recovery and deadline. Existing caches and frozen benchmarks are preserved.
 
 ## Initial native measurement

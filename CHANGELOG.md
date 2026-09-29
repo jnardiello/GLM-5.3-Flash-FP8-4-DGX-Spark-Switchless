@@ -102,7 +102,7 @@ Versions and releases are created only at the owner's explicit request.
   a controller telemetry timeout, with uninterrupted node samples and no observed
   OOM; the delivery-delay cause remains unresolved.
 - A bounded production resilience campaign under `scripts/resilience/`, documented in
-  `docs/resilience-campaign.md`: reproducible context and queue cases, cancellation and slow-client
+  `docs/resilience.md`: reproducible context and queue cases, cancellation and slow-client
   probes, isolated cache fault injection, worker faults with coordinated recovery, private
   receipts and a fixed restoration deadline. Test overlays keep cache mutations in a
   marked namespace capped at 8 GiB per node, with native eviction of synthetic cache
@@ -544,12 +544,8 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Changed
 
-- The README now summarizes performance and memory resilience in one short paragraph
-  each. The full E31 table, notes and history moved to `docs/performance.md`; the
-  protections, per-rank memory, limits and the new free-memory figure moved to a new
-  `docs/resilience.md` results page. The resilience campaign runbook is now
-  `docs/resilience-campaign.md`, and the agent contract and benchmark index point to the
-  new pages.
+- The README's memory-resilience summary is now a short "Measured resilience" section
+  after "Measured quality", with the free-memory figure and a link to the campaign report.
 - Made the memory-bounded operational recipe the default while retaining the frozen
   E31 performance reference: 14 GiB KV per rank with the 262,144-token context limit,
   eager-prefill allocator trim, a 6,912-token scheduler-step cap, six active API
