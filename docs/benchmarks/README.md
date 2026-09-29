@@ -1,6 +1,6 @@
 # Benchmark reports
 
-Readable reports live here; machine-readable frozen records and portable experiment extracts live in [historical benchmark datasets](../historical_benchmarks/README.md). The [project README](../../README.md) shows the current baseline. Historical records remain available regardless of whether a candidate was accepted, discarded, unresolved or stopped.
+Readable reports live here; machine-readable frozen records and portable experiment extracts live in [historical benchmark datasets](../historical_benchmarks/README.md). The [performance page](../performance.md) shows the current baseline, and the [project README](../../README.md) summarizes it. Historical records remain available regardless of whether a candidate was accepted, discarded, unresolved or stopped.
 
 ## Frozen references and reproduction
 
@@ -28,7 +28,7 @@ comparison ID per suite. A candidate is compared with a reference arm measured o
 load. The frozen E29-and-earlier records used a local fork, 8,192 decode tokens and thinking
 off, so they are not comparable with E31.
 
-The README table shows the E31 values against the same-load E29-equivalent arm. The comparison
+The [performance page](../performance.md) table shows the E31 values against the same-load E29-equivalent arm. The comparison
 figures still show the earlier E29 versus E28b medians: the plotter
 (`scripts/plot-baseline-comparison.py`) compares two frozen records, while E31's comparison
 arm lives inside the E31 record. All earlier comparisons remain archived unchanged under

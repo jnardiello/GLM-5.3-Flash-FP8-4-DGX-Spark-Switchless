@@ -148,7 +148,7 @@ The resilience overlay can additionally select a smaller KV pool. Its optional
 `--kv-cache-memory-bytes` value on each rank, with `--max-model-len 262144`
 unchanged. Record the engine's actual KV-token capacity and test the largest context
 and concurrent admission before drawing a resilience conclusion; see
-[the campaign procedure](resilience.md).
+[the campaign procedure](resilience-campaign.md).
 
 The complete immediate operational return is
 `TP4_ENV=scripts/node/reference/operational-20260929-sparkcache-protected.env`.
@@ -1054,7 +1054,7 @@ recovery from kernel, driver, firmware, boot-loader or network failure.
 ## Keep an accepted change
 
 For an explicitly authorized exclusive production load and fault window, use the
-[resilience campaign runbook](resilience.md). Its temporary overlay confines cache
+[resilience campaign runbook](resilience-campaign.md). Its temporary overlay confines cache
 faults to a separate namespace, retains private receipts and restores the protected
 default through the same coordinated controller. Performance checks still use native
 Rigmark from its independent checkout.
