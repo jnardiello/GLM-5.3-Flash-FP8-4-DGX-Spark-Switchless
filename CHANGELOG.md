@@ -7,9 +7,10 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
-- `scripts/plot-resilience-memory.py` renders one plain-language figure of free memory per
-  node over the 99-minute mixed load from the hash-checked portable CSV, with approximate
-  request counts on the time axis.
+- `scripts/plot-resilience-memory.py` renders one figure of the lowest sampled available
+  memory in each of the eight KV14 resilience test checkpoints, from the campaign's portable
+  results: rank 0 as a point, ranks 1–3 as the range of their minima, and the 768 MiB test
+  stop guard.
 - A reproducible requests-versus-memory figure, portable CSV and summary of the
   98m59s mixed-load run: 756 complete responses, 84 intentional cancellations and
   fresh four-rank drains. The operator ended the stable run early; the original
@@ -550,7 +551,8 @@ Versions and releases are created only at the owner's explicit request.
   arm from the E31 record by default and keeps `--comparison e29-vs-e28b` for the archived
   figures. Figure labels round like the README table.
 - The README's memory-resilience summary is now a short "Measured resilience" section
-  after "Measured quality", with the free-memory figure and a link to the campaign report.
+  after "Measured quality", with the per-test minimum-memory figure and a link to the
+  campaign report.
 - Made the memory-bounded operational recipe the default while retaining the frozen
   E31 performance reference: 14 GiB KV per rank with the 262,144-token context limit,
   eager-prefill allocator trim, a 6,912-token scheduler-step cap, six active API

@@ -221,7 +221,7 @@ load. The first long load failed an idle check and the second was ended early by
 operator, so no two-hour run has passed; worker crashes, larger queues and combined
 faults remain deferred.
 
-[![Free memory per node over a 99-minute mixed load of 840 requests: rank 0 stays between about 3 and 6 GiB free, ranks 1–3 between about 8 and 10.7 GiB, with two early rises and no downward trend.](docs/plots/experiments/2026-09-29-sparkcache-resilience/memory-over-time.png)](docs/plots/experiments/2026-09-29-sparkcache-resilience/memory-over-time.svg)
+[![Lowest sampled available memory in each of eight resilience test checkpoints: rank 0 between 2.55 and 4.48 GiB, ranks 1–3 between 7.54 and 9.60 GiB, all above the 768 MiB test stop guard.](docs/plots/experiments/2026-09-29-sparkcache-resilience/memory-by-test.png)](docs/plots/experiments/2026-09-29-sparkcache-resilience/memory-by-test.svg)
 
 The [campaign report](docs/benchmarks/experiments/2026-09-29-sparkcache-resilience.md)
 records every case, the per-rank memory, the final Rigmark suite and the limits.
