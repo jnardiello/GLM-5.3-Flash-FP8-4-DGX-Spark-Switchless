@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "identity_id": "2026-09-30-e36-lm-head",
+  "status": "operational default",
+  "description": "E36: the E35 default plus the INT8 shared lm_head. The vocab-parallel lm_head that the target shares with the DFlash2 drafter is packed INT8 W8A16 (symmetric, group 128, Marlin) at load, before CUDA graph capture, and its BF16 weight is freed. This operational identity is separate from the frozen E31 performance baseline, which remains its engine identity.",
+  "performance_baseline": {
+    "id": "2026-09-28-e31",
+    "path": "docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json",
+    "sha256": "33647fe7c40840f1bdeaefea31e97493f4a98187492acf158c7e006c80a150b1"
+  },
+  "sparkcache": {
+    "connector_sha256": "aa046965637b685ec1f6a00e427eb46279e28bf0d49ee546236bc774be2de9bd",
+    "kv_transfer_config_sha256": "d99bd6720572b2f46668d0a11229f7662f1e8fdd69a69f61cbfa5592aa600c72",
+    "hybrid_encoder_sha256": "11a2db855306b816a4f3d377d04207cc2d62112a381bcc54162099248bbf75f6",
+    "transfer_chunk_bytes": 8388608,
+    "cpu_budget_bytes_per_rank": 1073741824,
+    "min_available_bytes_per_rank": 1073741824,
+    "cache_namespace": "/cache/jit/sparkcache-e22b-drafter-context-bf16-cpu-budget-v1",
+    "disk_max_bytes_per_rank": 214748364800,
+    "disk_low_watermark_bytes_per_rank": 171798691840
+  },
+  "engine_overrides": {
+    "kv_cache_memory_bytes": 15032385536,
+    "actual_kv_cache_tokens": 1194033
+  },
+  "runtime_identity_overrides": {
+    "container_file_sha256": {
+      "/usr/local/lib/python3.12/dist-packages/sparkcache/spark_context_cache_connector.py": "aa046965637b685ec1f6a00e427eb46279e28bf0d49ee546236bc774be2de9bd",
+      "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd",
+      "/opt/tp4/tp4_admission.py": "3909b20d57752e4e68035bfe81f35490fe2dd763bf65f089b08d20374d97c6db",
+      "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu/model_runner.py": "d8fbfa5112f700d2a7468e97c6bb0857a16adccd70c34a22d59ec7ef97a40216",
+      "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu/spec_decode/dflash2/speculator.py": "553d3e7b33482a93f72ed116e0e8d8b5bf2070313a7ad4aa5be9d83c4167bad5",
+      "/opt/tp4/adaptive_k_scheduler.py": "89dbca0f780911aae3f5f5b3954237a9271a30cc9905d56f70705e77696b8ef8",
+      "/tmp/glm53-e35-policy": "3f67929e07d991f1b2e904c720c776e76760db43680216df676fbce7ad63bd5a",
+      "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e36_lm_head_w8a16.py": "576eeb38c20f3f4bf714fbd5dfc22da185674dab2038ddcace8ea42139d3b722"
+    },
+    "environment": {
+      "VLLM_PREFILL_CACHE_TRIM": "1",
+      "VLLM_RESILIENCE_STEP_TOKEN_CAP": "6912",
+      "TP4_ADMISSION_MAX_ACTIVE": "6",
+      "TP4_ADMISSION_MAX_QUEUED": "128",
+      "TP4_ADMISSION_MAX_BODY_BYTES": "8388608",
+      "TP4_ADMISSION_QUEUE_TIMEOUT_SECONDS": "1800",
+      "TP4_ADMISSION_REQUEST_TIMEOUT_SECONDS": "3600",
+      "TP4_ADMISSION_BODY_IDLE_SECONDS": "30",
+      "TP4_ADMISSION_SEND_IDLE_SECONDS": "30",
+      "SPARK_CONTEXT_CACHE_MAX_BYTES": "214748364800",
+      "SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES": "171798691840",
+      "VLLM_E35_ENABLE": "1",
+      "VLLM_E35_POLICY_FLAG": "/tmp/glm53-e35-policy",
+      "VLLM_E36_LM_HEAD_W8A16": "1",
+      "VLLM_E36_KEEP_BF16": "0"
+    },
+    "boot_lines": [
+      "RESILIENCE_STEP_TOKEN_CAP_READY configured=8192 effective=6912 block=2304 eager_above=72",
+      "TP4_ADMISSION_READY ",
+      "GPU KV cache size: 1,194,033 tokens, Maximum concurrency for 262,144 tokens per request: 4.55x",
+      "E35_SCHEDULER_READY flag=/tmp/glm53-e35-policy k_hi=7"
+    ],
+    "all_rank_boot_lines": [
+      "SPARKCACHE_CPU_BUDGET_READY cap_bytes=1073741824 floor_bytes=1073741824",
+      "SPARKCACHE_DISK_STREAM_READY chunk_bytes=8388608",
+      "max_bytes=214748364800 low_bytes=171798691840 ttl_seconds=0"
+    ],
+    "all_rank_boot_lines_by_rank": {
+      "0": [
+        "PREFILL_CACHE_TRIM_READY rank=0 enabled=1 trigger=pre_eager_prefill",
+        "E35_RUNNER_K_READY enabled=1 flag=/tmp/glm53-e35-policy margin=0.005 wait_ms=2.8",
+        "E35_CONF_RECORDER_READY enabled=1",
+        "E36_LM_HEAD_W8A16_READY {\"freed_bytes\": 317194240, \"group_size\": 128, \"keep_bf16\": false",
+        "\"shape\": [38720, 4096], \"shared_with_drafter\": true"
+      ],
+      "1": [
+        "PREFILL_CACHE_TRIM_READY rank=1 enabled=1 trigger=pre_eager_prefill",
+        "E35_RUNNER_K_READY enabled=1 flag=/tmp/glm53-e35-policy margin=0.005 wait_ms=2.8",
+        "E35_CONF_RECORDER_READY enabled=1",
+        "E36_LM_HEAD_W8A16_READY {\"freed_bytes\": 317194240, \"group_size\": 128, \"keep_bf16\": false",
+        "\"shape\": [38720, 4096], \"shared_with_drafter\": true"
+      ],
+      "2": [
+        "PREFILL_CACHE_TRIM_READY rank=2 enabled=1 trigger=pre_eager_prefill",
+        "E35_RUNNER_K_READY enabled=1 flag=/tmp/glm53-e35-policy margin=0.005 wait_ms=2.8",
+        "E35_CONF_RECORDER_READY enabled=1",
+        "E36_LM_HEAD_W8A16_READY {\"freed_bytes\": 317194240, \"group_size\": 128, \"keep_bf16\": false",
+        "\"shape\": [38720, 4096], \"shared_with_drafter\": true"
+      ],
+      "3": [
+        "PREFILL_CACHE_TRIM_READY rank=3 enabled=1 trigger=pre_eager_prefill",
+        "E35_RUNNER_K_READY enabled=1 flag=/tmp/glm53-e35-policy margin=0.005 wait_ms=2.8",
+        "E35_CONF_RECORDER_READY enabled=1",
+        "E36_LM_HEAD_W8A16_READY {\"freed_bytes\": 317194240, \"group_size\": 128, \"keep_bf16\": false",
+        "\"shape\": [38720, 4096], \"shared_with_drafter\": true"
+      ]
+    }
+  },
+  "runtime_sources": [
+    {
+      "path": "scripts/node/experiments/e03/prefill-cache-trim/gpu_worker.py",
+      "sha256": "442f18ed75193ba85f7be763d4fff2987b7613b9fa0b9dafdb6cceb18baf70de",
+      "mount_source": "$HOME/tp4/experiments/e03/prefill-cache-trim/gpu_worker.py",
+      "container_path": "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py"
+    },
+    {
+      "path": "scripts/node/experiments/e03/prefill-step-cap/scheduler.py",
+      "sha256": "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd",
+      "mount_source": "$HOME/tp4/experiments/e03/prefill-step-cap/scheduler.py",
+      "container_path": "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py"
+    },
+    {
+      "path": "scripts/node/experiments/e03/bounded-admission/middleware.py",
+      "sha256": "3909b20d57752e4e68035bfe81f35490fe2dd763bf65f089b08d20374d97c6db",
+      "mount_source": "$HOME/tp4/experiments/e03/bounded-admission/middleware.py",
+      "container_path": "/opt/tp4/tp4_admission.py"
+    },
+    {
+      "path": "scripts/node/experiments/e03/e36-lm-head-w8a16/model_runner.py",
+      "sha256": "d8fbfa5112f700d2a7468e97c6bb0857a16adccd70c34a22d59ec7ef97a40216",
+      "mount_source": "$HOME/tp4/experiments/e03/e36-lm-head-w8a16/model_runner.py",
+      "container_path": "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu/model_runner.py"
+    },
+    {
+      "path": "scripts/node/experiments/e03/e35-runner-k/speculator.py",
+      "sha256": "553d3e7b33482a93f72ed116e0e8d8b5bf2070313a7ad4aa5be9d83c4167bad5",
+      "mount_source": "$HOME/tp4/experiments/e03/e35-runner-k/speculator.py",
+      "container_path": "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu/spec_decode/dflash2/speculator.py"
+    },
+    {
+      "path": "scripts/node/experiments/e03/e35-runner-k/adaptive_k_scheduler.py",
+      "sha256": "89dbca0f780911aae3f5f5b3954237a9271a30cc9905d56f70705e77696b8ef8",
+      "mount_source": "$HOME/tp4/experiments/e03/e35-runner-k/adaptive_k_scheduler.py",
+      "container_path": "/opt/tp4/adaptive_k_scheduler.py"
+    },
+    {
+      "path": "scripts/node/experiments/e03/e35-runner-k/policy.flag",
+      "sha256": "3f67929e07d991f1b2e904c720c776e76760db43680216df676fbce7ad63bd5a",
+      "mount_source": "$HOME/tp4/experiments/e03/e35-runner-k/policy.flag",
+      "container_path": "/tmp/glm53-e35-policy"
+    },
+    {
+      "path": "scripts/node/experiments/e03/e36-lm-head-w8a16/e36_lm_head_w8a16.py",
+      "sha256": "576eeb38c20f3f4bf714fbd5dfc22da185674dab2038ddcace8ea42139d3b722",
+      "mount_source": "$HOME/tp4/experiments/e03/e36-lm-head-w8a16/e36_lm_head_w8a16.py",
+      "container_path": "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e36_lm_head_w8a16.py"
+    }
+  ],
+  "api_admission": {
+    "middleware": "tp4_admission.BoundedAdmissionMiddleware",
+    "environment": {
+      "TP4_ADMISSION_MAX_ACTIVE": "6",
+      "TP4_ADMISSION_MAX_QUEUED": "128",
+      "TP4_ADMISSION_MAX_BODY_BYTES": "8388608",
+      "TP4_ADMISSION_QUEUE_TIMEOUT_SECONDS": "1800",
+      "TP4_ADMISSION_REQUEST_TIMEOUT_SECONDS": "3600",
+      "TP4_ADMISSION_BODY_IDLE_SECONDS": "30",
+      "TP4_ADMISSION_SEND_IDLE_SECONDS": "30"
+    }
+  },
+  "recipe": {
+    "path": "cluster.env.example",
+    "sha256": "df6ecd00fec11b0d26b529edde395139148ef35ea4e9365961bb7c6464bc1a70"
+  },
+  "rollback": {
+    "path": "scripts/node/reference/operational-20260930-e35.env",
+    "sha256": "e2c9b431c94d76b4e5d29b66468a6026d921df3cb56f643bee8910d5af4ca547"
+  },
+  "capacity": {
+    "bytes_per_rank": 15032385536,
+    "change_from_e31_percent": -12.5,
+    "reported_tokens": 1194033,
+    "max_context_tokens": 262144,
+    "reported_max_context_multiple": 4.55,
+    "five_full_max_contexts_resident": false
+  },
+  "previous_identity": {
+    "path": "docs/operational-identities/2026-09-30-e35-hybrid.json",
+    "sha256": "9b7d16053f41fb6c2022a36a25d4e9d8adb3187a200e50c23d71718821689232"
+  },
+  "e35": {
+    "policy": "hybrid",
+    "policy_file": {
+      "path": "scripts/node/experiments/e03/e35-runner-k/policy.flag",
+      "content": "hybrid\n",
+      "container_path": "/tmp/glm53-e35-policy",
+      "read_by": "tensor-parallel rank 0 every 0.5 s"
+    },
+    "measured_overlay": {
+      "path": "scripts/node/experiments/e03/e35-runner-k/delta.env",
+      "sha256": "ce5159f90a39485b842ce5a0c5507add4187301957e7bc705f8a152adada188a"
+    },
+    "manifest": {
+      "path": "scripts/node/experiments/e03/e35-runner-k/manifest.json",
+      "sha256": "d1eede26253de4215b0bf9735feee24119377401a1ee99076f05ae739ae0dcc3"
+    },
+    "measurement": "docs/historical_benchmarks/experiments/2026-09-30-e35-runner-k/results.json"
+  },
+  "e36": {
+    "measured_overlay": {
+      "path": "scripts/node/experiments/e03/e36-lm-head-w8a16/delta.env",
+      "sha256": "e7400ba6e03388a6b2e15c5d1f18f9bbfaf6dd3ad0a181421eb3ba0c779b77aa"
+    },
+    "manifest": {
+      "path": "scripts/node/experiments/e03/e36-lm-head-w8a16/manifest.json",
+      "sha256": "c246613da6bc62fd7f6642e0154905fb83dcf9412c8e66e9fde098c44b5b342c"
+    },
+    "preregistration": "docs/historical_benchmarks/experiments/2026-09-30-e36-lm-head/preregistration.json",
+    "fidelity": "docs/historical_benchmarks/experiments/2026-09-30-e36-lm-head/fidelity-result.json"
+  }
+}

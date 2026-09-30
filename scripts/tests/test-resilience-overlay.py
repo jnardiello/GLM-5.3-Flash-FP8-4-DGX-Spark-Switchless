@@ -402,6 +402,30 @@ class OverlayTests(unittest.TestCase):
                 "/opt/tp4-resilience/runtime.py:ro")
             self.assertIn(runtime_mount, sourced.stdout.split())
             self.assertNotIn(str(controller_home), sourced.stdout)
+            # The default's disk capacity is replaced, never duplicated, by the campaign's.
+            self.assertIn("SPARK_CONTEXT_CACHE_MAX_BYTES=214748364800",
+                          (REPO / "cluster.env.example").read_text())
+            self.assertEqual(
+                [word for word in sourced.stdout.split() if "SPARK_CONTEXT_CACHE_" in word],
+                ["SPARK_CONTEXT_CACHE_MAX_BYTES=3221225472",
+                 "SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES=2147483648"])
+            self.assertNotIn("-e -e", sourced.stdout)
+            for name, extra in (
+                    ("duplicate", ' -e SPARK_CONTEXT_CACHE_MAX_BYTES=1'
+                                  ' -e SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES=1'),
+                    ("unpaired", ' -e SPARK_CONTEXT_CACHE_MAX_BYTES=1'),
+                    ("long-form", ' --env SPARK_CONTEXT_CACHE_TTL_SECONDS=60')):
+                ambiguous = root / f"{name}.env"
+                ambiguous.write_text(cluster.read_text()
+                                     + f'EXTRA_DOCKER_ENV+="{extra}"\n')
+                refused = __import__("subprocess").run(
+                    ["bash", "-c", 'source "$1"; source "$2" || exit 1', "overlay-test",
+                     str(ambiguous), str(overlay)],
+                    env={**os.environ, "HOME": str(controller_home)},
+                    capture_output=True, text=True)
+                self.assertNotEqual(refused.returncode, 0, name)
+                self.assertIn("at most one plain SparkCache disk-capacity pair",
+                              refused.stderr, name)
 
             launched = __import__("subprocess").run(
                 ["bash", str(launcher), "0"],

@@ -93,7 +93,10 @@ Then verify these signatures that `docker ps` does not prove:
 | E29 end-drain and idle coalescing | rank-0 logs, `docker inspect`, `./scripts/check-f0.py` | `E29_END_DRAIN_READY trace=0` and `E29_IDLE_COALESCE_READY ms=4 trace=0` on rank 0; `VLLM_E29_END_DRAIN=1`, `VLLM_E29_IDLE_COALESCE_MS=4` and `VLLM_E29_TRACE=0` on every rank, with the `experiments/e03/end-drain/scheduler.py` hash mounted over `vllm/v1/core/sched/scheduler.py` and the `experiments/e03/end-drain/core.py` hash over `vllm/v1/engine/core.py`; the first request held at a length finish logs `E29_END_DRAIN_HELD` |
 | E31 indexer (tail ring on, head gate off) | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E31_INDEXER_GATE path=fp32` and `E31_KPOOL_TAIL_RING ring=12` on every rank, logged by the first forward; `VLLM_GLM53_INDEXER_GATE_TC_FLAG=/tmp/glm53-indexer-gate-tc` and `VLLM_GLM53_KPOOL_TAIL_RING_FLAG=/tmp/glm53-kpool-tail-ring` on every rank and no `VLLM_GLM53_INDEXER_GATE_TC` or `VLLM_GLM53_KPOOL_TAIL_RING` variable, with the `experiments/e03/e31-indexer/pooled_indexer.py` and `glm_kpool.py` hashes mounted over `vllm/models/glm5next/nvidia/pooled_indexer.py` and `ops/glm_kpool.py`; `ring=4` or `path=bf16-tc` means a flag file was changed and is not the accepted state |
 | Protected SparkCache default | all rank logs, deployed recipe, `docker inspect`, `./scripts/check-f0.py` | connector SHA-256 `aa046965637b…`, config SHA-256 `d99bd6720572…`, `SPARKCACHE_CPU_BUDGET_READY cap_bytes=1073741824 floor_bytes=1073741824` and `SPARKCACHE_DISK_STREAM_READY chunk_bytes=8388608` on every rank; the versioned operational identity pins the full values |
+| SparkCache disk capacity | all rank logs, `docker inspect`, `./scripts/check-f0.py` | `SPARK_CONTEXT_CACHE_MAX_BYTES=214748364800` and `SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES=171798691840` on every rank, and each rank's `sparkcache: config role=WORKER` line reports `max_bytes=214748364800 low_bytes=171798691840 ttl_seconds=0`; `max_bytes=0` means the store has no disk limit |
 | Memory bounds and API admission | rank logs, `docker inspect`, `./scripts/check-f0.py` | `PREFILL_CACHE_TRIM_READY rank=<rank> enabled=1 trigger=pre_eager_prefill` on every rank; `RESILIENCE_STEP_TOKEN_CAP_READY configured=8192 effective=6912 block=2304 eager_above=72` and `TP4_ADMISSION_READY` on rank 0; limits are six active admission slots, 128 queued, 8 MiB body, 1,800 s queue, 3,600 s request, and 30 s body/send idle; active slots do not imply resident engine requests |
+| E35 verify length (policy `hybrid`) | rank logs, `docker inspect`, `./scripts/check-f0.py` | `E35_RUNNER_K_READY enabled=1 flag=/tmp/glm53-e35-policy margin=0.005 wait_ms=2.8` and `E35_CONF_RECORDER_READY enabled=1` on every rank; `E35_SCHEDULER_READY flag=/tmp/glm53-e35-policy k_hi=7` on rank 0; `VLLM_E35_ENABLE=1` and `VLLM_E35_POLICY_FLAG=/tmp/glm53-e35-policy` on every rank, with the `experiments/e03/e35-runner-k/` speculator and scheduler hashes mounted over `vllm/v1/worker/gpu/spec_decode/dflash2/speculator.py` and `/opt/tp4/adaptive_k_scheduler.py` (the runner is the E36 copy, see the next row), and `policy.flag` (content `hybrid`) read-only at `/tmp/glm53-e35-policy`; every 200 participating steps rank 0 logs `E35_RUNNER_K` with its decisions, waits, broadcast latency and `errors=0` |
+| E36 INT8 shared lm_head | all rank logs, `docker inspect`, `./scripts/check-f0.py` | `E36_LM_HEAD_W8A16_READY` on every rank with `"freed_bytes": 317194240`, `"keep_bf16": false`, `"shape": [38720, 4096]`, `"shared_with_drafter": true`, a `tp_rank_vocab_start` of 0, 38720, 77440 or 116160, a group-128 weight error near 0.72% and a logit error below 1%; `VLLM_E36_LM_HEAD_W8A16=1` and `VLLM_E36_KEEP_BF16=0` on every rank and no `VLLM_E36_FLAG`; the `experiments/e03/e36-lm-head-w8a16/` runner (the E35 runner plus the load-time conversion) mounted over `vllm/v1/worker/gpu/model_runner.py` and `e36_lm_head_w8a16.py` over `vllm/models/glm5next/nvidia/e36_lm_head_w8a16.py`, both read-only |
 
 The operational default retains the [accepted E31 engine recipe](benchmarks/baselines/2026-09-28-e31.md) and those
 signatures, including the E03 `SPARK_MHC_PREFILL_SHARD=1` and its measured source
@@ -119,9 +122,11 @@ avoid holding a full serialized snapshot in RAM.
 The selected protected connector SHA-256 is
 `aa046965637b685ec1f6a00e427eb46279e28bf0d49ee546236bc774be2de9bd`.
 The scheduler SHA-256 is
-`697f99bf1951535dcc3381776fa744ad8204d83d2606f341b617bac7a31949b4`.
-Its rank-0 startup signature is
-`draft-budget active=1 source=SchedulerOutput.resolve_num_spec_tokens_to_schedule engine_k=7`,
+`89dbca0f780911aae3f5f5b3954237a9271a30cc9905d56f70705e77696b8ef8`, the E35 copy of the
+draft-budget scheduler (`697f99bf1951535dcc3381776fa744ad8204d83d2606f341b617bac7a31949b4`)
+with one additions-only rule. Its rank-0 startup signatures are
+`draft-budget active=1 source=SchedulerOutput.resolve_num_spec_tokens_to_schedule engine_k=7`
+and `E35_SCHEDULER_READY flag=/tmp/glm53-e35-policy k_hi=7`,
 alongside the enabled batch-uniform async policy. When concurrent requests trigger a
 limit, expect `draft-budget first-cap budget=3` and aggregate `limited_requests` and
 `trimmed_tokens`. These count placeholder handouts, not accepted tokens or saved compute.
@@ -150,11 +155,16 @@ unchanged. Record the engine's actual KV-token capacity and test the largest con
 and concurrent admission before drawing a resilience conclusion; see
 [the campaign procedure](resilience.md).
 
-The complete immediate operational return is
+The one-step operational return is
+`TP4_ENV=scripts/node/reference/operational-20260930-e35.env`: it removes only E36.
+`TP4_ENV=scripts/node/reference/operational-20260930-e31-mb.env` removes E36 and E35, and
+`TP4_ENV=scripts/node/reference/operational-20260929-memory-bounded.env` removes E36, E35 and the
+SparkCache disk limit. The complete immediate operational return is
 `TP4_ENV=scripts/node/reference/operational-20260929-sparkcache-protected.env`.
 It keeps the bounded SparkCache connector, 8 MiB transfers and 1 GiB transient/admission
-budgets, but restores the 16 GiB KV pool and removes allocator trim, the 6,912-token step cap
-and API admission. It therefore does not retain the complete memory-bounded protection.
+budgets, but restores the 16 GiB KV pool and removes allocator trim, the 6,912-token step cap,
+API admission and the disk limit. It therefore does not retain the complete memory-bounded
+protection.
 The historical `TP4_ENV=scripts/node/reference/baseline-20260928-e31.env` return restores
 the measured E31 recipe with the prior replay connector, transfer config and cache namespace;
 it also removes the SparkCache memory limits.
@@ -206,9 +216,11 @@ TP4_ENV=scripts/node/reference/baseline-20260918.env ./scripts/check-f0.py --bas
 The second form uses an already-established localhost SSH tunnel when the management LAN
 is not directly reachable. The checker reads the local `cluster.env` and honors `TP4_ENV`
 as the effective delta. By default it validates the
-[memory-bounded operational identity](operational-identities/2026-09-29-memory-bounded.json),
+[E36 operational identity](operational-identities/2026-09-30-e36-lm-head.json),
 which pins the frozen **September 28 E31** engine identity by hash and adds the bounded
-connector, KV14, trim, scheduler-cap and API-admission identities. It still checks
+connector, KV14, trim, scheduler-cap, API-admission and SparkCache disk-capacity identities,
+the E35 speculator, scheduler copy, policy file, variables and boot lines, and the E36 runner,
+conversion module, variables and per-rank receipts. It still checks
 seven draft tokens, the adaptive table and high state, the CUDA graph limit, the 14 GiB KV
 budget, the E29 scheduler and engine-core hashes, the E31 indexer hashes and flag files, the E27c, E29 and E31 flags and rank-0 boot lines, the E27 prefill cadence in the recipe
 and every rank's command, the E22b drafter sources/flags/boot signature, the E21 sources/flag/boot signature, the mHC sources/flag, protected connector, draft-budget scheduler/activation, hybrid KDA,
@@ -625,6 +637,9 @@ below is full-cluster and must fall within an authorized service window.
 | --- | --- | --- |
 | Overlay result is bad | `./scripts/tp4ctl restart` with no `TP4_ENV` | base `cluster.env` signatures and gates return |
 | Production engine knob is bad | restore the rollback documented beside the value in `cluster.env.example`, update local `cluster.env`, deploy, restart | all runtime signatures plus task gate |
+| Return the lm_head to BF16 (E35) | the [E35 return](#return-to-e35) | no `e36-lm-head-w8a16` mount, `VLLM_E36_` variable or `E36_` log line on any rank; the E35 runner mounted; `./scripts/check-f0.py --identity docs/operational-identities/2026-09-30-e35-return.json` with the same overlay, both gates |
+| Return the verify length to E31-MB | at once: overwrite `~/tp4/experiments/e03/e35-runner-k/policy.flag` on rank 0 in place with `ema`; persistent: the [E31-MB return](#return-to-e31-mb) | at once: the next `E35_RUNNER_K` line reports `policy=ema` and `check-f0` reports the changed policy file; persistent: no `e35-runner-k` mount, `VLLM_E35_` variable or `E35_` log line on any rank; `./scripts/check-f0.py --identity docs/operational-identities/2026-09-30-e31-mb-return.json` with the same overlay, both gates |
+| Remove the SparkCache disk limit | use the [memory-bounded return](#remove-the-sparkcache-disk-limit) | no `SPARK_CONTEXT_CACHE_` variable on any rank, `max_bytes=0` in each rank's `sparkcache: config` line, every other memory-bounded signature retained; `./scripts/check-f0.py --identity docs/operational-identities/2026-09-30-memory-bounded-return.json` with the same overlay, both gates |
 | Restore measured E31 cache behavior | use the [complete E31 rollback](#restore-the-measured-e31-cache-behavior) | E31 engine identity retained; previous replay connector/config/cache namespace restored; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json` with the same overlay, both gates |
 | Restore the previous E29 reference | use the [complete E29 rollback](#restore-the-previous-e29-reference) | production `pooled_indexer.py` and `ops/glm_kpool.py` mounted, no `VLLM_GLM53_` variable, no `E31_` log line, E29 scheduler and engine core retained, same cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json` with the same overlay, both gates |
 | Restore the older E28b reference | use the [complete E28b rollback](#restore-the-older-e28b-reference) | E27c scheduler mounted over `vllm/v1/core/sched/scheduler.py`, no engine-core mount, no `VLLM_E29_` flag or boot line, seven draft tokens and 16 GiB KV retained, same cache namespace; `./scripts/check-f0.py --baseline docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json` with the same overlay, both gates |
@@ -647,6 +662,80 @@ below is full-cluster and must fall within an authorized service window.
 An IOMMU revert exit code 4 means GRUB was not safely regenerated: do not reboot.
 Never use `EXTRA_DOCKER_ENV=""` as a generic rollback. Never purge a model to recover
 space without a fresh disk census and explicit owner decision.
+
+### Return to E35
+
+Use [`operational-20260930-e35.env`](../scripts/node/reference/operational-20260930-e35.env) when
+the INT8 `lm_head` itself must be withdrawn. It swaps the E36 runner back to the E35 runner
+and removes exactly the E36 module mount and its two variables; it refuses any other E36
+form. In an authorized window, stop with the recipe that is serving, then select the return
+for deploy, every lifecycle command and the identity check:
+
+```sh
+export TP4_ENV=scripts/node/reference/operational-20260930-e35.env
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Complete both functional gates within two minutes of /health 200.
+./scripts/check-f0.py --identity docs/operational-identities/2026-09-30-e35-return.json
+```
+
+Persist the selection for autostart with the drop-in procedure below, using
+`60-e35-return.conf` and this overlay path instead of the protected16 values.
+
+### Return to E31-MB
+
+The E35 policy file offers an immediate return without a restart. On rank 0, overwrite the
+deployed file in place, keeping the same file so the running container sees the change:
+
+```sh
+printf 'ema\n' > ~/tp4/experiments/e03/e35-runner-k/policy.flag
+```
+
+Within 0.5 s the verify length follows the acceptance average again. Rank 0 still broadcasts
+the unchanged choice, and `check-f0` reports the changed policy file until the next deploy
+restores `hybrid`. For a persistent return, use
+[`operational-20260930-e31-mb.env`](../scripts/node/reference/operational-20260930-e31-mb.env).
+It swaps the E35 scheduler copy back to the draft-budget scheduler and removes exactly the E36
+runner and module mounts, the E35 speculator and policy mounts and the four `VLLM_E35_` and
+`VLLM_E36_` variables; it refuses any other E35 or E36 form. In an authorized window, stop with the recipe that is serving, then select the
+return for deploy, every lifecycle command and the identity check:
+
+```sh
+export TP4_ENV=scripts/node/reference/operational-20260930-e31-mb.env
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Complete both functional gates within two minutes of /health 200.
+./scripts/check-f0.py --identity docs/operational-identities/2026-09-30-e31-mb-return.json
+```
+
+Persist the selection for autostart with the drop-in procedure below, using
+`60-e31-mb-return.conf` and this overlay path instead of the protected16 values.
+
+### Remove the SparkCache disk limit
+
+Use [`operational-20260929-memory-bounded.env`](../scripts/node/reference/operational-20260929-memory-bounded.env)
+only when the disk-capacity policy itself must be withdrawn. It removes E36 and E35 (as the
+E31-MB return does) and exactly the two `SPARK_CONTEXT_CACHE_` capacity assignments of the default,
+and keeps every other memory-bounded setting; without a limit the store grows until the disk is full, so monitor
+free space on every rank. The overlay refuses a base without exactly the E36 and E35
+selections and that pair. In an
+authorized window, stop with the recipe that is serving, then select the return for deploy,
+every lifecycle command and the identity check:
+
+```sh
+export TP4_ENV=scripts/node/reference/operational-20260929-memory-bounded.env
+./scripts/deploy.sh
+./scripts/tp4ctl fabric-check
+./scripts/tp4ctl up
+# Complete both functional gates within two minutes of /health 200.
+./scripts/check-f0.py --identity docs/operational-identities/2026-09-30-memory-bounded-return.json
+```
+
+Before leaving it unattended, persist the selection for autostart with the drop-in
+procedure below, using `60-memory-bounded-return.conf` and this overlay path instead of the
+protected16 values. Never keep two drop-ins that set `TP4_ENV`.
 
 ### Restore the protected 16 GiB operational predecessor
 

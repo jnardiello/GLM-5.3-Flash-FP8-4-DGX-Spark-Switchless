@@ -525,6 +525,22 @@ case "${EXTRA_DOCKER_ENV:-}" in
         || { echo "[launch] ERROR: bounded-admission source manifest failed" >&2; exit 1; }
     fi ;;
 esac
+# The E35 runner verify-length candidate carries its own source manifest.
+case "${EXTRA_DOCKER_ENV:-}" in
+  */e35-runner-k/*)
+    if [ "$DRY_RUN" != 1 ]; then
+      (cd "$ENV_DIR/experiments/e03/e35-runner-k" && sha256sum -c SHA256SUMS) \
+        || { echo "[launch] ERROR: E35 runner-k source manifest failed" >&2; exit 1; }
+    fi ;;
+esac
+# The E36 lm_head candidate carries its own source manifest.
+case "${EXTRA_DOCKER_ENV:-}" in
+  */e36-lm-head-w8a16/*)
+    if [ "$DRY_RUN" != 1 ]; then
+      (cd "$ENV_DIR/experiments/e03/e36-lm-head-w8a16" && sha256sum -c SHA256SUMS) \
+        || { echo "[launch] ERROR: E36 lm-head source manifest failed" >&2; exit 1; }
+    fi ;;
+esac
 if [ "$ASYNC_SCHEDULING" = "1" ]; then
   ASYNCFLAG="--async-scheduling"
 fi

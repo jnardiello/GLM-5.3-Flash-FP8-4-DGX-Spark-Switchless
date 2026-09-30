@@ -7,6 +7,48 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- E36 is the new default: the vocab-parallel `lm_head` that the target shares with the
+  DFlash2 drafter is packed INT8 W8A16 (group 128, Marlin) once at load, before CUDA graph
+  capture, and its BF16 weight is freed (about 155 MB per rank net).
+  - Pre-registered fidelity on one measurement load (424 windows, BF16 against INT8): dense
+    perplexity +0.018% [+0.013, +0.024], top-1 agreement 99.6%.
+  - Two native Rigmark suites against the E35 record on another load: code decode +2.3%,
+    prose +3.6%, C1 +6.2%; C2/C4, prefill and time to first token within noise. The owner
+    judged the gains marginal and kept the change.
+  - `operational-20260930-e35.env` returns to E35 in one step; the E31-MB and memory-bounded
+    returns now also remove E36.
+  - `check-f0.py` validates the new `2026-09-30-e36-lm-head` identity, and the E35 return has
+    its own identity. E36 becomes the current performance reference.
+  - The fidelity harness can build overlays from the current template, and has an `le36-m`
+    measurement arm that selects the BF16 or INT8 head with a flag file on one load.
+- E35 is the new default: on a single-request decode step with seven scheduled drafts, the
+  model runner verifies 3 or 7 drafts from the DFlash2 selector's own confidence instead of
+  the acceptance average the scheduler sees two steps late. Rank 0 decides and broadcasts
+  the length to every tensor-parallel rank; trimmed drafts count as rejected.
+  - A read-only policy file selects `hybrid`. Overwriting it in place with `ema` on rank 0
+    returns to the acceptance average without a restart.
+  - On native Rigmark with the reference flags, code decode and C1 were unchanged within
+    noise, prose decode −1.5% and decode time to first token about 30 ms lower. The owner
+    promoted it for the latency gain and judged the prose change to be noise.
+  - `operational-20260930-e31-mb.env` returns to E31-MB in one step. The memory-bounded
+    return now also removes E35.
+  - `check-f0.py` validates the new `2026-09-30-e35-hybrid` identity, and the E31-MB return
+    has its own identity. `deploy.sh` also ships `*.flag` policy files.
+  - The report and portable extract record the held-out screen and the A–P–P–A suites.
+  - E35 is the new performance reference, frozen from the two `hybrid` suites (n = 2,
+    108 requests, zero errors) with the same-load `ema` arm kept per metric; E31-MB
+    becomes the previous reference.
+- E31-MB, the owner-named current performance reference: the E31 engine with the
+  memory-bounded layer, frozen from the two default-arm suites of the E32 series (n = 2,
+  108 requests, zero errors) with upstream Rigmark and the reference flags. The record keeps
+  the frozen E31 values for context and states that the measured load ran the E32 overlay
+  at the default's flags. The E31 record and the README figures are unchanged. The
+  operational identity of the default is `2026-09-30-e31-mb`.
+- The discarded E32 experiment has a report and a portable extract: runtime switches for the
+  eager-prefill allocator trim and the 6,912-token step cap, compared on one load with a
+  factorial screen, a resilience re-check and four native Rigmark suites. Trimming only on
+  new-request steps shortened cold prefills by 0.8–1.7% but slowed cached replays by up to
+  3.8%; the cap switches had no effect. The default is unchanged and the overlay is not kept.
 - `scripts/plot-resilience-memory.py` renders one plain-language bar chart of the free
   memory left on the busiest node (rank 0) in each of the eight KV14 resilience tests, from
   the campaign's portable results, with the 0.75 GiB safety stop marked and the other three

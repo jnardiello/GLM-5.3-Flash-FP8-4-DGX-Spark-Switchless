@@ -1,0 +1,5 @@
+{
+  "schema": 1,
+  "date": "2026-09-30",
+  "decision": "Name the operational default E31-MB (the E31 engine with the memory-bounded layer and the SparkCache disk-capacity policy) and freeze a performance record from the default-arm suites A1 and A4 of the E32 A-P-P-A series, measured on 2026-09-30. The E31 record stays unchanged; the README keeps E31 values until the owner asks for an update."
+}

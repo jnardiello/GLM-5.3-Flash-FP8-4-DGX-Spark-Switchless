@@ -1,0 +1,324 @@
+{
+ "schema": 1,
+ "run": "run-4",
+ "arm": "A",
+ "arm_description": "policy flag `ema`: the default's acceptance-EMA verify length, with the overlay loaded (rank 0 still broadcasts the unchanged length on single-request steps with seven drafts)",
+ "scope": "One complete upstream Rigmark suite with the reference flags on the single E35 load (A-P-P-A, switched at runtime).",
+ "comparison_id": "glm53-e35-suite-20260930-s4-115712",
+ "receipt_sha256": "ceb77bd482dae38cdce0a46947c257eb169282b5bb46b0cbba49523825b4655e",
+ "rigmark_revision": "c5a0db01b0542ac291883ab049b6141efae0c7d3",
+ "rigmark_source_sha256": "61d71055b4a3a64cb0520fc1bc535de9a1863463c6937d423745957339f7f1b7",
+ "native_validation_errors": [],
+ "protocol_errors": [],
+ "runtime_error": null,
+ "request_count": 54,
+ "completed_streams": 54,
+ "visible_responses": 54,
+ "missing_visible_responses": 0,
+ "native_first_visible_latency_unavailable": 0,
+ "finish_reasons": {
+  "stop": 15,
+  "length": 39
+ },
+ "decode_output_gates": {
+  "code": {
+   "passed": 5,
+   "total": 5
+  },
+  "prose": {
+   "passed": 5,
+   "total": 5
+  },
+  "structured": {
+   "passed": 5,
+   "total": 5
+  }
+ },
+ "prefill_token_matches": 18,
+ "prefill_requests": 18,
+ "request_groups": {
+  "decode/code": {
+   "requests": 5,
+   "finish_reasons": {
+    "stop": 5
+   },
+   "completed_streams": 5,
+   "visible_responses": 5
+  },
+  "decode/prose": {
+   "requests": 5,
+   "finish_reasons": {
+    "stop": 5
+   },
+   "completed_streams": 5,
+   "visible_responses": 5
+  },
+  "decode/structured": {
+   "requests": 5,
+   "finish_reasons": {
+    "stop": 5
+   },
+   "completed_streams": 5,
+   "visible_responses": 5
+  },
+  "prefill/8192/cold": {
+   "requests": 3,
+   "finish_reasons": {
+    "length": 3
+   },
+   "completed_streams": 3,
+   "visible_responses": 3
+  },
+  "prefill/8192/warm_replay": {
+   "requests": 3,
+   "finish_reasons": {
+    "length": 3
+   },
+   "completed_streams": 3,
+   "visible_responses": 3
+  },
+  "prefill/32768/cold": {
+   "requests": 3,
+   "finish_reasons": {
+    "length": 3
+   },
+   "completed_streams": 3,
+   "visible_responses": 3
+  },
+  "prefill/32768/warm_replay": {
+   "requests": 3,
+   "finish_reasons": {
+    "length": 3
+   },
+   "completed_streams": 3,
+   "visible_responses": 3
+  },
+  "prefill/65536/cold": {
+   "requests": 3,
+   "finish_reasons": {
+    "length": 3
+   },
+   "completed_streams": 3,
+   "visible_responses": 3
+  },
+  "prefill/65536/warm_replay": {
+   "requests": 3,
+   "finish_reasons": {
+    "length": 3
+   },
+   "completed_streams": 3,
+   "visible_responses": 3
+  },
+  "concurrency/1": {
+   "requests": 3,
+   "finish_reasons": {
+    "length": 3
+   },
+   "completed_streams": 3,
+   "visible_responses": 3
+  },
+  "concurrency/2": {
+   "requests": 6,
+   "finish_reasons": {
+    "length": 6
+   },
+   "completed_streams": 6,
+   "visible_responses": 6
+  },
+  "concurrency/4": {
+   "requests": 12,
+   "finish_reasons": {
+    "length": 12
+   },
+   "completed_streams": 12,
+   "visible_responses": 12
+  }
+ },
+ "metrics": [
+  {
+   "key": "code_decode_throughput",
+   "unit": "tokens_per_second",
+   "source_path": [
+    "decode",
+    "code",
+    "decode_tokens_per_second",
+    "median"
+   ],
+   "value": 64.295
+  },
+  {
+   "key": "code_c1_aggregate_end_to_end_throughput",
+   "unit": "tokens_per_second",
+   "source_path": [
+    "concurrency",
+    "1",
+    "aggregate_end_to_end_tokens_per_second",
+    "median"
+   ],
+   "value": 45.513
+  },
+  {
+   "key": "code_c2_aggregate_end_to_end_throughput",
+   "unit": "tokens_per_second",
+   "source_path": [
+    "concurrency",
+    "2",
+    "aggregate_end_to_end_tokens_per_second",
+    "median"
+   ],
+   "value": 75.461
+  },
+  {
+   "key": "code_c4_aggregate_end_to_end_throughput",
+   "unit": "tokens_per_second",
+   "source_path": [
+    "concurrency",
+    "4",
+    "aggregate_end_to_end_tokens_per_second",
+    "median"
+   ],
+   "value": 108.557
+  },
+  {
+   "key": "prose_decode_throughput",
+   "unit": "tokens_per_second",
+   "source_path": [
+    "decode",
+    "prose",
+    "decode_tokens_per_second",
+    "median"
+   ],
+   "value": 34.002
+  },
+  {
+   "key": "code_ttft",
+   "unit": "seconds",
+   "source_path": [
+    "decode",
+    "code",
+    "ttft_seconds",
+    "median"
+   ],
+   "value": 0.488
+  },
+  {
+   "key": "prose_ttft",
+   "unit": "seconds",
+   "source_path": [
+    "decode",
+    "prose",
+    "ttft_seconds",
+    "median"
+   ],
+   "value": 0.397
+  },
+  {
+   "key": "code_c1_per_stream_ttft",
+   "unit": "seconds",
+   "source_path": [
+    "concurrency",
+    "1",
+    "per_stream_ttft_seconds",
+    "median"
+   ],
+   "value": 0.431
+  },
+  {
+   "key": "code_c2_per_stream_ttft",
+   "unit": "seconds",
+   "source_path": [
+    "concurrency",
+    "2",
+    "per_stream_ttft_seconds",
+    "median"
+   ],
+   "value": 0.466
+  },
+  {
+   "key": "code_c4_per_stream_ttft",
+   "unit": "seconds",
+   "source_path": [
+    "concurrency",
+    "4",
+    "per_stream_ttft_seconds",
+    "median"
+   ],
+   "value": 0.556
+  },
+  {
+   "key": "prefill_8k_cold_throughput",
+   "unit": "tokens_per_second",
+   "source_path": [
+    "prefill",
+    "8192",
+    "cold",
+    "effective_prefill_tokens_per_second",
+    "median"
+   ],
+   "value": 2633.701
+  },
+  {
+   "key": "prefill_8k_replay_throughput",
+   "unit": "tokens_per_second",
+   "source_path": [
+    "prefill",
+    "8192",
+    "warm_replay",
+    "effective_prefill_tokens_per_second",
+    "median"
+   ],
+   "value": 8836.842
+  },
+  {
+   "key": "prefill_32k_cold_throughput",
+   "unit": "tokens_per_second",
+   "source_path": [
+    "prefill",
+    "32768",
+    "cold",
+    "effective_prefill_tokens_per_second",
+    "median"
+   ],
+   "value": 2772.856
+  },
+  {
+   "key": "prefill_32k_replay_throughput",
+   "unit": "tokens_per_second",
+   "source_path": [
+    "prefill",
+    "32768",
+    "warm_replay",
+    "effective_prefill_tokens_per_second",
+    "median"
+   ],
+   "value": 35127.741
+  },
+  {
+   "key": "prefill_64k_cold_throughput",
+   "unit": "tokens_per_second",
+   "source_path": [
+    "prefill",
+    "65536",
+    "cold",
+    "effective_prefill_tokens_per_second",
+    "median"
+   ],
+   "value": 2787.419
+  },
+  {
+   "key": "prefill_64k_replay_throughput",
+   "unit": "tokens_per_second",
+   "source_path": [
+    "prefill",
+    "65536",
+    "warm_replay",
+    "effective_prefill_tokens_per_second",
+    "median"
+   ],
+   "value": 39576.05
+  }
+ ],
+ "started_at": "2026-09-30T11:57:12.423866+00:00",
+ "finished_at": "2026-09-30T12:06:20.490645+00:00",
+ "cache_salt": "none (fresh comparison ID per suite)"
+}

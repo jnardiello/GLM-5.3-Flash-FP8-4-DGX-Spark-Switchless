@@ -296,8 +296,27 @@ _RES_FROM="$_RES_BASE:$_RES_TARGET:ro"
 _RES_WRAPPER='{remote}/connector_wrapper.py'
 _RES_TO="$_RES_WRAPPER:$_RES_TARGET:ro"
 read -r -a _RES_WORDS <<<"${{EXTRA_DOCKER_ENV-}}"
-_RES_PREV= _RES_OUT= _RES_FOUND=0 _RES_TARGETS=0
+_RES_PREV= _RES_OUT= _RES_FOUND=0 _RES_TARGETS=0 _RES_CAP_MAX=0 _RES_CAP_LOW=0 _RES_CAP_OTHER=0
 for _RES_WORD in "${{_RES_WORDS[@]}}"; do
+  # The campaign replaces the operational SparkCache disk capacity with its own below.
+  _RES_CAP=
+  if [ "$_RES_PREV" = -e ]; then
+    case "$_RES_WORD" in
+      SPARK_CONTEXT_CACHE_MAX_BYTES=*) _RES_CAP=max ;;
+      SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES=*) _RES_CAP=low ;;
+    esac
+  fi
+  if [ -n "$_RES_CAP" ]; then
+    if [ "$_RES_CAP" = max ]; then _RES_CAP_MAX=$((_RES_CAP_MAX + 1))
+    else _RES_CAP_LOW=$((_RES_CAP_LOW + 1)); fi
+    if [ "$_RES_OUT" = -e ]; then _RES_OUT=; else _RES_OUT=${{_RES_OUT% -e}}; fi
+    _RES_PREV=
+    continue
+  fi
+  case "$_RES_WORD" in
+    *SPARK_CONTEXT_CACHE_MAX_BYTES*|*SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES*|\\
+    *SPARK_CONTEXT_CACHE_TTL_SECONDS*) _RES_CAP_OTHER=$((_RES_CAP_OTHER + 1)) ;;
+  esac
   if [ "$_RES_PREV" = -v ]; then
     case "$_RES_WORD" in *:"$_RES_TARGET"|*:"$_RES_TARGET":*) _RES_TARGETS=$((_RES_TARGETS + 1)) ;; esac
     if [ "$_RES_WORD" = "$_RES_FROM" ]; then
@@ -312,12 +331,17 @@ if [ "$_RES_FOUND" != 1 ] || [ "$_RES_TARGETS" != 1 ]; then
   echo "resilience overlay requires exactly one active bounded connector mount" >&2
   return 1
 fi
+if [ "$_RES_CAP_MAX" != "$_RES_CAP_LOW" ] || [ "$_RES_CAP_MAX" -gt 1 ] \\
+   || [ "$_RES_CAP_OTHER" != 0 ]; then
+  echo "resilience overlay requires at most one plain SparkCache disk-capacity pair" >&2
+  return 1
+fi
 EXTRA_DOCKER_ENV="$_RES_OUT -v $_RES_BASE:/opt/tp4-resilience/base_connector.py:ro -v \\{remote}/runtime.py:/opt/tp4-resilience/runtime.py:ro -e TP4_RESILIENCE_RUNTIME=/opt/tp4-resilience/runtime.py -e TP4_RESILIENCE_BASE_CONNECTOR=/opt/tp4-resilience/base_connector.py -e TP4_RESILIENCE_BASE_SHA256={base_connector_sha} -e TP4_RESILIENCE_CAMPAIGN_ID={campaign_id} -e TP4_RESILIENCE_CACHE_ROOT={container_root} -e TP4_RESILIENCE_MAX_BYTES={MAX_NAMESPACE_BYTES} -e SPARK_CONTEXT_CACHE_MAX_BYTES={TEST_CACHE_MAX_BYTES} -e SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES={TEST_CACHE_LOW_WATERMARK_BYTES}"
 SPARKCACHE_CONNECTOR='{remote}/connector_wrapper.py'
 SPARKCACHE_CONNECTOR_SHA256={wrapper_sha}
 SPARKCACHE_CONFIG='{remote}/kv-transfer-config.json'
 SPARKCACHE_CONFIG_SHA256={config_sha}
-unset _RES_TARGET _RES_BASE _RES_FROM _RES_WRAPPER _RES_TO _RES_WORDS _RES_WORD _RES_PREV _RES_OUT _RES_FOUND _RES_TARGETS
+unset _RES_TARGET _RES_BASE _RES_FROM _RES_WRAPPER _RES_TO _RES_WORDS _RES_WORD _RES_PREV _RES_OUT _RES_FOUND _RES_TARGETS _RES_CAP _RES_CAP_MAX _RES_CAP_LOW _RES_CAP_OTHER
 """
 
 

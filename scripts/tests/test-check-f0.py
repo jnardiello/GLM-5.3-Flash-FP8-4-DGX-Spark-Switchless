@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import ast
 import importlib.util
 import io
@@ -434,7 +435,8 @@ def identity_fixture(exp: dict) -> tuple[dict, dict, list]:
         c["speculative"].update(num_speculative_tokens=int(exp["spec_tokens"]),
                                 num_speculative_tokens_per_batch_size=[[1, 1, high], [2, 6, low]])
         c.update(image_reference=rec["image"], image_digests=[exp["image_digest"]],
-                 image_id=exp["image_id"], runtime_files=deepcopy(identity.get("container_file_sha256", {})))
+                 image_id=exp["image_id"], runtime_files=deepcopy(identity.get("container_file_sha256", {})),
+                 mount_rw={target: False for target in exp.get("recipe_mounts", {})})
         c["kv_transfer_config"] = deepcopy(exp.get("kv_transfer_config"))
         c["options"]["--kv-cache-memory-bytes"] = [exp["kv_cache_memory_bytes"]]
         c["options"]["--prefill-schedule-interval"] = check.interval_flag(exp)
@@ -444,6 +446,8 @@ def identity_fixture(exp: dict) -> tuple[dict, dict, list]:
         c["options"]["--middleware"] = [exp["middleware"]] if exp.get("middleware") else []
         c["candidate_mount_targets"] = (["/opt/tp4/tp4_admission.py"]
                                         if exp.get("middleware") else [])
+        c["candidate_mount_targets"] += [target for target in check.E36_TARGETS
+                                         if target in exp.get("recipe_mounts", {})]
         c["environment"].update(exp["adaptive_env"])
         c["environment"].update(identity.get("environment", {}))
         c["runtime_workers"] = [{"pid": 100 + rank, "patched_nccl_loaded": True}]
@@ -472,7 +476,33 @@ def baseline_fixture(path: Path) -> tuple[dict, dict, list]:
 
 
 assert check.BASELINE == BASELINES / "2026-09-28-e31/baseline.json"
-assert check.IDENTITY == REPO / "docs/operational-identities/2026-09-29-memory-bounded.json"
+assert check.IDENTITY == REPO / "docs/operational-identities/2026-09-30-e36-lm-head.json"
+E35_RETURN_IDENTITY = REPO / "docs/operational-identities/2026-09-30-e35-return.json"
+RETURN_IDENTITY = REPO / "docs/operational-identities/2026-09-30-memory-bounded-return.json"
+E31MB_RETURN_IDENTITY = REPO / "docs/operational-identities/2026-09-30-e31-mb-return.json"
+E35_DIR = "scripts/node/experiments/e03/e35-runner-k"
+E35_VLLM = "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu"
+E35_SOURCES = {f"{E35_VLLM}/model_runner.py": f"{E35_DIR}/model_runner.py",
+               f"{E35_VLLM}/spec_decode/dflash2/speculator.py": f"{E35_DIR}/speculator.py",
+               "/opt/tp4/adaptive_k_scheduler.py": f"{E35_DIR}/adaptive_k_scheduler.py",
+               "/tmp/glm53-e35-policy": f"{E35_DIR}/policy.flag"}
+E35_FILES = {target: hashlib.sha256((REPO / path).read_bytes()).hexdigest()
+             for target, path in E35_SOURCES.items()}
+E35_ENV = {"VLLM_E35_ENABLE": "1", "VLLM_E35_POLICY_FLAG": "/tmp/glm53-e35-policy"}
+E35_SCHED_LINE = "E35_SCHEDULER_READY flag=/tmp/glm53-e35-policy k_hi=7"
+E35_RANK_LINES = ["E35_RUNNER_K_READY enabled=1 flag=/tmp/glm53-e35-policy margin=0.005 wait_ms=2.8",
+                  "E35_CONF_RECORDER_READY enabled=1"]
+assert (REPO / E35_DIR / "policy.flag").read_bytes() == b"hybrid\n"
+E36_DIR = "scripts/node/experiments/e03/e36-lm-head-w8a16"
+E36_MODULE_T = "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e36_lm_head_w8a16.py"
+E36_FILES = {f"{E35_VLLM}/model_runner.py": hashlib.sha256((REPO / E36_DIR / "model_runner.py").read_bytes()).hexdigest(),
+             E36_MODULE_T: hashlib.sha256((REPO / E36_DIR / "e36_lm_head_w8a16.py").read_bytes()).hexdigest()}
+E36_ENV = {"VLLM_E36_LM_HEAD_W8A16": "1", "VLLM_E36_KEEP_BF16": "0"}
+E36_RANK_LINES = ['E36_LM_HEAD_W8A16_READY {"freed_bytes": 317194240, "group_size": 128, "keep_bf16": false',
+                  '"shape": [38720, 4096], "shared_with_drafter": true']
+DISK_ENV = {"SPARK_CONTEXT_CACHE_MAX_BYTES": "214748364800",
+            "SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES": "171798691840"}
+DISK_LINE = "max_bytes=214748364800 low_bytes=171798691840 ttl_seconds=0"
 PROTECTED_IDENTITY = REPO / "docs/operational-identities/2026-09-29-sparkcache-protected.json"
 CANDIDATE_IDENTITY = REPO / "docs/operational-identities/2026-09-29-memory-bounded-candidate.json"
 launcher_text = (REPO / "scripts/launcher/launch-glm53-tp4.sh").read_text(encoding="utf-8")
@@ -552,10 +582,250 @@ assert candidate_expected["runtime_identity"]["container_file_sha256"][
 ] == "2284d481291295baa229b6084d6a6686b05510c8c5b5e12cb07ca569e9c877bd"
 assert check.evaluate(candidate_recipe, candidate_expected, candidate_ranks, endpoint()) == []
 default_recipe, default_expected, default_ranks = identity_fixture(check.expected_operational())
-assert default_expected["identity_id"] == "2026-09-29-memory-bounded"
+assert default_expected["identity_id"] == "2026-09-30-e36-lm-head"
 assert default_expected["kv_cache_memory_bytes"] == "15032385536"
-assert default_expected["runtime_identity"] == candidate_expected["runtime_identity"]
+# E31-MB is the memory-bounded runtime plus the SparkCache disk policy; its return identity
+# reaches it from the E35 template.
+capacity_runtime = deepcopy(candidate_expected["runtime_identity"])
+capacity_runtime["environment"].update(DISK_ENV)
+capacity_runtime["all_rank_boot_lines"].append(DISK_LINE)
+e31mb_recipe, e31mb_expected, e31mb_ranks = identity_fixture(
+    check.expected_operational(E31MB_RETURN_IDENTITY))
+assert e31mb_expected["identity_id"] == "2026-09-30-e31-mb-return"
+assert e31mb_expected["direct_operational_recipe"]
+assert e31mb_expected["runtime_identity"] == capacity_runtime
+assert check.evaluate(e31mb_recipe, e31mb_expected, e31mb_ranks, endpoint()) == []
+# E35 is E31-MB plus the E35 files, variables and boot lines; its return identity reaches it
+# from the E36 template.
+e35_recipe, e35_expected, e35_ranks = identity_fixture(check.expected_operational(E35_RETURN_IDENTITY))
+assert e35_expected["identity_id"] == "2026-09-30-e35-return"
+assert e35_expected["direct_operational_recipe"]
+e35_runtime = deepcopy(capacity_runtime)
+e35_runtime["container_file_sha256"].update(E35_FILES)
+e35_runtime["environment"].update(E35_ENV)
+e35_runtime["boot_lines"].append(E35_SCHED_LINE)
+e35_runtime["all_rank_boot_lines_by_rank"] = {
+    rank: [*lines, *E35_RANK_LINES]
+    for rank, lines in capacity_runtime["all_rank_boot_lines_by_rank"].items()}
+assert e35_expected["runtime_identity"] == e35_runtime
+assert check.evaluate(e35_recipe, e35_expected, e35_ranks, endpoint()) == []
+# The E36 default is E35 with the E36 runner, the conversion module, two variables and the
+# per-rank receipt.
+e36_runtime = deepcopy(e35_runtime)
+e36_runtime["container_file_sha256"].update(E36_FILES)
+e36_runtime["environment"].update(E36_ENV)
+e36_runtime["all_rank_boot_lines_by_rank"] = {
+    rank: [*lines, *E36_RANK_LINES] for rank, lines in e35_runtime["all_rank_boot_lines_by_rank"].items()}
+assert default_expected["runtime_identity"] == e36_runtime
+assert set(default_expected["recipe_mounts"]) >= set(E35_FILES) | set(E36_FILES)
 assert check.evaluate(default_recipe, default_expected, default_ranks, endpoint()) == []
+for key, value in E36_ENV.items():
+    missing_e36 = deepcopy(default_recipe)
+    missing_e36["extra_docker_env"] = missing_e36["extra_docker_env"].replace(f"-e {key}={value}", "")
+    assert "operational runtime environment: " + key in check.recipe_problems(missing_e36, default_expected), key
+    stale_e36 = deepcopy(e35_recipe)
+    stale_e36["extra_docker_env"] += f" -e {key}={value}"
+    assert "baseline runtime environment: unexpected " + key in check.recipe_problems(stale_e36, e35_expected), key
+    stale_e36_live = deepcopy(e35_ranks)
+    stale_e36_live[3]["remote"]["container"]["environment"][key] = value
+    assert f"rank 3: unexpected runtime environment {key}" in check.evaluate(
+        e35_recipe, e35_expected, stale_e36_live, endpoint()), key
+flag_recipe = deepcopy(default_recipe)
+flag_recipe["extra_docker_env"] += " -e VLLM_E36_FLAG=/tmp/glm53-e36-lm-head"
+assert "baseline runtime environment: unexpected VLLM_E36_FLAG" in check.recipe_problems(flag_recipe, default_expected)
+stale_module = deepcopy(e35_recipe)
+stale_module["extra_docker_env"] += f" -v $HOME/tp4/experiments/e03/e36-lm-head-w8a16/x.py:{E36_MODULE_T}:ro"
+assert "baseline runtime mount: unexpected " + E36_MODULE_T in check.recipe_problems(stale_module, e35_expected)
+renamed_module = deepcopy(e35_recipe)
+renamed_module["extra_docker_env"] += f" -v /tmp/renamed.py:{E36_MODULE_T}:ro"
+assert "baseline runtime mount: unexpected " + E36_MODULE_T in check.recipe_problems(renamed_module, e35_expected)
+stray_live = deepcopy(e35_ranks)
+stray_live[0]["remote"]["container"]["candidate_mount_targets"].append(E36_MODULE_T)
+assert f"rank 0: unexpected mount {E36_MODULE_T}" in check.evaluate(e35_recipe, e35_expected, stray_live, endpoint())
+writable_module = deepcopy(default_recipe)
+writable_module["extra_docker_env"] = writable_module["extra_docker_env"].replace(f":{E36_MODULE_T}:ro", f":{E36_MODULE_T}:rw")
+assert "operational runtime mount: read-only " + E36_MODULE_T in check.recipe_problems(writable_module, default_expected)
+wrong_module = deepcopy(default_ranks)
+wrong_module[1]["remote"]["container"]["runtime_files"][E36_MODULE_T] = "0" * 64
+assert f"rank 1: runtime file {E36_MODULE_T}" in check.evaluate(default_recipe, default_expected, wrong_module, endpoint())
+writable_live = deepcopy(default_ranks)
+writable_live[2]["remote"]["container"]["mount_rw"][E36_MODULE_T] = True
+assert f"rank 2: read-only mount {E36_MODULE_T}" in check.evaluate(default_recipe, default_expected, writable_live, endpoint())
+for rank in range(4):
+    for line in E36_RANK_LINES:
+        unconverted = deepcopy(default_ranks)
+        unconverted[rank]["remote"]["container"]["runtime_receipts"]["rank_boot_lines"].remove(line)
+        assert f"rank {rank}: boot signature {line}" in check.evaluate(
+            default_recipe, default_expected, unconverted, endpoint()), (rank, line)
+for key, value in E35_ENV.items():
+    missing_e35 = deepcopy(default_recipe)
+    missing_e35["extra_docker_env"] = missing_e35["extra_docker_env"].replace(f"-e {key}={value}", "")
+    assert "operational runtime environment: " + key in check.recipe_problems(
+        missing_e35, default_expected), key
+    stale_e35 = deepcopy(e31mb_recipe)
+    stale_e35["extra_docker_env"] += f" -e {key}={value}"
+    assert "baseline runtime environment: unexpected " + key in check.recipe_problems(
+        stale_e35, e31mb_expected), key
+    stale_e35_live = deepcopy(e31mb_ranks)
+    stale_e35_live[3]["remote"]["container"]["environment"][key] = value
+    assert f"rank 3: unexpected runtime environment {key}" in check.evaluate(
+        e31mb_recipe, e31mb_expected, stale_e35_live, endpoint()), key
+    wrong_e35_live = deepcopy(default_ranks)
+    wrong_e35_live[2]["remote"]["container"]["environment"][key] = "0"
+    assert f"rank 2: runtime environment {key}" in check.evaluate(
+        default_recipe, default_expected, wrong_e35_live, endpoint()), key
+for target in E35_FILES:
+    stale_mount = deepcopy(e31mb_recipe)
+    stale_mount["extra_docker_env"] += f" -v $HOME/tp4/experiments/e03/e35-runner-k/x:{target}:ro"
+    assert "baseline runtime mount: unexpected " + target in check.recipe_problems(
+        stale_mount, e31mb_expected), target
+    moved_mount = deepcopy(default_recipe)
+    source = default_expected["recipe_mounts"][target]
+    moved_mount["extra_docker_env"] = moved_mount["extra_docker_env"].replace(
+        f"{source}:{target}", f"{source}.other:{target}")
+    assert "operational runtime mount: " + target in check.recipe_problems(
+        moved_mount, default_expected), target
+    wrong_file = deepcopy(default_ranks)
+    wrong_file[1]["remote"]["container"]["runtime_files"][target] = "0" * 64
+    assert f"rank 1: runtime file {target}" in check.evaluate(
+        default_recipe, default_expected, wrong_file, endpoint()), target
+for target in E35_FILES:
+    writable = deepcopy(default_recipe)
+    writable["extra_docker_env"] = writable["extra_docker_env"].replace(f":{target}:ro", f":{target}:rw")
+    assert "operational runtime mount: read-only " + target in check.recipe_problems(
+        writable, default_expected), target
+    unmoded = deepcopy(default_recipe)
+    unmoded["extra_docker_env"] = unmoded["extra_docker_env"].replace(f":{target}:ro", f":{target}")
+    assert "operational runtime mount: read-only " + target in check.recipe_problems(
+        unmoded, default_expected), target
+    writable_live = deepcopy(default_ranks)
+    writable_live[0]["remote"]["container"]["mount_rw"][target] = True
+    assert f"rank 0: read-only mount {target}" in check.evaluate(
+        default_recipe, default_expected, writable_live, endpoint()), target
+    unknown_live = deepcopy(default_ranks)
+    del unknown_live[3]["remote"]["container"]["mount_rw"][target]
+    assert f"rank 3: read-only mount {target}" in check.evaluate(
+        default_recipe, default_expected, unknown_live, endpoint()), target
+missing_sched_line = deepcopy(default_ranks)
+missing_sched_line[0]["remote"]["container"]["runtime_receipts"]["boot_lines"].remove(E35_SCHED_LINE)
+assert "rank 0: boot signature " + E35_SCHED_LINE in check.evaluate(
+    default_recipe, default_expected, missing_sched_line, endpoint())
+for rank in range(4):
+    for line in E35_RANK_LINES:
+        missing_rank_line = deepcopy(default_ranks)
+        missing_rank_line[rank]["remote"]["container"]["runtime_receipts"]["rank_boot_lines"].remove(line)
+        assert f"rank {rank}: boot signature {line}" in check.evaluate(
+            default_recipe, default_expected, missing_rank_line, endpoint()), (rank, line)
+return_recipe, return_expected, return_ranks = identity_fixture(
+    check.expected_operational(RETURN_IDENTITY))
+assert return_expected["identity_id"] == "2026-09-30-memory-bounded-return"
+assert return_expected["direct_operational_recipe"]
+assert return_expected["runtime_identity"] == candidate_expected["runtime_identity"]
+assert check.evaluate(return_recipe, return_expected, return_ranks, endpoint()) == []
+for key, value in DISK_ENV.items():
+    missing_disk = deepcopy(default_recipe)
+    missing_disk["extra_docker_env"] = missing_disk["extra_docker_env"].replace(
+        f"-e {key}={value}", "")
+    assert "operational runtime environment: " + key in check.recipe_problems(
+        missing_disk, default_expected), key
+    wrong_disk_live = deepcopy(default_ranks)
+    wrong_disk_live[1]["remote"]["container"]["environment"][key] = "1"
+    assert f"rank 1: runtime environment {key}" in check.evaluate(
+        default_recipe, default_expected, wrong_disk_live, endpoint()), key
+    stale_disk = deepcopy(return_recipe)
+    stale_disk["extra_docker_env"] += f" -e {key}={value}"
+    assert "baseline runtime environment: unexpected " + key in check.recipe_problems(
+        stale_disk, return_expected), key
+    stale_disk_live = deepcopy(return_ranks)
+    stale_disk_live[2]["remote"]["container"]["environment"][key] = value
+    assert f"rank 2: unexpected runtime environment {key}" in check.evaluate(
+        return_recipe, return_expected, stale_disk_live, endpoint()), key
+ttl_recipe = deepcopy(default_recipe)
+ttl_recipe["extra_docker_env"] += " -e SPARK_CONTEXT_CACHE_TTL_SECONDS=60"
+assert ("baseline runtime environment: unexpected SPARK_CONTEXT_CACHE_TTL_SECONDS"
+        in check.recipe_problems(ttl_recipe, default_expected))
+for rank in range(4):
+    unapplied_disk = deepcopy(default_ranks)
+    unapplied_disk[rank]["remote"]["container"]["runtime_receipts"][
+        "all_rank_boot_lines"].remove(DISK_LINE)
+    assert f"rank {rank}: boot signature {DISK_LINE}" in check.evaluate(
+        default_recipe, default_expected, unapplied_disk, endpoint()), rank
+
+
+def refuses_identity(record: dict, message: str) -> None:
+    with tempfile.TemporaryDirectory(prefix="tp4-bad-operational-identity.") as temp:
+        bad_path = Path(temp) / "identity.json"
+        bad_path.write_text(json.dumps(record), encoding="utf-8")
+        try:
+            check.expected_operational(bad_path)
+        except check.CheckFailure as exc:
+            assert message in str(exc), (message, str(exc))
+        else:
+            raise AssertionError("accepted malformed operational identity: " + message)
+
+
+default_record = json.loads(check.IDENTITY.read_text(encoding="utf-8"))
+return_record = json.loads(RETURN_IDENTITY.read_text(encoding="utf-8"))
+e31mb_return_record = json.loads(E31MB_RETURN_IDENTITY.read_text(encoding="utf-8"))
+e35_return_record = json.loads(E35_RETURN_IDENTITY.read_text(encoding="utf-8"))
+for record, mutate, message in (
+    (default_record, lambda record: record["sparkcache"].update(
+        disk_low_watermark_bytes_per_rank=record["sparkcache"]["disk_max_bytes_per_rank"] + 1),
+     "disk capacity is invalid"),
+    (default_record, lambda record: record["sparkcache"].pop("disk_low_watermark_bytes_per_rank"),
+     "disk capacity is invalid"),
+    (default_record, lambda record: record["sparkcache"].update(disk_max_bytes_per_rank=True),
+     "disk capacity is invalid"),
+    (default_record, lambda record: record["runtime_identity_overrides"]["environment"].update(
+        SPARK_CONTEXT_CACHE_MAX_BYTES="1"), "disk capacity and environment disagree"),
+    (default_record, lambda record: record["runtime_identity_overrides"]["environment"].update(
+        SPARK_CONTEXT_CACHE_TTL_SECONDS="60"), "disk capacity and environment disagree"),
+    (default_record, lambda record: record["runtime_identity_overrides"][
+        "all_rank_boot_lines"].pop(), "boot lines do not match"),
+    (return_record, lambda record: record["runtime_identity_overrides"]["environment"].update(
+        DISK_ENV), "disk capacity and environment disagree"),
+    (return_record, lambda record: record["recipe"]["template"].update(sha256="0" * 64),
+     "recipe template hash mismatch"),
+    (return_record, lambda record: record["recipe"]["template"].update(path="README.md"),
+     "recipe template hash mismatch"),
+    (default_record, lambda record: record["runtime_identity_overrides"]["environment"].pop(
+        "VLLM_E35_POLICY_FLAG"), "E35 selection is incomplete"),
+    (default_record, lambda record: record["runtime_identity_overrides"]["environment"].update(
+        VLLM_E35_ENABLE="0"), "E35 selection is incomplete"),
+    (default_record, lambda record: record.update(runtime_sources=[
+        source for source in record["runtime_sources"]
+        if source["container_path"] != "/tmp/glm53-e35-policy"]), "do not cover its file overrides"),
+    (default_record, lambda record: (
+        record["runtime_identity_overrides"]["container_file_sha256"].pop("/tmp/glm53-e35-policy"),
+        record.update(runtime_sources=[source for source in record["runtime_sources"]
+                                       if source["container_path"] != "/tmp/glm53-e35-policy"])),
+     "E35 selection is incomplete"),
+    (e31mb_return_record, lambda record: record["runtime_identity_overrides"]["environment"].update(
+        E35_ENV), "E35 selection is incomplete"),
+    (e31mb_return_record, lambda record: record["recipe"]["template"].update(sha256="0" * 64),
+     "recipe template hash mismatch"),
+    (default_record, lambda record: record["runtime_identity_overrides"]["environment"].pop(
+        "VLLM_E36_KEEP_BF16"), "E36 selection is incomplete"),
+    (default_record, lambda record: record["runtime_identity_overrides"]["environment"].update(
+        VLLM_E36_KEEP_BF16="1"), "E36 selection is incomplete"),
+    (e35_return_record, lambda record: record["runtime_identity_overrides"]["environment"].update(
+        E36_ENV), "E36 selection is incomplete"),
+    (e35_return_record, lambda record: record["recipe"]["template"].update(sha256="0" * 64),
+     "recipe template hash mismatch"),
+):
+    bad_record = deepcopy(record)
+    mutate(bad_record)
+    refuses_identity(bad_record, message)
+original_pinned_config = check.pinned_kv_transfer_config
+try:
+    def shadowing_config(digest):
+        config = deepcopy(original_pinned_config(digest))
+        config["kv_connector_extra_config"]["spark_cache_max_bytes"] = 1 << 30
+        return config
+    check.pinned_kv_transfer_config = shadowing_config
+    refuses_identity(default_record, "disk capacity is shadowed by its config")
+finally:
+    check.pinned_kv_transfer_config = original_pinned_config
 
 for key in candidate_expected["required_runtime_environment"]:
     missing_recipe = deepcopy(candidate_recipe)
@@ -807,7 +1077,31 @@ try:
                             rank_probe=lambda rank, host, recipe, timeout: deepcopy(default_ranks[rank]),
                             http_probe=lambda url, timeout: endpoint())
         assert rc == 0
-        assert output.getvalue() == "2026-09-29-memory-bounded CHECK PASS\n"
+        assert output.getvalue() == "2026-09-30-e36-lm-head CHECK PASS\n"
+        check.load_recipe = lambda timeout: (deepcopy(e35_recipe), {"returncode": 0})
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            rc = check.main(["--identity", str(E35_RETURN_IDENTITY), "--report-root", temp],
+                            rank_probe=lambda rank, host, recipe, timeout: deepcopy(e35_ranks[rank]),
+                            http_probe=lambda url, timeout: endpoint())
+        assert rc == 0
+        assert output.getvalue() == "2026-09-30-e35-return CHECK PASS\n"
+        check.load_recipe = lambda timeout: (deepcopy(e31mb_recipe), {"returncode": 0})
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            rc = check.main(["--identity", str(E31MB_RETURN_IDENTITY), "--report-root", temp],
+                            rank_probe=lambda rank, host, recipe, timeout: deepcopy(e31mb_ranks[rank]),
+                            http_probe=lambda url, timeout: endpoint())
+        assert rc == 0
+        assert output.getvalue() == "2026-09-30-e31-mb-return CHECK PASS\n"
+        check.load_recipe = lambda timeout: (deepcopy(return_recipe), {"returncode": 0})
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            rc = check.main(["--identity", str(RETURN_IDENTITY), "--report-root", temp],
+                            rank_probe=lambda rank, host, recipe, timeout: deepcopy(return_ranks[rank]),
+                            http_probe=lambda url, timeout: endpoint())
+        assert rc == 0
+        assert output.getvalue() == "2026-09-30-memory-bounded-return CHECK PASS\n"
         check.load_recipe = lambda timeout: (deepcopy(current_recipe), {"returncode": 0})
         output = io.StringIO()
         with contextlib.redirect_stdout(output):
@@ -890,6 +1184,12 @@ try:
                          "scripts/node/experiments/e03/prefill-cache-trim/gpu_worker.py",
                          "scripts/node/experiments/e03/prefill-step-cap/scheduler.py",
                          "scripts/node/reference/operational-20260929-sparkcache-protected.env",
+                         "scripts/node/reference/operational-20260929-memory-bounded.env",
+                         "scripts/node/reference/operational-20260930-e31-mb.env",
+                         "scripts/node/reference/operational-20260930-e35.env",
+                         f"{E36_DIR}/model_runner.py", f"{E36_DIR}/e36_lm_head_w8a16.py",
+                         f"{E35_DIR}/model_runner.py", f"{E35_DIR}/speculator.py",
+                         f"{E35_DIR}/adaptive_k_scheduler.py", f"{E35_DIR}/policy.flag",
                          "scripts/launcher/launch-glm53-tp4.sh",
                          "scripts/node/reference/f0-20260912.env", "cluster.env.example"):
             target = isolated / relative
@@ -1027,10 +1327,74 @@ RELAY_DEST=operator@192.0.2.23
         for rank in range(4):
             assert protected_commands[rank] != default_commands[rank]
 
+        # The one-step return removes exactly the E35 selection from every rank; the
+        # memory-bounded return also removes the disk-capacity pair.
+        home = str(Path.home()) + "/tp4/experiments/e03"
+        e35_pairs = [["-v", f"{home}/e35-runner-k/{name}:{target}:ro"] for name, target in (
+            ("model_runner.py", f"{E35_VLLM}/model_runner.py"),
+            ("speculator.py", f"{E35_VLLM}/spec_decode/dflash2/speculator.py"),
+            ("policy.flag", "/tmp/glm53-e35-policy"))]
+        e35_pairs += [["-e", f"{key}={value}"] for key, value in E35_ENV.items()]
+        disk_words = ["-e", "SPARK_CONTEXT_CACHE_MAX_BYTES=214748364800",
+                      "-e", "SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES=171798691840"]
+
+        def without(words, pairs):
+            words = list(words)
+            for pair in pairs:
+                start = next(index for index in range(len(words))
+                             if words[index:index + len(pair)] == pair)
+                del words[start:start + len(pair)]
+            return words
+
+        e35_overlay = "scripts/node/reference/operational-20260930-e35.env"
+        e31mb_overlay = "scripts/node/reference/operational-20260930-e31-mb.env"
+        return_overlay = "scripts/node/reference/operational-20260929-memory-bounded.env"
+        e35_commands = launcher_commands(config, e35_overlay)
+        e31mb_commands = launcher_commands(config, e31mb_overlay)
+        return_commands = launcher_commands(config, return_overlay)
+        scheduler_e35 = f"{home}/e35-runner-k/adaptive_k_scheduler.py:/opt/tp4/adaptive_k_scheduler.py:ro"
+        scheduler_mb = f"{home}/draft-budget/adaptive_k_scheduler.py:/opt/tp4/adaptive_k_scheduler.py:ro"
+        runner_e36 = f"{home}/e36-lm-head-w8a16/model_runner.py:{E35_VLLM}/model_runner.py:ro"
+        runner_e35 = f"{home}/e35-runner-k/model_runner.py:{E35_VLLM}/model_runner.py:ro"
+        e36_pairs = [["-v", f"{home}/e36-lm-head-w8a16/e36_lm_head_w8a16.py:{E36_MODULE_T}:ro"]]
+        e36_pairs += [["-e", f"{key}={value}"] for key, value in E36_ENV.items()]
+        for rank in range(4):
+            assert default_commands[rank].count(runner_e36) == 1, rank
+            e35_state = without([runner_e35 if word == runner_e36 else word
+                                 for word in default_commands[rank]], e36_pairs)
+            assert e35_commands[rank] == e35_state, rank
+            assert not any("e36-lm-head-w8a16" in word or "VLLM_E36_" in word for word in e35_state)
+            assert e35_state.count(scheduler_e35) == 1, rank
+            swapped = [scheduler_mb if word == scheduler_e35 else word for word in e35_state]
+            assert e31mb_commands[rank] == without(swapped, e35_pairs), rank
+            assert return_commands[rank] == without(swapped, e35_pairs + [disk_words]), rank
+            for commands in (e31mb_commands, return_commands):
+                assert not any("e35-runner-k" in word or "VLLM_E35_" in word for word in commands[rank])
+            assert not any("SPARK_CONTEXT_CACHE_" in word for word in return_commands[rank])
+        (isolated / "cluster.env").write_text(config, encoding="utf-8")
+        os.environ["TP4_ENV"] = e35_overlay
+        returned, diagnostic = check.load_recipe(10)
+        assert diagnostic["returncode"] == 0
+        assert check.recipe_problems(returned, check.expected_operational(E35_RETURN_IDENTITY)) == []
+        assert any(problem.startswith("operational runtime environment: VLLM_E36_")
+                   for problem in check.recipe_problems(returned, promoted_selected))
+        os.environ["TP4_ENV"] = e31mb_overlay
+        returned, diagnostic = check.load_recipe(10)
+        assert diagnostic["returncode"] == 0
+        assert check.recipe_problems(returned, check.expected_operational(E31MB_RETURN_IDENTITY)) == []
+        assert any(problem.startswith("operational runtime environment: VLLM_E35_")
+                   for problem in check.recipe_problems(returned, promoted_selected))
+        os.environ["TP4_ENV"] = return_overlay
+        returned, diagnostic = check.load_recipe(10)
+        assert diagnostic["returncode"] == 0
+        assert check.recipe_problems(returned, check.expected_operational(RETURN_IDENTITY)) == []
+        assert any(problem.startswith("operational runtime environment: SPARK_CONTEXT_CACHE_")
+                   for problem in check.recipe_problems(returned, promoted_selected))
+
         protected_config = config + "\n" + protected_body
         assert launcher_commands(protected_config) == protected_commands
         candidate_commands = launcher_commands(protected_config, production_overlay)
-        assert candidate_commands == default_commands
+        assert candidate_commands == return_commands
         (isolated / "cluster.env").write_text(protected_config, encoding="utf-8")
         os.environ["TP4_ENV"] = production_overlay
         prepared_candidate, diagnostic = check.load_recipe(10)

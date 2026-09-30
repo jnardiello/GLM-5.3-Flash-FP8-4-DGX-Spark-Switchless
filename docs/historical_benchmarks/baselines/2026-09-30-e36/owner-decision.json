@@ -1,0 +1,5 @@
+{
+  "schema": 1,
+  "date": "2026-09-30",
+  "decision": "Promote E36, the INT8 W8A16 lm_head shared by the target and the DFlash2 drafter, to the operational default after the pre-registered fidelity gate passed and two Rigmark suites. The owner judged the gains marginal and kept the change. Freeze the two E36 suites as the E36 performance record."
+}

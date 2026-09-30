@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "record_type": "preregistration",
+  "experiment_id": "2026-09-30-e36-lm-head",
+  "registered_utc": "2026-09-30T16:39:31Z",
+  "registered_before_any_measurement": true,
+  "candidate": {
+    "change": "INT8 W8A16 (symmetric, group 128, Marlin for every row count) for the vocab-parallel lm_head shared by the target and the DFlash2 drafter",
+    "overlay": {
+      "path": "scripts/node/experiments/e03/e36-lm-head-w8a16/delta.env",
+      "sha256": "e7400ba6e03388a6b2e15c5d1f18f9bbfaf6dd3ad0a181421eb3ba0c779b77aa"
+    },
+    "sources_sha256": {
+      "scripts/node/experiments/e03/e36-lm-head-w8a16/model_runner.py": "d8fbfa5112f700d2a7468e97c6bb0857a16adccd70c34a22d59ec7ef97a40216",
+      "scripts/node/experiments/e03/e36-lm-head-w8a16/e36_lm_head_w8a16.py": "576eeb38c20f3f4bf714fbd5dfc22da185674dab2038ddcace8ea42139d3b722",
+      "scripts/node/experiments/e03/e36-lm-head-w8a16/manifest.json": "3c15f9d9d0ac5e39afd2b37bc82b15932540d532cd7e9b08aeac2feccda8019e"
+    },
+    "base": "E35 default, docs/operational-identities/2026-09-30-e35-hybrid.json"
+  },
+  "fidelity": {
+    "harness": "scripts/fidelity (docs/fidelity/REPORT.md method: teacher-forced prompt_logprobs, bootstrap over source groups B = 2000, seed 20260927)",
+    "overlay": {
+      "path": "scripts/node/experiments/fidelity/le36-m.env",
+      "sha256": "a38b2d71f8484377b34e1f748f170a39cc4d91f99c5c720c134d89ab6acdc0b1"
+    },
+    "load": "one measurement-mode boot of le36-m; the flag /tmp/glm53-e36-lm-head selects the path on every rank, changed only while idle and read back",
+    "runs": {
+      "reference": "Cnow/prompt-a (flag bf16: the current recipe's BF16 head)",
+      "candidate": "LE36/prompt-a (flag int8)"
+    },
+    "corpus": "all 424 windows of the provisional manifest (global sha256 prefix 5e962c36), K = 20",
+    "comparison": "campaign.config.json pair le36-vs-cnow (floor floor-r0); bit-identity check cm-a-vs-cnow-a (non-strict, informational)",
+    "gate": {
+      "metric": "mean delta NLL per position (candidate minus reference), token-weighted over the finite subset, source-group bootstrap (B = 2000, seed 20260927), one-sided upper bound ub95",
+      "gated_regimes": [
+        "dense"
+      ],
+      "limit_ppl_pct": 0.5,
+      "limit_nats": 0.00498754,
+      "rule": "PASS when ub95 <= log1p(0.005) nats (+0.5% perplexity) in the dense regime AND the integrity check passes; otherwise FAIL. The campaign's generic KL/top-1 verdict is not the E36 gate.",
+      "integrity": "in the dense and all-position blocks, the candidate's nonfinite actual-token scores (infinite NLL, missing, zero probability, other) must not exceed the reference's",
+      "descriptive": [
+        "all-position and sparse delta NLL with their floor (floor-r0)",
+        "mean and p99 KL",
+        "top-1 agreement",
+        "per-category delta NLL"
+      ],
+      "on_fail": "no serving window; the service returns to the E35 default"
+    },
+    "numeric_receipt": "E36_LM_HEAD_W8A16_READY on every rank: group-128 weight relative L2 (row chunks), logit relative L2 and top-1 agreement of eight seeded Gaussian rows; the load refuses a non-finite result or a logit relative L2 above 5%"
+  },
+  "performance": {
+    "load": "one serving boot of the candidate (conversion in place, BF16 freed)",
+    "protocol": "upstream Rigmark c5a0db0 with the reference flags, fresh comparison ID per suite, memory guard, spec-decode counters before and after each suite",
+    "suites": 2,
+    "comparison": "the frozen E35 record (docs/historical_benchmarks/baselines/2026-09-30-e35/baseline.json), a different load: descriptive",
+    "expected": "code decode and C1 about +2%, time to first token unchanged or lower, C2/C4 and prefill unchanged"
+  },
+  "amendments": [
+    {
+      "utc": "2026-09-30T16:59:46Z",
+      "before_any_measurement": true,
+      "change": "gate restricted to the dense regime (was dense and all positions); integrity check added; receipt refusal limits added",
+      "reason": "an independent review and the campaign floor: identical R0 executions already reach an all-position ub95 of about +0.48% perplexity (floor-r0), because the sparse regime varies between executions, so an all-position limit of +0.5% would fail on noise; the dense regime is deterministic (floor 0) and carries the INT8 effect"
+    },
+    {
+      "utc": "2026-09-30T17:26:55Z",
+      "before_any_measurement": true,
+      "change": "the conversion resolves the target head with the image's get_target_lm_head(target, get_language_model()), as the DFlash sharing does",
+      "reason": "the first measurement boot stopped at load: the target is a ForConditionalGeneration wrapper whose top level has no lm_head; the conversion refused it and no window was scored"
+    }
+  ]
+}

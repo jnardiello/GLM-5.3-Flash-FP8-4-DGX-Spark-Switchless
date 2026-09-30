@@ -1,0 +1,55 @@
+{
+  "schema": "tp4-e36-lm-head-w8a16-candidate-v1",
+  "status": "promoted_default",
+  "promotion": {
+    "date": "2026-09-30",
+    "decision": "owner",
+    "recipe": "cluster.env.example",
+    "measured_candidate": "delta.env (retained unchanged as the record of the measured overlay)",
+    "rollback": "scripts/node/reference/operational-20260930-e35.env"
+  },
+  "summary": "INT8 W8A16 (symmetric, group 128, Marlin) for the vocab-parallel lm_head that the target shares with the DFlash2 drafter, converted in place after both models load and before CUDA graph capture; every row count uses Marlin. Target logits change; the SparkCache namespace does not.",
+  "base": "E35 default (docs/operational-identities/2026-09-30-e35-hybrid.json)",
+  "environment": [
+    "VLLM_E36_LM_HEAD_W8A16=1",
+    "VLLM_E36_KEEP_BF16=0"
+  ],
+  "measurement_environment": [
+    "VLLM_E36_KEEP_BF16=1",
+    "VLLM_E36_FLAG=/tmp/glm53-e36-lm-head"
+  ],
+  "flag_values": {
+    "int8 (default, missing or other content)": "INT8 Marlin path",
+    "bf16": "retained BF16 weight (only with VLLM_E36_KEEP_BF16=1; eager calls only)"
+  },
+  "candidates": [
+    {
+      "path": "scripts/node/experiments/e03/e36-lm-head-w8a16/model_runner.py",
+      "sha256": "d8fbfa5112f700d2a7468e97c6bb0857a16adccd70c34a22d59ec7ef97a40216",
+      "parent": {
+        "path": "scripts/node/experiments/e03/e35-runner-k/model_runner.py",
+        "sha256": "4aa67bc0379d1e39649b7eb5297f247eaa0ad7597ed087e876dc81a4075e2e36"
+      },
+      "patch": "model_runner.patch",
+      "patch_sha256": "907c603de57cf1302dbca7833a543d6b2b01b482c6976527413485b116bcb677",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu/model_runner.py"
+    },
+    {
+      "path": "scripts/node/experiments/e03/e36-lm-head-w8a16/e36_lm_head_w8a16.py",
+      "sha256": "576eeb38c20f3f4bf714fbd5dfc22da185674dab2038ddcace8ea42139d3b722",
+      "parent": null,
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e36_lm_head_w8a16.py",
+      "reuses": "scripts/node/experiments/e03/bf16-residue/e21_bf16_residue.py (_pack_projection, ResidueW8A16Method)"
+    }
+  ],
+  "memory_per_rank": {
+    "bf16_bytes_freed": 317194240,
+    "int8_packed_bytes_expected": 161874112,
+    "measurement_mode": "keeps both (VLLM_E36_KEEP_BF16=1)"
+  },
+  "cache_namespace": "unchanged: logits never feed cached target K/V, recurrent state or drafter context",
+  "ready_lines": [
+    "E36_LM_HEAD_W8A16_READY"
+  ],
+  "fidelity": "measured with scripts/fidelity on one measurement-mode load: flag bf16 (Cnow) then int8 (LE36)"
+}

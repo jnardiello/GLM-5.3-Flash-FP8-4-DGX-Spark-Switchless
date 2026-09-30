@@ -1,0 +1,27 @@
+{
+  "checks": {
+    "cm-a-vs-cnow-a": {
+      "arrays": [
+        "lp_actual",
+        "topk_ids",
+        "topk_lp"
+      ],
+      "cand": "Cnow/prompt-a",
+      "complete": true,
+      "first_differing_row": 257,
+      "ref": "Cm/prompt-a",
+      "rows": "1..2048",
+      "rows_compared": 773500,
+      "rows_differing": 25088,
+      "status": "fail",
+      "windows_compared": 424,
+      "windows_expected": 424,
+      "windows_identical": 410
+    }
+  },
+  "name": "bit-identity",
+  "regime": "dense (rows 1..2048)",
+  "schema": "fidelity-campaign-identity/1",
+  "status": "fail",
+  "type": "bit_identity"
+}

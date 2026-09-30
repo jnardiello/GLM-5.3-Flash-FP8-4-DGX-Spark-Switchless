@@ -1,0 +1,31 @@
+--- a/model_runner.py
++++ b/model_runner.py
+@@ -2393,3 +2393,28 @@
+ GPUModelRunner.execute_model = _e35_execute_model
+ _e35_logger.info("E35_RUNNER_K_READY enabled=%d flag=%s margin=%s wait_ms=%s", int(_E35_ENABLED),
+                  _E35_POLICY_FLAG or "unset", _E35_HYBRID_MARGIN, _E35_HYBRID_WAIT_MS)
++
++
++# --- E36 candidate addition. Every byte above this marker is the promoted E35 runner
++# (scripts/node/experiments/e03/e35-runner-k/model_runner.py,
++# sha256 4aa67bc0379d1e39649b7eb5297f247eaa0ad7597ed087e876dc81a4075e2e36).
++# With VLLM_E36_LM_HEAD_W8A16 set to a non-zero integer, the vocab-parallel lm_head that the
++# target shares with the DFlash2 drafter becomes INT8 W8A16 once both models are loaded and
++# before any CUDA graph is captured (vllm/models/glm5next/nvidia/e36_lm_head_w8a16.py). A
++# failed conversion raises: a rank that kept BF16 would gather mismatched logit shards.
++import os as _e36_os
++
++_e36_original_load_model = GPUModelRunner.load_model
++
++
++def _e36_load_model(self, *args, **kwargs):
++    result = _e36_original_load_model(self, *args, **kwargs)
++    if _e36_os.environ.get("VLLM_E36_LM_HEAD_W8A16", "0").strip() not in ("", "0"):
++        from vllm.models.glm5next.nvidia import e36_lm_head_w8a16 as _e36
++
++        if _e36.enabled():
++            _e36.convert_shared_lm_head(self.model, getattr(self, "speculator", None))
++    return result
++
++
++GPUModelRunner.load_model = _e36_load_model

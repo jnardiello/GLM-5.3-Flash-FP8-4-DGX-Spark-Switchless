@@ -19,9 +19,12 @@ for each part of the requested task before substantive work:
 For installation, read both [`docs/install-from-zero.md`](docs/install-from-zero.md)
 and [`docs/operations.md`](docs/operations.md). The default recipe is
 [`cluster.env.example`](cluster.env.example); its current identity is
-[`docs/operational-identities/2026-09-29-memory-bounded.json`](docs/operational-identities/2026-09-29-memory-bounded.json).
-The unchanged E31 performance record is
-[`docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json`](docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json). Preserve the recipe's
+[`docs/operational-identities/2026-09-30-e36-lm-head.json`](docs/operational-identities/2026-09-30-e36-lm-head.json).
+The current performance record is E36,
+[`docs/historical_benchmarks/baselines/2026-09-30-e36/baseline.json`](docs/historical_benchmarks/baselines/2026-09-30-e36/baseline.json);
+the unchanged E31 record,
+[`docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json`](docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json),
+remains the engine identity. Preserve the recipe's
 non-site settings unless the owner requests a variant. Use this checklist to navigate
 the existing procedures:
 
@@ -146,12 +149,26 @@ benchmark interface. Do not recreate it with private wrapper scripts, blanket ca
 qualification prerequisites, or a parallel benchmark/admission framework; necessary
 measurement fixes belong in Rigmark.
 
-Run one experiment at a time. The owner-accepted **September 28, 2026 E31** reference is
-[`docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json`](docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json):
-the E29 recipe (E28b's seven draft tokens and 16 GiB KV pool, the end-drain scheduler and
+Run one experiment at a time. The current reference is the owner-promoted **September 30,
+2026 E36** record,
+[`docs/historical_benchmarks/baselines/2026-09-30-e36/baseline.json`](docs/historical_benchmarks/baselines/2026-09-30-e36/baseline.json):
+the operational default as it serves, that is E35 plus the INT8 W8A16 `lm_head` that the target
+shares with the DFlash2 drafter. It holds two suites (n = 2) of the promoted default. Compare a
+candidate with a same-load arm of this default. The previous owner-promoted **E35** record,
+[`docs/historical_benchmarks/baselines/2026-09-30-e35/baseline.json`](docs/historical_benchmarks/baselines/2026-09-30-e35/baseline.json),
+is E31-MB plus the E35 verify length (the model runner verifies 3 or 7 drafts of a
+single-request step from the drafter's confidence, policy `hybrid`); it holds the two `hybrid`
+suites (n = 2) of the E35 A-P-P-A series. The earlier owner-named **E31-MB** record,
+[`docs/historical_benchmarks/baselines/2026-09-30-e31-mb/baseline.json`](docs/historical_benchmarks/baselines/2026-09-30-e31-mb/baseline.json),
+is the E31 engine with the memory-bounded layer (14 GiB KV pool, allocator trim, 6,912-token
+step cap, bounded API admission) and the protected SparkCache connector; it holds two suites
+of the default arm (n = 2) from the E32 series.
+The previous owner-accepted **September 28, 2026 E31** reference,
+[`docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json`](docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json),
+is the E29 recipe (E28b's seven draft tokens and 16 GiB KV pool, the end-drain scheduler and
 4 ms idle coalescing) plus the speculative-safe C4 tail ring, with the head-gate switch off.
-It holds one suite of the promoted arm (n = 1) and a same-load E29-equivalent arm. The
-client reached the rank-0 API over direct LAN HTTP; keep that path for small effects.
+It holds one suite of the promoted arm (n = 1) and a same-load E29-equivalent arm. Both
+clients reached the rank-0 API over direct LAN HTTP; keep that path for small effects.
 
 **Rigmark policy (owner, September 28, 2026).** Measure with upstream, unmodified Rigmark
 (`alexellis/rigmark`, the revision in the current record's `rigmark.source`) and exactly
@@ -171,12 +188,18 @@ cadence with the E27c scheduler, the E28b draft length, the E29
 end-drain scheduler and idle coalescing, and the E31 indexer tail ring, retaining hybrid KDA.
 They also select the protected SparkCache connector and its 8 MiB transfers, shared 1 GiB
 transient budget per rank and 1 GiB admission floor, a 14 GiB operational KV pool,
-eager-prefill allocator trim, a 6,912-token step cap and bounded API admission. E31's
+eager-prefill allocator trim, a 6,912-token step cap, bounded API admission, a 200 GiB
+per-rank SparkCache disk capacity, the E35 confidence-based verify length with its
+read-only `hybrid` policy file and the E36 INT8 shared `lm_head`. E31's
 frozen performance record retains its measured 16 GiB engine. `scripts/check-f0.py` selects the
 versioned operational identity by default; use `--baseline` explicitly for a historical
 performance identity. The
 [promotion record](docs/historical_benchmarks/baselines/2026-09-28-e31/promotion.json)
-records how E31 was applied. The immediate operational rollback is
+records how E31 was applied. The one-step operational rollback is
+`scripts/node/reference/operational-20260930-e35.env`, which removes only E36;
+`scripts/node/reference/operational-20260930-e31-mb.env` removes E36 and E35, and
+`scripts/node/reference/operational-20260929-memory-bounded.env` removes E36, E35 and the disk
+capacity. The immediate complete rollback is
 `scripts/node/reference/operational-20260929-sparkcache-protected.env`, the complete
 protected E31 operational recipe with a 16 GiB KV pool. The historical performance return is
 `scripts/node/reference/baseline-20260928-e31.env`, the complete measured E31 recipe with

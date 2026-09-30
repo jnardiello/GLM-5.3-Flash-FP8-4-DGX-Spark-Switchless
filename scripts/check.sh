@@ -106,6 +106,8 @@ python3 scripts/tests/test-resilience-probe.py
 python3 scripts/tests/test-prefill-cache-trim.py
 python3 scripts/tests/test-prefill-step-cap.py
 python3 scripts/tests/test-bounded-admission.py
+python3 scripts/tests/test-e35-runner-k.py
+python3 scripts/tests/test-e36-lm-head.py
 python3 scripts/tests/test-kda-hybrid.py
 python3 scripts/tests/test-e03-config.py
 python3 scripts/tests/test-adaptive-draft-budget.py

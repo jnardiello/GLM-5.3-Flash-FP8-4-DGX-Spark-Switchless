@@ -1,0 +1,93 @@
+{
+  "label": "le36-m-09301732",
+  "recorded_utc": "2026-09-30T17:49:59+00:00",
+  "overlay": "scripts/node/experiments/fidelity/le36-m.env",
+  "overlay_sha256": "a38b2d71f8484377b34e1f748f170a39cc4d91f99c5c720c134d89ab6acdc0b1",
+  "cluster_env_sha256": "dff6ca1a5d4d6bc5ce6c5a8903aa19abbc62d494746a88fd72f160b90fb67032",
+  "image": "ghcr.io/fujitsupolycom/sparkring-glm53-sparkcache@sha256:0d4029b3b7023cf32c37ac20279469c9a2ee16a057f25aae3bcfee9ee5fb660f",
+  "image_id_pinned": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+  "model_repo": "zai-org/GLM-5.3-Flash",
+  "model_rev": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+  "draft_rev": "bf582e4eacc1810f76656d1811693ff6c6737d2a",
+  "kv_cache_dtype": "fp8_e4m3",
+  "spec_tokens": "7",
+  "extra_vllm_args": "--kv-cache-memory-bytes=6442450944 --attention-backend B12X --moe-backend triton --linear-backend triton --scheduler-cls adaptive_k_scheduler.AdaptiveKScheduler --prefill-schedule-interval 8 --compilation-config={\"max_cudagraph_capture_size\":72} --middleware tp4_admission.BoundedAdmissionMiddleware --max-logprobs 100",
+  "k": 20,
+  "ranks": [
+    {
+      "rank": 0,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "e57063b5c0b3f50cde3e2fa3107d29452e540026dca6f87a3e4e3ae945b2bc19",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411",
+        "E22_DRAFTER_W8A16_READY {\"added_scratch_bytes\": 0, \"context_kv_w8a16\": false, \"families\": [\"down_proj\", \"gate_up_proj\", \"kernel_projection\", \"o_proj\", \"qkv_proj\"], \"group_size\": 128, \"modules\": 30, \"original_bytes\": 566231040, \"packed_bytes\": 287544960, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"family\": \"qkv_proj\", \"layer\": ",
+        "E27B_SHORT_PREFILL_READY tokens=2048 interval=8",
+        "E27C_CADENCE_WHEN_QUEUED_READY interval=8",
+        "E29_END_DRAIN_READY trace=0",
+        "E29_IDLE_COALESCE_READY ms=4 trace=0",
+        "E35_CONF_RECORDER_READY enabled=1",
+        "E35_RUNNER_K_READY enabled=1 flag=/tmp/glm53-e35-policy margin=0.005 wait_ms=2.8",
+        "E35_SCHEDULER_READY flag=/tmp/glm53-e35-policy k_hi=7",
+        "E36_LM_HEAD_W8A16_READY {\"flag\": \"/tmp/glm53-e36-lm-head\", \"freed_bytes\": 0, \"group_size\": 128, \"keep_bf16\": true, \"logits_rel_l2\": 0.007692, \"original_bytes\": 317194240, \"packed_bytes\": 161874112, \"padded_k\": 4096, \"padded_n\": 38912, \"shape\": [38720, 4096], \"shared_with_drafter\": true, \"top1_agreement\": \"8/8\", \"tp_rank_vocab_star",
+        "PREFILL_CACHE_TRIM_READY rank=0 enabled=1 trigger=pre_eager_prefill capture_sizes=[1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72]",
+        "RESILIENCE_STEP_TOKEN_CAP_READY configured=8192 effective=6912 block=2304 eager_above=72",
+        "SPARKCACHE_CPU_BUDGET_READY cap_bytes=1073741824 floor_bytes=1073741824",
+        "SPARKCACHE_DISK_STREAM_READY chunk_bytes=8388608",
+        "TP4_ADMISSION_READY {\"active\": 0, \"admitted_total\": 0, \"body_idle\": 0, \"body_idle_seconds\": 30.0, \"body_too_large\": 0, \"cancelled_active\": 0, \"cancelled_queued\": 0, \"event\": \"ready\", \"inflight\": 0, \"max_active\": 6, \"max_body_bytes\": 8388608, \"max_queued\": 128, \"monotonic_ns\": 1205314416437198, \"queue_timeout_seconds\": 1800.0, \"queued\": 0"
+      ]
+    },
+    {
+      "rank": 1,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "ebea09b7802d30a3980010a05ce7b7c97dad5a47c526fe5690c1e78dd2208a1d",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411",
+        "E22_DRAFTER_W8A16_READY {\"added_scratch_bytes\": 0, \"context_kv_w8a16\": false, \"families\": [\"down_proj\", \"gate_up_proj\", \"kernel_projection\", \"o_proj\", \"qkv_proj\"], \"group_size\": 128, \"modules\": 30, \"original_bytes\": 566231040, \"packed_bytes\": 287544960, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"family\": \"qkv_proj\", \"layer\": ",
+        "E35_CONF_RECORDER_READY enabled=1",
+        "E35_RUNNER_K_READY enabled=1 flag=/tmp/glm53-e35-policy margin=0.005 wait_ms=2.8",
+        "E36_LM_HEAD_W8A16_READY {\"flag\": \"/tmp/glm53-e36-lm-head\", \"freed_bytes\": 0, \"group_size\": 128, \"keep_bf16\": true, \"logits_rel_l2\": 0.007837, \"original_bytes\": 317194240, \"packed_bytes\": 161874112, \"padded_k\": 4096, \"padded_n\": 38912, \"shape\": [38720, 4096], \"shared_with_drafter\": true, \"top1_agreement\": \"8/8\", \"tp_rank_vocab_star",
+        "PREFILL_CACHE_TRIM_READY rank=1 enabled=1 trigger=pre_eager_prefill capture_sizes=[1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72]",
+        "SPARKCACHE_CPU_BUDGET_READY cap_bytes=1073741824 floor_bytes=1073741824",
+        "SPARKCACHE_DISK_STREAM_READY chunk_bytes=8388608"
+      ]
+    },
+    {
+      "rank": 2,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "ecf74ae152219e4ce0bcc83469ccd4da4674d4bff5bd22150ac28dce5f22e6f5",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411",
+        "E22_DRAFTER_W8A16_READY {\"added_scratch_bytes\": 0, \"context_kv_w8a16\": false, \"families\": [\"down_proj\", \"gate_up_proj\", \"kernel_projection\", \"o_proj\", \"qkv_proj\"], \"group_size\": 128, \"modules\": 30, \"original_bytes\": 566231040, \"packed_bytes\": 287544960, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"family\": \"qkv_proj\", \"layer\": ",
+        "E35_CONF_RECORDER_READY enabled=1",
+        "E35_RUNNER_K_READY enabled=1 flag=/tmp/glm53-e35-policy margin=0.005 wait_ms=2.8",
+        "E36_LM_HEAD_W8A16_READY {\"flag\": \"/tmp/glm53-e36-lm-head\", \"freed_bytes\": 0, \"group_size\": 128, \"keep_bf16\": true, \"logits_rel_l2\": 0.007838, \"original_bytes\": 317194240, \"packed_bytes\": 161874112, \"padded_k\": 4096, \"padded_n\": 38912, \"shape\": [38720, 4096], \"shared_with_drafter\": true, \"top1_agreement\": \"8/8\", \"tp_rank_vocab_star",
+        "PREFILL_CACHE_TRIM_READY rank=2 enabled=1 trigger=pre_eager_prefill capture_sizes=[1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72]",
+        "SPARKCACHE_CPU_BUDGET_READY cap_bytes=1073741824 floor_bytes=1073741824",
+        "SPARKCACHE_DISK_STREAM_READY chunk_bytes=8388608"
+      ]
+    },
+    {
+      "rank": 3,
+      "container_running": true,
+      "image_id": "sha256:5e32aaa1bbe3559e81db7706ed4286248f18d27cfdb186f6b851bf786eb43075",
+      "cmd_sha256": "0fa29965c4bccb46d0d48b9a9d11992c221f72d530aa9e15eb8e14933e5c5788",
+      "ready_lines": [
+        "E20_KDA_INPUT_W8A16_READY {\"group_size\": 128, \"modules\": 34, \"original_bytes\": 1751384064, \"packed_bytes\": 905222528, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"layer\": 0, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"padded_k\": 4096, \"padded_n\": 6400}, {\"layer\": 1, \"original_bytes\": 51511296, \"packed_bytes\": 26624192, \"",
+        "E21_BF16_RESIDUE_W8A16_READY {\"added_scratch_bytes\": 79691776, \"distinct_shapes_nk\": [[2048, 4096], [4096, 1536], [4096, 2048], [4096, 4096]], \"families\": [\"kda_o_proj\", \"mla_fused_qkv_a_proj\", \"mla_o_proj\", \"mla_q_b_proj\"], \"group_size\": 128, \"mla_layout\": \"q_lora\", \"modules\": 67, \"original_bytes\": 1262485504, \"packed_bytes\": 6411",
+        "E22_DRAFTER_W8A16_READY {\"added_scratch_bytes\": 0, \"context_kv_w8a16\": false, \"families\": [\"down_proj\", \"gate_up_proj\", \"kernel_projection\", \"o_proj\", \"qkv_proj\"], \"group_size\": 128, \"modules\": 30, \"original_bytes\": 566231040, \"packed_bytes\": 287544960, \"prefill_bf16_min_tokens\": 2048, \"receipts\": [{\"family\": \"qkv_proj\", \"layer\": ",
+        "E35_CONF_RECORDER_READY enabled=1",
+        "E35_RUNNER_K_READY enabled=1 flag=/tmp/glm53-e35-policy margin=0.005 wait_ms=2.8",
+        "E36_LM_HEAD_W8A16_READY {\"flag\": \"/tmp/glm53-e36-lm-head\", \"freed_bytes\": 0, \"group_size\": 128, \"keep_bf16\": true, \"logits_rel_l2\": 0.008023, \"original_bytes\": 317194240, \"packed_bytes\": 161874112, \"padded_k\": 4096, \"padded_n\": 38912, \"shape\": [38720, 4096], \"shared_with_drafter\": true, \"top1_agreement\": \"8/8\", \"tp_rank_vocab_star",
+        "PREFILL_CACHE_TRIM_READY rank=3 enabled=1 trigger=pre_eager_prefill capture_sizes=[1, 2, 4, 8, 16, 24, 32, 40, 48, 56, 64, 72]",
+        "SPARKCACHE_CPU_BUDGET_READY cap_bytes=1073741824 floor_bytes=1073741824",
+        "SPARKCACHE_DISK_STREAM_READY chunk_bytes=8388608"
+      ]
+    }
+  ]
+}

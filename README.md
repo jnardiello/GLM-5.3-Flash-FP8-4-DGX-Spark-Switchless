@@ -10,47 +10,51 @@ contains the infrastructure as code, runtime patches, and guides to
 
 ## Measured performance
 
-Current accepted baseline: **28/09/2026 · E31, speculative-safe C4 tail ring**, measured
+Current accepted baseline: **30/09/2026 · E36, the output head stored in 8 bits**, measured
 with upstream, unmodified [Rigmark](https://github.com/alexellis/rigmark) and the reference
-flags of its GLM receipts: every default plus `reasoning_effort` low. **One complete suite
-(54/54 requests, n = 1)**, zero measurement/runtime errors and 15/15 native output gates
-passing. The comparison is an arm with the E29 arithmetic (legacy tail), measured on the same
-load with the same flags.
+flags of its GLM receipts: every default plus `reasoning_effort` low. **Two complete suites
+(108/108 requests, n = 2)**, zero measurement/runtime errors and 30/30 native output gates
+passing. The comparison is the previous baseline, **30/09/2026 · E35**, also two suites with
+the same flags, measured on another load.
 
-The operational default keeps the E31 model, context and scheduler lineage, adds bounded
-SparkCache disk transfers, and limits aggregate request admission. It uses a 14 GiB KV pool,
-allocator trim before eligible eager prefills, a 6,912-token scheduling-step cap, six active
-API admission slots and 128 queued requests. Admission slots do not imply resident engine
-requests. This safety configuration has its own
-[versioned operational identity](docs/operational-identities/2026-09-29-memory-bounded.json);
-it does not replace or alter the frozen E31 performance baseline. The complete
+The operational default is the measured recipe. It keeps the E31 model, context and scheduler
+lineage, adds bounded SparkCache disk transfers, and limits aggregate request admission. It
+uses a 14 GiB KV pool, allocator trim before eligible eager prefills, a 6,912-token
+scheduling-step cap, six active API admission slots and 128 queued requests, and evicts
+SparkCache data once it exceeds 200 GiB of disk per node. Admission slots do not imply
+resident engine requests. For a single-request decode step, the model runner verifies 3 or 7
+drafts from the drafter's own confidence (E35), and the output head shared with the drafter is
+stored in 8 bits (E36). This configuration has its own
+[versioned operational identity](docs/operational-identities/2026-09-30-e36-lm-head.json). The
+[E35 return](scripts/node/reference/operational-20260930-e35.env) restores the BF16 head in one
+step, and the complete
 [protected 16 GiB rollback](scripts/node/reference/operational-20260929-sparkcache-protected.env)
-removes the allocator, step-cap and admission deltas while keeping cache protection. The
-[E31 rollback](scripts/node/reference/baseline-20260928-e31.env) also restores the measured
-cache behavior.
+removes the operational deltas while keeping cache protection.
 
-| Workload | Current · 28/09/2026 E31 | vs same-load E29-equivalent arm ([📊 E31 report](docs/benchmarks/baselines/2026-09-28-e31.md)) |
+| Workload | Current · 30/09/2026 E36 | vs previous 30/09/2026 E35 ([📊 E36 report](docs/benchmarks/baselines/2026-09-30-e36.md)) |
 | --- | ---: | ---: |
-| Code decode, one request | 65.19 tok/s | 64.56 tok/s · +0.97% |
-| Code C1, end-to-end | 43.99 tok/s | 40.99 tok/s · +7.32% |
-| Code C2, aggregate end-to-end | 68.37 tok/s | 73.10 tok/s · -6.48% |
-| Code C4, aggregate end-to-end | 101.45 tok/s | 108.67 tok/s · -6.65% |
-| Prose decode | 34.09 tok/s | 34.28 tok/s · -0.54% |
-| Code TTFT | 0.475 s | 0.473 s · +0.42% |
-| Prose TTFT | 0.374 s | 0.385 s · -2.86% |
-| C1 per-stream TTFT | 0.421 s | 0.415 s · +1.45% |
-| C2 per-stream TTFT | 0.469 s | 0.457 s · +2.63% |
-| C4 per-stream TTFT | 0.548 s | 0.555 s · -1.26% |
-| Prefill 8K, cold | 2,572.5 tok/s | 2,600.2 tok/s · -1.07% |
-| Prefill 8K, replay | 8,848.1 tok/s | 8,708.4 tok/s · +1.60% |
-| Prefill 32K, cold | 2,697.9 tok/s | 2,766.0 tok/s · -2.46% |
-| Prefill 32K, replay | 33,944.4 tok/s | 32,797.3 tok/s · +3.50% |
-| Prefill 64K, cold | 2,614.4 tok/s | 2,595.3 tok/s · +0.74% |
-| Prefill 64K, replay | 39,576.6 tok/s | 40,326.5 tok/s · -1.86% |
+| Code decode, one request | 65.55 tok/s | 64.11 tok/s · +2.25% |
+| Code C1, end-to-end | 48.75 tok/s | 45.90 tok/s · +6.19% |
+| Code C2, aggregate end-to-end | 73.27 tok/s | 73.80 tok/s · -0.71% |
+| Code C4, aggregate end-to-end | 107.60 tok/s | 107.31 tok/s · +0.27% |
+| Prose decode | 34.64 tok/s | 33.42 tok/s · +3.63% |
+| Code TTFT | 0.454 s | 0.457 s · -0.66% |
+| Prose TTFT | 0.413 s | 0.387 s · +6.72% |
+| C1 per-stream TTFT | 0.411 s | 0.413 s · -0.60% |
+| C2 per-stream TTFT | 0.464 s | 0.468 s · -0.85% |
+| C4 per-stream TTFT | 0.556 s | 0.557 s · -0.27% |
+| Prefill 8K, cold | 2,638.6 tok/s | 2,620.5 tok/s · +0.69% |
+| Prefill 8K, replay | 9,013.2 tok/s | 8,809.0 tok/s · +2.32% |
+| Prefill 32K, cold | 2,778.3 tok/s | 2,763.7 tok/s · +0.53% |
+| Prefill 32K, replay | 35,478.0 tok/s | 35,969.9 tok/s · -1.37% |
+| Prefill 64K, cold | 2,788.6 tok/s | 2,781.6 tok/s · +0.25% |
+| Prefill 64K, replay | 40,002.0 tok/s | 40,338.0 tok/s · -0.83% |
 
-Each value comes from a single suite, so differences of a few percent are within noise. The
-C1/C2/C4 rows rest on three short rounds each and moved about ±7% in both directions.
-Percentages use unrounded values. Higher throughput and lower TTFT are better.
+Each value is the median of two suites (their mean); the two baselines ran on different
+loads, so differences of a few percent are within noise. The C1/C2/C4 rows rest on three
+short rounds per suite. The +6.72% prose TTFT comes from one outlier in the first E36 suite
+(0.442 s, then 0.384 s). Percentages use unrounded values. Higher throughput and lower TTFT
+are better.
 
 - **Workloads.** C1/C2/C4 mean one, two or four concurrent requests. Decode excludes the
   initial wait; end-to-end speed includes it. TTFT is time to first token.
@@ -58,36 +62,36 @@ Percentages use unrounded values. Higher throughput and lower TTFT are better.
 - **Cache isolation.** Each suite has a fresh comparison ID, which isolates the prefix cache.
 - **Scope.** These are inference measurements, not complete agent-task timings.
 
-**The numbers above are not comparable with earlier ones.** Up to September 25 (E29), this
-README showed three-suite medians measured with a local Rigmark fork, 8,192-token decode,
-thinking off and a cache salt. Those records remain in the
+**The numbers above are not comparable with those before September 28.** Up to September 25
+(E29), this README showed three-suite medians measured with a local Rigmark fork,
+8,192-token decode, thinking off and a cache salt. Those records remain in the
 [benchmark archive](docs/benchmarks/README.md) under their own protocol.
 
-**What E31 changes.** The pooled indexer builds one key from every four tokens. It keeps each
-request's recent rows in a four-slot tail so a pool can be completed across steps. A DFlash2
-verify step writes eight consecutive positions, including drafts that may be rejected.
-Their rows overwrote committed members of the pool still being built, and after a rejection
-that pool was completed from rejected-draft keys.
+**What E36 changes.** The output head (`lm_head`, 38,720 × 4,096 per node) was the largest
+16-bit weight left in a decode step. The model reads it once per step, and the DFlash2 drafter
+reads the same weights to pick its draft candidates: together about 2.9 ms of a 61 ms step.
 
-- **Fix:** the tail becomes a ring of 12 slots for seven drafts, so no row of one step can
-  reach a committed member of the open pool. A GPU test with the real kernels found 200
-  wrong pools with the old tail and none with the ring. vLLM merged the equivalent fix
-  upstream on September 25.
-- **Cost:** none measurable. Code and prose decode move less than 1% against the same-load
-  E29-equivalent arm.
-- **Head gate on tensor cores:** included but off. Its same-load comparison is unresolved.
-- **Cache:** the SparkCache namespace was kept. Pools built before E31 could carry the old
-  defect if they were persisted and restored.
+- **Change:** the shared head is packed once at load in 8 bits (INT8 weights with 16-bit
+  activations, groups of 128, Marlin kernel). That halves the bytes read and frees about
+  155 MB per node.
+- **Fidelity:** the output logits change slightly. Before measuring speed, one measurement
+  load scored the 424-window fidelity corpus with the 16-bit and the 8-bit head. Dense
+  perplexity rose by 0.018% [0.013, 0.024], and the top token agreed on 99.6% of positions;
+  the pre-registered limit was +0.5%.
+- **Gain:** code decode +2.3%, prose +3.6%, C1 +6.2%. Concurrency, prefill and time to first
+  token stay within noise. The gains are modest, and the previous baseline ran on another load.
 
-The [current benchmark report](docs/benchmarks/baselines/2026-09-28-e31.md) lists all three
-arms, the leaf tests, the excluded series and limitations.
+The [E36 experiment report](docs/benchmarks/experiments/2026-09-30-e36-lm-head.md) lists the
+fidelity result, both suites and the limitations. E35 (the model runner choosing 3 or 7 drafts
+from the drafter's confidence) is described in its
+[report](docs/benchmarks/experiments/2026-09-30-e35-runner-k.md).
 
-The graphs compare E31 with the E29-equivalent arm measured on the same load with the same
-flags, the values of the table above. Click an image for its SVG version.
+The graphs compare E36 with the previous E35 baseline, the values of the table above. Click an
+image for its SVG version.
 
-[![E31 versus the same-load E29-equivalent arm, upstream Rigmark with Alex Ellis's reference flags: generation throughput, time to first token and percentage changes.](docs/plots/comparisons/2026-09-28-e31-vs-e29-same-load/generation.png)](docs/plots/comparisons/2026-09-28-e31-vs-e29-same-load/generation.svg)
+[![E36 versus the previous E35 baseline, upstream Rigmark with Alex Ellis's reference flags: generation throughput, time to first token and percentage changes.](docs/plots/comparisons/2026-09-30-e36-vs-2026-09-30-e35/generation.png)](docs/plots/comparisons/2026-09-30-e36-vs-2026-09-30-e35/generation.svg)
 
-[![E31 versus the same-load E29-equivalent arm, upstream Rigmark with Alex Ellis's reference flags: cold prefill, immediate replay and percentage changes at 8K, 32K and 64K.](docs/plots/comparisons/2026-09-28-e31-vs-e29-same-load/prefill.png)](docs/plots/comparisons/2026-09-28-e31-vs-e29-same-load/prefill.svg)
+[![E36 versus the previous E35 baseline, upstream Rigmark with Alex Ellis's reference flags: cold prefill, immediate replay and percentage changes at 8K, 32K and 64K.](docs/plots/comparisons/2026-09-30-e36-vs-2026-09-30-e35/prefill.png)](docs/plots/comparisons/2026-09-30-e36-vs-2026-09-30-e35/prefill.svg)
 
 The [benchmark archive](docs/benchmarks/README.md) retains earlier baselines, experiments
 and separate reproduction results. See [local Rigmark reports](docs/rigmark_reports/README.md)
@@ -99,8 +103,8 @@ DFlash2 with adaptive verification capped by its effective draft budget, E03 mHC
 sharding, hybrid INT8/BF16 KDA input projections, E21 8-bit weights for the KDA output
 and MLA attention projections, E22b 8-bit weights for the DFlash2 drafter, the E27 prefill
 cadence with the E27c scheduler, seven draft tokens (E28b), the E29 length-finish hold and
-idle coalescing, the E31 speculative-safe indexer tail, SparkCache replay views and
-SIRCL/patched NCCL.
+idle coalescing, the E31 speculative-safe indexer tail, the E35 confidence-based verify
+length, the E36 8-bit output head, SparkCache replay views and SIRCL/patched NCCL.
 The operational **14 GiB KV pool per rank** is 12.5% smaller than E31's measured 16 GiB
 pool; the **262,144-token context limit** is unchanged. Startup reports 1,194,033 KV tokens
 (4.55 full contexts), so five complete 256K contexts cannot be resident at once; scheduling

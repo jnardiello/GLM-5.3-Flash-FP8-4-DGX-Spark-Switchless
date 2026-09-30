@@ -38,6 +38,34 @@ for row in record["performance"]["metrics"]:
     assert all(item["reason"] for item in row.get("excluded_per_run", [])), row["key"]
     assert statistics.median(row["per_run"]) == row["median"], row["key"]
 
+# The current E31-MB reference: two default-arm suites of the E32 series (n = 2). The operational
+# identity is pinned at freeze time only, because it follows every template change.
+MB = json.loads((REPO / "docs/historical_benchmarks/baselines/2026-09-30-e31-mb/baseline.json").read_text())
+assert MB["name"] == "E31-MB" and MB["status"] == "frozen_baseline"
+for item in MB["provenance"].values():
+    if "sha256" in item:
+        assert sha(REPO / item["path"]) == item["sha256"], item["path"]
+assert MB["provenance"]["previous_baseline"]["path"] == str(REFERENCE.relative_to(REPO))
+for path, digest in MB["system"]["source_files_sha256"].items():
+    assert sha(REPO / path) == digest, path
+mb_values = {}
+for run in MB["performance"]["accepted_runs"]:
+    item = MB["receipts"][run]
+    extract = item["portable_extract"]
+    assert sha(REPO / extract["path"]) == extract["sha256"], run
+    data = json.loads((REPO / extract["path"]).read_text())
+    assert data["receipt_sha256"] == item["native_receipt_sha256"] and data["arm"] == "A"
+    assert data["request_count"] == data["completed_streams"] == data["visible_responses"] == 54
+    assert data["prefill_token_matches"] == data["prefill_requests"] == 18
+    mb_values[run] = {row["key"]: row["value"] for row in data["metrics"]}
+assert MB["performance"]["included_run_count"] == len(mb_values) == 2
+assert MB["functional"]["measured_requests"]["count"] == 54 * len(mb_values)
+assert {row["key"] for row in MB["performance"]["metrics"]} == {
+    row["key"] for row in record["performance"]["metrics"]}
+for row in MB["performance"]["metrics"]:
+    assert row["per_run"] == [mb_values[run][row["key"]] for run in MB["performance"]["accepted_runs"]]
+    assert statistics.median(row["per_run"]) == row["median"], row["key"]
+
 e03 = REPO / "scripts/node/experiments/e03"
 previous = (REPO / "scripts/node/reference/baseline-20260919.env").read_text()
 e03_rollback = (REPO / "scripts/node/reference/baseline-20260919-e03.env").read_text()
@@ -76,8 +104,21 @@ bounded_candidate = "\n".join([
     protected_candidate,
     (e03 / "bounded-admission/production.env").read_text(),
 ])
-bounded_identity = json.loads((
-    REPO / "docs/operational-identities/2026-09-29-memory-bounded.json").read_text())
+# E31-MB: the memory-bounded command plus the SparkCache disk-capacity pair. The measured E35
+# load: E31-MB plus the E35 overlay, whose policy the window wrote at runtime.
+e31mb_candidate = "\n".join([bounded_candidate, 'EXTRA_DOCKER_ENV+=" -e SPARK_CONTEXT_CACHE_MAX_BYTES='
+                              '214748364800 -e SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES=171798691840"'])
+e35_measured = "\n".join([e31mb_candidate, (e03 / "e35-runner-k/delta.env").read_text()])
+# The E35 default: the measured E35 load plus its read-only policy mount. The measured E36
+# load: that default plus the E36 overlay, which the current default must reproduce exactly.
+e35_default = "\n".join([e35_measured, "EXTRA_DOCKER_ENV+=' -v $HOME/tp4/experiments/e03/e35-runner-k/"
+                          "policy.flag:/tmp/glm53-e35-policy:ro'"])
+e36_measured = "\n".join([e35_default, (e03 / "e36-lm-head-w8a16/delta.env").read_text()])
+default_identity = json.loads((
+    REPO / "docs/operational-identities/2026-09-30-e36-lm-head.json").read_text())
+DISK_WORDS = ["-e", "SPARK_CONTEXT_CACHE_MAX_BYTES=214748364800",
+              "-e", "SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES=171798691840"]
+POLICY_WORDS = ["-v", str(Path.home()) + "/tp4/experiments/e03/e35-runner-k/policy.flag:/tmp/glm53-e35-policy:ro"]
 NVIDIA = "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/"
 E31_ADDED = [str(Path.home()) + "/tp4/experiments/e03/e31-indexer/pooled_indexer.py:" + NVIDIA + "pooled_indexer.py:ro",
              str(Path.home()) + "/tp4/experiments/e03/e31-indexer/glm_kpool.py:" + NVIDIA + "ops/glm_kpool.py:ro",
@@ -113,6 +154,16 @@ RELAY_DEST=operator@192.0.2.23
     (root / "cluster.env").write_text(config)
     (root / "protected.env").write_text(protected_candidate)
     (root / "bounded.env").write_text(bounded_candidate)
+    (root / "e31mb.env").write_text(e31mb_candidate)
+    (root / "e35-measured.env").write_text(e35_measured)
+    (root / "e35-default.env").write_text(e35_default)
+    (root / "e36-measured.env").write_text(e36_measured)
+    (root / "operational-e35.env").write_text((
+        REPO / "scripts/node/reference/operational-20260930-e35.env").read_text())
+    (root / "operational-e31-mb.env").write_text((
+        REPO / "scripts/node/reference/operational-20260930-e31-mb.env").read_text())
+    (root / "operational-memory-bounded.env").write_text((
+        REPO / "scripts/node/reference/operational-20260929-memory-bounded.env").read_text())
     (root / "operational-protected.env").write_text((
         REPO / "scripts/node/reference/operational-20260929-sparkcache-protected.env").read_text())
     (root / "rollback.env").write_text(previous)
@@ -153,14 +204,31 @@ RELAY_DEST=operator@192.0.2.23
 
     for rank in range(4):
         current = launch(rank)
-        assert current == launch(rank, "bounded.env"), f"rank {rank}: bounded default drifted"
+        # The default is the measured E35 command plus only the read-only policy mount.
+        # The default is exactly the measured E36 command; the one-step return reaches E35, which
+        # is the measured E35 command plus only the read-only policy mount.
+        assert current == launch(rank, "e36-measured.env"), f"rank {rank}: E36 default drifted"
+        e35 = launch(rank, "e35-default.env")
+        assert launch(rank, "operational-e35.env") == e35, f"rank {rank}: E35 return drifted"
+        measured = launch(rank, "e35-measured.env")
+        start = next(i for i in range(len(e35)) if e35[i:i + 2] == POLICY_WORDS)
+        assert e35[:start] + e35[start + 2:] == measured, f"rank {rank}: E35 default drifted"
+        # E31-MB is the memory-bounded command plus the SparkCache disk-capacity pair; the
+        # one-step return reaches it, and the memory-bounded return removes E35 and the pair.
+        e31mb = launch(rank, "e31mb.env")
+        bounded = launch(rank, "bounded.env")
+        assert launch(rank, "operational-e31-mb.env") == e31mb, f"rank {rank}: E31-MB return drifted"
+        assert launch(rank, "operational-memory-bounded.env") == bounded, (
+            f"rank {rank}: memory-bounded return drifted")
+        start = next(i for i in range(len(e31mb)) if e31mb[i:i + 4] == DISK_WORDS)
+        assert e31mb[:start] + e31mb[start + 4:] == bounded, f"rank {rank}: bounded default drifted"
         mounts = dict(arg.split(":")[1::-1] for i, arg in enumerate(current) if i and current[i-1] == "-v")
         mount_count = Counter(arg.split(":")[1] for i, arg in enumerate(current) if i and current[i-1] == "-v")
         assert all(n == 1 for n in mount_count.values()), "Duplicate mount target"
         payloads = record["system"]["payload_packaging"]["operator_payloads"]
         private_targets = {item["container_path"] for item in payloads.values()}
         runtime_hashes = dict(record["system"]["operational_identity"]["container_file_sha256"])
-        runtime_hashes.update(bounded_identity["runtime_identity_overrides"]["container_file_sha256"])
+        runtime_hashes.update(default_identity["runtime_identity_overrides"]["container_file_sha256"])
         for target, digest in runtime_hashes.items():
             assert target in mounts, target
             if target in private_targets:
@@ -232,4 +300,43 @@ RELAY_DEST=operator@192.0.2.23
         assert not any("connector-e03-replay-views" in item for item in restored)
         assert "--kv-cache-memory-bytes=16106127360" in restored
 
-print("test-accepted-recipe: PASS (four-rank bounded default; protected16, E31, E29, E28b, E27c, E27, E22b, E21, E03 and pre-E03 rollbacks)")
+    # Both returns refuse any base without exactly the default E35 selection (and, for the
+    # memory-bounded return, the default capacity pair).
+    e35_changes = (
+        ("e35-twice", 'EXTRA_DOCKER_ENV+=" -e VLLM_E35_ENABLE=1"\n'),
+        ("e35-policy", "EXTRA_DOCKER_ENV=${EXTRA_DOCKER_ENV/policy.flag/other.flag}\n"),
+        ("e35-scheduler", "EXTRA_DOCKER_ENV=${EXTRA_DOCKER_ENV/e35-runner-k\\/adaptive/draft-budget\\/adaptive}\n"),
+        ("renamed-e36-module", 'EXTRA_DOCKER_ENV+=" -v /tmp/renamed.py:/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e36_lm_head_w8a16.py:ro"\n'),
+        ("env-file", 'EXTRA_DOCKER_ENV+=" --env-file /x.env"\n'),
+        ("volume-form", 'EXTRA_DOCKER_ENV+=" --volume=/a:/b"\n'),
+        ("second-scheduler", 'EXTRA_DOCKER_ENV+=" -v /other:/opt/tp4/adaptive_k_scheduler.py:ro"\n'),
+    )
+    e36_changes = (
+        ("e36-twice", 'EXTRA_DOCKER_ENV+=" -e VLLM_E36_KEEP_BF16=0"\n'),
+        ("e36-module", "EXTRA_DOCKER_ENV=${EXTRA_DOCKER_ENV/e36_lm_head_w8a16.py:ro/e36_other.py:ro}\n"),
+        ("env-file", 'EXTRA_DOCKER_ENV+=" --env-file /x.env"\n'),
+        ("second-runner", 'EXTRA_DOCKER_ENV+=" -v /o:/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu/model_runner.py:ro"\n'),
+    )
+    for reference, message, cases in (
+        ("operational-20260930-e35.env",
+         "requires exactly the default E36 runner, module and variables", e36_changes),
+        ("operational-20260929-memory-bounded.env",
+         "requires exactly the default E35 selection and SparkCache disk-capacity pair", (
+             ("changed-value", "EXTRA_DOCKER_ENV=${EXTRA_DOCKER_ENV/MAX_BYTES=214748364800/MAX_BYTES=1}\n"),
+             ("duplicate-pair", 'EXTRA_DOCKER_ENV+=" ' + " ".join(DISK_WORDS) + '"\n'),
+             ("ttl", 'EXTRA_DOCKER_ENV+=" -e SPARK_CONTEXT_CACHE_TTL_SECONDS=60"\n'), *e35_changes)),
+        ("operational-20260930-e31-mb.env",
+         "requires exactly the default E35 scheduler, runner, speculator and policy selection",
+         e35_changes),
+    ):
+        return_body = (REPO / "scripts/node/reference" / reference).read_text()
+        for name, prefix in (("applied-twice", return_body + "\n"), *cases):
+            (root / f"return-{name}.env").write_text(prefix + return_body)
+            refused = subprocess.run(["bash", str(root / "launch.sh"), "0"],
+                                     env=dict(env, TP4_ENV=f"return-{name}.env"),
+                                     capture_output=True, text=True, timeout=10)
+            assert refused.returncode != 0, (reference, name)
+            assert message in refused.stderr, (reference, name, refused.stderr)
+            assert not forbidden.exists(), "Dry-run attempted an external action"
+
+print("test-accepted-recipe: PASS (four-rank E36 default = measured E36; E35 = measured E35 + policy mount; E31-MB, memory-bounded, protected16, E31, E29, E28b, E27c, E27, E22b, E21, E03 and pre-E03 rollbacks)")

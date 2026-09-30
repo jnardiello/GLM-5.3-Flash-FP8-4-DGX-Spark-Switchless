@@ -25,7 +25,7 @@ from typing import Any, Callable
 
 REPO = Path(__file__).resolve().parents[1]
 BASELINE = REPO / "docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json"
-IDENTITY = REPO / "docs/operational-identities/2026-09-29-memory-bounded.json"
+IDENTITY = REPO / "docs/operational-identities/2026-09-30-e36-lm-head.json"
 KV_CONFIG_PATHS = (
     "scripts/node/reference/sparkcache-20260918.json",
     "scripts/node/sparkcache/kv-transfer-config.json",
@@ -167,6 +167,9 @@ safe_env_names = (
     "TP4_ADMISSION_MAX_ACTIVE", "TP4_ADMISSION_MAX_QUEUED", "TP4_ADMISSION_MAX_BODY_BYTES",
     "TP4_ADMISSION_QUEUE_TIMEOUT_SECONDS", "TP4_ADMISSION_REQUEST_TIMEOUT_SECONDS",
     "TP4_ADMISSION_BODY_IDLE_SECONDS", "TP4_ADMISSION_SEND_IDLE_SECONDS",
+    "SPARK_CONTEXT_CACHE_MAX_BYTES", "SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES",
+    "SPARK_CONTEXT_CACHE_TTL_SECONDS", "VLLM_E35_ENABLE", "VLLM_E35_POLICY_FLAG",
+    "VLLM_E36_LM_HEAD_W8A16", "VLLM_E36_KEEP_BF16", "VLLM_E36_FLAG",
 )
 identity = p.get("runtime_identity") or {}
 safe_env_names = set(safe_env_names) | set(identity.get("environment", {}))
@@ -174,6 +177,7 @@ safe_environment = {key: environment[key] for key in safe_env_names if key in en
 foreign_gpu_container_count = sum(
     name(obj) != p["container"] and uses_gpu(obj) for obj in objects)
 mounts = {item.get("Destination"): item.get("Source") for item in container.get("Mounts") or []}
+mount_rw = {item.get("Destination"): item.get("RW") for item in container.get("Mounts") or []}
 model_marker = ""
 if mounts.get("/model"):
     try: model_marker = (Path(mounts["/model"]) / ".glm53-fp8-synced").read_text().strip()
@@ -349,9 +353,13 @@ print(json.dumps({
                   "kv_transfer_config": kv_transfer_config,
                   "model_mount": mounts.get("/model") == os.path.expandvars(p["model_dir"]),
                   "draft_mount": mounts.get("/draft") == os.path.expandvars(p["draft_dir"]),
-                  "candidate_mount_targets": [target for target in ("/opt/tp4/tp4_admission.py",)
+                  "candidate_mount_targets": [target for target in (
+                      "/opt/tp4/tp4_admission.py",
+                      "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e36_lm_head_w8a16.py")
                                               if target in mounts],
                   "runtime_files": runtime_files, "runtime_receipts": runtime_receipts,
+                  "mount_rw": {path: mount_rw[path] for path in identity.get("container_file_sha256", {})
+                               if path in mount_rw},
                   "runtime_workers": runtime_workers},
     "flusher": {"unit_state": unit, "unit_rc": unit_rc, "legacy_process": legacy_rc == 0},
     "fabric_interfaces": interfaces, "jumbo_pings": jumbo,
@@ -509,6 +517,7 @@ def expected_operational(identity_path: Path = IDENTITY) -> dict[str, Any]:
         "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py",
         "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py",
         "/opt/tp4/tp4_admission.py",
+        *E35_TARGETS, *E36_TARGETS,
     }
     if set(overrides.get("container_file_sha256", {})) - allowed_override_targets:
         raise CheckFailure("operational identity has unsupported container file overrides")
@@ -527,6 +536,29 @@ def expected_operational(identity_path: Path = IDENTITY) -> dict[str, Any]:
          f"floor_bytes={cache['min_available_bytes_per_rank']}"),
         f"SPARKCACHE_DISK_STREAM_READY chunk_bytes={cache['transfer_chunk_bytes']}",
     ]
+    disk_keys = ("disk_max_bytes_per_rank", "disk_low_watermark_bytes_per_rank")
+    disk_env: dict[str, str] = {}
+    if any(key in cache for key in disk_keys):
+        max_bytes = cache.get(disk_keys[0])
+        low_bytes = cache.get(disk_keys[1])
+        if (any(isinstance(value, bool) or not isinstance(value, int)
+                for value in (max_bytes, low_bytes)) or not 0 < low_bytes <= max_bytes):
+            raise CheckFailure("operational SparkCache disk capacity is invalid")
+        if any(key in extra for key in (
+                "spark_cache_max_bytes", "spark_cache_low_watermark_bytes",
+                "spark_cache_ttl_seconds")):
+            raise CheckFailure("operational SparkCache disk capacity is shadowed by its config")
+        disk_env = {"SPARK_CONTEXT_CACHE_MAX_BYTES": str(max_bytes),
+                    "SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES": str(low_bytes)}
+        # The connector's configuration line on every worker proves the applied policy.
+        required_boot_lines.append(
+            f"max_bytes={max_bytes} low_bytes={low_bytes} ttl_seconds=0")
+    configured_disk_env = {
+        key: str(value) for key, value in overrides.get("environment", {}).items()
+        if key in DISK_CAPACITY_ENV
+    }
+    if configured_disk_env != disk_env:
+        raise CheckFailure("operational SparkCache disk capacity and environment disagree")
     if overrides.get("all_rank_boot_lines") != required_boot_lines:
         raise CheckFailure("operational SparkCache boot lines do not match protection values")
     runtime["all_rank_boot_lines"] = required_boot_lines
@@ -557,11 +589,12 @@ def expected_operational(identity_path: Path = IDENTITY) -> dict[str, Any]:
     if not isinstance(runtime_sources, list):
         raise CheckFailure("operational identity runtime sources must be a list")
     recipe_mounts: dict[str, str] = {}
-    allowed_targets = {
+    required_targets = {
         "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py",
         "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py",
         "/opt/tp4/tp4_admission.py",
     }
+    allowed_targets = required_targets | set(E35_TARGETS) | set(E36_TARGETS)
     for source in runtime_sources:
         try:
             path = REPO / source["path"]
@@ -580,8 +613,29 @@ def expected_operational(identity_path: Path = IDENTITY) -> dict[str, Any]:
     source_override_targets = set(overrides.get("container_file_sha256", {})) & allowed_targets
     if set(recipe_mounts) != source_override_targets:
         raise CheckFailure("operational identity runtime sources do not cover its file overrides")
-    if runtime_sources and set(recipe_mounts) != allowed_targets:
+    if runtime_sources and not required_targets <= set(recipe_mounts):
         raise CheckFailure("operational identity runtime source set is incomplete")
+    # E35 is one selection: its runner, speculator, scheduler copy and policy file come
+    # together with its two variables, or none of them does.
+    e35_sources = set(recipe_mounts) & set(E35_TARGETS)
+    e35_env = {key: str(value) for key, value in overrides.get("environment", {}).items()
+               if key in E35_ENV}
+    if e35_sources and (e35_sources != set(E35_TARGETS) or e35_env != E35_REQUIRED_ENV):
+        raise CheckFailure("operational identity E35 selection is incomplete")
+    if not e35_sources and (e35_env or set(overrides.get("container_file_sha256", {}))
+                            & set(E35_TARGETS)):
+        raise CheckFailure("operational identity E35 selection is incomplete")
+    # E36 (the INT8 shared lm_head) needs E35's runner mount: its module and its two serving
+    # variables come together, and its measurement-only flag is never part of an identity.
+    e36_sources = set(recipe_mounts) & set(E36_TARGETS)
+    e36_env = {key: str(value) for key, value in overrides.get("environment", {}).items()
+               if key in E36_ENV}
+    if e36_sources and (e36_sources != set(E36_TARGETS) or e36_env != E36_REQUIRED_ENV
+                        or not e35_sources):
+        raise CheckFailure("operational identity E36 selection is incomplete")
+    if not e36_sources and (e36_env or set(overrides.get("container_file_sha256", {}))
+                            & set(E36_TARGETS)):
+        raise CheckFailure("operational identity E36 selection is incomplete")
     expected["recipe_mounts"] = recipe_mounts
 
     admission = identity_record.get("api_admission")
@@ -611,9 +665,19 @@ def expected_operational(identity_path: Path = IDENTITY) -> dict[str, Any]:
             path = REPO / artifact["path"]
             if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != artifact["sha256"]:
                 raise CheckFailure(f"operational identity {field} hash mismatch")
+    # A return identity pins its delta together with the template it is sourced over; the
+    # delta must leave the template's engine arguments unchanged.
+    recipe_artifact = identity_record.get("recipe")
+    template = recipe_artifact.get("template") if isinstance(recipe_artifact, dict) else None
+    if template is not None:
+        template_path = REPO / str(template.get("path") if isinstance(template, dict) else "")
+        if (not isinstance(template, dict) or template.get("path") != "cluster.env.example"
+                or not template_path.is_file()
+                or hashlib.sha256(template_path.read_bytes()).hexdigest() != template.get("sha256")):
+            raise CheckFailure("operational identity recipe template hash mismatch")
     expected["direct_operational_recipe"] = (
-        isinstance(identity_record.get("recipe"), dict)
-        and identity_record["recipe"].get("path") == "cluster.env.example"
+        isinstance(recipe_artifact, dict)
+        and (recipe_artifact.get("path") == "cluster.env.example" or template is not None)
     )
     expected["sparkcache_protection"] = {
         key: cache[key] for key in (
@@ -662,6 +726,22 @@ def docker_mounts(value: str) -> dict[str, list[str]]:
     return result
 
 
+def docker_mount_options(value: str) -> dict[str, list[str]]:
+    """Option field of every -v/--volume pair by target ("" when the pair has none)."""
+    tokens, result, index = shlex.split(value), {}, 0
+    while index < len(tokens):
+        item, volume = tokens[index], ""
+        if item in ("-v", "--volume") and index + 1 < len(tokens):
+            index += 1; volume = tokens[index]
+        elif item.startswith("--volume="):
+            volume = item.split("=", 1)[1]
+        fields = volume.split(":")
+        if len(fields) >= 2 and fields[0] and fields[1]:
+            result.setdefault(fields[1], []).append(":".join(fields[2:]))
+        index += 1
+    return result
+
+
 def adaptive_env(value: str) -> dict[str, str]:
     parsed = docker_env(value)
     return {key: parsed.get(key, default) for key, default in ADAPTIVE_DEFAULTS.items()}
@@ -673,16 +753,40 @@ SCHEDULER_FLAGS = ("VLLM_E27B_SHORT_PREFILL_TOKENS", "VLLM_E27C_CADENCE_WHEN_QUE
                    "VLLM_E29_END_DRAIN", "VLLM_E29_IDLE_COALESCE_MS", "VLLM_E29_TRACE",
                    "VLLM_GLM53_INDEXER_GATE_TC", "VLLM_GLM53_KPOOL_TAIL_RING",
                    "VLLM_GLM53_INDEXER_GATE_TC_FLAG", "VLLM_GLM53_KPOOL_TAIL_RING_FLAG")
+# SparkCache reads its disk capacity from these variables while its JSON leaves the keys unset.
+DISK_CAPACITY_ENV = (
+    "SPARK_CONTEXT_CACHE_MAX_BYTES", "SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES",
+    "SPARK_CONTEXT_CACHE_TTL_SECONDS",
+)
+# The E35 verify-length selection: the V2 runner and DFlash2 speculator with their additions,
+# the adaptive-k scheduler copy and the read-only policy file, with its two variables.
+E35_TARGETS = (
+    "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu/model_runner.py",
+    "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu/spec_decode/dflash2/speculator.py",
+    "/opt/tp4/adaptive_k_scheduler.py",
+    "/tmp/glm53-e35-policy",
+)
+E35_REQUIRED_ENV = {"VLLM_E35_ENABLE": "1", "VLLM_E35_POLICY_FLAG": "/tmp/glm53-e35-policy"}
+E35_ENV = tuple(E35_REQUIRED_ENV)
+# The E36 INT8 shared lm_head: its conversion module (the runner is E35's target with the E36
+# copy's bytes) and its two serving variables; VLLM_E36_FLAG belongs to fidelity measurement.
+E36_TARGETS = (
+    "/usr/local/lib/python3.12/dist-packages/vllm/models/glm5next/nvidia/e36_lm_head_w8a16.py",
+)
+E36_REQUIRED_ENV = {"VLLM_E36_LM_HEAD_W8A16": "1", "VLLM_E36_KEEP_BF16": "0"}
+E36_ENV = (*E36_REQUIRED_ENV, "VLLM_E36_FLAG")
 CANDIDATE_ENV = (
     "VLLM_PREFILL_CACHE_TRIM", "VLLM_RESILIENCE_STEP_TOKEN_CAP",
     "TP4_ADMISSION_MAX_ACTIVE", "TP4_ADMISSION_MAX_QUEUED", "TP4_ADMISSION_MAX_BODY_BYTES",
     "TP4_ADMISSION_QUEUE_TIMEOUT_SECONDS", "TP4_ADMISSION_REQUEST_TIMEOUT_SECONDS",
     "TP4_ADMISSION_BODY_IDLE_SECONDS", "TP4_ADMISSION_SEND_IDLE_SECONDS",
+    *DISK_CAPACITY_ENV, *E35_ENV, *E36_ENV,
 )
 CANDIDATE_MOUNTS = (
     "/opt/tp4/tp4_admission.py",
     "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu_worker.py",
     "/usr/local/lib/python3.12/dist-packages/vllm/v1/core/sched/scheduler.py",
+    *E35_TARGETS, *E36_TARGETS,
 )
 
 
@@ -796,14 +900,18 @@ def recipe_problems(recipe: dict[str, str], expected: dict[str, Any]) -> list[st
     for key in CANDIDATE_ENV:
         if key in raw_env and key not in expected.get("required_runtime_environment", {}):
             problems.append("baseline runtime environment: unexpected " + key)
+    options = docker_mount_options(recipe.get("extra_docker_env", ""))
     for target in CANDIDATE_MOUNTS:
         wanted = expected.get("recipe_mounts", {}).get(target)
         actual = mounts.get(target, [])
         if wanted is not None and actual != [wanted]:
             problems.append("operational runtime mount: " + target)
+        elif wanted is not None and target in (*E35_TARGETS, *E36_TARGETS) and options.get(target) != ["ro"]:
+            problems.append("operational runtime mount: read-only " + target)
         elif wanted is None and actual and (
-                target == "/opt/tp4/tp4_admission.py"
+                target == "/opt/tp4/tp4_admission.py" or target in E36_TARGETS
                 or any("/prefill-cache-trim/" in source or "/prefill-step-cap/" in source
+                       or "/e35-runner-k/" in source or "/e36-lm-head-w8a16/" in source
                        for source in actual)):
             problems.append("baseline runtime mount: unexpected " + target)
     if any(target.startswith("/opt/tp4-resilience/")
@@ -960,6 +1068,10 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
             problems.append(f"rank {rank}: command --middleware")
         admission_mounted = "/opt/tp4/tp4_admission.py" in container.get(
             "candidate_mount_targets", [])
+        for target in E36_TARGETS:
+            if (target in container.get("candidate_mount_targets", [])
+                    and target not in expected.get("recipe_mounts", {})):
+                problems.append(f"rank {rank}: unexpected mount {target}")
         if admission_mounted != bool(middleware):
             problems.append(f"rank {rank}: admission middleware mount")
         running_kv_config = container.get("kv_transfer_config")
@@ -1007,6 +1119,10 @@ def evaluate(recipe: dict[str, str], expected: dict[str, Any], ranks: list[dict[
         for path, sha in identity.get("container_file_sha256", {}).items():
             if container.get("runtime_files", {}).get(path) != sha:
                 problems.append(f"rank {rank}: runtime file {path}")
+        for target in (*E35_TARGETS, *E36_TARGETS):
+            if (target in expected.get("recipe_mounts", {})
+                    and (container.get("mount_rw") or {}).get(target) is not False):
+                problems.append(f"rank {rank}: read-only mount {target}")
         receipts = container.get("runtime_receipts") or {}
         if (rank == 0 and identity.get("scheduler_boot_signature")
                 and not receipts.get("scheduler_boot_signature")):

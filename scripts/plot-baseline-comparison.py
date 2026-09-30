@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Compare two frozen Rigmark measurements; requires matplotlib==3.11.2.
 
-By default, compares E31 with the E29-equivalent arm measured on the same load with
-the same upstream Rigmark flags; both come from the E31 record. `--comparison
-e29-vs-e28b` reproduces the archived E29 versus E28b figures (old protocol).
+By default, compares the current E36 record with the previous E35 record (two suites each,
+upstream Rigmark with the reference flags, different loads). `--comparison e31-same-load`
+reproduces the E31 figures (E31 against its same-load E29-equivalent arm) and `--comparison
+e29-vs-e28b` the archived E29 versus E28b figures (old protocol).
 Reads all 16 saved metrics. No benchmark requests are sent.
 """
 
@@ -20,6 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 E31_BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-28-e31/baseline.json"
 E29_BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-25-e29/baseline.json"
 E28B_BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-25-e28b/baseline.json"
+E35_BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-30-e35/baseline.json"
+E36_BASELINE = ROOT / "docs/historical_benchmarks/baselines/2026-09-30-e36/baseline.json"
 TEAL, INK, MUTED = "#087f74", "#172b46", "#536478"
 PREVIOUS_COLOR = "#92a5ba"
 # Match the owner's descriptive convention in the accepted reports: within about the
@@ -44,6 +47,20 @@ COLD = [(f"prefill_{depth}k_cold_throughput", f"{depth}K tokens") for depth in (
 REPLAY = [(f"prefill_{depth}k_replay_throughput", f"{depth}K tokens") for depth in (8, 32, 64)]
 
 COMPARISONS = {
+    "e36-vs-e35": {
+        "output_dir": ROOT / "docs/plots/comparisons/2026-09-30-e36-vs-2026-09-30-e35",
+        "titles": ("Generation: E36 vs the previous E35 baseline", "Prefill: E36 vs the previous E35 baseline"),
+        "subtitle": ("GLM-5.3-Flash · Four GB10 nodes · E36 INT8 shared lm_head over E35 · "
+                     "Upstream Rigmark, Alex Ellis's reference flags"),
+        "delta_heading": "Δ vs E35",
+        "approx_unchanged": APPROX_UNCHANGED,
+        "float_labels": False,
+        "footer": ("Δ = (E36 / E35 − 1) × 100, calculated from unrounded frozen medians.",
+                   "Each record holds two suites (n = 2) on its own load; ≈ unchanged marks changes of about 2%, "
+                   "not a statistical test."),
+        "prefill_note": ("Cold prefill is isolated by a fresh comparison ID per suite; replay reuses the prefix "
+                         "within each suite. K = 1,024 tokens."),
+    },
     "e31-same-load": {
         "output_dir": ROOT / "docs/plots/comparisons/2026-09-28-e31-vs-e29-same-load",
         "titles": ("Generation: E31 vs the same-load E29-equivalent arm",
@@ -196,13 +213,17 @@ def figure(output_dir, name, title, panels, current, previous, captions, note, p
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--comparison", choices=sorted(COMPARISONS), default="e31-same-load")
+    parser.add_argument("--comparison", choices=sorted(COMPARISONS), default="e36-vs-e35")
     parser.add_argument("--output-dir", type=Path)
     args = parser.parse_args()
     profile = COMPARISONS[args.comparison]
     output_dir = args.output_dir or profile["output_dir"]
     if args.comparison == "e31-same-load":
         current, previous, captions = read_same_load(E31_BASELINE)
+    elif args.comparison == "e36-vs-e35":
+        current, current_caption = read_baseline(E36_BASELINE, "Current E36")
+        previous, previous_caption = read_baseline(E35_BASELINE, "Previous E35")
+        captions = previous_caption, current_caption
     else:
         current, current_caption = read_baseline(E29_BASELINE, "Current E29")
         previous, previous_caption = read_baseline(E28B_BASELINE, "Previous E28b")

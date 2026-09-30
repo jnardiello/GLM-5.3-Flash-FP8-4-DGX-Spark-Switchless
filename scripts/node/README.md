@@ -46,6 +46,9 @@ reference's later capture.
 | shared `scripts/node/etc/common/` files | `/etc/sysctl.d/`, `/etc/sudoers.d/`, `/usr/local/sbin/`, `/etc/systemd/system/` | bootstrap/deploy-host |
 | GRUB drop-in | `/etc/default/grub.d/zz-tp4-perf.cfg` | bootstrap/deploy-host and `tp4-iommu.sh` |
 | built NCCL library | `$NCCL_DIR/libnccl.so.2` | `scripts/node/nccl/install-nccl.sh` |
+| one-step E35 return (no E36) selected through `TP4_ENV` | `~/tp4/scripts/node/reference/operational-20260930-e35.env` | `scripts/deploy.sh` |
+| E31-MB return (no E36, no E35) selected through `TP4_ENV` | `~/tp4/scripts/node/reference/operational-20260930-e31-mb.env` | `scripts/deploy.sh` |
+| memory-bounded return (no E35, no SparkCache disk limit) selected through `TP4_ENV` | `~/tp4/scripts/node/reference/operational-20260929-memory-bounded.env` | `scripts/deploy.sh` |
 | immediate protected 16 GiB rollback selected through `TP4_ENV` | `~/tp4/scripts/node/reference/operational-20260929-sparkcache-protected.env` | `scripts/deploy.sh` |
 | historical E31 cache-behavior rollback selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260928-e31.env` | `scripts/deploy.sh` |
 | E29 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/baseline-20260925-e29.env` | `scripts/deploy.sh` |
@@ -60,7 +63,7 @@ reference's later capture.
 | `reference/model-20260918.py` and `reference/sparkcache-20260918.json` | `~/tp4/reference/` | `scripts/deploy.sh` |
 | September 11 reference overlay selected through `TP4_ENV` | `~/tp4/scripts/node/reference/f0-20260912.env` | `scripts/deploy.sh` |
 | Frozen `reference/tp4ctl-f0-20260912.sh` controller | `~/tp4/tp4ctl-f0-reference` | `scripts/deploy.sh` |
-| `scripts/node/experiments/e03/` Python, JSON and source manifests | `~/tp4/experiments/e03/` (same relative layout) | `scripts/deploy.sh` |
+| `scripts/node/experiments/e03/` Python, JSON, `*.flag` policy files and source manifests | `~/tp4/experiments/e03/` (same relative layout) | `scripts/deploy.sh` |
 | `scripts/node/overrides/**/*.py` | `~/tp4/overrides/…` (same relative layout) | `scripts/deploy.sh` |
 | `scripts/node/sparkcache/kv-transfer-config.json` and `SHA256SUMS` | `~/tp4/sparkcache/` | `scripts/deploy.sh` |
 | `scripts/node/sircl/SHA256SUMS` and the gitignored per-site `SHA256SUMS.site` | `~/tp4/sircl/` | `scripts/deploy.sh` |
@@ -74,11 +77,17 @@ script activates `/etc` state only under `--apply`; it never reboots a node.
 
 ## Current engine and cache payload
 
-The current recipe mounts 22 vLLM modules: retained cache allocation, worker/probe,
+The current recipe mounts 25 vLLM modules: retained cache allocation, worker/probe,
 hybrid-KDA sources, the E31 pooled indexer and C4 kernels from
 [`experiments/e03/e31-indexer/`](experiments/e03/e31-indexer/README.md), the E03 model and mHC per-call sharding modules, the
 E21 residual-projection module, the E22b drafter override and conversion module, and the
-E29 scheduler and engine core from [`experiments/e03/end-drain/`](experiments/e03/end-drain/README.md).
+E29 scheduler and engine core from [`experiments/e03/end-drain/`](experiments/e03/end-drain/README.md),
+the E35 DFlash2 speculator from
+[`experiments/e03/e35-runner-k/`](experiments/e03/e35-runner-k/README.md), which also holds
+the E35 copy of the adaptive-k scheduler mounted at `/opt/tp4/adaptive_k_scheduler.py` and the
+read-only `policy.flag` mounted at `/tmp/glm53-e35-policy`, and the E36 V2 model runner (the
+E35 runner plus the load-time `lm_head` conversion) and its conversion module from
+[`experiments/e03/e36-lm-head-w8a16/`](experiments/e03/e36-lm-head-w8a16/README.md).
 The E29 scheduler is the E27c scheduler from
 [`experiments/e03/queued-cadence/`](experiments/e03/queued-cadence/README.md) plus one
 additions-only patch; the launcher verifies each directory's `SHA256SUMS` whenever it is mounted. The KDA hook is mounted from
@@ -138,7 +147,13 @@ are pinned by the operational identity. Preserve the measured E31 rollback JSON 
 `experiments/e03/drafter-w8a16/kv-transfer-config-e22b.json`, separate from the E21, E03
 and earlier cache computations. Each namespace spelling is part of its config hash.
 
-For the immediate operational return, use
+The default's SparkCache disk capacity is two `EXTRA_DOCKER_ENV` variables, not JSON keys;
+[`reference/operational-20260929-memory-bounded.env`](reference/operational-20260929-memory-bounded.env)
+removes exactly that pair together with the E36 and E35 selections,
+[`reference/operational-20260930-e31-mb.env`](reference/operational-20260930-e31-mb.env) removes
+the E36 and E35 selections, and
+[`reference/operational-20260930-e35.env`](reference/operational-20260930-e35.env) removes only
+the E36 selection. For the immediate complete operational return, use
 [`reference/operational-20260929-sparkcache-protected.env`](reference/operational-20260929-sparkcache-protected.env).
 It preserves the protected connector and its cache-memory limits, restores the 16 GiB KV
 pool, and removes allocator trim, the step cap and API admission. It is not the complete

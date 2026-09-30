@@ -1,0 +1,5 @@
+{
+  "schema": 1,
+  "date": "2026-09-30",
+  "decision": "Promote the E35 `hybrid` verify length to the operational default. On native Rigmark with the reference flags the owner judged the prose decode change (-1.5%) to be noise and the lower decode time to first token (about 30 ms in both `hybrid` suites) to be real. The default selects `hybrid` through a read-only policy file; the measured code bytes are unchanged. Freeze the two `hybrid` suites P2 and P3 of the E35 A-P-P-A series as the E35 performance record. An initial discard the same day was reversed by this decision."
+}

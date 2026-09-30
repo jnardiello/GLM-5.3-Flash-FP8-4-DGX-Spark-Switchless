@@ -17,6 +17,8 @@
      "role": "descriptive"},
     {"name": "n-vs-cm", "type": "pair", "ref": "Cm/prompt-a", "cand": "N/prompt-a", "floor": "floor-r0",
      "role": "descriptive"},
+    {"name": "le36-vs-cnow", "type": "pair", "ref": "Cnow/prompt-a", "cand": "LE36/prompt-a", "floor": "floor-r0",
+     "role": "e36-gate"},
     {"name": "k-cm-vs-r0", "type": "k_sensitivity", "ref": "R0/prompt-k100", "cand": "Cm/prompt-k100",
      "k_low": 20, "subset": "subsets/k100.txt"},
     {"name": "ladder", "type": "ladder", "subset": "subsets/ladder.txt", "regime": "dense", "floor": "floor-r0",
@@ -43,6 +45,7 @@
        "subset": "subsets/crossboot.txt"},
       {"name": "cpre-a-vs-rep2", "ref": "Cpre/prompt-a", "cand": "Cpre/prompt-rep2",
        "subset": "subsets/crossboot.txt"},
-      {"name": "n-a-vs-rep2", "ref": "N/prompt-a", "cand": "N/prompt-rep2", "subset": "subsets/crossboot.txt"}]}
+      {"name": "n-a-vs-rep2", "ref": "N/prompt-a", "cand": "N/prompt-rep2", "subset": "subsets/crossboot.txt"},
+      {"name": "cm-a-vs-cnow-a", "ref": "Cm/prompt-a", "cand": "Cnow/prompt-a"}]}
   ]
 }

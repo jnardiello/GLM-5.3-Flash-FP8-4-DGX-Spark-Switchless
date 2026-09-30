@@ -1,0 +1,671 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "experiment_id": "2026-09-30-e35-runner-k",
+  "title": "E35: verify length decided in the model runner from the DFlash2 selector's confidence",
+  "outcome": "promote",
+  "outcome_detail": "Owner decision after the A-P-P-A suites. The `hybrid` policy passed the frozen held-out screen with thinking off (short tasks +5.1%, 9/10). On native Rigmark with the reference flags (reasoning effort low) code decode (+0.1%) and C1 (+1.8%) stayed within the arm A drift (+0.9%, +1.9%), prose decode was -1.5% and decode TTFT about 30 ms lower in both P suites. The owner judged the prose change to be noise and the TTFT gain real, and promoted `hybrid` as the default through a read-only policy file (the measured code bytes are unchanged).",
+  "reference": {
+    "operational_identity": "2026-09-30-e31-mb",
+    "operational_identity_sha256": "385a68ca4451277fcf445a82cee40b8125d7f075301f99ff56d0fbfccaa2d9c1",
+    "performance_baseline_id": "2026-09-30-e31-mb",
+    "comparison": "same-load arm A (policy `ema`, the default's verify length with the overlay loaded)"
+  },
+  "candidate": {
+    "change": "Wrappers of the V2 model runner's execute_model() and the DFlash2 speculator's propose(), plus the E31-MB adaptive-k scheduler with one addition. On a decode step with one request and seven scheduled drafts, tensor-parallel rank 0 chooses to verify 3 or 7 drafts from the selector's per-position confidence (isotonic survival calibration, 58/81 ms step costs), broadcasts the choice over the tensor-parallel CPU group, and every rank runs a trimmed copy of the scheduler output; trimmed drafts count as rejected. A flag file selects `ema` (no trim), `lag1` (previous draft, no wait) or `hybrid` (waits for the current draft when the rule's margin is below 0.005). Under `lag1`/`hybrid` the scheduler schedules seven drafts for single-request steps.",
+    "source_sha256": {
+      "scripts/node/experiments/e03/e35-runner-k/model_runner.py": "4aa67bc0379d1e39649b7eb5297f247eaa0ad7597ed087e876dc81a4075e2e36",
+      "scripts/node/experiments/e03/e35-runner-k/speculator.py": "553d3e7b33482a93f72ed116e0e8d8b5bf2070313a7ad4aa5be9d83c4167bad5",
+      "scripts/node/experiments/e03/e35-runner-k/adaptive_k_scheduler.py": "89dbca0f780911aae3f5f5b3954237a9271a30cc9905d56f70705e77696b8ef8"
+    },
+    "parents": {
+      "vllm/v1/worker/gpu/model_runner.py (serving image)": "f232398c93cf3193166136e823343840a41ebde8669253f56ce63a0023930cb4",
+      "vllm/v1/worker/gpu/spec_decode/dflash2/speculator.py (serving image)": "1f6ff5ca9c8f38ff417aafd43bfa3116b5387bf0f7b58721acb2185781879836",
+      "scripts/node/experiments/e03/draft-budget/adaptive_k_scheduler.py": "697f99bf1951535dcc3381776fa744ad8204d83d2606f341b617bac7a31949b4"
+    },
+    "calibration": "fitted on the E33 thinking-off captures; the held-out tasks were frozen beforehand"
+  },
+  "protocol": {
+    "rigmark_source": "alexellis/rigmark c5a0db0 (upstream, unmodified)",
+    "flags": "Rigmark defaults plus --extra-body '{\"chat_template_kwargs\": {\"reasoning_effort\": \"low\"}}'; no cache_salt; fresh --comparison-id per suite",
+    "series": "A-P-P-A on one load, switched at runtime; A = `ema`, P = `hybrid`",
+    "aggregation": "per-suite native medians; arm value = mean of its two suites; A4-vs-A1 drift as the noise reference"
+  },
+  "coverage": {
+    "loads": 1,
+    "suites": 4,
+    "suite_requests": 216,
+    "heldout_screen_arms": 4,
+    "heldout_screen_requests": 100
+  },
+  "client_transport": "direct LAN HTTP to the rank-0 API",
+  "runs": [
+    {
+      "run": "run-1",
+      "arm": "A",
+      "comparison_id": "glm53-e35-suite-20260930-s1-113026",
+      "receipt_sha256": "115a0529f4bf352b91cbddde36a7e86923ebbda2fb092a0821eaad34d707bf8a",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-30-e35-runner-k/run-1.json",
+        "sha256": "958361e796ba7e958c55439ff99fa101be1e18e7478aa7d4930cf455badffe3f"
+      },
+      "memory_guard_tripped": false,
+      "min_mem_available_gib_by_rank": {
+        "0": 4.77,
+        "1": 9.907,
+        "2": 9.843,
+        "3": 9.879
+      }
+    },
+    {
+      "run": "run-2",
+      "arm": "P",
+      "comparison_id": "glm53-e35-suite-20260930-s2-113919",
+      "receipt_sha256": "0d33867f79608a561bc62678264cee9568ad0777188ebc16dd83c5177d74c5cb",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-30-e35-runner-k/run-2.json",
+        "sha256": "215f157584cdf85d1a884bf579beb36b712834df04bfaf60acc331cb209bbf52"
+      },
+      "memory_guard_tripped": false,
+      "min_mem_available_gib_by_rank": {
+        "0": 4.761,
+        "1": 9.818,
+        "2": 9.769,
+        "3": 9.771
+      }
+    },
+    {
+      "run": "run-3",
+      "arm": "P",
+      "comparison_id": "glm53-e35-suite-20260930-s3-114819",
+      "receipt_sha256": "9d2ce22865e1afe6a4f17b5493ba7e5650fc0b4bbb828f1f549db45fbd60c42d",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-30-e35-runner-k/run-3.json",
+        "sha256": "09065628a2bfe589e317e2a18dc379c15e2e21a51604a3e450141de94c73275c"
+      },
+      "memory_guard_tripped": false,
+      "min_mem_available_gib_by_rank": {
+        "0": 4.759,
+        "1": 9.768,
+        "2": 9.763,
+        "3": 9.727
+      }
+    },
+    {
+      "run": "run-4",
+      "arm": "A",
+      "comparison_id": "glm53-e35-suite-20260930-s4-115712",
+      "receipt_sha256": "ceb77bd482dae38cdce0a46947c257eb169282b5bb46b0cbba49523825b4655e",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-30-e35-runner-k/run-4.json",
+        "sha256": "04bd0de858c0c903d17957f32e9a18d913ef166d0a83fb70c8e438f398610467"
+      },
+      "memory_guard_tripped": false,
+      "min_mem_available_gib_by_rank": {
+        "0": 4.749,
+        "1": 9.774,
+        "2": 9.759,
+        "3": 9.725
+      }
+    }
+  ],
+  "performance_metrics": [
+    {
+      "key": "decode_code_tok_s",
+      "per_suite": {
+        "run-1": 63.739,
+        "run-2": 63.428,
+        "run-3": 64.784,
+        "run-4": 64.295
+      },
+      "arm_mean_A": 64.017,
+      "arm_mean_P": 64.106,
+      "change_pct_P_vs_A": 0.139,
+      "drift_pct_A4_vs_A1": 0.872
+    },
+    {
+      "key": "decode_code_ttft_s",
+      "per_suite": {
+        "run-1": 0.489,
+        "run-2": 0.457,
+        "run-3": 0.457,
+        "run-4": 0.488
+      },
+      "arm_mean_A": 0.4885,
+      "arm_mean_P": 0.457,
+      "change_pct_P_vs_A": -6.448,
+      "drift_pct_A4_vs_A1": -0.204
+    },
+    {
+      "key": "decode_prose_tok_s",
+      "per_suite": {
+        "run-1": 33.833,
+        "run-2": 33.206,
+        "run-3": 33.64,
+        "run-4": 34.002
+      },
+      "arm_mean_A": 33.9175,
+      "arm_mean_P": 33.423,
+      "change_pct_P_vs_A": -1.458,
+      "drift_pct_A4_vs_A1": 0.5
+    },
+    {
+      "key": "decode_prose_ttft_s",
+      "per_suite": {
+        "run-1": 0.394,
+        "run-2": 0.388,
+        "run-3": 0.386,
+        "run-4": 0.397
+      },
+      "arm_mean_A": 0.3955,
+      "arm_mean_P": 0.387,
+      "change_pct_P_vs_A": -2.149,
+      "drift_pct_A4_vs_A1": 0.761
+    },
+    {
+      "key": "decode_structured_tok_s",
+      "per_suite": {
+        "run-1": 94.108,
+        "run-2": 93.048,
+        "run-3": 92.473,
+        "run-4": 94.174
+      },
+      "arm_mean_A": 94.141,
+      "arm_mean_P": 92.7605,
+      "change_pct_P_vs_A": -1.466,
+      "drift_pct_A4_vs_A1": 0.07
+    },
+    {
+      "key": "decode_structured_ttft_s",
+      "per_suite": {
+        "run-1": 0.467,
+        "run-2": 0.447,
+        "run-3": 0.431,
+        "run-4": 0.461
+      },
+      "arm_mean_A": 0.464,
+      "arm_mean_P": 0.439,
+      "change_pct_P_vs_A": -5.388,
+      "drift_pct_A4_vs_A1": -1.285
+    },
+    {
+      "key": "prefill_8192_cold_tok_s",
+      "per_suite": {
+        "run-1": 2633.345,
+        "run-2": 2618.235,
+        "run-3": 2622.791,
+        "run-4": 2633.701
+      },
+      "arm_mean_A": 2633.523,
+      "arm_mean_P": 2620.513,
+      "change_pct_P_vs_A": -0.494,
+      "drift_pct_A4_vs_A1": 0.014
+    },
+    {
+      "key": "prefill_8192_cold_ttft_s",
+      "per_suite": {
+        "run-1": 3.111,
+        "run-2": 3.129,
+        "run-3": 3.123,
+        "run-4": 3.11
+      },
+      "arm_mean_A": 3.1105,
+      "arm_mean_P": 3.126,
+      "change_pct_P_vs_A": 0.498,
+      "drift_pct_A4_vs_A1": -0.032
+    },
+    {
+      "key": "prefill_8192_replay_tok_s",
+      "per_suite": {
+        "run-1": 9052.004,
+        "run-2": 8720.135,
+        "run-3": 8897.887,
+        "run-4": 8836.842
+      },
+      "arm_mean_A": 8944.423,
+      "arm_mean_P": 8809.011,
+      "change_pct_P_vs_A": -1.514,
+      "drift_pct_A4_vs_A1": -2.377
+    },
+    {
+      "key": "prefill_8192_replay_ttft_s",
+      "per_suite": {
+        "run-1": 0.905,
+        "run-2": 0.939,
+        "run-3": 0.921,
+        "run-4": 0.927
+      },
+      "arm_mean_A": 0.916,
+      "arm_mean_P": 0.93,
+      "change_pct_P_vs_A": 1.528,
+      "drift_pct_A4_vs_A1": 2.431
+    },
+    {
+      "key": "prefill_32768_cold_tok_s",
+      "per_suite": {
+        "run-1": 2754.044,
+        "run-2": 2761.833,
+        "run-3": 2765.488,
+        "run-4": 2772.856
+      },
+      "arm_mean_A": 2763.45,
+      "arm_mean_P": 2763.6605,
+      "change_pct_P_vs_A": 0.008,
+      "drift_pct_A4_vs_A1": 0.683
+    },
+    {
+      "key": "prefill_32768_cold_ttft_s",
+      "per_suite": {
+        "run-1": 11.898,
+        "run-2": 11.865,
+        "run-3": 11.849,
+        "run-4": 11.817
+      },
+      "arm_mean_A": 11.8575,
+      "arm_mean_P": 11.857,
+      "change_pct_P_vs_A": -0.004,
+      "drift_pct_A4_vs_A1": -0.681
+    },
+    {
+      "key": "prefill_32768_replay_tok_s",
+      "per_suite": {
+        "run-1": 36165.136,
+        "run-2": 36026.765,
+        "run-3": 35913.049,
+        "run-4": 35127.741
+      },
+      "arm_mean_A": 35646.4385,
+      "arm_mean_P": 35969.907,
+      "change_pct_P_vs_A": 0.907,
+      "drift_pct_A4_vs_A1": -2.868
+    },
+    {
+      "key": "prefill_32768_replay_ttft_s",
+      "per_suite": {
+        "run-1": 0.906,
+        "run-2": 0.91,
+        "run-3": 0.912,
+        "run-4": 0.933
+      },
+      "arm_mean_A": 0.9195,
+      "arm_mean_P": 0.911,
+      "change_pct_P_vs_A": -0.924,
+      "drift_pct_A4_vs_A1": 2.98
+    },
+    {
+      "key": "prefill_65536_cold_tok_s",
+      "per_suite": {
+        "run-1": 2776.41,
+        "run-2": 2776.772,
+        "run-3": 2786.362,
+        "run-4": 2787.419
+      },
+      "arm_mean_A": 2781.9145,
+      "arm_mean_P": 2781.567,
+      "change_pct_P_vs_A": -0.012,
+      "drift_pct_A4_vs_A1": 0.397
+    },
+    {
+      "key": "prefill_65536_cold_ttft_s",
+      "per_suite": {
+        "run-1": 23.605,
+        "run-2": 23.602,
+        "run-3": 23.52,
+        "run-4": 23.511
+      },
+      "arm_mean_A": 23.558,
+      "arm_mean_P": 23.561,
+      "change_pct_P_vs_A": 0.013,
+      "drift_pct_A4_vs_A1": -0.398
+    },
+    {
+      "key": "prefill_65536_replay_tok_s",
+      "per_suite": {
+        "run-1": 39548.561,
+        "run-2": 39981.381,
+        "run-3": 40694.544,
+        "run-4": 39576.05
+      },
+      "arm_mean_A": 39562.3055,
+      "arm_mean_P": 40337.9625,
+      "change_pct_P_vs_A": 1.961,
+      "drift_pct_A4_vs_A1": 0.07
+    },
+    {
+      "key": "prefill_65536_replay_ttft_s",
+      "per_suite": {
+        "run-1": 1.657,
+        "run-2": 1.639,
+        "run-3": 1.61,
+        "run-4": 1.656
+      },
+      "arm_mean_A": 1.6565,
+      "arm_mean_P": 1.6245,
+      "change_pct_P_vs_A": -1.932,
+      "drift_pct_A4_vs_A1": -0.06
+    },
+    {
+      "key": "c1_aggregate_tok_s",
+      "per_suite": {
+        "run-1": 44.671,
+        "run-2": 44.758,
+        "run-3": 47.049,
+        "run-4": 45.513
+      },
+      "arm_mean_A": 45.092,
+      "arm_mean_P": 45.9035,
+      "change_pct_P_vs_A": 1.8,
+      "drift_pct_A4_vs_A1": 1.885
+    },
+    {
+      "key": "c1_per_stream_decode_tok_s",
+      "per_suite": {
+        "run-1": 48.171,
+        "run-2": 48.065,
+        "run-3": 50.7,
+        "run-4": 49.108
+      },
+      "arm_mean_A": 48.6395,
+      "arm_mean_P": 49.3825,
+      "change_pct_P_vs_A": 1.528,
+      "drift_pct_A4_vs_A1": 1.945
+    },
+    {
+      "key": "c1_per_stream_ttft_s",
+      "per_suite": {
+        "run-1": 0.425,
+        "run-2": 0.414,
+        "run-3": 0.413,
+        "run-4": 0.431
+      },
+      "arm_mean_A": 0.428,
+      "arm_mean_P": 0.4135,
+      "change_pct_P_vs_A": -3.388,
+      "drift_pct_A4_vs_A1": 1.412
+    },
+    {
+      "key": "c2_aggregate_tok_s",
+      "per_suite": {
+        "run-1": 70.491,
+        "run-2": 73.877,
+        "run-3": 73.714,
+        "run-4": 75.461
+      },
+      "arm_mean_A": 72.976,
+      "arm_mean_P": 73.7955,
+      "change_pct_P_vs_A": 1.123,
+      "drift_pct_A4_vs_A1": 7.051
+    },
+    {
+      "key": "c2_per_stream_decode_tok_s",
+      "per_suite": {
+        "run-1": 39.037,
+        "run-2": 39.597,
+        "run-3": 39.854,
+        "run-4": 40.514
+      },
+      "arm_mean_A": 39.7755,
+      "arm_mean_P": 39.7255,
+      "change_pct_P_vs_A": -0.126,
+      "drift_pct_A4_vs_A1": 3.784
+    },
+    {
+      "key": "c2_per_stream_ttft_s",
+      "per_suite": {
+        "run-1": 0.468,
+        "run-2": 0.467,
+        "run-3": 0.469,
+        "run-4": 0.466
+      },
+      "arm_mean_A": 0.467,
+      "arm_mean_P": 0.468,
+      "change_pct_P_vs_A": 0.214,
+      "drift_pct_A4_vs_A1": -0.427
+    },
+    {
+      "key": "c4_aggregate_tok_s",
+      "per_suite": {
+        "run-1": 108.176,
+        "run-2": 104.798,
+        "run-3": 109.831,
+        "run-4": 108.557
+      },
+      "arm_mean_A": 108.3665,
+      "arm_mean_P": 107.3145,
+      "change_pct_P_vs_A": -0.971,
+      "drift_pct_A4_vs_A1": 0.352
+    },
+    {
+      "key": "c4_per_stream_decode_tok_s",
+      "per_suite": {
+        "run-1": 29.421,
+        "run-2": 28.511,
+        "run-3": 29.706,
+        "run-4": 29.037
+      },
+      "arm_mean_A": 29.229,
+      "arm_mean_P": 29.1085,
+      "change_pct_P_vs_A": -0.412,
+      "drift_pct_A4_vs_A1": -1.305
+    },
+    {
+      "key": "c4_per_stream_ttft_s",
+      "per_suite": {
+        "run-1": 0.552,
+        "run-2": 0.558,
+        "run-3": 0.556,
+        "run-4": 0.556
+      },
+      "arm_mean_A": 0.554,
+      "arm_mean_P": 0.557,
+      "change_pct_P_vs_A": 0.542,
+      "drift_pct_A4_vs_A1": 0.725
+    }
+  ],
+  "integrity": {
+    "requests": 216,
+    "decode_gates_passed": 60,
+    "decode_gates_total": 60,
+    "decode_finish_reasons": "stop in all decode runs",
+    "errors": 0,
+    "e35_decision_errors": 0,
+    "external_requests_during_screen_and_suites": 0
+  },
+  "e35_decisions_rank0": {
+    "run-1": {
+      "participating_steps_approx": 2200,
+      "k3": 0,
+      "k7": 2200,
+      "k3_share_pct": 0.0,
+      "decided_from_previous_draft": 0,
+      "waited_for_current_draft": 0,
+      "no_confidence_available": 0,
+      "left_to_ema": 2200,
+      "errors": 0,
+      "wait_ms_p50": null,
+      "broadcast_ms_p50": 1.495,
+      "broadcast_ms_p90": 2.441
+    },
+    "run-2": {
+      "participating_steps_approx": 5200,
+      "k3": 3433,
+      "k7": 1767,
+      "k3_share_pct": 66.0,
+      "decided_from_previous_draft": 4459,
+      "waited_for_current_draft": 641,
+      "no_confidence_available": 0,
+      "left_to_ema": 100,
+      "errors": 0,
+      "wait_ms_p50": 4.675,
+      "broadcast_ms_p50": 1.185,
+      "broadcast_ms_p90": 2.181
+    },
+    "run-3": {
+      "participating_steps_approx": 5000,
+      "k3": 3402,
+      "k7": 1598,
+      "k3_share_pct": 68.0,
+      "decided_from_previous_draft": 4387,
+      "waited_for_current_draft": 613,
+      "no_confidence_available": 0,
+      "left_to_ema": 0,
+      "errors": 0,
+      "wait_ms_p50": 4.476,
+      "broadcast_ms_p50": 1.141,
+      "broadcast_ms_p90": 2.394
+    },
+    "run-4": {
+      "participating_steps_approx": 2400,
+      "k3": 59,
+      "k7": 2341,
+      "k3_share_pct": 2.5,
+      "decided_from_previous_draft": 73,
+      "waited_for_current_draft": 13,
+      "no_confidence_available": 0,
+      "left_to_ema": 2314,
+      "errors": 0,
+      "wait_ms_p50": null,
+      "broadcast_ms_p50": 1.365,
+      "broadcast_ms_p90": 2.309
+    }
+  },
+  "heldout_screen": {
+    "design": "25 frozen held-out requests per arm (10 short code tasks x 2 repetitions at 256 tokens, 2 long code and 3 prose tasks at 8,192), one at a time, thinking off, arms ema / lag1 / hybrid / ema on the same load; per-request decode tok/s, per-task mean, compared with the mean of the two ema arms",
+    "gate": "short median >= +2% with >= 7/10 tasks improving; long and prose medians >= -1.5%",
+    "ema_drift_arm4_vs_arm1": {
+      "short": {
+        "median_task_change_pct": 0.42,
+        "tasks_improving": 5,
+        "tasks": 10
+      },
+      "long": {
+        "median_task_change_pct": 4.6,
+        "tasks_improving": 2,
+        "tasks": 2
+      },
+      "prose": {
+        "median_task_change_pct": 0.8,
+        "tasks_improving": 2,
+        "tasks": 3
+      }
+    },
+    "lag1": {
+      "per_kind_vs_ema_mean": {
+        "short": {
+          "median_task_change_pct": 1.96,
+          "tasks_improving": 7,
+          "tasks": 10
+        },
+        "long": {
+          "median_task_change_pct": 3.48,
+          "tasks_improving": 2,
+          "tasks": 2
+        },
+        "prose": {
+          "median_task_change_pct": 3.48,
+          "tasks_improving": 3,
+          "tasks": 3
+        }
+      },
+      "gate_pass": false,
+      "errors": 0
+    },
+    "hybrid": {
+      "per_kind_vs_ema_mean": {
+        "short": {
+          "median_task_change_pct": 5.13,
+          "tasks_improving": 9,
+          "tasks": 10
+        },
+        "long": {
+          "median_task_change_pct": 2.64,
+          "tasks_improving": 2,
+          "tasks": 2
+        },
+        "prose": {
+          "median_task_change_pct": 4.31,
+          "tasks_improving": 3,
+          "tasks": 3
+        }
+      },
+      "gate_pass": true,
+      "errors": 0
+    },
+    "decisions_rank0": {
+      "1-ema": {
+        "participating_steps_approx": 2600,
+        "k3": 0,
+        "k7": 2600,
+        "k3_share_pct": 0.0,
+        "decided_from_previous_draft": 0,
+        "waited_for_current_draft": 0,
+        "no_confidence_available": 0,
+        "left_to_ema": 2600,
+        "errors": 0,
+        "wait_ms_p50": null,
+        "broadcast_ms_p50": 1.489,
+        "broadcast_ms_p90": 2.216
+      },
+      "2-lag1": {
+        "participating_steps_approx": 5600,
+        "k3": 3183,
+        "k7": 2417,
+        "k3_share_pct": 56.8,
+        "decided_from_previous_draft": 5402,
+        "waited_for_current_draft": 0,
+        "no_confidence_available": 26,
+        "left_to_ema": 172,
+        "errors": 0,
+        "wait_ms_p50": null,
+        "broadcast_ms_p50": 1.394,
+        "broadcast_ms_p90": 2.181
+      },
+      "3-hybrid": {
+        "participating_steps_approx": 4600,
+        "k3": 2827,
+        "k7": 1773,
+        "k3_share_pct": 61.5,
+        "decided_from_previous_draft": 3703,
+        "waited_for_current_draft": 897,
+        "no_confidence_available": 0,
+        "left_to_ema": 0,
+        "errors": 0,
+        "wait_ms_p50": 4.872,
+        "broadcast_ms_p50": 1.305,
+        "broadcast_ms_p90": 2.201
+      },
+      "4-ema": {
+        "participating_steps_approx": 3200,
+        "k3": 140,
+        "k7": 3060,
+        "k3_share_pct": 4.4,
+        "decided_from_previous_draft": 129,
+        "waited_for_current_draft": 14,
+        "no_confidence_available": 0,
+        "left_to_ema": 3057,
+        "errors": 0,
+        "wait_ms_p50": null,
+        "broadcast_ms_p50": 1.482,
+        "broadcast_ms_p90": 2.21
+      }
+    }
+  },
+  "excluded_series": [
+    {
+      "run": "reasoning-low held-out diagnostic (ema / hybrid / hybrid / ema, short tasks)",
+      "reason": "stopped by its idle check after the first request: an external client started sending requests after the suites; the one completed request shows 2 s stalls. Not used."
+    }
+  ],
+  "limitations": [
+    "Arm A carries the overlay: rank 0 broadcasts the unchanged length on its seven-draft single-request steps (median 1.2-1.5 ms). Its code decode (63.7 and 64.3 tok/s) is within cross-load noise of the frozen E31-MB value (63.3), so no instrumentation cost is visible there; it was not measured on the same load.",
+    "The held-out screen ran with thinking off, matching the calibration captures; the suites use reasoning effort low, where the policy chose 3 drafts on about two thirds of the steps.",
+    "The long and prose held-out groups hold 2 and 3 tasks; their arm-to-arm drift reached 4.6%.",
+    "Rank 0 logs its E35 counters every 200 participating steps, so the per-suite and per-arm decision counts are differences of those samples and can shift up to about 200 steps across a boundary (for example the few `hybrid` decisions attributed to run-4)."
+  ],
+  "owner_decision": "promote (2026-09-30), after an initial discard the same day was reversed by the owner",
+  "promotion": {
+    "identity": "docs/operational-identities/2026-09-30-e35-hybrid.json",
+    "record": "docs/historical_benchmarks/baselines/2026-09-30-e35/baseline.json",
+    "method": "launcher command parity: the default equals the measured E35 command plus the read-only policy mount on all four ranks"
+  }
+}

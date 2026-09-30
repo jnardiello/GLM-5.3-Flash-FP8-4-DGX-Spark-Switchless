@@ -1,0 +1,517 @@
+{
+  "schema": 1,
+  "record_type": "portable_measurement_extract",
+  "experiment_id": "2026-09-30-e36-lm-head",
+  "title": "E36: the lm_head shared by the target and the DFlash2 drafter packed INT8 W8A16",
+  "outcome": "promote",
+  "outcome_detail": "Owner decision after the fidelity gate (PASS: dense perplexity +0.018%) and two native Rigmark suites: code decode +2.3%, prose decode +3.6%, C1 +6.2% against the frozen E35 record on another load; C2, C4, prefill and time to first token unchanged within noise. The owner judged the gains marginal and kept the change.",
+  "reference": {
+    "performance_baseline_id": "2026-09-30-e35",
+    "path": "docs/historical_benchmarks/baselines/2026-09-30-e35/baseline.json",
+    "sha256": "1c825bdf26aca3447e9317c75ce5c154f48d93188835155d8327bfd5a8d8fd3a",
+    "comparison": "the frozen E35 record (its two hybrid suites), a different load: descriptive"
+  },
+  "candidate": {
+    "change": "The vocab-parallel lm_head (38,720 x 4,096 per rank) that the target shares with the DFlash2 drafter is packed INT8 symmetric group-128 for Marlin at load, before CUDA graph capture; every row count uses Marlin; the BF16 head is freed.",
+    "source_sha256": {
+      "scripts/node/experiments/e03/e36-lm-head-w8a16/model_runner.py": "d8fbfa5112f700d2a7468e97c6bb0857a16adccd70c34a22d59ec7ef97a40216",
+      "scripts/node/experiments/e03/e36-lm-head-w8a16/e36_lm_head_w8a16.py": "576eeb38c20f3f4bf714fbd5dfc22da185674dab2038ddcace8ea42139d3b722"
+    },
+    "parent": {
+      "scripts/node/experiments/e03/e35-runner-k/model_runner.py": "4aa67bc0379d1e39649b7eb5297f247eaa0ad7597ed087e876dc81a4075e2e36"
+    }
+  },
+  "preregistration": "docs/historical_benchmarks/experiments/2026-09-30-e36-lm-head/preregistration.json",
+  "fidelity": {
+    "result": "PASS",
+    "detail": "fidelity-result.json",
+    "dense_perplexity_change_pct": {
+      "estimate": 0.0183,
+      "lb95": 0.0132,
+      "ub95": 0.0235
+    }
+  },
+  "protocol": {
+    "rigmark_source": "alexellis/rigmark c5a0db0 (upstream, unmodified)",
+    "flags": "Rigmark defaults plus --extra-body '{\"chat_template_kwargs\": {\"reasoning_effort\": \"low\"}}'; no cache_salt; fresh --comparison-id per suite",
+    "aggregation": "per-suite native medians; E36 value = mean of its two suites; reference = mean of the E35 record's two suites"
+  },
+  "coverage": {
+    "serving_loads": 1,
+    "suites": 2,
+    "suite_requests": 108,
+    "measurement_loads": 1,
+    "fidelity_windows_per_arm": 424
+  },
+  "client_transport": "direct LAN HTTP to the rank-0 API",
+  "runs": [
+    {
+      "run": "run-1",
+      "comparison_id": "glm53-e35-suite-e36-20260930-s1-191042",
+      "receipt_sha256": "3446d565ac1e513f68d337e24d3803ebdddb62c7937b5b633cb8025957b5287b",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-30-e36-lm-head/run-1.json",
+        "sha256": "b29abbb19279c7626cfb434ed772aba0b3e20bd7f02b7785636b6b643ee643b1"
+      },
+      "memory_guard_tripped": false,
+      "min_mem_available_gib_by_rank": {
+        "0": 3.862,
+        "1": 9.15,
+        "2": 9.116,
+        "3": 9.104
+      }
+    },
+    {
+      "run": "run-2",
+      "comparison_id": "glm53-e35-suite-e36-20260930-s2-191936",
+      "receipt_sha256": "3fb5236f667b265c468d6eb9c54d4c029aa64e193d561fafafb643ec07686477",
+      "portable_extract": {
+        "path": "docs/historical_benchmarks/experiments/2026-09-30-e36-lm-head/run-2.json",
+        "sha256": "12a435d420f5d1051724229eb34929398a3bb72ee119cc6dc4ea681b343a737a"
+      },
+      "memory_guard_tripped": false,
+      "min_mem_available_gib_by_rank": {
+        "0": 4.711,
+        "1": 9.931,
+        "2": 9.899,
+        "3": 9.885
+      }
+    }
+  ],
+  "performance_metrics": [
+    {
+      "key": "decode_code_tok_s",
+      "e36_per_suite": {
+        "run-1": 64.358,
+        "run-2": 66.745
+      },
+      "e35_record_per_suite": {
+        "run-2": 63.428,
+        "run-3": 64.784
+      },
+      "e36_mean": 65.5515,
+      "e35_record_mean": 64.106,
+      "change_pct": 2.255,
+      "e35_suite_range_pct": 2.115
+    },
+    {
+      "key": "decode_code_ttft_s",
+      "e36_per_suite": {
+        "run-1": 0.453,
+        "run-2": 0.455
+      },
+      "e35_record_per_suite": {
+        "run-2": 0.457,
+        "run-3": 0.457
+      },
+      "e36_mean": 0.454,
+      "e35_record_mean": 0.457,
+      "change_pct": -0.656,
+      "e35_suite_range_pct": 0.0
+    },
+    {
+      "key": "decode_prose_tok_s",
+      "e36_per_suite": {
+        "run-1": 34.718,
+        "run-2": 34.557
+      },
+      "e35_record_per_suite": {
+        "run-2": 33.206,
+        "run-3": 33.64
+      },
+      "e36_mean": 34.6375,
+      "e35_record_mean": 33.423,
+      "change_pct": 3.634,
+      "e35_suite_range_pct": 1.299
+    },
+    {
+      "key": "decode_prose_ttft_s",
+      "e36_per_suite": {
+        "run-1": 0.442,
+        "run-2": 0.384
+      },
+      "e35_record_per_suite": {
+        "run-2": 0.388,
+        "run-3": 0.386
+      },
+      "e36_mean": 0.413,
+      "e35_record_mean": 0.387,
+      "change_pct": 6.718,
+      "e35_suite_range_pct": 0.517
+    },
+    {
+      "key": "decode_structured_tok_s",
+      "e36_per_suite": {
+        "run-1": 95.014,
+        "run-2": 95.849
+      },
+      "e35_record_per_suite": {
+        "run-2": 93.048,
+        "run-3": 92.473
+      },
+      "e36_mean": 95.4315,
+      "e35_record_mean": 92.7605,
+      "change_pct": 2.879,
+      "e35_suite_range_pct": 0.62
+    },
+    {
+      "key": "decode_structured_ttft_s",
+      "e36_per_suite": {
+        "run-1": 0.435,
+        "run-2": 0.436
+      },
+      "e35_record_per_suite": {
+        "run-2": 0.447,
+        "run-3": 0.431
+      },
+      "e36_mean": 0.4355,
+      "e35_record_mean": 0.439,
+      "change_pct": -0.797,
+      "e35_suite_range_pct": 3.645
+    },
+    {
+      "key": "prefill_8192_cold_tok_s",
+      "e36_per_suite": {
+        "run-1": 2650.936,
+        "run-2": 2626.316
+      },
+      "e35_record_per_suite": {
+        "run-2": 2618.235,
+        "run-3": 2622.791
+      },
+      "e36_mean": 2638.626,
+      "e35_record_mean": 2620.513,
+      "change_pct": 0.691,
+      "e35_suite_range_pct": 0.174
+    },
+    {
+      "key": "prefill_8192_cold_ttft_s",
+      "e36_per_suite": {
+        "run-1": 3.09,
+        "run-2": 3.119
+      },
+      "e35_record_per_suite": {
+        "run-2": 3.129,
+        "run-3": 3.123
+      },
+      "e36_mean": 3.1045,
+      "e35_record_mean": 3.126,
+      "change_pct": -0.688,
+      "e35_suite_range_pct": 0.192
+    },
+    {
+      "key": "prefill_8192_replay_tok_s",
+      "e36_per_suite": {
+        "run-1": 9031.695,
+        "run-2": 8994.735
+      },
+      "e35_record_per_suite": {
+        "run-2": 8720.135,
+        "run-3": 8897.887
+      },
+      "e36_mean": 9013.215,
+      "e35_record_mean": 8809.011,
+      "change_pct": 2.318,
+      "e35_suite_range_pct": 2.018
+    },
+    {
+      "key": "prefill_8192_replay_ttft_s",
+      "e36_per_suite": {
+        "run-1": 0.907,
+        "run-2": 0.911
+      },
+      "e35_record_per_suite": {
+        "run-2": 0.939,
+        "run-3": 0.921
+      },
+      "e36_mean": 0.909,
+      "e35_record_mean": 0.93,
+      "change_pct": -2.258,
+      "e35_suite_range_pct": 1.935
+    },
+    {
+      "key": "prefill_32768_cold_tok_s",
+      "e36_per_suite": {
+        "run-1": 2782.21,
+        "run-2": 2774.398
+      },
+      "e35_record_per_suite": {
+        "run-2": 2761.833,
+        "run-3": 2765.488
+      },
+      "e36_mean": 2778.304,
+      "e35_record_mean": 2763.6605,
+      "change_pct": 0.53,
+      "e35_suite_range_pct": 0.132
+    },
+    {
+      "key": "prefill_32768_cold_ttft_s",
+      "e36_per_suite": {
+        "run-1": 11.778,
+        "run-2": 11.811
+      },
+      "e35_record_per_suite": {
+        "run-2": 11.865,
+        "run-3": 11.849
+      },
+      "e36_mean": 11.7945,
+      "e35_record_mean": 11.857,
+      "change_pct": -0.527,
+      "e35_suite_range_pct": 0.135
+    },
+    {
+      "key": "prefill_32768_replay_tok_s",
+      "e36_per_suite": {
+        "run-1": 35453.496,
+        "run-2": 35502.51
+      },
+      "e35_record_per_suite": {
+        "run-2": 36026.765,
+        "run-3": 35913.049
+      },
+      "e36_mean": 35478.003,
+      "e35_record_mean": 35969.907,
+      "change_pct": -1.368,
+      "e35_suite_range_pct": 0.316
+    },
+    {
+      "key": "prefill_32768_replay_ttft_s",
+      "e36_per_suite": {
+        "run-1": 0.924,
+        "run-2": 0.923
+      },
+      "e35_record_per_suite": {
+        "run-2": 0.91,
+        "run-3": 0.912
+      },
+      "e36_mean": 0.9235,
+      "e35_record_mean": 0.911,
+      "change_pct": 1.372,
+      "e35_suite_range_pct": 0.22
+    },
+    {
+      "key": "prefill_65536_cold_tok_s",
+      "e36_per_suite": {
+        "run-1": 2788.935,
+        "run-2": 2788.31
+      },
+      "e35_record_per_suite": {
+        "run-2": 2776.772,
+        "run-3": 2786.362
+      },
+      "e36_mean": 2788.6225,
+      "e35_record_mean": 2781.567,
+      "change_pct": 0.254,
+      "e35_suite_range_pct": 0.345
+    },
+    {
+      "key": "prefill_65536_cold_ttft_s",
+      "e36_per_suite": {
+        "run-1": 23.499,
+        "run-2": 23.504
+      },
+      "e35_record_per_suite": {
+        "run-2": 23.602,
+        "run-3": 23.52
+      },
+      "e36_mean": 23.5015,
+      "e35_record_mean": 23.561,
+      "change_pct": -0.253,
+      "e35_suite_range_pct": 0.348
+    },
+    {
+      "key": "prefill_65536_replay_tok_s",
+      "e36_per_suite": {
+        "run-1": 40001.929,
+        "run-2": 40002.124
+      },
+      "e35_record_per_suite": {
+        "run-2": 39981.381,
+        "run-3": 40694.544
+      },
+      "e36_mean": 40002.0265,
+      "e35_record_mean": 40337.9625,
+      "change_pct": -0.833,
+      "e35_suite_range_pct": 1.768
+    },
+    {
+      "key": "prefill_65536_replay_ttft_s",
+      "e36_per_suite": {
+        "run-1": 1.638,
+        "run-2": 1.638
+      },
+      "e35_record_per_suite": {
+        "run-2": 1.639,
+        "run-3": 1.61
+      },
+      "e36_mean": 1.638,
+      "e35_record_mean": 1.6245,
+      "change_pct": 0.831,
+      "e35_suite_range_pct": 1.785
+    },
+    {
+      "key": "c1_aggregate_tok_s",
+      "e36_per_suite": {
+        "run-1": 47.731,
+        "run-2": 49.762
+      },
+      "e35_record_per_suite": {
+        "run-2": 44.758,
+        "run-3": 47.049
+      },
+      "e36_mean": 48.7465,
+      "e35_record_mean": 45.9035,
+      "change_pct": 6.193,
+      "e35_suite_range_pct": 4.991
+    },
+    {
+      "key": "c1_per_stream_decode_tok_s",
+      "e36_per_suite": {
+        "run-1": 51.497,
+        "run-2": 53.87
+      },
+      "e35_record_per_suite": {
+        "run-2": 48.065,
+        "run-3": 50.7
+      },
+      "e36_mean": 52.6835,
+      "e35_record_mean": 49.3825,
+      "change_pct": 6.685,
+      "e35_suite_range_pct": 5.336
+    },
+    {
+      "key": "c1_per_stream_ttft_s",
+      "e36_per_suite": {
+        "run-1": 0.411,
+        "run-2": 0.411
+      },
+      "e35_record_per_suite": {
+        "run-2": 0.414,
+        "run-3": 0.413
+      },
+      "e36_mean": 0.411,
+      "e35_record_mean": 0.4135,
+      "change_pct": -0.605,
+      "e35_suite_range_pct": 0.242
+    },
+    {
+      "key": "c2_aggregate_tok_s",
+      "e36_per_suite": {
+        "run-1": 73.375,
+        "run-2": 73.164
+      },
+      "e35_record_per_suite": {
+        "run-2": 73.877,
+        "run-3": 73.714
+      },
+      "e36_mean": 73.2695,
+      "e35_record_mean": 73.7955,
+      "change_pct": -0.713,
+      "e35_suite_range_pct": 0.221
+    },
+    {
+      "key": "c2_per_stream_decode_tok_s",
+      "e36_per_suite": {
+        "run-1": 40.013,
+        "run-2": 39.27
+      },
+      "e35_record_per_suite": {
+        "run-2": 39.597,
+        "run-3": 39.854
+      },
+      "e36_mean": 39.6415,
+      "e35_record_mean": 39.7255,
+      "change_pct": -0.211,
+      "e35_suite_range_pct": 0.647
+    },
+    {
+      "key": "c2_per_stream_ttft_s",
+      "e36_per_suite": {
+        "run-1": 0.464,
+        "run-2": 0.464
+      },
+      "e35_record_per_suite": {
+        "run-2": 0.467,
+        "run-3": 0.469
+      },
+      "e36_mean": 0.464,
+      "e35_record_mean": 0.468,
+      "change_pct": -0.855,
+      "e35_suite_range_pct": 0.427
+    },
+    {
+      "key": "c4_aggregate_tok_s",
+      "e36_per_suite": {
+        "run-1": 107.256,
+        "run-2": 107.942
+      },
+      "e35_record_per_suite": {
+        "run-2": 104.798,
+        "run-3": 109.831
+      },
+      "e36_mean": 107.599,
+      "e35_record_mean": 107.3145,
+      "change_pct": 0.265,
+      "e35_suite_range_pct": 4.69
+    },
+    {
+      "key": "c4_per_stream_decode_tok_s",
+      "e36_per_suite": {
+        "run-1": 28.642,
+        "run-2": 29.276
+      },
+      "e35_record_per_suite": {
+        "run-2": 28.511,
+        "run-3": 29.706
+      },
+      "e36_mean": 28.959,
+      "e35_record_mean": 29.1085,
+      "change_pct": -0.514,
+      "e35_suite_range_pct": 4.105
+    },
+    {
+      "key": "c4_per_stream_ttft_s",
+      "e36_per_suite": {
+        "run-1": 0.557,
+        "run-2": 0.554
+      },
+      "e35_record_per_suite": {
+        "run-2": 0.558,
+        "run-3": 0.556
+      },
+      "e36_mean": 0.5555,
+      "e35_record_mean": 0.557,
+      "change_pct": -0.269,
+      "e35_suite_range_pct": 0.359
+    }
+  ],
+  "spec_decode_counters": {
+    "run-1": {
+      "drafts": 6651,
+      "draft_tokens": 40601,
+      "accepted_tokens": 16596,
+      "accepted_per_draft_token": 0.4088
+    },
+    "run-2": {
+      "drafts": 6676,
+      "draft_tokens": 40748,
+      "accepted_tokens": 17332,
+      "accepted_per_draft_token": 0.4253
+    }
+  },
+  "integrity": {
+    "requests": 108,
+    "decode_gates_passed": 30,
+    "decode_gates_total": 30,
+    "decode_finish_reasons": "stop in all decode runs",
+    "errors": 0
+  },
+  "limitations": [
+    "The reference is the frozen E35 record, measured on another load; single-request metrics vary by a few percent between loads, so the decode gains are indicative.",
+    "Two suites (n = 2). C1's two E35 suites already differ by 5%.",
+    "No spec-decode counters exist for the E35 suites, so acceptance cannot be compared directly.",
+    "The first measurement boot stopped at load (the target head sits on the language model of a ForConditionalGeneration wrapper); the code was fixed before any measurement and the gate was amended beforehand.",
+    "Rank 0's lowest MemAvailable was 3.86 GiB in suite 1 and 4.71 GiB in suite 2 (E35 suites: about 4.76 GiB)."
+  ],
+  "owner_decision": "promote (2026-09-30): gains judged marginal, change kept"
+}

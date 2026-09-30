@@ -107,7 +107,9 @@ the reviewed connector go through the same check. A different connector hash or 
 contract fails startup.
 
 The overlay also sets the connector's native capacity to 3 GiB and its low-water mark to
-2 GiB, so native eviction remains confined to the exclusive campaign namespace. The generated
+2 GiB, so native eviction remains confined to the exclusive campaign namespace. It replaces
+the operational default's disk-capacity pair instead of adding a second one, and refuses any
+other capacity form. The generated
 SparkCache JSON still changes only the cache root; these capacity values are temporary overlay
 environment policy. A largest-context spool plus publication can still need more headroom than
 the native capacity allows. If a case cannot create its case-bound target, record it as pending;

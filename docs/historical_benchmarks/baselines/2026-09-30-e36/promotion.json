@@ -1,0 +1,68 @@
+{
+  "schema": "tp4-iac-promotion/v1",
+  "baseline_id": "2026-09-30-e36",
+  "owner_decision": "promote",
+  "status": "promoted_live_identity_verified",
+  "measured_recipe_encoded": true,
+  "runtime_sources_unchanged": true,
+  "promotion_method": "launcher_command_parity",
+  "promotion_method_reason": "Owner decision under the repository promotion rule: the measured E36 candidate is still serving. The default encodes that recipe byte for byte; it is deployed without a restart and no reproduction run is made.",
+  "owner_decisions": {
+    "date": "2026-09-30",
+    "record": {
+      "path": "docs/historical_benchmarks/baselines/2026-09-30-e36/owner-decision.json",
+      "sha256": "ee85f79ef465fedf785969ae0936f09323cece257681f7ecebdc131cfca8c55e"
+    }
+  },
+  "candidate_overlays": {
+    "e36_lm_head_w8a16": {
+      "path": "scripts/node/experiments/e03/e36-lm-head-w8a16/delta.env",
+      "sha256": "e7400ba6e03388a6b2e15c5d1f18f9bbfaf6dd3ad0a181421eb3ba0c779b77aa",
+      "status": "measured overlay (applied on the E35 default); encoded in the default; retained as the record of the measured candidate"
+    }
+  },
+  "local_validation": {
+    "offline_check": "PASS (./scripts/check.sh)",
+    "four_rank_command_parity_with_measured_candidate_example_config": "PASS: the default dry-run equals the E35 default plus delta.env on ranks 0-3 byte for byte (scripts/tests/test-accepted-recipe.py)",
+    "returns": "PASS: operational-20260930-e35.env reproduces E35, operational-20260930-e31-mb.env E31-MB and operational-20260929-memory-bounded.env the memory-bounded command on ranks 0-3; each refuses other forms",
+    "fidelity": "PASS, pre-registered gate (docs/historical_benchmarks/experiments/2026-09-30-e36-lm-head/fidelity-result.json)",
+    "independent_review": "fresh-context review of the promotion diff; findings adjudicated before the default was deployed"
+  },
+  "identity": {
+    "path": "docs/operational-identities/2026-09-30-e36-lm-head.json",
+    "sha256": "ab4888b749016b44a508091eacf708248c2aa0a0115c8833e7f2e8e39f8fdac2"
+  },
+  "baseline": {
+    "path": "docs/historical_benchmarks/baselines/2026-09-30-e36/baseline.json",
+    "sha256": "6054fcd0d73efba1af1d661a180fae9e5a2541c491ae484c8f21da1bd6209fa8"
+  },
+  "rollback": {
+    "path": "scripts/node/reference/operational-20260930-e35.env",
+    "sha256": "e2c9b431c94d76b4e5d29b66468a6026d921df3cb56f643bee8910d5af4ca547",
+    "identity": "docs/operational-identities/2026-09-30-e35-return.json"
+  },
+  "live_default_apply": {
+    "site_parity": "PASS: with the private cluster.env updated to the new default, the TP4_DRY_RUN command on ranks 0-3 equals, byte for byte, the E35 site recipe plus delta.env that launched the serving load",
+    "deploy": "PASS: scripts/deploy.sh without TP4_ENV on 2026-09-30 after the suites; no restart (the measured candidate keeps serving)",
+    "restart": {
+      "performed": false
+    },
+    "serving_load": {
+      "health_200_utc": "2026-09-30T19:10:39Z",
+      "post_boot_gates": "PASS 2026-09-30T19:10:39Z"
+    },
+    "check_f0": {
+      "identity": "2026-09-30-e36-lm-head",
+      "result": "CHECK PASS",
+      "note": "a first run failed only on rank 2's host check: a snapd refresh had left NeedDaemonReload=yes on tp4-fabric-iptables.service; a bounded daemon-reload (unit bytes unchanged, fabric active) cleared it"
+    },
+    "per_rank_running_identity": "E36_LM_HEAD_W8A16_READY on ranks 0-3 with freed_bytes 317194240, keep_bf16 false, shared_with_drafter true; E35 READY lines on every rank",
+    "result": "PASS"
+  },
+  "new_measurement_requests": 0,
+  "live_reproduction": {
+    "status": "not_required_by_owner_decision",
+    "executed_runs": 0,
+    "executed_requests": 0
+  }
+}

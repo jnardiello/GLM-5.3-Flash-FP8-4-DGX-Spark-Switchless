@@ -1,0 +1,133 @@
+{
+  "schema": 1,
+  "experiment_id": "2026-09-30-e36-lm-head",
+  "record_type": "fidelity_result",
+  "load": "one measurement-mode boot of le36-m (health 2026-09-30T17:49Z); Cnow/prompt-a with flag bf16 17:50-18:23 UTC, LE36/prompt-a with flag int8 18:23-18:56 UTC; flag verified on 4/4 ranks before and after each pass",
+  "corpus": "424 windows, K = 20, provisional manifest 5e962c36",
+  "gate": {
+    "preregistration": "preregistration.json",
+    "limit": "dense ub95 <= log1p(0.005) nats (+0.5% perplexity)",
+    "result": "PASS",
+    "perplexity_change_pct": {
+      "dense": {
+        "estimate": 0.0183,
+        "lb95": 0.0132,
+        "ub95": 0.0235
+      },
+      "sparse": {
+        "estimate": 0.0611,
+        "lb95": -0.3703,
+        "ub95": 0.4426
+      },
+      "all": {
+        "estimate": 0.048,
+        "lb95": -0.2424,
+        "ub95": 0.3196
+      }
+    },
+    "floor_ub95_pct": {
+      "dense": 0.0,
+      "sparse": 0.6446,
+      "all": 0.4407
+    },
+    "kl_mean_nats": {
+      "dense": 0.00013963590625823573,
+      "sparse": 0.2765729736756532,
+      "all": 0.19153570822992314
+    },
+    "top1_agreement": {
+      "dense": 0.995934065934066,
+      "sparse": 0.7998611095953281,
+      "all": 0.8601776697086947
+    },
+    "nonfinite_actual_token_scores": {
+      "dense": {
+        "ref": 0,
+        "cand": 0
+      },
+      "sparse": {
+        "ref": 0,
+        "cand": 0
+      },
+      "all": {
+        "ref": 0,
+        "cand": 0
+      }
+    }
+  },
+  "numeric_receipts_by_rank": {
+    "0": {
+      "shape": [
+        38720,
+        4096
+      ],
+      "padded_n": 38912,
+      "group_size": 128,
+      "original_bytes": 317194240,
+      "packed_bytes": 161874112,
+      "weight_rel_l2": 0.007163,
+      "logits_rel_l2": 0.007692,
+      "top1_agreement": "8/8",
+      "shared_with_drafter": true,
+      "keep_bf16": true,
+      "tp_rank_vocab_start": 0
+    },
+    "1": {
+      "shape": [
+        38720,
+        4096
+      ],
+      "padded_n": 38912,
+      "group_size": 128,
+      "original_bytes": 317194240,
+      "packed_bytes": 161874112,
+      "weight_rel_l2": 0.007182,
+      "logits_rel_l2": 0.007837,
+      "top1_agreement": "8/8",
+      "shared_with_drafter": true,
+      "keep_bf16": true,
+      "tp_rank_vocab_start": 38720
+    },
+    "2": {
+      "shape": [
+        38720,
+        4096
+      ],
+      "padded_n": 38912,
+      "group_size": 128,
+      "original_bytes": 317194240,
+      "packed_bytes": 161874112,
+      "weight_rel_l2": 0.007212,
+      "logits_rel_l2": 0.007838,
+      "top1_agreement": "8/8",
+      "shared_with_drafter": true,
+      "keep_bf16": true,
+      "tp_rank_vocab_start": 77440
+    },
+    "3": {
+      "shape": [
+        38720,
+        4096
+      ],
+      "padded_n": 38912,
+      "group_size": 128,
+      "original_bytes": 317194240,
+      "packed_bytes": 161874112,
+      "weight_rel_l2": 0.007275,
+      "logits_rel_l2": 0.008023,
+      "top1_agreement": "8/8",
+      "shared_with_drafter": true,
+      "keep_bf16": true,
+      "tp_rank_vocab_start": 116160
+    }
+  },
+  "analysis_outputs": {
+    "bit-identity.json": "617d460fc5b7fb7d71da56acd6b0b67d2c52d5dbdd8b6fc7015c3b26e51b3e83",
+    "cnow-vs-cm.json": "ea9a636230107ff90557190098519c6b79f7d64228310bb29f00159191ff3f19",
+    "le36-vs-cnow.json": "2523b19e4dab012ee703e01b88fb17180cd5f9be248c5ce96061cbfe24e0033a"
+  },
+  "notes": [
+    "The sparse regime (> 2,048 positions) is dominated by execution variability; its floor (identical R0 executions) reaches a similar ub95; descriptive only.",
+    "Cnow vs the campaign's Cm (E29, 2026-09-27): 410/424 windows bit-identical in the dense regime; 14 windows differ (3.2% of dense rows); dense perplexity change +0.031% [-0.026, +0.102], descriptive."
+  ]
+}

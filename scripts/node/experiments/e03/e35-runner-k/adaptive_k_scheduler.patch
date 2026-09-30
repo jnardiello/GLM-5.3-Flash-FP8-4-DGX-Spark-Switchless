@@ -1,0 +1,86 @@
+--- a/adaptive_k_scheduler.py
++++ b/adaptive_k_scheduler.py
+@@ -39,6 +39,61 @@
+ __all__ = ["AdaptiveKConfig", "AdaptiveKPolicy", "AdaptiveKScheduler", "should_observe",
+            "placeholder_len", "DraftedRing", "filter_candidates", "assign_lengths"]
+ 
++# E35 candidate addition: with the policy flag file named by VLLM_E35_POLICY_FLAG holding
++# "lag1" or "hybrid", a step that schedules exactly one request, a spec-decode candidate,
++# gives it k_hi placeholders
++# (before the unchanged draft-budget cap), so the E35 runner can verify k_lo or k_hi of that
++# draft. Policy observations are unchanged; "ema", a missing flag or any other content keeps
++# the policy's length. The flag is re-read at most every 0.5 s.
++_E35_POLICY_FLAG = os.environ.get("VLLM_E35_POLICY_FLAG", "")
++_E35_FLAG_MAX_BYTES = 64
++
++
++def e35_parse_policy(raw) -> str:
++    if raw is None or len(raw) > _E35_FLAG_MAX_BYTES:
++        return "ema"
++    try:
++        text = raw.decode("ascii").strip()
++    except UnicodeDecodeError:
++        return "ema"
++    return text if text in ("lag1", "hybrid") else "ema"
++
++
++def _e35_read_flag(path, opener=open):
++    if not path:
++        return None
++    try:
++        with opener(path, "rb") as stream:
++            return stream.read(_E35_FLAG_MAX_BYTES + 1)
++    except OSError:
++        return None
++
++
++class _E35PolicySwitch:
++    def __init__(self, path, clock=None, reader=_e35_read_flag) -> None:
++        import time
++        self.path, self.clock, self.reader = path, clock or time.monotonic, reader
++        self.checked_at = None
++        self.policy = "ema"
++
++    def poll(self) -> str:
++        now = self.clock()
++        if self.checked_at is None or now - self.checked_at >= 0.5:
++            self.checked_at = now
++            self.policy = e35_parse_policy(self.reader(self.path))
++        return self.policy
++
++
++def e35_force_single(lengths: dict, policy: str, k_hi: int, engine_k: int,
++                     num_scheduled_requests: int) -> dict:
++    """Pure: k_hi placeholders when the step schedules exactly one request and it is the lone
++    candidate, under lag1/hybrid; otherwise unchanged (matches the runner's participation)."""
++    if policy not in ("lag1", "hybrid") or len(lengths) != 1 or num_scheduled_requests != 1:
++        return lengths
++    (req_id,) = lengths
++    return {req_id: placeholder_len(k_hi, engine_k)}
++
++
+ _MODES = ("per-request", "batch-uniform")
+ _SIGNALS = ("pos", "mean")
+ 
+@@ -394,6 +449,8 @@
+                 "engine_k=%s",
+                 int(cfg.enabled and cfg.respect_draft_budget), self._ak_engine_k,
+             )
++            self._e35_switch = _E35PolicySwitch(_E35_POLICY_FLAG)
++            logger.info("E35_SCHEDULER_READY flag=%s k_hi=%s", _E35_POLICY_FLAG or "unset", cfg.k_hi)
+ 
+         def _ak_budget_counters_line(self) -> str:
+             c = self._ak_budget_counters
+@@ -429,6 +486,12 @@
+             candidates = filter_candidates(items)
+             self._ak_ring.push(candidates)
+             lengths = assign_lengths(self._ak, candidates, self._ak_cfg.mode, self._ak_engine_k)
++            try:
++                lengths = e35_force_single(lengths, self._e35_switch.poll(), self._ak_cfg.k_hi,
++                                           self._ak_engine_k,
++                                           len(scheduler_output.num_scheduled_tokens))
++            except Exception:  # noqa: BLE001 - keep the policy's length; never disable adaptive-k
++                pass
+             if self._ak_cfg.respect_draft_budget and lengths:
+                 # R10's worker resolves this very output when producing next-step
+                 # drafts. Do not recompute from candidates or a later batch size.

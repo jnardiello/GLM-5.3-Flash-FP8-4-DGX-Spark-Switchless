@@ -26,13 +26,61 @@ KV tokens, or 4.55 maximum-length contexts, so five complete 262,144-token conte
 be resident together. In the five-client functional checks, all five clients overlapped,
 while engine scheduling used waiting and preemption rather than five resident full contexts.
 Those checks used an instrumented connector, an isolated cache namespace, and 3 GiB/2 GiB
-eviction limits. Production uses the protected connector, its normal namespace, and the 0/0
-disk-capacity policy, so the checks do not establish arbitrary production-cache growth or
-new performance results.
+eviction limits, so they do not establish new performance results.
+Production uses the protected connector and its normal namespace with a disk-capacity
+policy per rank: once the accounted cache files exceed 200 GiB, each rank's worker removes
+the oldest entries by manifest time until 160 GiB remain. A verified reuse refreshes an
+entry at most once per 60 seconds, so the order is approximately least recently used. The
+policy is a maintenance trigger, not a hard quota: transient spool files are not counted,
+chunks left by a failed publication are counted and removed only at the next maintenance
+pass, and a pass skips while another cache operation holds the store lock. A replay whose
+entry is evicted during the request recomputes. The connector reads this policy
+from `SPARK_CONTEXT_CACHE_MAX_BYTES` and `SPARK_CONTEXT_CACHE_LOW_WATERMARK_BYTES` because its
+JSON leaves the capacity keys unset, so the config hash and namespace are unchanged. Without
+a limit the store grows until the root filesystem is full; stores then fail and long replays
+recompute. Size both values to the disk left after the weights, image and logs.
 
-The versioned [operational identity](operational-identities/2026-09-29-memory-bounded.json)
-pins the frozen E31 record by hash and records the memory and protected-cache deltas. The
-complete [protected 16 GiB rollback](../scripts/node/reference/operational-20260929-sparkcache-protected.env)
+**E35 verify length.** The adaptive scheduler alone picks 3 or 7 verified drafts per request
+from an acceptance average that it sees two steps late. E35 lets the V2 model runner make that
+choice for single-request decode steps, where the scheduler has already scheduled seven drafts,
+from the DFlash2 selector's own per-position confidence:
+- The speculator records each draft's confidence on tensor-parallel rank 0.
+- Rank 0 compares the calibrated expected tokens per millisecond at 3 and 7 drafts, using the
+  previous draft's confidence. Under the `hybrid` policy it waits for the current draft's
+  confidence only when the margin is small.
+- Rank 0 broadcasts the choice over the tensor-parallel CPU group, so every rank verifies the
+  same trimmed step; trimmed drafts count as rejected.
+- Steps with several requests are unchanged.
+
+A read-only policy file (`policy.flag`, content `hybrid`) selects the policy. Rank 0 re-reads
+it every 0.5 s: overwriting the host file on rank 0 in place with `ema` returns the verify
+length to the acceptance average without a restart, until the next deploy. On native Rigmark
+with the reference flags, E35 left code decode and C1 unchanged within noise, prose decode at
+−1.5% and decode time to first token about 30 ms lower (see the
+[E35 report](benchmarks/experiments/2026-09-30-e35-runner-k.md)).
+
+**E36 INT8 lm_head.** The vocab-parallel `lm_head` (38,720 × 4,096 per rank) was the largest
+BF16 weight left in a decode step. The target projects through it once per step, and the
+drafter projects through the same module to pick its candidates. E36 packs it once at load,
+before CUDA graph capture: INT8 symmetric, group 128, for Marlin, with every row count on
+Marlin. The BF16 weight is freed (about 155 MB per rank net). Target logits change slightly:
+on one measurement load the dense perplexity rose by 0.018% [0.013, 0.024] against the BF16
+head, and top-1 agreed on 99.6% of positions. On native Rigmark, code decode rose by 2.3%,
+prose by 3.6% and C1 by 6.2%, against the E35 record measured on another load (see the
+[E36 report](benchmarks/experiments/2026-09-30-e36-lm-head.md)).
+
+The versioned [operational identity](operational-identities/2026-09-30-e36-lm-head.json)
+pins the frozen E31 record by hash and records the memory, protected-cache, disk-capacity,
+E35 and E36 deltas. The one-step
+[E35 return](../scripts/node/reference/operational-20260930-e35.env) removes only E36; its
+identity is [`2026-09-30-e35-return.json`](operational-identities/2026-09-30-e35-return.json).
+The [E31-MB return](../scripts/node/reference/operational-20260930-e31-mb.env) removes E36 and
+E35; its identity is
+[`2026-09-30-e31-mb-return.json`](operational-identities/2026-09-30-e31-mb-return.json). The
+[memory-bounded return](../scripts/node/reference/operational-20260929-memory-bounded.env)
+removes E36, E35 and the disk limit; its identity is
+[`2026-09-30-memory-bounded-return.json`](operational-identities/2026-09-30-memory-bounded-return.json).
+The complete [protected 16 GiB rollback](../scripts/node/reference/operational-20260929-sparkcache-protected.env)
 is the immediate operational predecessor: it preserves the bounded SparkCache connector but
 restores the 16 GiB pool and removes admission, trim and step-cap selections. It does not
 retain the complete memory-bounded protection. The historical
@@ -446,7 +494,8 @@ either spelling changes both the configuration hash and the cache selected by th
 SparkCache persists across container restarts. For current native Rigmark measurements,
 use a fresh `--comparison-id` for every suite and send no `cache_salt`; Rigmark's prompt
 nonce isolates the cache while preserving its cold/replay protocol. Restarting the
-container does not empty the persistent cache. Monitor free disk space on the runtime
+container does not empty the persistent cache; the disk-capacity policy above trims it
+back to 160 GiB per rank once it exceeds 200 GiB. Monitor free disk space on the runtime
 cache volume.
 
 A variant that changes weight precision or other calculations producing cached state
@@ -454,10 +503,16 @@ must use its own `spark_cache_root`. Unchanged checkpoint hashes do not establis
 compatibility when weights are converted in memory. Keep the original cache for rollback;
 update the variant's config hash and manifest together with its separate cache path.
 
-The immediate operational rollback,
+The one-step rollback,
+[`operational-20260930-e35.env`](../scripts/node/reference/operational-20260930-e35.env),
+removes only E36;
+[`operational-20260930-e31-mb.env`](../scripts/node/reference/operational-20260930-e31-mb.env)
+removes E36 and E35;
+[`operational-20260929-memory-bounded.env`](../scripts/node/reference/operational-20260929-memory-bounded.env)
+removes E36, E35 and the disk-capacity limit. The complete immediate operational rollback,
 [`operational-20260929-sparkcache-protected.env`](../scripts/node/reference/operational-20260929-sparkcache-protected.env),
 preserves the bounded SparkCache connector but restores the 16 GiB pool and removes the new
-trim, step-cap and admission controls. The historical
+trim, step-cap, admission and disk-capacity controls, E35 and E36. The historical
 [`baseline-20260928-e31.env`](../scripts/node/reference/baseline-20260928-e31.env) restores
 the measured E31 recipe with unrestricted cache behavior.
 [`baseline-20260925-e29.env`](../scripts/node/reference/baseline-20260925-e29.env)

@@ -1,0 +1,75 @@
+{
+  "schema": "tp4-e35-runner-k-candidate-v1",
+  "status": "promoted_default",
+  "promotion": {
+    "date": "2026-09-30",
+    "decision": "owner",
+    "default_policy": "hybrid",
+    "policy_file": "policy.flag",
+    "policy_mount": "$HOME/tp4/experiments/e03/e35-runner-k/policy.flag:/tmp/glm53-e35-policy:ro",
+    "recipe": "cluster.env.example",
+    "measured_candidate": "delta.env (retained unchanged as the record of the measured overlay)",
+    "rollback": "scripts/node/reference/operational-20260930-e31-mb.env"
+  },
+  "summary": "Confidence-based verify length decided in the V2 model runner for single-request decode steps: the DFlash2 speculator records each draft's per-position selector confidence, rank 0 picks 3 or 7 verified drafts with a calibrated rule and broadcasts the choice to every tensor-parallel rank, and the runner verifies a trimmed copy of the SchedulerOutput. Runtime policy flag; the default behaviour without it.",
+  "candidates": [
+    {
+      "path": "scripts/node/experiments/e03/e35-runner-k/model_runner.py",
+      "sha256": "4aa67bc0379d1e39649b7eb5297f247eaa0ad7597ed087e876dc81a4075e2e36",
+      "parent": {
+        "path": "vllm/v1/worker/gpu/model_runner.py (serving image)",
+        "sha256": "f232398c93cf3193166136e823343840a41ebde8669253f56ce63a0023930cb4"
+      },
+      "patch": "scripts/node/experiments/e03/e35-runner-k/model_runner.patch",
+      "patch_sha256": "c85c31ed38e82388d0d264c113bfdd1ae5959044aac014ce2d12681048af2021",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu/model_runner.py"
+    },
+    {
+      "path": "scripts/node/experiments/e03/e35-runner-k/speculator.py",
+      "sha256": "553d3e7b33482a93f72ed116e0e8d8b5bf2070313a7ad4aa5be9d83c4167bad5",
+      "parent": {
+        "path": "vllm/v1/worker/gpu/spec_decode/dflash2/speculator.py (serving image)",
+        "sha256": "1f6ff5ca9c8f38ff417aafd43bfa3116b5387bf0f7b58721acb2185781879836"
+      },
+      "patch": "scripts/node/experiments/e03/e35-runner-k/speculator.patch",
+      "patch_sha256": "db8885cd440334d600070fef716f7355c2a9adc4a16c4cc320f5520266f42a33",
+      "mount_target": "/usr/local/lib/python3.12/dist-packages/vllm/v1/worker/gpu/spec_decode/dflash2/speculator.py"
+    },
+    {
+      "path": "scripts/node/experiments/e03/e35-runner-k/adaptive_k_scheduler.py",
+      "sha256": "89dbca0f780911aae3f5f5b3954237a9271a30cc9905d56f70705e77696b8ef8",
+      "parent": {
+        "path": "scripts/node/experiments/e03/draft-budget/adaptive_k_scheduler.py",
+        "sha256": "697f99bf1951535dcc3381776fa744ad8204d83d2606f341b617bac7a31949b4"
+      },
+      "patch": "scripts/node/experiments/e03/e35-runner-k/adaptive_k_scheduler.patch",
+      "patch_sha256": "fc4cc628700798ac5a299be6bf4421dec430bf98538c3ad23d94554b712f02b4",
+      "mount_target": "/opt/tp4/adaptive_k_scheduler.py"
+    }
+  ],
+  "environment": [
+    "VLLM_E35_ENABLE=1",
+    "VLLM_E35_POLICY_FLAG=/tmp/glm53-e35-policy"
+  ],
+  "flag_values": {
+    "missing, 'ema' or any other content": "default behaviour (no trim)",
+    "lag1": "previous draft's confidence, no wait",
+    "hybrid": "previous draft's confidence unless its margin is below 0.005, then wait for the current draft"
+  },
+  "calibration": {
+    "source": "E33 in-sample probes (force k=7)",
+    "method": "weighted isotonic survival",
+    "step_ms": {
+      "3": 58.0,
+      "7": 81.0
+    },
+    "hybrid_margin": 0.005,
+    "hybrid_wait_ms_assumed": 2.8,
+    "margin_selection": "in-sample only (code median +3.2%, prose -0.2%)"
+  },
+  "ready_lines": [
+    "E35_RUNNER_K_READY",
+    "E35_CONF_RECORDER_READY",
+    "E35_SCHEDULER_READY"
+  ]
+}
