@@ -1,0 +1,3375 @@
+{
+  "schema": "tp4.e38-diagnostic-extract.v1",
+  "experiment": "E38 MLA preparation",
+  "date": "2026-10-01",
+  "status": "unresolved",
+  "prototype_gate": {
+    "reviewer": "independent fresh-context review",
+    "outcome": "unresolved",
+    "prototype_gate": "NO-GO",
+    "stop_stage": "diagnostic_before_prototype",
+    "qualified_shapes": [],
+    "reason": "Realizable removable critical-path margin is not established; retained-subset optimistic bounds are small, phase/timestamp selection and profiling limit evidence, exact installed Marlin C++ provenance remains unresolved.",
+    "fixed_percentage_floor": false,
+    "candidate_speedup_or_regression_claimed": false,
+    "outstanding_findings": [],
+    "adjudicated_findings": [
+      {
+        "severity": "P2",
+        "finding": "Functional request count was hardcoded before restored gate receipts existed",
+        "disposition": "fixed and independently verified; completed counts derived from receipts"
+      },
+      {
+        "severity": "P2",
+        "finding": "Restoration PASS depended on identity alone",
+        "disposition": "fixed and independently verified; coordinated phases, health, both timely gates, autostart and immutable files required"
+      }
+    ],
+    "independent_verification": {
+      "four_sqlite_analyses_reproduced_exactly": true,
+      "joint_analysis_reproduced_exactly": true,
+      "publisher_reproduced_in_memory": true,
+      "native_request_count": 48,
+      "native_transport_errors": 0,
+      "unfinished_streams": 0,
+      "synchronized_graphs": 1705,
+      "retained_graphs": 870,
+      "excluded_graphs": 835,
+      "native_hashes_counts_metrics_and_public_tables_checked": true
+    },
+    "skipped_phases": [
+      "CUDA C++ prototype",
+      "eager and CUDA graph bit-identity qualification",
+      "three paired full-chain microbenchmark blocks",
+      "same-load graph integration",
+      "seven full service suites A3 P3 A1, 378 planned requests"
+    ],
+    "handoff_requirements": "Root completes E36 restoration, timely gates, operational identity, autostart preservation, final archive and offline check"
+  },
+  "comparison_reference": {
+    "identity": "E36 complete operational default",
+    "baseline": "2026-09-30-e36",
+    "baseline_sha256": "6054fcd0d73efba1af1d661a180fae9e5a2541c491ae484c8f21da1bd6209fa8",
+    "same_load_candidate_comparison": false,
+    "frozen_reference_remeasured": false
+  },
+  "system": {
+    "hardware": "4 NVIDIA GB10, ASUS Ascent GX10",
+    "topology": "TP4, one GPU per rank, switchless RoCE ring",
+    "model": "zai-org/GLM-5.3-Flash",
+    "model_revision": "690b705278a3a58e538fcb37c2ca8b5f9511213c",
+    "quantisation": "E36: FP8 checkpoint with inherited INT8 W8A16 projections and shared INT8 lm_head",
+    "kv_cache_dtype": "fp8_e4m3",
+    "serving_engine": "SparkRing R10, vLLM 0.1.dev1+gd377796e8",
+    "context_limit": 262144,
+    "competing_traffic": "none at preflight; monitoring during run",
+    "experiment": "E38 MLA preparation diagnostics, not a candidate performance arm"
+  },
+  "counts": {
+    "native_diagnostic_executions": 2,
+    "warmup_requests": 24,
+    "profiled_requests": 24,
+    "total_native_requests": 48,
+    "native_full_suites": 0,
+    "candidate_requests": 0,
+    "transport_errors": 0,
+    "unfinished_streams": 0,
+    "profiled_api_success_delta": 24,
+    "post_boot_functional_requests_completed": 4,
+    "functional_request_accounting": "Completed requests derived from available profiled/restored gate receipts; missing receipts do not establish attempted-request counts. Controller startup smoke and preflight identity traffic are separate from native Rigmark"
+  },
+  "protocol": {
+    "benchmark_interface": "upstream unmodified Rigmark",
+    "flags": [
+      "--runs 1",
+      "--skip-prefill",
+      "--extra-body {\"chat_template_kwargs\": {\"reasoning_effort\": \"low\"}}",
+      "unique --comparison-id",
+      "unique absolute --output"
+    ],
+    "cache_salt": false,
+    "remaining_flags": "upstream E36 defaults",
+    "raw_receipts_modified": false,
+    "native_phase_requests": {
+      "preliminary_decode": 3,
+      "concurrency_1": 3,
+      "concurrency_2": 6,
+      "concurrency_4": 12
+    },
+    "profile": "Nsight Systems 2025.3.2, cuda/nvtx/osrt, CUDA graph node trace, all four ranks",
+    "native_aggregation": "Upstream per-execution summaries; two diagnostics are not pooled as candidate repeats"
+  },
+  "native_diagnostics": [
+    {
+      "arm": "warmup",
+      "requests": 24,
+      "complete": true,
+      "errors": 0,
+      "unfinished_streams": 0,
+      "native_decode_gates": {
+        "code": {
+          "passed": 1,
+          "total": 1
+        },
+        "prose": {
+          "passed": 1,
+          "total": 1
+        },
+        "structured": {
+          "passed": 1,
+          "total": 1
+        }
+      },
+      "finish_reasons": {
+        "length": 21,
+        "stop": 3
+      },
+      "source": {
+        "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+        "prompts_version": "1.0.0",
+        "repository_dirty": null,
+        "repository_revision": "c5a0db01b0542ac291883ab049b6141efae0c7d3",
+        "repository_source": "git-archive",
+        "repository_source_sha256": "61d71055b4a3a64cb0520fc1bc535de9a1863463c6937d423745957339f7f1b7",
+        "version": "1.1.0"
+      },
+      "settings": {
+        "concurrency": [
+          1,
+          2,
+          4
+        ],
+        "concurrency_runs": 3,
+        "concurrency_tokens": 256,
+        "concurrency_workload": "code",
+        "decode_tokens": 4096,
+        "extra_body": {
+          "chat_template_kwargs": {
+            "reasoning_effort": "low"
+          }
+        },
+        "prefill_depths": [],
+        "prefill_runs": 3,
+        "runs": 1,
+        "seed": 20260905,
+        "temperature": 0.0,
+        "top_p": 1.0
+      },
+      "receipt_sha256": "4166a84dd3576b7f190fbc9e0353ed7f3d5d2b60cddb7acbab6778dca87756bc",
+      "decode_metrics": {
+        "code": {
+          "decode_tokens_per_second": {
+            "maximum": 67.477,
+            "median": 67.477,
+            "minimum": 67.477,
+            "p90": 67.477
+          },
+          "ttft_seconds": {
+            "maximum": 0.453,
+            "median": 0.453,
+            "minimum": 0.453,
+            "p90": 0.453
+          },
+          "time_to_last_output_seconds": {
+            "maximum": 26.744,
+            "median": 26.744,
+            "minimum": 26.744,
+            "p90": 26.744
+          },
+          "wall_seconds": {
+            "maximum": 26.744,
+            "median": 26.744,
+            "minimum": 26.744,
+            "p90": 26.744
+          }
+        },
+        "prose": {
+          "decode_tokens_per_second": {
+            "maximum": 34.581,
+            "median": 34.581,
+            "minimum": 34.581,
+            "p90": 34.581
+          },
+          "ttft_seconds": {
+            "maximum": 0.38,
+            "median": 0.38,
+            "minimum": 0.38,
+            "p90": 0.38
+          },
+          "time_to_last_output_seconds": {
+            "maximum": 29.876,
+            "median": 29.876,
+            "minimum": 29.876,
+            "p90": 29.876
+          },
+          "wall_seconds": {
+            "maximum": 29.876,
+            "median": 29.876,
+            "minimum": 29.876,
+            "p90": 29.876
+          }
+        },
+        "structured": {
+          "decode_tokens_per_second": {
+            "maximum": 95.45,
+            "median": 95.45,
+            "minimum": 95.45,
+            "p90": 95.45
+          },
+          "ttft_seconds": {
+            "maximum": 0.442,
+            "median": 0.442,
+            "minimum": 0.442,
+            "p90": 0.442
+          },
+          "time_to_last_output_seconds": {
+            "maximum": 5.01,
+            "median": 5.01,
+            "minimum": 5.01,
+            "p90": 5.01
+          },
+          "wall_seconds": {
+            "maximum": 5.01,
+            "median": 5.01,
+            "minimum": 5.01,
+            "p90": 5.01
+          }
+        }
+      },
+      "concurrency_metrics": {
+        "1": {
+          "aggregate_end_to_end_tokens_per_second": {
+            "maximum": 52.369,
+            "median": 50.462,
+            "minimum": 47.827,
+            "p90": 52.369
+          },
+          "per_stream_decode_tokens_per_second": {
+            "maximum": 57.581,
+            "median": 54.65,
+            "minimum": 51.581,
+            "p90": 57.581
+          },
+          "per_stream_ttft_seconds": {
+            "maximum": 0.459,
+            "median": 0.408,
+            "minimum": 0.406,
+            "p90": 0.459
+          }
+        },
+        "2": {
+          "aggregate_end_to_end_tokens_per_second": {
+            "maximum": 78.488,
+            "median": 72.831,
+            "minimum": 68.68,
+            "p90": 78.488
+          },
+          "per_stream_decode_tokens_per_second": {
+            "maximum": 42.246,
+            "median": 40.971,
+            "minimum": 36.443,
+            "p90": 42.245
+          },
+          "per_stream_ttft_seconds": {
+            "maximum": 0.615,
+            "median": 0.486,
+            "minimum": 0.457,
+            "p90": 0.615
+          }
+        },
+        "4": {
+          "aggregate_end_to_end_tokens_per_second": {
+            "maximum": 116.512,
+            "median": 104.887,
+            "minimum": 100.768,
+            "p90": 116.512
+          },
+          "per_stream_decode_tokens_per_second": {
+            "maximum": 33.161,
+            "median": 30.537,
+            "minimum": 26.529,
+            "p90": 32.006
+          },
+          "per_stream_ttft_seconds": {
+            "maximum": 1.197,
+            "median": 0.586,
+            "minimum": 0.547,
+            "p90": 1.197
+          }
+        }
+      },
+      "round_aggregate_tokens_per_second": {
+        "1": [
+          52.369,
+          47.827,
+          50.462
+        ],
+        "2": [
+          78.488,
+          72.831,
+          68.68
+        ],
+        "4": [
+          116.512,
+          104.887,
+          100.768
+        ]
+      }
+    },
+    {
+      "arm": "profile",
+      "requests": 24,
+      "complete": true,
+      "errors": 0,
+      "unfinished_streams": 0,
+      "native_decode_gates": {
+        "code": {
+          "passed": 1,
+          "total": 1
+        },
+        "prose": {
+          "passed": 1,
+          "total": 1
+        },
+        "structured": {
+          "passed": 1,
+          "total": 1
+        }
+      },
+      "finish_reasons": {
+        "length": 21,
+        "stop": 3
+      },
+      "source": {
+        "prompts_sha256": "0c3ac4015813af6a1b967659bd2289990fde895a5e43ae065b894d1e1f909ecb",
+        "prompts_version": "1.0.0",
+        "repository_dirty": null,
+        "repository_revision": "c5a0db01b0542ac291883ab049b6141efae0c7d3",
+        "repository_source": "git-archive",
+        "repository_source_sha256": "61d71055b4a3a64cb0520fc1bc535de9a1863463c6937d423745957339f7f1b7",
+        "version": "1.1.0"
+      },
+      "settings": {
+        "concurrency": [
+          1,
+          2,
+          4
+        ],
+        "concurrency_runs": 3,
+        "concurrency_tokens": 256,
+        "concurrency_workload": "code",
+        "decode_tokens": 4096,
+        "extra_body": {
+          "chat_template_kwargs": {
+            "reasoning_effort": "low"
+          }
+        },
+        "prefill_depths": [],
+        "prefill_runs": 3,
+        "runs": 1,
+        "seed": 20260905,
+        "temperature": 0.0,
+        "top_p": 1.0
+      },
+      "receipt_sha256": "f256215a31d1ba104a807a086d9fdaa27acee319b716670101b757d9bcb647a2",
+      "decode_metrics": {
+        "code": {
+          "decode_tokens_per_second": {
+            "maximum": 61.64,
+            "median": 61.64,
+            "minimum": 61.64,
+            "p90": 61.64
+          },
+          "ttft_seconds": {
+            "maximum": 0.434,
+            "median": 0.434,
+            "minimum": 0.434,
+            "p90": 0.434
+          },
+          "time_to_last_output_seconds": {
+            "maximum": 32.654,
+            "median": 32.654,
+            "minimum": 32.654,
+            "p90": 32.654
+          },
+          "wall_seconds": {
+            "maximum": 32.735,
+            "median": 32.735,
+            "minimum": 32.735,
+            "p90": 32.735
+          }
+        },
+        "prose": {
+          "decode_tokens_per_second": {
+            "maximum": 32.629,
+            "median": 32.629,
+            "minimum": 32.629,
+            "p90": 32.629
+          },
+          "ttft_seconds": {
+            "maximum": 0.378,
+            "median": 0.378,
+            "minimum": 0.378,
+            "p90": 0.378
+          },
+          "time_to_last_output_seconds": {
+            "maximum": 28.542,
+            "median": 28.542,
+            "minimum": 28.542,
+            "p90": 28.542
+          },
+          "wall_seconds": {
+            "maximum": 28.543,
+            "median": 28.543,
+            "minimum": 28.543,
+            "p90": 28.543
+          }
+        },
+        "structured": {
+          "decode_tokens_per_second": {
+            "maximum": 92.52,
+            "median": 92.52,
+            "minimum": 92.52,
+            "p90": 92.52
+          },
+          "ttft_seconds": {
+            "maximum": 0.461,
+            "median": 0.461,
+            "minimum": 0.461,
+            "p90": 0.461
+          },
+          "time_to_last_output_seconds": {
+            "maximum": 5.173,
+            "median": 5.173,
+            "minimum": 5.173,
+            "p90": 5.173
+          },
+          "wall_seconds": {
+            "maximum": 5.173,
+            "median": 5.173,
+            "minimum": 5.173,
+            "p90": 5.173
+          }
+        }
+      },
+      "concurrency_metrics": {
+        "1": {
+          "aggregate_end_to_end_tokens_per_second": {
+            "maximum": 48.344,
+            "median": 44.876,
+            "minimum": 43.498,
+            "p90": 48.344
+          },
+          "per_stream_decode_tokens_per_second": {
+            "maximum": 52.243,
+            "median": 48.163,
+            "minimum": 47.055,
+            "p90": 52.243
+          },
+          "per_stream_ttft_seconds": {
+            "maximum": 0.465,
+            "median": 0.413,
+            "minimum": 0.409,
+            "p90": 0.465
+          }
+        },
+        "2": {
+          "aggregate_end_to_end_tokens_per_second": {
+            "maximum": 71.908,
+            "median": 69.378,
+            "minimum": 68.448,
+            "p90": 71.908
+          },
+          "per_stream_decode_tokens_per_second": {
+            "maximum": 41.685,
+            "median": 37.794,
+            "minimum": 36.346,
+            "p90": 38.367
+          },
+          "per_stream_ttft_seconds": {
+            "maximum": 0.473,
+            "median": 0.468,
+            "minimum": 0.463,
+            "p90": 0.473
+          }
+        },
+        "4": {
+          "aggregate_end_to_end_tokens_per_second": {
+            "maximum": 109.403,
+            "median": 106.454,
+            "minimum": 103.178,
+            "p90": 109.403
+          },
+          "per_stream_decode_tokens_per_second": {
+            "maximum": 30.719,
+            "median": 28.779,
+            "minimum": 27.215,
+            "p90": 29.781
+          },
+          "per_stream_ttft_seconds": {
+            "maximum": 0.555,
+            "median": 0.554,
+            "minimum": 0.553,
+            "p90": 0.555
+          }
+        }
+      },
+      "round_aggregate_tokens_per_second": {
+        "1": [
+          43.498,
+          48.344,
+          44.876
+        ],
+        "2": [
+          71.908,
+          69.378,
+          68.448
+        ],
+        "4": [
+          103.178,
+          109.403,
+          106.454
+        ]
+      }
+    }
+  ],
+  "mla_census": {
+    "per_rank_layers": 11,
+    "layer_indices": [
+      3,
+      7,
+      11,
+      15,
+      19,
+      23,
+      27,
+      31,
+      35,
+      39,
+      43
+    ],
+    "observed_graph_rows": [
+      4,
+      8,
+      16
+    ],
+    "prototype_qualified_rows": [],
+    "verification_level": "Model configuration, matched installed Python source hashes, and graph kernel geometry; runtime pointer aliases, write regions and adversarial numerical invariants were not qualified",
+    "qkv_a_nk": [
+      2048,
+      4096
+    ],
+    "q_b_nk": [
+      4096,
+      1536
+    ],
+    "q_lora_rank": 1536,
+    "kv_lora_rank": 512,
+    "local_heads": 16,
+    "head_width": 256,
+    "rope_width": 0,
+    "rms_epsilon": 1e-05,
+    "split_row_stride_elements": 2048,
+    "weight_format": "Marlin uint8b128 INT8, group 128, int32 packed weights, BF16 scales, FP32 reduction",
+    "padding": "N aligned to 256 and K unpadded; no extra N/K padding for these two projections",
+    "rounding": "Native QKV-A BF16; normalized q_c and kv_c_normed BF16; Q-B BF16 output",
+    "aliases_and_mutations": "Source-derived: q_c/kv_lora initially split views of QKV-A; normalizations materialize separate tensors; Q-B output is viewed as heads. q_c remains required by the indexer; workspace mutations remain outside this qualification.",
+    "rope_and_boundaries": "No MLA Q/K-RoPE arithmetic at width zero; indexer positional operations stay outside fusion",
+    "fallback_contract": "Prefill, mixed requests and unqualified shapes must retain E36",
+    "installed_sources": [
+      {
+        "module": "vllm/model_executor/layers/mla.py",
+        "sha256": "eddc5d57cf39468157300189a12f7a1e440886218444e7a111286c527c9de3bf",
+        "bytes": 9223
+      },
+      {
+        "module": "vllm/models/glm5next/nvidia/attention.py",
+        "sha256": "c04298d14eedcb6cc329d161c182cfccf092113ee7f12e54d27ad233818df083",
+        "bytes": 8159
+      },
+      {
+        "module": "vllm/model_executor/layers/linear.py",
+        "sha256": "bed47ddb286f5e55a7ffcccf4243d92d7d489db858a6c90e91c81342b0b8e1ae",
+        "bytes": 66650
+      },
+      {
+        "module": "vllm/model_executor/layers/quantization/utils/marlin_utils.py",
+        "sha256": "6f91cbf2b0ae276abd4b57b80b20f260307f9df3e24d40ee2b0abf76f4c7f100",
+        "bytes": 26649
+      },
+      {
+        "module": "vllm/model_executor/layers/layernorm.py",
+        "sha256": "ef94ccd617c284e0fcd01b92a741b9262d343a02110cefc71dbf3e4c22356c44",
+        "bytes": 10494
+      },
+      {
+        "module": "vllm/model_executor/layers/rotary_embedding/base.py",
+        "sha256": "c81804498f08f072356a26b41967f211475df2694dabf5da9f488c074d1fdef5",
+        "bytes": 10964
+      },
+      {
+        "module": "vllm/_custom_ops.py",
+        "sha256": "183264850d17237bf7ec9c82728c1d8ff042c73545843912faccad29056bb84d",
+        "bytes": 125541
+      }
+    ],
+    "installed_python_hashes_equal_across_four_ranks": true,
+    "exact_marlin_cpp_provenance": "unresolved; no matching C++ source found in inspected image build locations; no substitute used"
+  },
+  "attribution": {
+    "full_target_graph_marker": "84 fused_moe_kernel short names in one GPU correlation group",
+    "mla_tuple": "Marlin grid(48,1,1) block(256,1,1); RMS q grid(m,1,1) block(192,1,1); RMS KV grid(m,1,1) block(64,1,1); Marlin same grid/block; consecutive graph nodes, same stream",
+    "layers_per_graph": 11,
+    "rank_results": [
+      {
+        "full_target_graphs": 1705,
+        "attributed_graphs": 1206,
+        "excluded_graphs": {
+          "nonmonotonic_kernel_timestamps": 381,
+          "phase_boundary_clock_uncertainty_and_empirical_guard": 118
+        },
+        "summaries": [
+          {
+            "phase": "concurrency/1",
+            "rows": 4,
+            "target_graphs": 111,
+            "target_span_ms": {
+              "n": 111,
+              "p50": 51.658688,
+              "p99": 55.757632
+            },
+            "q_norm_us": {
+              "n": 111,
+              "p50": 23.424,
+              "p99": 35.808
+            },
+            "kv_norm_us": {
+              "n": 111,
+              "p50": 18.336,
+              "p99": 29.504
+            },
+            "pre_qb_bound_us": {
+              "n": 111,
+              "p50": 45.344,
+              "p99": 64.032
+            },
+            "qb_diagnostic_us": {
+              "n": 111,
+              "p50": 355.072,
+              "p99": 422.62399999999997
+            }
+          },
+          {
+            "phase": "concurrency/1",
+            "rows": 8,
+            "target_graphs": 46,
+            "target_span_ms": {
+              "n": 46,
+              "p50": 74.982768,
+              "p99": 83.42272
+            },
+            "q_norm_us": {
+              "n": 46,
+              "p50": 23.119999999999997,
+              "p99": 60.0
+            },
+            "kv_norm_us": {
+              "n": 46,
+              "p50": 18.656,
+              "p99": 29.376
+            },
+            "pre_qb_bound_us": {
+              "n": 46,
+              "p50": 45.584,
+              "p99": 85.568
+            },
+            "qb_diagnostic_us": {
+              "n": 46,
+              "p50": 355.43999999999994,
+              "p99": 410.62399999999997
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 4,
+            "target_graphs": 3,
+            "target_span_ms": {
+              "n": 3,
+              "p50": 51.540736,
+              "p99": 52.730976
+            },
+            "q_norm_us": {
+              "n": 3,
+              "p50": 21.887999999999998,
+              "p99": 28.672
+            },
+            "kv_norm_us": {
+              "n": 3,
+              "p50": 18.496,
+              "p99": 18.656
+            },
+            "pre_qb_bound_us": {
+              "n": 3,
+              "p50": 43.936,
+              "p99": 50.336
+            },
+            "qb_diagnostic_us": {
+              "n": 3,
+              "p50": 351.55199999999996,
+              "p99": 369.504
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 8,
+            "target_graphs": 203,
+            "target_span_ms": {
+              "n": 203,
+              "p50": 73.083168,
+              "p99": 83.304832
+            },
+            "q_norm_us": {
+              "n": 203,
+              "p50": 23.392,
+              "p99": 41.376
+            },
+            "kv_norm_us": {
+              "n": 203,
+              "p50": 18.656,
+              "p99": 25.951999999999998
+            },
+            "pre_qb_bound_us": {
+              "n": 203,
+              "p50": 45.6,
+              "p99": 68.672
+            },
+            "qb_diagnostic_us": {
+              "n": 203,
+              "p50": 353.69599999999997,
+              "p99": 387.68
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 4,
+            "target_graphs": 1,
+            "target_span_ms": {
+              "n": 1,
+              "p50": 57.505824,
+              "p99": 57.505824
+            },
+            "q_norm_us": {
+              "n": 1,
+              "p50": 21.759999999999998,
+              "p99": 21.759999999999998
+            },
+            "kv_norm_us": {
+              "n": 1,
+              "p50": 17.919999999999998,
+              "p99": 17.919999999999998
+            },
+            "pre_qb_bound_us": {
+              "n": 1,
+              "p50": 43.36,
+              "p99": 43.36
+            },
+            "qb_diagnostic_us": {
+              "n": 1,
+              "p50": 351.74399999999997,
+              "p99": 351.74399999999997
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 8,
+            "target_graphs": 4,
+            "target_span_ms": {
+              "n": 4,
+              "p50": 78.79064,
+              "p99": 81.98128
+            },
+            "q_norm_us": {
+              "n": 4,
+              "p50": 27.28,
+              "p99": 27.584
+            },
+            "kv_norm_us": {
+              "n": 4,
+              "p50": 18.784,
+              "p99": 21.216
+            },
+            "pre_qb_bound_us": {
+              "n": 4,
+              "p50": 49.632,
+              "p99": 52.288
+            },
+            "qb_diagnostic_us": {
+              "n": 4,
+              "p50": 364.64,
+              "p99": 391.328
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 16,
+            "target_graphs": 181,
+            "target_span_ms": {
+              "n": 181,
+              "p50": 97.243392,
+              "p99": 123.866528
+            },
+            "q_norm_us": {
+              "n": 181,
+              "p50": 23.424,
+              "p99": 39.519999999999996
+            },
+            "kv_norm_us": {
+              "n": 181,
+              "p50": 18.496,
+              "p99": 21.951999999999998
+            },
+            "pre_qb_bound_us": {
+              "n": 181,
+              "p50": 45.6,
+              "p99": 63.711999999999996
+            },
+            "qb_diagnostic_us": {
+              "n": 181,
+              "p50": 356.864,
+              "p99": 369.888
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 4,
+            "target_graphs": 107,
+            "target_span_ms": {
+              "n": 107,
+              "p50": 51.990144,
+              "p99": 57.159968
+            },
+            "q_norm_us": {
+              "n": 107,
+              "p50": 22.56,
+              "p99": 34.816
+            },
+            "kv_norm_us": {
+              "n": 107,
+              "p50": 18.24,
+              "p99": 26.272
+            },
+            "pre_qb_bound_us": {
+              "n": 107,
+              "p50": 44.48,
+              "p99": 65.28
+            },
+            "qb_diagnostic_us": {
+              "n": 107,
+              "p50": 354.304,
+              "p99": 407.072
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 8,
+            "target_graphs": 209,
+            "target_span_ms": {
+              "n": 209,
+              "p50": 76.804096,
+              "p99": 83.74544
+            },
+            "q_norm_us": {
+              "n": 209,
+              "p50": 22.88,
+              "p99": 40.864000000000004
+            },
+            "kv_norm_us": {
+              "n": 209,
+              "p50": 18.4,
+              "p99": 29.28
+            },
+            "pre_qb_bound_us": {
+              "n": 209,
+              "p50": 45.056,
+              "p99": 71.424
+            },
+            "qb_diagnostic_us": {
+              "n": 209,
+              "p50": 352.928,
+              "p99": 423.168
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 4,
+            "target_graphs": 308,
+            "target_span_ms": {
+              "n": 308,
+              "p50": 51.430127999999996,
+              "p99": 60.205184
+            },
+            "q_norm_us": {
+              "n": 308,
+              "p50": 22.799999999999997,
+              "p99": 62.624
+            },
+            "kv_norm_us": {
+              "n": 308,
+              "p50": 18.368,
+              "p99": 34.144
+            },
+            "pre_qb_bound_us": {
+              "n": 308,
+              "p50": 44.8,
+              "p99": 97.248
+            },
+            "qb_diagnostic_us": {
+              "n": 308,
+              "p50": 354.224,
+              "p99": 441.312
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 8,
+            "target_graphs": 4,
+            "target_span_ms": {
+              "n": 4,
+              "p50": 69.907824,
+              "p99": 71.842816
+            },
+            "q_norm_us": {
+              "n": 4,
+              "p50": 22.240000000000002,
+              "p99": 32.864
+            },
+            "kv_norm_us": {
+              "n": 4,
+              "p50": 18.512,
+              "p99": 18.848
+            },
+            "pre_qb_bound_us": {
+              "n": 4,
+              "p50": 44.384,
+              "p99": 54.752
+            },
+            "qb_diagnostic_us": {
+              "n": 4,
+              "p50": 351.13599999999997,
+              "p99": 358.94399999999996
+            }
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 8,
+            "target_graphs": 29,
+            "target_span_ms": {
+              "n": 29,
+              "p50": 77.89168,
+              "p99": 82.19008
+            },
+            "q_norm_us": {
+              "n": 29,
+              "p50": 23.616,
+              "p99": 33.536
+            },
+            "kv_norm_us": {
+              "n": 29,
+              "p50": 18.624,
+              "p99": 37.152
+            },
+            "pre_qb_bound_us": {
+              "n": 29,
+              "p50": 45.792,
+              "p99": 74.304
+            },
+            "qb_diagnostic_us": {
+              "n": 29,
+              "p50": 353.888,
+              "p99": 406.784
+            }
+          }
+        ],
+        "denominators": [
+          {
+            "phase": "concurrency/1",
+            "rows": 4,
+            "eligible": 172,
+            "accepted": 111,
+            "excluded": 61,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 17,
+              "nonmonotonic_kernel_timestamps": 44
+            }
+          },
+          {
+            "phase": "concurrency/1",
+            "rows": 8,
+            "eligible": 62,
+            "accepted": 46,
+            "excluded": 16,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 6,
+              "nonmonotonic_kernel_timestamps": 10
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 4,
+            "eligible": 8,
+            "accepted": 3,
+            "excluded": 5,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 4,
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 1
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 8,
+            "eligible": 254,
+            "accepted": 203,
+            "excluded": 51,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 19,
+              "nonmonotonic_kernel_timestamps": 32
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 16,
+            "eligible": 252,
+            "accepted": 181,
+            "excluded": 71,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 59,
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 12
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 4,
+            "eligible": 4,
+            "accepted": 1,
+            "excluded": 3,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 2,
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 1
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 8,
+            "eligible": 7,
+            "accepted": 4,
+            "excluded": 3,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 2,
+              "nonmonotonic_kernel_timestamps": 1
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 4,
+            "eligible": 176,
+            "accepted": 107,
+            "excluded": 69,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 60,
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 9
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 8,
+            "eligible": 250,
+            "accepted": 209,
+            "excluded": 41,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 33,
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 8
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 4,
+            "eligible": 460,
+            "accepted": 308,
+            "excluded": 152,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 128,
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 24
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 8,
+            "eligible": 4,
+            "accepted": 4,
+            "excluded": 0,
+            "reasons": {}
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 4,
+            "eligible": 1,
+            "accepted": 0,
+            "excluded": 1,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 1
+            }
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 8,
+            "eligible": 55,
+            "accepted": 29,
+            "excluded": 26,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 19,
+              "nonmonotonic_kernel_timestamps": 7
+            }
+          }
+        ]
+      },
+      {
+        "full_target_graphs": 1705,
+        "attributed_graphs": 1463,
+        "excluded_graphs": {
+          "phase_boundary_clock_uncertainty_and_empirical_guard": 135,
+          "nonmonotonic_kernel_timestamps": 107
+        },
+        "summaries": [
+          {
+            "phase": "concurrency/1",
+            "rows": 4,
+            "target_graphs": 152,
+            "target_span_ms": {
+              "n": 152,
+              "p50": 51.912112,
+              "p99": 55.7504
+            },
+            "q_norm_us": {
+              "n": 152,
+              "p50": 22.336,
+              "p99": 41.696
+            },
+            "kv_norm_us": {
+              "n": 152,
+              "p50": 18.688,
+              "p99": 26.176
+            },
+            "pre_qb_bound_us": {
+              "n": 152,
+              "p50": 44.8,
+              "p99": 68.224
+            },
+            "qb_diagnostic_us": {
+              "n": 152,
+              "p50": 360.96,
+              "p99": 404.32
+            }
+          },
+          {
+            "phase": "concurrency/1",
+            "rows": 8,
+            "target_graphs": 48,
+            "target_span_ms": {
+              "n": 48,
+              "p50": 74.834288,
+              "p99": 82.227488
+            },
+            "q_norm_us": {
+              "n": 48,
+              "p50": 22.479999999999997,
+              "p99": 33.28
+            },
+            "kv_norm_us": {
+              "n": 48,
+              "p50": 18.832,
+              "p99": 28.96
+            },
+            "pre_qb_bound_us": {
+              "n": 48,
+              "p50": 45.056,
+              "p99": 60.448
+            },
+            "qb_diagnostic_us": {
+              "n": 48,
+              "p50": 361.648,
+              "p99": 417.08799999999997
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 4,
+            "target_graphs": 5,
+            "target_span_ms": {
+              "n": 5,
+              "p50": 51.539296,
+              "p99": 56.254816
+            },
+            "q_norm_us": {
+              "n": 5,
+              "p50": 22.048000000000002,
+              "p99": 25.664
+            },
+            "kv_norm_us": {
+              "n": 5,
+              "p50": 18.944,
+              "p99": 23.104
+            },
+            "pre_qb_bound_us": {
+              "n": 5,
+              "p50": 45.568,
+              "p99": 50.304
+            },
+            "qb_diagnostic_us": {
+              "n": 5,
+              "p50": 367.23199999999997,
+              "p99": 399.648
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 8,
+            "target_graphs": 231,
+            "target_span_ms": {
+              "n": 231,
+              "p50": 73.105056,
+              "p99": 86.885184
+            },
+            "q_norm_us": {
+              "n": 231,
+              "p50": 22.528,
+              "p99": 30.624
+            },
+            "kv_norm_us": {
+              "n": 231,
+              "p50": 18.752,
+              "p99": 30.336
+            },
+            "pre_qb_bound_us": {
+              "n": 231,
+              "p50": 44.928,
+              "p99": 69.024
+            },
+            "qb_diagnostic_us": {
+              "n": 231,
+              "p50": 363.74399999999997,
+              "p99": 404.032
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 4,
+            "target_graphs": 3,
+            "target_span_ms": {
+              "n": 3,
+              "p50": 54.927584,
+              "p99": 57.516576
+            },
+            "q_norm_us": {
+              "n": 3,
+              "p50": 22.656,
+              "p99": 23.072
+            },
+            "kv_norm_us": {
+              "n": 3,
+              "p50": 18.4,
+              "p99": 18.464
+            },
+            "pre_qb_bound_us": {
+              "n": 3,
+              "p50": 44.64,
+              "p99": 47.264
+            },
+            "qb_diagnostic_us": {
+              "n": 3,
+              "p50": 365.12,
+              "p99": 382.912
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 8,
+            "target_graphs": 4,
+            "target_span_ms": {
+              "n": 4,
+              "p50": 78.788928,
+              "p99": 81.986528
+            },
+            "q_norm_us": {
+              "n": 4,
+              "p50": 23.552,
+              "p99": 25.344
+            },
+            "kv_norm_us": {
+              "n": 4,
+              "p50": 18.848,
+              "p99": 19.04
+            },
+            "pre_qb_bound_us": {
+              "n": 4,
+              "p50": 45.92,
+              "p99": 47.872
+            },
+            "qb_diagnostic_us": {
+              "n": 4,
+              "p50": 361.72799999999995,
+              "p99": 365.279
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 16,
+            "target_graphs": 192,
+            "target_span_ms": {
+              "n": 192,
+              "p50": 96.560048,
+              "p99": 125.42992
+            },
+            "q_norm_us": {
+              "n": 192,
+              "p50": 22.560000000000002,
+              "p99": 28.192
+            },
+            "kv_norm_us": {
+              "n": 192,
+              "p50": 18.688,
+              "p99": 24.544
+            },
+            "pre_qb_bound_us": {
+              "n": 192,
+              "p50": 44.976,
+              "p99": 53.184
+            },
+            "qb_diagnostic_us": {
+              "n": 192,
+              "p50": 369.82399999999996,
+              "p99": 386.336
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 4,
+            "target_graphs": 160,
+            "target_span_ms": {
+              "n": 160,
+              "p50": 52.112688,
+              "p99": 57.066048
+            },
+            "q_norm_us": {
+              "n": 160,
+              "p50": 22.032,
+              "p99": 36.8
+            },
+            "kv_norm_us": {
+              "n": 160,
+              "p50": 18.496,
+              "p99": 25.6
+            },
+            "pre_qb_bound_us": {
+              "n": 160,
+              "p50": 44.192,
+              "p99": 62.688
+            },
+            "qb_diagnostic_us": {
+              "n": 160,
+              "p50": 359.056,
+              "p99": 397.92
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 8,
+            "target_graphs": 217,
+            "target_span_ms": {
+              "n": 217,
+              "p50": 76.954912,
+              "p99": 84.1664
+            },
+            "q_norm_us": {
+              "n": 217,
+              "p50": 22.240000000000002,
+              "p99": 42.592
+            },
+            "kv_norm_us": {
+              "n": 217,
+              "p50": 18.624,
+              "p99": 28.672
+            },
+            "pre_qb_bound_us": {
+              "n": 217,
+              "p50": 44.512,
+              "p99": 74.976
+            },
+            "qb_diagnostic_us": {
+              "n": 217,
+              "p50": 359.68,
+              "p99": 398.144
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 4,
+            "target_graphs": 413,
+            "target_span_ms": {
+              "n": 413,
+              "p50": 51.483936,
+              "p99": 65.290176
+            },
+            "q_norm_us": {
+              "n": 413,
+              "p50": 22.336,
+              "p99": 41.248000000000005
+            },
+            "kv_norm_us": {
+              "n": 413,
+              "p50": 18.56,
+              "p99": 30.528
+            },
+            "pre_qb_bound_us": {
+              "n": 413,
+              "p50": 44.672,
+              "p99": 87.968
+            },
+            "qb_diagnostic_us": {
+              "n": 413,
+              "p50": 360.352,
+              "p99": 424.64
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 8,
+            "target_graphs": 4,
+            "target_span_ms": {
+              "n": 4,
+              "p50": 69.903792,
+              "p99": 71.838976
+            },
+            "q_norm_us": {
+              "n": 4,
+              "p50": 22.464,
+              "p99": 22.624
+            },
+            "kv_norm_us": {
+              "n": 4,
+              "p50": 19.2,
+              "p99": 19.296
+            },
+            "pre_qb_bound_us": {
+              "n": 4,
+              "p50": 45.216,
+              "p99": 45.472
+            },
+            "qb_diagnostic_us": {
+              "n": 4,
+              "p50": 361.888,
+              "p99": 364.448
+            }
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 8,
+            "target_graphs": 34,
+            "target_span_ms": {
+              "n": 34,
+              "p50": 77.934304,
+              "p99": 82.193696
+            },
+            "q_norm_us": {
+              "n": 34,
+              "p50": 22.4,
+              "p99": 33.568
+            },
+            "kv_norm_us": {
+              "n": 34,
+              "p50": 18.72,
+              "p99": 19.36
+            },
+            "pre_qb_bound_us": {
+              "n": 34,
+              "p50": 44.704,
+              "p99": 56.096000000000004
+            },
+            "qb_diagnostic_us": {
+              "n": 34,
+              "p50": 360.81600000000003,
+              "p99": 383.072
+            }
+          }
+        ],
+        "denominators": [
+          {
+            "phase": "concurrency/1",
+            "rows": 4,
+            "eligible": 172,
+            "accepted": 152,
+            "excluded": 20,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 20
+            }
+          },
+          {
+            "phase": "concurrency/1",
+            "rows": 8,
+            "eligible": 62,
+            "accepted": 48,
+            "excluded": 14,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 5,
+              "nonmonotonic_kernel_timestamps": 9
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 4,
+            "eligible": 8,
+            "accepted": 5,
+            "excluded": 3,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 3
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 8,
+            "eligible": 254,
+            "accepted": 231,
+            "excluded": 23,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 21,
+              "nonmonotonic_kernel_timestamps": 2
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 16,
+            "eligible": 252,
+            "accepted": 192,
+            "excluded": 60,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 11,
+              "nonmonotonic_kernel_timestamps": 49
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 4,
+            "eligible": 4,
+            "accepted": 3,
+            "excluded": 1,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 1
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 8,
+            "eligible": 7,
+            "accepted": 4,
+            "excluded": 3,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 3
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 4,
+            "eligible": 176,
+            "accepted": 160,
+            "excluded": 16,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 14,
+              "nonmonotonic_kernel_timestamps": 2
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 8,
+            "eligible": 250,
+            "accepted": 217,
+            "excluded": 33,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 9,
+              "nonmonotonic_kernel_timestamps": 24
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 4,
+            "eligible": 460,
+            "accepted": 413,
+            "excluded": 47,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 29,
+              "nonmonotonic_kernel_timestamps": 18
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 8,
+            "eligible": 4,
+            "accepted": 4,
+            "excluded": 0,
+            "reasons": {}
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 4,
+            "eligible": 1,
+            "accepted": 0,
+            "excluded": 1,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 1
+            }
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 8,
+            "eligible": 55,
+            "accepted": 34,
+            "excluded": 21,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 18,
+              "nonmonotonic_kernel_timestamps": 3
+            }
+          }
+        ]
+      },
+      {
+        "full_target_graphs": 1705,
+        "attributed_graphs": 1438,
+        "excluded_graphs": {
+          "phase_boundary_clock_uncertainty_and_empirical_guard": 139,
+          "nonmonotonic_kernel_timestamps": 128
+        },
+        "summaries": [
+          {
+            "phase": "concurrency/1",
+            "rows": 4,
+            "target_graphs": 140,
+            "target_span_ms": {
+              "n": 140,
+              "p50": 52.081807999999995,
+              "p99": 57.183872
+            },
+            "q_norm_us": {
+              "n": 140,
+              "p50": 22.336,
+              "p99": 48.32
+            },
+            "kv_norm_us": {
+              "n": 140,
+              "p50": 18.512,
+              "p99": 30.56
+            },
+            "pre_qb_bound_us": {
+              "n": 140,
+              "p50": 44.512,
+              "p99": 82.464
+            },
+            "qb_diagnostic_us": {
+              "n": 140,
+              "p50": 355.44,
+              "p99": 408.704
+            }
+          },
+          {
+            "phase": "concurrency/1",
+            "rows": 8,
+            "target_graphs": 55,
+            "target_span_ms": {
+              "n": 55,
+              "p50": 74.983232,
+              "p99": 82.23264
+            },
+            "q_norm_us": {
+              "n": 55,
+              "p50": 22.688,
+              "p99": 30.368
+            },
+            "kv_norm_us": {
+              "n": 55,
+              "p50": 18.592,
+              "p99": 19.328
+            },
+            "pre_qb_bound_us": {
+              "n": 55,
+              "p50": 44.8,
+              "p99": 52.608000000000004
+            },
+            "qb_diagnostic_us": {
+              "n": 55,
+              "p50": 355.776,
+              "p99": 392.48
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 4,
+            "target_graphs": 5,
+            "target_span_ms": {
+              "n": 5,
+              "p50": 51.537728,
+              "p99": 56.255872
+            },
+            "q_norm_us": {
+              "n": 5,
+              "p50": 22.304000000000002,
+              "p99": 36.384
+            },
+            "kv_norm_us": {
+              "n": 5,
+              "p50": 18.24,
+              "p99": 18.528
+            },
+            "pre_qb_bound_us": {
+              "n": 5,
+              "p50": 44.352000000000004,
+              "p99": 58.272
+            },
+            "qb_diagnostic_us": {
+              "n": 5,
+              "p50": 354.368,
+              "p99": 360.544
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 8,
+            "target_graphs": 215,
+            "target_span_ms": {
+              "n": 215,
+              "p50": 73.078176,
+              "p99": 86.885664
+            },
+            "q_norm_us": {
+              "n": 215,
+              "p50": 22.464,
+              "p99": 30.496000000000002
+            },
+            "kv_norm_us": {
+              "n": 215,
+              "p50": 18.624,
+              "p99": 19.616
+            },
+            "pre_qb_bound_us": {
+              "n": 215,
+              "p50": 44.736000000000004,
+              "p99": 53.696
+            },
+            "qb_diagnostic_us": {
+              "n": 215,
+              "p50": 357.696,
+              "p99": 400.928
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 4,
+            "target_graphs": 3,
+            "target_span_ms": {
+              "n": 3,
+              "p50": 54.913568,
+              "p99": 57.525376
+            },
+            "q_norm_us": {
+              "n": 3,
+              "p50": 26.016,
+              "p99": 49.472
+            },
+            "kv_norm_us": {
+              "n": 3,
+              "p50": 18.176,
+              "p99": 26.272
+            },
+            "pre_qb_bound_us": {
+              "n": 3,
+              "p50": 47.808,
+              "p99": 79.392
+            },
+            "qb_diagnostic_us": {
+              "n": 3,
+              "p50": 360.99199999999996,
+              "p99": 367.456
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 8,
+            "target_graphs": 4,
+            "target_span_ms": {
+              "n": 4,
+              "p50": 78.78847999999999,
+              "p99": 81.988736
+            },
+            "q_norm_us": {
+              "n": 4,
+              "p50": 22.560000000000002,
+              "p99": 22.88
+            },
+            "kv_norm_us": {
+              "n": 4,
+              "p50": 18.863999999999997,
+              "p99": 18.912
+            },
+            "pre_qb_bound_us": {
+              "n": 4,
+              "p50": 45.007999999999996,
+              "p99": 45.312
+            },
+            "qb_diagnostic_us": {
+              "n": 4,
+              "p50": 357.632,
+              "p99": 361.056
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 16,
+            "target_graphs": 201,
+            "target_span_ms": {
+              "n": 201,
+              "p50": 98.228224,
+              "p99": 125.435232
+            },
+            "q_norm_us": {
+              "n": 201,
+              "p50": 22.496000000000002,
+              "p99": 30.08
+            },
+            "kv_norm_us": {
+              "n": 201,
+              "p50": 18.464,
+              "p99": 21.024
+            },
+            "pre_qb_bound_us": {
+              "n": 201,
+              "p50": 44.608000000000004,
+              "p99": 55.072
+            },
+            "qb_diagnostic_us": {
+              "n": 201,
+              "p50": 362.11199999999997,
+              "p99": 372.128
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 4,
+            "target_graphs": 146,
+            "target_span_ms": {
+              "n": 146,
+              "p50": 52.146144,
+              "p99": 57.161344
+            },
+            "q_norm_us": {
+              "n": 146,
+              "p50": 22.128,
+              "p99": 43.712
+            },
+            "kv_norm_us": {
+              "n": 146,
+              "p50": 18.304,
+              "p99": 27.936
+            },
+            "pre_qb_bound_us": {
+              "n": 146,
+              "p50": 44.064,
+              "p99": 68.19200000000001
+            },
+            "qb_diagnostic_us": {
+              "n": 146,
+              "p50": 355.952,
+              "p99": 422.20799999999997
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 8,
+            "target_graphs": 238,
+            "target_span_ms": {
+              "n": 238,
+              "p50": 76.795008,
+              "p99": 84.113408
+            },
+            "q_norm_us": {
+              "n": 238,
+              "p50": 22.4,
+              "p99": 38.112
+            },
+            "kv_norm_us": {
+              "n": 238,
+              "p50": 18.448,
+              "p99": 26.688
+            },
+            "pre_qb_bound_us": {
+              "n": 238,
+              "p50": 44.448,
+              "p99": 68.352
+            },
+            "qb_diagnostic_us": {
+              "n": 238,
+              "p50": 355.456,
+              "p99": 402.176
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 4,
+            "target_graphs": 394,
+            "target_span_ms": {
+              "n": 394,
+              "p50": 51.5124,
+              "p99": 65.28848
+            },
+            "q_norm_us": {
+              "n": 394,
+              "p50": 22.272,
+              "p99": 37.216
+            },
+            "kv_norm_us": {
+              "n": 394,
+              "p50": 18.464,
+              "p99": 27.072
+            },
+            "pre_qb_bound_us": {
+              "n": 394,
+              "p50": 44.352000000000004,
+              "p99": 68.416
+            },
+            "qb_diagnostic_us": {
+              "n": 394,
+              "p50": 354.176,
+              "p99": 401.44
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 8,
+            "target_graphs": 3,
+            "target_span_ms": {
+              "n": 3,
+              "p50": 71.599648,
+              "p99": 71.83936
+            },
+            "q_norm_us": {
+              "n": 3,
+              "p50": 23.008,
+              "p99": 53.856
+            },
+            "kv_norm_us": {
+              "n": 3,
+              "p50": 19.104,
+              "p99": 21.152
+            },
+            "pre_qb_bound_us": {
+              "n": 3,
+              "p50": 45.184,
+              "p99": 78.49600000000001
+            },
+            "qb_diagnostic_us": {
+              "n": 3,
+              "p50": 358.848,
+              "p99": 369.216
+            }
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 8,
+            "target_graphs": 34,
+            "target_span_ms": {
+              "n": 34,
+              "p50": 77.935856,
+              "p99": 82.198016
+            },
+            "q_norm_us": {
+              "n": 34,
+              "p50": 22.496000000000002,
+              "p99": 25.824
+            },
+            "kv_norm_us": {
+              "n": 34,
+              "p50": 18.656,
+              "p99": 19.616
+            },
+            "pre_qb_bound_us": {
+              "n": 34,
+              "p50": 44.768,
+              "p99": 47.584
+            },
+            "qb_diagnostic_us": {
+              "n": 34,
+              "p50": 356.192,
+              "p99": 494.016
+            }
+          }
+        ],
+        "denominators": [
+          {
+            "phase": "concurrency/1",
+            "rows": 4,
+            "eligible": 172,
+            "accepted": 140,
+            "excluded": 32,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 20,
+              "nonmonotonic_kernel_timestamps": 12
+            }
+          },
+          {
+            "phase": "concurrency/1",
+            "rows": 8,
+            "eligible": 62,
+            "accepted": 55,
+            "excluded": 7,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 7
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 4,
+            "eligible": 8,
+            "accepted": 5,
+            "excluded": 3,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 3
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 8,
+            "eligible": 254,
+            "accepted": 215,
+            "excluded": 39,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 21,
+              "nonmonotonic_kernel_timestamps": 18
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 16,
+            "eligible": 252,
+            "accepted": 201,
+            "excluded": 51,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 10,
+              "nonmonotonic_kernel_timestamps": 41
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 4,
+            "eligible": 4,
+            "accepted": 3,
+            "excluded": 1,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 1
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 8,
+            "eligible": 7,
+            "accepted": 4,
+            "excluded": 3,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 3
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 4,
+            "eligible": 176,
+            "accepted": 146,
+            "excluded": 30,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 12,
+              "nonmonotonic_kernel_timestamps": 18
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 8,
+            "eligible": 250,
+            "accepted": 238,
+            "excluded": 12,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 10,
+              "nonmonotonic_kernel_timestamps": 2
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 4,
+            "eligible": 460,
+            "accepted": 394,
+            "excluded": 66,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 30,
+              "nonmonotonic_kernel_timestamps": 36
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 8,
+            "eligible": 4,
+            "accepted": 3,
+            "excluded": 1,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 1
+            }
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 4,
+            "eligible": 1,
+            "accepted": 0,
+            "excluded": 1,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 1
+            }
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 8,
+            "eligible": 55,
+            "accepted": 34,
+            "excluded": 21,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 21
+            }
+          }
+        ]
+      },
+      {
+        "full_target_graphs": 1705,
+        "attributed_graphs": 1303,
+        "excluded_graphs": {
+          "phase_boundary_clock_uncertainty_and_empirical_guard": 115,
+          "nonmonotonic_kernel_timestamps": 287
+        },
+        "summaries": [
+          {
+            "phase": "concurrency/1",
+            "rows": 4,
+            "target_graphs": 120,
+            "target_span_ms": {
+              "n": 120,
+              "p50": 51.912256,
+              "p99": 55.69824
+            },
+            "q_norm_us": {
+              "n": 120,
+              "p50": 22.528,
+              "p99": 35.488
+            },
+            "kv_norm_us": {
+              "n": 120,
+              "p50": 18.816,
+              "p99": 25.888
+            },
+            "pre_qb_bound_us": {
+              "n": 120,
+              "p50": 44.96,
+              "p99": 64.8
+            },
+            "qb_diagnostic_us": {
+              "n": 120,
+              "p50": 361.888,
+              "p99": 418.56
+            }
+          },
+          {
+            "phase": "concurrency/1",
+            "rows": 8,
+            "target_graphs": 55,
+            "target_span_ms": {
+              "n": 55,
+              "p50": 74.946176,
+              "p99": 82.229472
+            },
+            "q_norm_us": {
+              "n": 55,
+              "p50": 22.656,
+              "p99": 32.352000000000004
+            },
+            "kv_norm_us": {
+              "n": 55,
+              "p50": 18.624,
+              "p99": 22.624
+            },
+            "pre_qb_bound_us": {
+              "n": 55,
+              "p50": 44.928,
+              "p99": 58.432
+            },
+            "qb_diagnostic_us": {
+              "n": 55,
+              "p50": 362.11199999999997,
+              "p99": 377.92
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 4,
+            "target_graphs": 4,
+            "target_span_ms": {
+              "n": 4,
+              "p50": 51.99256,
+              "p99": 56.263584
+            },
+            "q_norm_us": {
+              "n": 4,
+              "p50": 23.04,
+              "p99": 27.904
+            },
+            "kv_norm_us": {
+              "n": 4,
+              "p50": 20.351999999999997,
+              "p99": 22.878999999999998
+            },
+            "pre_qb_bound_us": {
+              "n": 4,
+              "p50": 46.912000000000006,
+              "p99": 54.464
+            },
+            "qb_diagnostic_us": {
+              "n": 4,
+              "p50": 380.048,
+              "p99": 406.304
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 8,
+            "target_graphs": 187,
+            "target_span_ms": {
+              "n": 187,
+              "p50": 73.104896,
+              "p99": 86.883552
+            },
+            "q_norm_us": {
+              "n": 187,
+              "p50": 22.560000000000002,
+              "p99": 28.576
+            },
+            "kv_norm_us": {
+              "n": 187,
+              "p50": 18.784,
+              "p99": 23.552
+            },
+            "pre_qb_bound_us": {
+              "n": 187,
+              "p50": 44.96,
+              "p99": 51.647999999999996
+            },
+            "qb_diagnostic_us": {
+              "n": 187,
+              "p50": 362.784,
+              "p99": 391.872
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 4,
+            "target_graphs": 1,
+            "target_span_ms": {
+              "n": 1,
+              "p50": 57.516768,
+              "p99": 57.516768
+            },
+            "q_norm_us": {
+              "n": 1,
+              "p50": 21.984,
+              "p99": 21.984
+            },
+            "kv_norm_us": {
+              "n": 1,
+              "p50": 19.04,
+              "p99": 19.04
+            },
+            "pre_qb_bound_us": {
+              "n": 1,
+              "p50": 44.448,
+              "p99": 44.448
+            },
+            "qb_diagnostic_us": {
+              "n": 1,
+              "p50": 356.32,
+              "p99": 356.32
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 8,
+            "target_graphs": 3,
+            "target_span_ms": {
+              "n": 3,
+              "p50": 77.982496,
+              "p99": 81.9736
+            },
+            "q_norm_us": {
+              "n": 3,
+              "p50": 22.624000000000002,
+              "p99": 22.816
+            },
+            "kv_norm_us": {
+              "n": 3,
+              "p50": 18.656,
+              "p99": 18.656
+            },
+            "pre_qb_bound_us": {
+              "n": 3,
+              "p50": 44.8,
+              "p99": 44.832
+            },
+            "qb_diagnostic_us": {
+              "n": 3,
+              "p50": 366.688,
+              "p99": 367.808
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 16,
+            "target_graphs": 211,
+            "target_span_ms": {
+              "n": 211,
+              "p50": 96.285088,
+              "p99": 125.430784
+            },
+            "q_norm_us": {
+              "n": 211,
+              "p50": 22.592,
+              "p99": 27.68
+            },
+            "kv_norm_us": {
+              "n": 211,
+              "p50": 18.624,
+              "p99": 20.48
+            },
+            "pre_qb_bound_us": {
+              "n": 211,
+              "p50": 44.864000000000004,
+              "p99": 50.976
+            },
+            "qb_diagnostic_us": {
+              "n": 211,
+              "p50": 367.74399999999997,
+              "p99": 382.496
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 4,
+            "target_graphs": 112,
+            "target_span_ms": {
+              "n": 112,
+              "p50": 52.18824,
+              "p99": 56.880064
+            },
+            "q_norm_us": {
+              "n": 112,
+              "p50": 22.240000000000002,
+              "p99": 40.192
+            },
+            "kv_norm_us": {
+              "n": 112,
+              "p50": 18.592,
+              "p99": 26.016
+            },
+            "pre_qb_bound_us": {
+              "n": 112,
+              "p50": 44.480000000000004,
+              "p99": 67.008
+            },
+            "qb_diagnostic_us": {
+              "n": 112,
+              "p50": 358.176,
+              "p99": 404.288
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 8,
+            "target_graphs": 237,
+            "target_span_ms": {
+              "n": 237,
+              "p50": 76.787392,
+              "p99": 84.162208
+            },
+            "q_norm_us": {
+              "n": 237,
+              "p50": 22.336,
+              "p99": 34.08
+            },
+            "kv_norm_us": {
+              "n": 237,
+              "p50": 18.528,
+              "p99": 24.448
+            },
+            "pre_qb_bound_us": {
+              "n": 237,
+              "p50": 44.480000000000004,
+              "p99": 55.968
+            },
+            "qb_diagnostic_us": {
+              "n": 237,
+              "p50": 360.128,
+              "p99": 405.664
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 4,
+            "target_graphs": 336,
+            "target_span_ms": {
+              "n": 336,
+              "p50": 51.477888,
+              "p99": 66.345088
+            },
+            "q_norm_us": {
+              "n": 336,
+              "p50": 22.432000000000002,
+              "p99": 38.976
+            },
+            "kv_norm_us": {
+              "n": 336,
+              "p50": 18.752,
+              "p99": 28.32
+            },
+            "pre_qb_bound_us": {
+              "n": 336,
+              "p50": 44.832,
+              "p99": 68.64
+            },
+            "qb_diagnostic_us": {
+              "n": 336,
+              "p50": 360.20799999999997,
+              "p99": 413.536
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 8,
+            "target_graphs": 4,
+            "target_span_ms": {
+              "n": 4,
+              "p50": 69.90776,
+              "p99": 71.843648
+            },
+            "q_norm_us": {
+              "n": 4,
+              "p50": 22.560000000000002,
+              "p99": 22.752000000000002
+            },
+            "kv_norm_us": {
+              "n": 4,
+              "p50": 18.464,
+              "p99": 18.592
+            },
+            "pre_qb_bound_us": {
+              "n": 4,
+              "p50": 44.592,
+              "p99": 44.896
+            },
+            "qb_diagnostic_us": {
+              "n": 4,
+              "p50": 356.784,
+              "p99": 360.99199999999996
+            }
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 8,
+            "target_graphs": 33,
+            "target_span_ms": {
+              "n": 33,
+              "p50": 77.977728,
+              "p99": 82.19232
+            },
+            "q_norm_us": {
+              "n": 33,
+              "p50": 22.528,
+              "p99": 28.288
+            },
+            "kv_norm_us": {
+              "n": 33,
+              "p50": 18.656,
+              "p99": 33.568
+            },
+            "pre_qb_bound_us": {
+              "n": 33,
+              "p50": 44.768,
+              "p99": 65.248
+            },
+            "qb_diagnostic_us": {
+              "n": 33,
+              "p50": 361.312,
+              "p99": 392.192
+            }
+          }
+        ],
+        "denominators": [
+          {
+            "phase": "concurrency/1",
+            "rows": 4,
+            "eligible": 172,
+            "accepted": 120,
+            "excluded": 52,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 39,
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 13
+            }
+          },
+          {
+            "phase": "concurrency/1",
+            "rows": 8,
+            "eligible": 62,
+            "accepted": 55,
+            "excluded": 7,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 2,
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 5
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 4,
+            "eligible": 8,
+            "accepted": 4,
+            "excluded": 4,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 4
+            }
+          },
+          {
+            "phase": "concurrency/2",
+            "rows": 8,
+            "eligible": 254,
+            "accepted": 187,
+            "excluded": 67,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 15,
+              "nonmonotonic_kernel_timestamps": 52
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 16,
+            "eligible": 252,
+            "accepted": 211,
+            "excluded": 41,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 13,
+              "nonmonotonic_kernel_timestamps": 28
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 4,
+            "eligible": 4,
+            "accepted": 1,
+            "excluded": 3,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 2,
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 1
+            }
+          },
+          {
+            "phase": "concurrency/4",
+            "rows": 8,
+            "eligible": 7,
+            "accepted": 3,
+            "excluded": 4,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 1,
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 3
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 4,
+            "eligible": 176,
+            "accepted": 112,
+            "excluded": 64,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 14,
+              "nonmonotonic_kernel_timestamps": 50
+            }
+          },
+          {
+            "phase": "decode/code",
+            "rows": 8,
+            "eligible": 250,
+            "accepted": 237,
+            "excluded": 13,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 10,
+              "nonmonotonic_kernel_timestamps": 3
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 4,
+            "eligible": 460,
+            "accepted": 336,
+            "excluded": 124,
+            "reasons": {
+              "nonmonotonic_kernel_timestamps": 105,
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 19
+            }
+          },
+          {
+            "phase": "decode/prose",
+            "rows": 8,
+            "eligible": 4,
+            "accepted": 4,
+            "excluded": 0,
+            "reasons": {}
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 4,
+            "eligible": 1,
+            "accepted": 0,
+            "excluded": 1,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 1
+            }
+          },
+          {
+            "phase": "decode/structured",
+            "rows": 8,
+            "eligible": 55,
+            "accepted": 33,
+            "excluded": 22,
+            "reasons": {
+              "phase_boundary_clock_uncertainty_and_empirical_guard": 21,
+              "nonmonotonic_kernel_timestamps": 1
+            }
+          }
+        ]
+      }
+    ],
+    "joint": {
+      "method": "Equal-length ordered synchronous target graphs; unanimous shape and phase; all four ranks must pass attribution and boundary guards. Sum eleven per-layer rank maxima for the optimistic bound; max rank graph span for denominator. Q-B GEMM excluded.",
+      "interpretation": "Descriptive retained-subset bound, not a candidate speedup or confidence interval; one profiled execution, timestamp exclusions may select by shape.",
+      "examined_graphs": 1705,
+      "accepted_graphs": 870,
+      "excluded_graphs": 835,
+      "shape_mismatches": 0,
+      "phase_mismatches": 0,
+      "rank_start_skew_ms": {
+        "n": 1705,
+        "p50": 8.941958,
+        "p99": 9.058566
+      },
+      "rank_start_skew_max_ms": 9.131942,
+      "summaries": [
+        {
+          "phase": "concurrency/1",
+          "rows": 4,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 79,
+            "p50": 52.352000000000004,
+            "p99": 79.104
+          },
+          "max_rank_target_span_ms": {
+            "n": 79,
+            "p50": 51.889248,
+            "p99": 55.675168
+          },
+          "optimistic_fraction_percent": {
+            "n": 79,
+            "p50": 0.10009108480340119,
+            "p99": 0.1507514704671649
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 79,
+            "p50": 28.448,
+            "p99": 52.800000000000004
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 79,
+            "p50": 19.744,
+            "p99": 29.984
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 79,
+            "p50": 372.608,
+            "p99": 422.62399999999997
+          }
+        },
+        {
+          "phase": "concurrency/1",
+          "rows": 8,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 38,
+            "p50": 50.688,
+            "p99": 91.136
+          },
+          "max_rank_target_span_ms": {
+            "n": 38,
+            "p50": 74.93387200000001,
+            "p99": 82.23264
+          },
+          "optimistic_fraction_percent": {
+            "n": 38,
+            "p50": 0.06811237402637657,
+            "p99": 0.1353361306601913
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 38,
+            "p50": 26.704,
+            "p99": 64.736
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 38,
+            "p50": 19.92,
+            "p99": 34.144
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 38,
+            "p50": 372.0,
+            "p99": 410.62399999999997
+          }
+        },
+        {
+          "phase": "concurrency/2",
+          "rows": 4,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 2,
+            "p50": 60.495999999999995,
+            "p99": 65.856
+          },
+          "max_rank_target_span_ms": {
+            "n": 2,
+            "p50": 51.128864,
+            "p99": 52.74752
+          },
+          "optimistic_fraction_percent": {
+            "n": 2,
+            "p50": 0.11877156532614758,
+            "p99": 0.13301499359485622
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 2,
+            "p50": 35.744,
+            "p99": 43.136
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 2,
+            "p50": 21.648,
+            "p99": 23.68
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 2,
+            "p50": 387.904,
+            "p99": 406.304
+          }
+        },
+        {
+          "phase": "concurrency/2",
+          "rows": 8,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 148,
+            "p50": 48.496,
+            "p99": 85.792
+          },
+          "max_rank_target_span_ms": {
+            "n": 148,
+            "p50": 72.652416,
+            "p99": 83.655456
+          },
+          "optimistic_fraction_percent": {
+            "n": 148,
+            "p50": 0.06830088449295761,
+            "p99": 0.12534881549691732
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 148,
+            "p50": 25.488,
+            "p99": 50.816
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 148,
+            "p50": 19.695999999999998,
+            "p99": 37.664
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 148,
+            "p50": 366.848,
+            "p99": 540.512
+          }
+        },
+        {
+          "phase": "concurrency/4",
+          "rows": 4,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 1,
+            "p50": 48.608000000000004,
+            "p99": 48.608000000000004
+          },
+          "max_rank_target_span_ms": {
+            "n": 1,
+            "p50": 57.525376,
+            "p99": 57.525376
+          },
+          "optimistic_fraction_percent": {
+            "n": 1,
+            "p50": 0.0844983612101901,
+            "p99": 0.0844983612101901
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 1,
+            "p50": 26.336,
+            "p99": 26.336
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 1,
+            "p50": 19.232,
+            "p99": 19.232
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 1,
+            "p50": 367.456,
+            "p99": 367.456
+          }
+        },
+        {
+          "phase": "concurrency/4",
+          "rows": 8,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 3,
+            "p50": 51.168,
+            "p99": 57.248000000000005
+          },
+          "max_rank_target_span_ms": {
+            "n": 3,
+            "p50": 77.986432,
+            "p99": 81.988736
+          },
+          "optimistic_fraction_percent": {
+            "n": 3,
+            "p50": 0.06433939688380667,
+            "p99": 0.07666943516611426
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 3,
+            "p50": 28.608,
+            "p99": 31.744
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 3,
+            "p50": 19.584,
+            "p99": 22.080000000000002
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 3,
+            "p50": 374.048,
+            "p99": 391.328
+          }
+        },
+        {
+          "phase": "concurrency/4",
+          "rows": 16,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 110,
+            "p50": 47.728,
+            "p99": 68.32
+          },
+          "max_rank_target_span_ms": {
+            "n": 110,
+            "p50": 100.57121599999999,
+            "p99": 125.895488
+          },
+          "optimistic_fraction_percent": {
+            "n": 110,
+            "p50": 0.04935380573227742,
+            "p99": 0.0722160411939194
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 110,
+            "p50": 25.104,
+            "p99": 40.16
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 110,
+            "p50": 19.584,
+            "p99": 32.48
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 110,
+            "p50": 370.672,
+            "p99": 386.336
+          }
+        },
+        {
+          "phase": "decode/code",
+          "rows": 4,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 65,
+            "p50": 54.592,
+            "p99": 85.088
+          },
+          "max_rank_target_span_ms": {
+            "n": 65,
+            "p50": 52.148096,
+            "p99": 56.881152
+          },
+          "optimistic_fraction_percent": {
+            "n": 65,
+            "p50": 0.1063224268437008,
+            "p99": 0.16156068487869954
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 65,
+            "p50": 29.536,
+            "p99": 55.616
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 65,
+            "p50": 19.872,
+            "p99": 34.208
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 65,
+            "p50": 373.632,
+            "p99": 408.0
+          }
+        },
+        {
+          "phase": "decode/code",
+          "rows": 8,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 183,
+            "p50": 48.544,
+            "p99": 96.896
+          },
+          "max_rank_target_span_ms": {
+            "n": 183,
+            "p50": 77.09632,
+            "p99": 83.750496
+          },
+          "optimistic_fraction_percent": {
+            "n": 183,
+            "p50": 0.06355402482137748,
+            "p99": 0.11483032946596312
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 183,
+            "p50": 25.504,
+            "p99": 57.088
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 183,
+            "p50": 19.616,
+            "p99": 35.872
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 183,
+            "p50": 365.152,
+            "p99": 502.23999999999995
+          }
+        },
+        {
+          "phase": "decode/prose",
+          "rows": 4,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 210,
+            "p50": 53.152,
+            "p99": 101.6
+          },
+          "max_rank_target_span_ms": {
+            "n": 210,
+            "p50": 51.493424000000005,
+            "p99": 58.7128
+          },
+          "optimistic_fraction_percent": {
+            "n": 210,
+            "p50": 0.10242440350727494,
+            "p99": 0.19689975647869026
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 210,
+            "p50": 28.176000000000002,
+            "p99": 62.944
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 210,
+            "p50": 19.823999999999998,
+            "p99": 37.216
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 210,
+            "p50": 371.68,
+            "p99": 443.104
+          }
+        },
+        {
+          "phase": "decode/prose",
+          "rows": 8,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 3,
+            "p50": 57.472,
+            "p99": 80.256
+          },
+          "max_rank_target_span_ms": {
+            "n": 3,
+            "p50": 71.60464,
+            "p99": 71.843648
+          },
+          "optimistic_fraction_percent": {
+            "n": 3,
+            "p50": 0.08026295502637817,
+            "p99": 0.11170924950804278
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 3,
+            "p50": 34.368,
+            "p99": 54.816
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 3,
+            "p50": 19.968,
+            "p99": 22.048000000000002
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 3,
+            "p50": 364.448,
+            "p99": 369.216
+          }
+        },
+        {
+          "phase": "decode/structured",
+          "rows": 8,
+          "layerwise_max_pre_qb_bound_us": {
+            "n": 28,
+            "p50": 48.64,
+            "p99": 75.872
+          },
+          "max_rank_target_span_ms": {
+            "n": 28,
+            "p50": 77.940064,
+            "p99": 82.198016
+          },
+          "optimistic_fraction_percent": {
+            "n": 28,
+            "p50": 0.0619840885393334,
+            "p99": 0.09686304276599343
+          },
+          "layerwise_max_q_norm_us": {
+            "n": 28,
+            "p50": 25.616,
+            "p99": 40.192
+          },
+          "layerwise_max_kv_norm_us": {
+            "n": 28,
+            "p50": 19.536,
+            "p99": 38.144
+          },
+          "max_rank_qb_diagnostic_us": {
+            "n": 28,
+            "p50": 364.336,
+            "p99": 494.016
+          }
+        }
+      ],
+      "denominators": [
+        {
+          "phase": "concurrency/1",
+          "rows": 4,
+          "examined": 172,
+          "accepted": 79,
+          "excluded": 93,
+          "reasons": {
+            "nonmonotonic_kernel_timestamps": 82,
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 20
+          }
+        },
+        {
+          "phase": "concurrency/1",
+          "rows": 8,
+          "examined": 62,
+          "accepted": 38,
+          "excluded": 24,
+          "reasons": {
+            "nonmonotonic_kernel_timestamps": 20,
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 7
+          }
+        },
+        {
+          "phase": "concurrency/2",
+          "rows": 4,
+          "examined": 8,
+          "accepted": 2,
+          "excluded": 6,
+          "reasons": {
+            "nonmonotonic_kernel_timestamps": 6,
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 3
+          }
+        },
+        {
+          "phase": "concurrency/2",
+          "rows": 8,
+          "examined": 254,
+          "accepted": 148,
+          "excluded": 106,
+          "reasons": {
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 21,
+            "nonmonotonic_kernel_timestamps": 93
+          }
+        },
+        {
+          "phase": "concurrency/4",
+          "rows": 16,
+          "examined": 252,
+          "accepted": 110,
+          "excluded": 142,
+          "reasons": {
+            "nonmonotonic_kernel_timestamps": 138,
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 14
+          }
+        },
+        {
+          "phase": "concurrency/4",
+          "rows": 4,
+          "examined": 4,
+          "accepted": 1,
+          "excluded": 3,
+          "reasons": {
+            "nonmonotonic_kernel_timestamps": 2,
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 1
+          }
+        },
+        {
+          "phase": "concurrency/4",
+          "rows": 8,
+          "examined": 7,
+          "accepted": 3,
+          "excluded": 4,
+          "reasons": {
+            "nonmonotonic_kernel_timestamps": 2,
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 3
+          }
+        },
+        {
+          "phase": "decode/code",
+          "rows": 4,
+          "examined": 176,
+          "accepted": 65,
+          "excluded": 111,
+          "reasons": {
+            "nonmonotonic_kernel_timestamps": 106,
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 15
+          }
+        },
+        {
+          "phase": "decode/code",
+          "rows": 8,
+          "examined": 250,
+          "accepted": 183,
+          "excluded": 67,
+          "reasons": {
+            "nonmonotonic_kernel_timestamps": 60,
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 10
+          }
+        },
+        {
+          "phase": "decode/prose",
+          "rows": 4,
+          "examined": 460,
+          "accepted": 210,
+          "excluded": 250,
+          "reasons": {
+            "nonmonotonic_kernel_timestamps": 234,
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 31
+          }
+        },
+        {
+          "phase": "decode/prose",
+          "rows": 8,
+          "examined": 4,
+          "accepted": 3,
+          "excluded": 1,
+          "reasons": {
+            "nonmonotonic_kernel_timestamps": 1
+          }
+        },
+        {
+          "phase": "decode/structured",
+          "rows": 4,
+          "examined": 1,
+          "accepted": 0,
+          "excluded": 1,
+          "reasons": {
+            "nonmonotonic_kernel_timestamps": 1,
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 1
+          }
+        },
+        {
+          "phase": "decode/structured",
+          "rows": 8,
+          "examined": 55,
+          "accepted": 28,
+          "excluded": 27,
+          "reasons": {
+            "phase_boundary_clock_uncertainty_and_empirical_guard": 21,
+            "nonmonotonic_kernel_timestamps": 10
+          }
+        }
+      ]
+    },
+    "percentiles": "p50 median; p99 observed nearest index round((n-1)*0.99), no interpolation",
+    "clock_probe_uncertainty_ns_per_rank": [
+      55218001,
+      52549531,
+      63780212,
+      52257855
+    ],
+    "empirical_phase_guard_ns": 1000000000,
+    "phase_guard": "One second empirical guard plus pre/post SSH midpoint clock uncertainty; stdout delay and clock drift between probes are unbounded",
+    "removable_time": "Sum of eleven layerwise maximum rank intervals from QKV-A end to Q-B start; optimistically includes both RMSNorms and gaps, assumes zero fusion/materialization cost. Q-B GEMM excluded; max rank target graph span is an optimistic denominator.",
+    "limits": [
+      "One profiled execution, no independent repeats or paired 95% candidate interval",
+      "Four ranks are one synchronized observation, not four replicates",
+      "Timestamp exclusions are shape-dependent; retained-subset bounds are not universal bounds",
+      "Profiler overhead and between-execution request variation are confounded",
+      "Sparse drain cells with 1-3 retained graphs do not support tail inference"
+    ]
+  },
+  "restoration": {
+    "status": "pass",
+    "health_200": true,
+    "coherent_gate": true,
+    "tool_gate": true,
+    "since_first_health_seconds": 3.7,
+    "operational_identity": "2026-09-30-e36-lm-head",
+    "within_two_minutes": true,
+    "autostart_preserved": true,
+    "immutable_files_checked": 33,
+    "immutable_files_unchanged": true
+  },
+  "evidence_hashes": {
+    "run-warmup.json": {
+      "sha256": "4166a84dd3576b7f190fbc9e0353ed7f3d5d2b60cddb7acbab6778dca87756bc",
+      "bytes": 65338
+    },
+    "run-profile.json": {
+      "sha256": "f256215a31d1ba104a807a086d9fdaa27acee319b716670101b757d9bcb647a2",
+      "bytes": 66032
+    },
+    "run-warmup.card.txt": {
+      "sha256": "f2ddb781fe1824fa2dcee63dd16dc5bfabf30d52d65c308077129a7fbbd89f74",
+      "bytes": 3324
+    },
+    "run-profile.card.txt": {
+      "sha256": "e582cf2805e035222de0b48cd0771e45d234a722a526404c1ef90e1f010225b5",
+      "bytes": 3324
+    },
+    "run-profile.timeline.jsonl": {
+      "sha256": "afea48cfda7d18bb90d403bd5c5ad8e8dc7cebd9b48724e04987098f3b3c84c0",
+      "bytes": 8220
+    },
+    "analysis.json": {
+      "sha256": "d73d34bc7c026cb66c72f702342748d178adae138b55f038a9409f246c7f164e",
+      "bytes": 14887984
+    },
+    "joint-analysis.json": {
+      "sha256": "4fa76985d18d6120de14ecd15ee7b1e28f4a8e5f7df26bd6f374a72079b76f8c",
+      "bytes": 782053
+    },
+    "clock-offsets.json": {
+      "sha256": "083f3ff97a925ecf963b3c65ba600dbf587aaaaf067db86d6821c50c2de0f1c0",
+      "bytes": 6118
+    },
+    "profile-r0.nsys-rep": {
+      "sha256": "0630d2876e0902b7cb97ddf06c617fa66691f1529a358e134c99fa2b32c3e633",
+      "bytes": 149105679
+    },
+    "profile-r0.sqlite": {
+      "sha256": "f5598b5ec84649eeb936022b0d18446c019822249c4fb0100fae332c7a55f3c9",
+      "bytes": 469626880
+    },
+    "profile-r1.nsys-rep": {
+      "sha256": "20d7b98095f394261c2fbea190f9d688b18082cecbc9a0a8d87bc9b170fc4400",
+      "bytes": 146229585
+    },
+    "profile-r1.sqlite": {
+      "sha256": "12c72a645466746bd2a7a88629bf15296be898275c869260da03a62aa9599311",
+      "bytes": 455544832
+    },
+    "profile-r2.nsys-rep": {
+      "sha256": "ca208c014ed1eebc19cd25d0fced10957fe626755285d673d51ea461afafd600",
+      "bytes": 146164451
+    },
+    "profile-r2.sqlite": {
+      "sha256": "9439770df77738b6f2223f65844d498537d931bf3959ba06ff425a017e8a47d8",
+      "bytes": 459497472
+    },
+    "profile-r3.nsys-rep": {
+      "sha256": "e8a2687128aa29b9be88915f9b655a92bfa8f3526e87d9ff45210fa90e85a744",
+      "bytes": 147052337
+    },
+    "profile-r3.sqlite": {
+      "sha256": "a87ea21ee4fd4d55a9427f9ab41f610298bde3f1684fda3eedce8d79cb9df24b",
+      "bytes": 466898944
+    },
+    "native-counts.json": {
+      "sha256": "45c56a3707b531ba3845816a9ac1906ba894f48cd5dd2d48410e2166e67db0ff",
+      "bytes": 2808
+    },
+    "profile-gates.json": {
+      "sha256": "246c9169164fc7cc71712582c7cae3b1a1b9a034d332863d5f887caf7b88bafd",
+      "bytes": 366
+    },
+    "restore-gates.json": {
+      "sha256": "d35f02a7f886d983e0b2e367727c196c246b85a362f971bd31287d77fce1626b",
+      "bytes": 365
+    },
+    "restore-identity.log": {
+      "sha256": "f0fb384c80e32d393efa8141f8b36f7c295c62db23a6e323704bc099f7ad3842",
+      "bytes": 34
+    },
+    "restoration.json": {
+      "sha256": "cacd6a4b16e7cbb512527c907288171928e607963fb79e7062299a7620a0a80d",
+      "bytes": 1054
+    },
+    "final-review.json": {
+      "sha256": "5510c266b59797e825b4c2bb5ad234139eaedae043e0b23dfe0f930d7ee94377",
+      "bytes": 1904
+    },
+    "closure-review.json": {
+      "sha256": "01744c540c81c581f57626fb24489a7023e60b6ac3ccb7197fc976f62e280151",
+      "bytes": 1212
+    },
+    "offline-check.json": {
+      "sha256": "48fc8e5bc1ffcd0c329acacfd758bfa7e9645351121311d8c87555fbdb37a366",
+      "bytes": 86
+    },
+    "offline-check.log": {
+      "sha256": "d818e492f593635d715f34d1043cc7f8430f5811aeb131a215eb32277b495b06",
+      "bytes": 10016
+    },
+    "handoff-health.json": {
+      "sha256": "22957646fb1384488936f8789d8fc251a7411d05b035a7d1c0c6da264cb86aa2",
+      "bytes": 133
+    }
+  },
+  "analysis_source_hashes": {
+    "analyze_profile.py": "0feb1f3ebb227d72b7d177a2647b2aaf41505ee28a3aa1873f812f3571548041",
+    "joint_analysis.py": "6366d97d2f79ad20a137dc876c345d0202c270712e2b1a17ead636b24b0e6e8d",
+    "publish_extract.py": "592d1c72bf955ce34ced2df9fcd91e7cb4f426272ecb9bb5072118308ae06fcb",
+    "preregistration.md": "67f5d291088e2dcc9804e2d12636b808afbbdded13127f62c59473f8dbd9032e",
+    "profile.env": "3cc27bef233662b0e1606be862738d6d8556047566a4d1a9faa6c4221a2da755",
+    "entry.sh": "d10312a3bcf8d59c59c56112f2dac18fa3fb89853350312dbbf128255ad4a3dd"
+  },
+  "publication": "Portable numeric extract; raw site-specific native receipts, profiles and graph identities retained privately; no promotion or baseline replacement"
+}

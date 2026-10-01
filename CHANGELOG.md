@@ -7,6 +7,17 @@ Versions and releases are created only at the owner's explicit request.
 
 ### Added
 
+- An [E38 MLA preparation report](docs/benchmarks/experiments/2026-10-01-e38-mla-prep.md)
+  and portable extract record 48 native diagnostic requests and four-rank profiles
+  of the unchanged E36 engine. Independent review gives NO-GO to prototype:
+  realizable critical-path savings are not established and exact Marlin C++ provenance
+  remains unresolved. Candidate qualification and service comparison are skipped;
+  no recipe or frozen reference changes.
+- An [E37 collective microbenchmark report](docs/benchmarks/experiments/2026-10-01-e37-allreduce-butterfly.md)
+  and portable numeric extract record three profiles of neighbor-only butterfly
+  reductions against the production NCCL ring. All candidates are slower across
+  three confirmation blocks; independent review gives NO-GO. The checked
+  soak and serving overlay are skipped after disqualification; E36 remains the reference.
 - E36 is the new default: the vocab-parallel `lm_head` that the target shares with the
   DFlash2 drafter is packed INT8 W8A16 (group 128, Marlin) once at load, before CUDA graph
   capture, and its BF16 weight is freed (about 155 MB per rank net).
